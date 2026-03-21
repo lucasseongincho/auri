@@ -34,9 +34,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Dynamic import avoids issues with pdf-parse's test-file side-effect on import
+    // Dynamic import avoids issues with pdf-parse's test-file side-effect on import.
+    // In some bundler configs the module exposes .default instead of being directly callable.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>
+    const mod = require('pdf-parse')
+    const pdfParse = (typeof mod === 'function' ? mod : mod.default) as (buf: Buffer) => Promise<{ text: string }>
     const parsed = await pdfParse(buffer)
 
     const text = parsed.text
