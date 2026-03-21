@@ -13,7 +13,7 @@ interface ClassicProProps {
   isEditing?: boolean
 }
 
-export default function ClassicPro({ data, personal, isEditing }: ClassicProProps) {
+export default function ClassicPro({ data, personal, isEditing: _isEditing }: ClassicProProps) {
   return (
     <>
       <style>{`

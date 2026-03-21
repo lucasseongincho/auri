@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, FileText, RefreshCw, Target, Linkedin,
   Map, Mail, MessageSquare, Settings, ChevronRight,
-  Sparkles, User, Menu, X, Cloud, CloudOff,
+  Sparkles, User, Cloud, CloudOff,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
@@ -34,7 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname()
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false)
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const { isSyncing, syncError } = useCareerStore()
 
   const isActive = (href: string) => {

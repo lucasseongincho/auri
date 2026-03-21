@@ -24,7 +24,7 @@
 | Auth | Firebase Auth (Google OAuth + Email/Password) |
 | Database | Firebase Firestore |
 | File Storage: None — PDFs generated client-side via html2pdf.js on demand|
-| Hosting/Deploy | Firebase Hosting OR Vercel (Firebase for storage/auth/db) |
+| Hosting/Deploy | Vercel (Firebase for auth/db) — App URL: https://auri.vercel.app |
 | Resume Output | HTML → PDF (via Puppeteer on API route or `react-to-print` client-side) |
 | Styling System | Supanova Design System (see Section 9) |
 
@@ -591,7 +591,9 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 NEXT_PUBLIC_FIREBASE_APP_ID=
 
 ANTHROPIC_API_KEY=               # Server-side only, never expose to client
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000   # Production: https://auri.vercel.app
+
+STRIPE_WEBHOOK_SECRET=               # Add after first Vercel deploy (from Stripe dashboard webhook endpoint)
 ```
 
 **Security rule:** `ANTHROPIC_API_KEY` must NEVER be in any client-side code or `NEXT_PUBLIC_` variable. All Claude API calls go through server-side API routes only.

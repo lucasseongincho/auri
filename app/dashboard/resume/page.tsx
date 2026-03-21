@@ -1383,7 +1383,7 @@ export default function ResumePage() {
           {/* Step indicator */}
           <div className="flex-shrink-0 mb-4">
             <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide">
-              {STEPS.map((step, idx) => {
+              {STEPS.map((step, _idx) => {
                 const Icon = step.icon
                 const isActive = currentStep === step.id
                 const isDone = currentStep > step.id

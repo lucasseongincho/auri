@@ -13,7 +13,7 @@ interface MinimalSeoulProps {
   isEditing?: boolean
 }
 
-export default function MinimalSeoul({ data, personal, isEditing }: MinimalSeoulProps) {
+export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: MinimalSeoulProps) {
   return (
     <>
       <style>{`

@@ -26,11 +26,11 @@ interface AIAssistState {
 
 export default function ResumeEditor({
   resumeData,
-  personal,
+  personal: _personal,
   onDataChange,
   children,
 }: ResumeEditorProps) {
-  const { user } = useAuth()
+  useAuth() // auth context — user available for future AI assist attribution
   const { pushToHistory, undo, redo, canUndo, canRedo, profile } = useCareerStore()
   const editorRef = useRef<HTMLDivElement>(null)
   const [aiAssist, setAIAssist] = useState<AIAssistState>({
@@ -137,6 +137,7 @@ export default function ResumeEditor({
     } finally {
       setAIAssist((s) => ({ ...s, isLoading: false, isVisible: false }))
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aiAssist.selectedText, profile])
 
   // Sync contenteditable DOM changes back to ResumeData state

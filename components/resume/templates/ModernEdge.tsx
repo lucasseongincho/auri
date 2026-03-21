@@ -13,7 +13,7 @@ interface ModernEdgeProps {
   isEditing?: boolean
 }
 
-export default function ModernEdge({ data, personal, isEditing }: ModernEdgeProps) {
+export default function ModernEdge({ data, personal, isEditing: _isEditing }: ModernEdgeProps) {
   return (
     <>
       <style>{`

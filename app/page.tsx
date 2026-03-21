@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { motion, useInView, useAnimation, AnimatePresence } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 import {
-  FileText, Zap, Edit3, Layout, RefreshCw, Linkedin,
+  FileText, Edit3, Layout, RefreshCw, Linkedin,
   Map, Mail, MessageSquare, Star, CheckCircle, ArrowRight,
-  Sparkles, Target, TrendingUp, ChevronRight, Users,
+  Sparkles, Target, ChevronRight, Users,
 } from 'lucide-react'
 
 // Spring config per CLAUDE.md §9
@@ -511,7 +511,7 @@ export default function LandingPage() {
           </FadeInSection>
 
           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
-            {TEMPLATES.map((t, i) => (
+            {TEMPLATES.map((t) => (
               <motion.div
                 key={t.id}
                 whileHover={{ scale: 1.03, y: -4 }}

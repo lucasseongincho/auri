@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Target, CheckCircle, XCircle, AlertTriangle, Lightbulb, Zap, Loader2, TrendingUp } from 'lucide-react'
 import type { ATSScore } from '@/types'
 
@@ -16,10 +16,13 @@ interface ATSScorePanelProps {
 
 function ScoreMeter({ score, prevScore }: { score: number; prevScore?: number }) {
   const [displayed, setDisplayed] = useState(prevScore ?? 0)
+  const displayedRef = useRef(displayed)
   const circumference = 2 * Math.PI * 45
 
+  useEffect(() => { displayedRef.current = displayed })
+
   useEffect(() => {
-    const start = displayed
+    const start = displayedRef.current
     const end = score
     const duration = 1200
     const startTime = performance.now()
