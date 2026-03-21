@@ -83,8 +83,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const logout = useCallback(async () => {
-    await signOut(auth)
-    setUser(null)
+    // Always clear local state — even if Firebase signOut fails (e.g. guest mode, unconfigured)
+    try {
+      if (hasConfig) await signOut(auth)
+    } finally {
+      setUser(null)
+    }
   }, [])
 
   const continueAsGuest = useCallback(() => {
