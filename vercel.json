@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "app/api/claude/**": { "maxDuration": 60 },
+    "app/api/pdf/**": { "maxDuration": 30 }
+  },
+  "regions": ["iad1"]
+}
