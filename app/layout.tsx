@@ -36,25 +36,17 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'AURI',
     url: APP_URL,
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'AURI — AI-Powered Career Toolkit',
-      },
-    ],
+    // og:image is auto-injected by app/opengraph-image.tsx (Next.js file-based OG)
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AURI — AI-Powered Career Toolkit',
     description:
       'Build ATS-optimized resumes, rewrite your LinkedIn, craft cover letters, and prepare for interviews — powered by AI.',
-    images: ['/og-image.png'],
+    // twitter:image is auto-injected by app/twitter-image.tsx (falls back to opengraph-image)
   },
   icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    icon: '/favicon.svg',
   },
 }
 
