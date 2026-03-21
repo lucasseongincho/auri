@@ -23,22 +23,9 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    // pdfjs-dist (used internally by pdf-parse) requires DOMMatrix which doesn't
-    // exist in the Node.js serverless runtime — polyfill it before importing.
-    if (typeof globalThis.DOMMatrix === 'undefined') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(globalThis as any).DOMMatrix = class DOMMatrix {
-        // pdfjs only reads numeric properties off DOMMatrix; return 0 for all
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        constructor() { return new Proxy(this, { get: (_t, _p) => 0 }) }
-      }
-    }
-
-    // Dynamic import avoids issues with pdf-parse's test-file side-effect on import.
-    // In some bundler configs the module exposes .default instead of being directly callable.
+    // pdf-parse v1.1.1 — stable, exports a plain function
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('pdf-parse')
-    const pdfParse = (typeof mod === 'function' ? mod : mod.default) as (buf: Buffer) => Promise<{ text: string }>
+    const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string; numpages: number }>
     const parsed = await pdfParse(buffer)
 
     const text = parsed.text
@@ -48,7 +35,10 @@ export async function POST(req: NextRequest) {
 
     if (!text) {
       return Response.json(
-        { success: false, error: 'Could not extract text from this PDF. Try pasting the text directly.' },
+        {
+          success: false,
+          error: 'No text found in this PDF. It may be image-based or exported from a design tool. Please paste your resume text directly instead.',
+        },
         { status: 422 }
       )
     }
