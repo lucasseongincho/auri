@@ -25,8 +25,9 @@ const INPUT_CLASS =
 const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
 const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
+const MIN_WORDS = 150
 const MAX_WORDS = 200
-const WARN_WORDS = 180
+const WARN_WORDS = 185
 
 function countWords(text: string): number {
   return text.trim() ? text.trim().split(/\s+/).length : 0
@@ -34,16 +35,29 @@ function countWords(text: string): number {
 
 function WordCountBar({ wordCount }: { wordCount: number }) {
   const pct = Math.min((wordCount / MAX_WORDS) * 100, 100)
-  const color = wordCount > MAX_WORDS ? '#EF4444' : wordCount >= WARN_WORDS ? '#F59E0B' : '#22C55E'
-  const label = wordCount > MAX_WORDS
-    ? `${wordCount - MAX_WORDS} words over limit`
-    : `${MAX_WORDS - wordCount} words remaining`
+  const color =
+    wordCount > MAX_WORDS
+      ? '#EF4444'
+      : wordCount >= WARN_WORDS
+      ? '#F59E0B'
+      : wordCount >= MIN_WORDS
+      ? '#22C55E'
+      : '#60607A'
+
+  const label =
+    wordCount > MAX_WORDS
+      ? `${wordCount - MAX_WORDS} words over limit`
+      : wordCount >= MIN_WORDS
+      ? `${MAX_WORDS - wordCount} words remaining`
+      : `${MIN_WORDS - wordCount} more words to reach minimum`
 
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-xs">
-        <span className="text-[#60607A]">Word count</span>
-        <span style={{ color }} className="font-semibold tabular-nums">{wordCount} / {MAX_WORDS}</span>
+        <span className="text-[#60607A]">Word count (body only)</span>
+        <span style={{ color }} className="font-semibold tabular-nums">
+          {wordCount} / {MAX_WORDS}
+        </span>
       </div>
       <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
         <motion.div
@@ -54,10 +68,208 @@ function WordCountBar({ wordCount }: { wordCount: number }) {
           transition={{ duration: 0.4, ease: 'easeOut' }}
         />
       </div>
-      <p className="text-xs" style={{ color: wordCount > MAX_WORDS ? '#EF4444' : '#60607A' }}>{label}</p>
+      <p className="text-xs" style={{ color: wordCount > MAX_WORDS ? '#EF4444' : '#60607A' }}>
+        {label}
+      </p>
     </div>
   )
 }
+
+// ── Formal letter renderer ──────────────────────────────────────────────────
+
+interface LetterDocProps {
+  result: CoverLetter
+  personal: { name: string; email: string; phone: string; location: string }
+  company: string
+  position: string
+  hiringManagerName: string
+  isEditing: boolean
+  editedFields: { opening: string; body: string; closing: string }
+  onFieldChange: (field: 'opening' | 'body' | 'closing', value: string) => void
+  onStopEditing: () => void
+}
+
+function LetterDocument({
+  result,
+  personal,
+  company,
+  hiringManagerName,
+  isEditing,
+  editedFields,
+  onFieldChange,
+  onStopEditing,
+}: LetterDocProps) {
+  const today = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+
+  const salutation = hiringManagerName
+    ? `Dear ${hiringManagerName},`
+    : 'Dear Hiring Manager,'
+
+  const openingText = isEditing ? editedFields.opening : result.opening || result.cover_letter
+  const bodyText = isEditing ? editedFields.body : result.body || ''
+  const closingText = isEditing ? editedFields.closing : result.closing || ''
+
+  const hasStructured = Boolean(result.opening && result.body && result.closing)
+
+  return (
+    <div
+      style={{
+        fontFamily: 'Georgia, "Times New Roman", serif',
+        fontSize: '11pt',
+        lineHeight: '1.6',
+        color: '#1a1a1a',
+        background: 'white',
+        padding: '25mm 20mm',
+        minHeight: '297mm',
+        width: '210mm',
+        boxSizing: 'border-box',
+        position: 'relative',
+      }}
+    >
+      {/* ── Sender block ────────────────────────────── */}
+      <div style={{ marginBottom: '24px' }}>
+        <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700, fontSize: '13pt', margin: '0 0 4px 0' }}>
+          {personal.name || 'Your Name'}
+        </p>
+        <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '9.5pt', color: '#555', margin: 0 }}>
+          {[personal.location, personal.email, personal.phone].filter(Boolean).join('  ·  ')}
+        </p>
+      </div>
+
+      {/* ── Date ────────────────────────────────────── */}
+      <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '10pt', color: '#444', marginBottom: '20px' }}>
+        {today}
+      </p>
+
+      {/* ── Recipient block ─────────────────────────── */}
+      <div style={{ marginBottom: '24px' }}>
+        {hiringManagerName && (
+          <p style={{ margin: '0 0 2px 0', fontWeight: 600 }}>{hiringManagerName}</p>
+        )}
+        <p style={{ margin: 0 }}>{company}</p>
+      </div>
+
+      {/* ── Salutation ──────────────────────────────── */}
+      <p style={{ marginBottom: '16px', fontWeight: 500 }}>{salutation}</p>
+
+      {/* ── Body paragraphs ─────────────────────────── */}
+      {hasStructured ? (
+        isEditing ? (
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={onStopEditing}
+              style={{
+                position: 'absolute',
+                top: -28,
+                right: 0,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#999',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '11px',
+              }}
+              aria-label="Done editing"
+            >
+              <X size={14} /> Done
+            </button>
+            {(['opening', 'body', 'closing'] as const).map((field) => (
+              <textarea
+                key={field}
+                value={editedFields[field]}
+                onChange={(e) => onFieldChange(field, e.target.value)}
+                style={{
+                  width: '100%',
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                  fontSize: '11pt',
+                  lineHeight: '1.6',
+                  color: '#1a1a1a',
+                  background: 'rgba(99,102,241,0.04)',
+                  border: '1px dashed rgba(99,102,241,0.3)',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  resize: 'vertical',
+                  marginBottom: '14px',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                }}
+                rows={4}
+                aria-label={`Edit ${field} paragraph`}
+              />
+            ))}
+          </div>
+        ) : (
+          <>
+            <p style={{ marginBottom: '14px', textIndent: '0' }}>{openingText}</p>
+            <p style={{ marginBottom: '14px' }}>{bodyText}</p>
+            <p style={{ marginBottom: '14px' }}>{closingText}</p>
+          </>
+        )
+      ) : (
+        isEditing ? (
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={onStopEditing}
+              style={{
+                position: 'absolute',
+                top: -28,
+                right: 0,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#999',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '11px',
+              }}
+              aria-label="Done editing"
+            >
+              <X size={14} /> Done
+            </button>
+            <textarea
+              value={editedFields.opening}
+              onChange={(e) => onFieldChange('opening', e.target.value)}
+              style={{
+                width: '100%',
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontSize: '11pt',
+                lineHeight: '1.6',
+                color: '#1a1a1a',
+                background: 'rgba(99,102,241,0.04)',
+                border: '1px dashed rgba(99,102,241,0.3)',
+                borderRadius: '4px',
+                padding: '8px',
+                resize: 'vertical',
+                marginBottom: '14px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
+              rows={10}
+              aria-label="Edit cover letter"
+            />
+          </div>
+        ) : (
+          <p style={{ whiteSpace: 'pre-wrap', marginBottom: '14px' }}>{openingText}</p>
+        )
+      )}
+
+      {/* ── Closing ─────────────────────────────────── */}
+      <p style={{ marginBottom: '40px' }}>Sincerely,</p>
+      <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700 }}>
+        {personal.name || 'Your Name'}
+      </p>
+    </div>
+  )
+}
+
+// ── Main page ───────────────────────────────────────────────────────────────
 
 export default function CoverLetterPage() {
   const { user } = useAuth()
@@ -69,10 +281,12 @@ export default function CoverLetterPage() {
   const [experienceSummary, setExperienceSummary] = useState(
     profile && profile.experience.length > 0 ? buildExperienceSummary(profile) : ''
   )
+  const [hiringManagerName, setHiringManagerName] = useState('')
+  const [cityState, setCityState] = useState(profile?.personal?.location ?? '')
 
   const [result, setResult] = useState<CoverLetter | null>(null)
-  const [editedLetter, setEditedLetter] = useState('')
   const [isEditing, setIsEditing] = useState(false)
+  const [editedFields, setEditedFields] = useState({ opening: '', body: '', closing: '' })
   const [generateError, setGenerateError] = useState('')
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
@@ -91,6 +305,8 @@ export default function CoverLetterPage() {
       company,
       jobDescription,
       experienceSummary,
+      hiringManagerName,
+      cityState,
       uid: user?.uid,
       isPro: false,
     }, {
@@ -102,19 +318,26 @@ export default function CoverLetterPage() {
         const cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
         const parsed = JSON.parse(cleaned) as CoverLetter
         setResult(parsed)
-        setEditedLetter(parsed.cover_letter)
+        setEditedFields({
+          opening: parsed.opening || parsed.cover_letter,
+          body: parsed.body || '',
+          closing: parsed.closing || '',
+        })
       } catch {
         setGenerateError('Could not parse the cover letter. Please try again.')
       }
     }
-  }, [position, company, jobDescription, experienceSummary, user?.uid, stream])
+  }, [position, company, jobDescription, experienceSummary, hiringManagerName, cityState, user?.uid, stream])
 
   const handleCopy = useCallback(async () => {
-    const text = isEditing ? editedLetter : (result?.cover_letter ?? '')
-    await navigator.clipboard.writeText(text)
+    if (!result) return
+    const body = isEditing
+      ? [editedFields.opening, editedFields.body, editedFields.closing].filter(Boolean).join('\n\n')
+      : result.cover_letter
+    await navigator.clipboard.writeText(body)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }, [isEditing, editedLetter, result])
+  }, [isEditing, editedFields, result])
 
   const handleDownloadPDF = useCallback(async () => {
     if (!letterCardRef.current) return
@@ -128,7 +351,27 @@ export default function CoverLetterPage() {
     }
   }, [company])
 
-  const currentWordCount = countWords(isEditing ? editedLetter : (result?.cover_letter ?? ''))
+  const handleFieldChange = useCallback(
+    (field: 'opening' | 'body' | 'closing', value: string) => {
+      setEditedFields((prev) => ({ ...prev, [field]: value }))
+    },
+    []
+  )
+
+  // Count words across body paragraphs only
+  const bodyText = isEditing
+    ? [editedFields.opening, editedFields.body, editedFields.closing].filter(Boolean).join(' ')
+    : result
+    ? [result.opening, result.body, result.closing].filter(Boolean).join(' ') || result.cover_letter
+    : ''
+  const currentWordCount = countWords(bodyText)
+
+  const personal = {
+    name: profile?.personal?.name ?? '',
+    email: profile?.personal?.email ?? '',
+    phone: profile?.personal?.phone ?? '',
+    location: cityState || (profile?.personal?.location ?? ''),
+  }
 
   return (
     <div className="space-y-6 pb-20 md:pb-0">
@@ -140,12 +383,12 @@ export default function CoverLetterPage() {
           <h1 className="font-heading text-2xl font-bold text-white">Cover Letter Generator</h1>
         </div>
         <p className="text-[#A0A0B8] text-sm ml-12">
-          Compelling, under-200-word cover letter that opens with a powerful hook — never &quot;I am applying for...&quot;
+          Professional letter structure, 150–200 words, opens with a powerful hook — never &quot;I am applying for...&quot;
         </p>
       </motion.div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* ── Left: Form ──────────────────────────────────────────────────────── */}
+        {/* ── Left: Form ─────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -163,22 +406,75 @@ export default function CoverLetterPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL_CLASS}>Position <span className="text-[#EF4444]">*</span></label>
-                <input type="text" className={INPUT_CLASS} placeholder="Senior Software Engineer" value={position} onChange={(e) => setPosition(e.target.value)} aria-label="Target position" />
+                <input
+                  type="text"
+                  className={INPUT_CLASS}
+                  placeholder="Senior Software Engineer"
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  aria-label="Target position"
+                />
               </div>
               <div>
                 <label className={LABEL_CLASS}>Company Name <span className="text-[#EF4444]">*</span></label>
-                <input type="text" className={INPUT_CLASS} placeholder="Acme Corp" value={company} onChange={(e) => setCompany(e.target.value)} aria-label="Company name" />
+                <input
+                  type="text"
+                  className={INPUT_CLASS}
+                  placeholder="Acme Corp"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  aria-label="Company name"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={LABEL_CLASS}>Hiring Manager Name <span className="text-[#60607A] font-normal">(optional)</span></label>
+                <input
+                  type="text"
+                  className={INPUT_CLASS}
+                  placeholder="Jane Smith"
+                  value={hiringManagerName}
+                  onChange={(e) => setHiringManagerName(e.target.value)}
+                  aria-label="Hiring manager name"
+                />
+              </div>
+              <div>
+                <label className={LABEL_CLASS}>Your City, State</label>
+                <input
+                  type="text"
+                  className={INPUT_CLASS}
+                  placeholder="New York, NY"
+                  value={cityState}
+                  onChange={(e) => setCityState(e.target.value)}
+                  aria-label="City and state"
+                />
               </div>
             </div>
 
             <div>
-              <label className={LABEL_CLASS}>Job Description (paste only)</label>
-              <textarea className={TEXTAREA_CLASS} rows={4} placeholder="Paste the job description for Claude to match your keywords…" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} aria-label="Job description" />
+              <label className={LABEL_CLASS}>Job Description <span className="text-[#60607A] font-normal">(paste for keyword match)</span></label>
+              <textarea
+                className={TEXTAREA_CLASS}
+                rows={4}
+                placeholder="Paste the job description here…"
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                aria-label="Job description"
+              />
             </div>
 
             <div>
               <label className={LABEL_CLASS}>Your Experience Summary</label>
-              <textarea className={TEXTAREA_CLASS} rows={6} placeholder="Your experience is auto-filled from your profile, or paste a summary here…" value={experienceSummary} onChange={(e) => setExperienceSummary(e.target.value)} aria-label="Experience summary" />
+              <textarea
+                className={TEXTAREA_CLASS}
+                rows={5}
+                placeholder="Your experience is auto-filled from your profile, or paste a summary here…"
+                value={experienceSummary}
+                onChange={(e) => setExperienceSummary(e.target.value)}
+                aria-label="Experience summary"
+              />
             </div>
 
             {generateError && (
@@ -196,12 +492,15 @@ export default function CoverLetterPage() {
                 shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.01]
                 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {isStreaming ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating…</> : <><Sparkles className="w-4 h-4" /> Generate Cover Letter</>}
+              {isStreaming
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating…</>
+                : <><Sparkles className="w-4 h-4" /> Generate Cover Letter</>
+              }
             </button>
           </div>
         </motion.div>
 
-        {/* ── Right: Output ────────────────────────────────────────────────────── */}
+        {/* ── Right: Output ───────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -217,7 +516,7 @@ export default function CoverLetterPage() {
                     <Loader2 className="w-4 h-4 text-[#F59E0B] animate-spin" />
                     <span className="text-sm text-[#F59E0B] font-medium">Claude is crafting your cover letter…</span>
                   </div>
-                  {[95, 80, 88, 72, 90, 78, 85].map((w, i) => (
+                  {[95, 80, 88, 72, 90, 78, 85, 60, 70, 82].map((w, i) => (
                     <div key={i} className="h-3 rounded-full bg-white/[0.04] animate-pulse" style={{ width: `${w}%` }} />
                   ))}
                 </div>
@@ -225,31 +524,28 @@ export default function CoverLetterPage() {
             ) : result ? (
               <motion.div key="result" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}
                 className="space-y-4">
-                <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1" ref={letterCardRef}>
-                  <div className="rounded-xl border border-white/[0.05] bg-white p-8">
-                    {result.opening_hook && (
-                      <div className="mb-4 p-3 rounded-lg bg-amber-50 border-l-4 border-[#F59E0B]">
-                        <p className="text-xs font-semibold text-[#92400E] uppercase tracking-wide mb-1">Opening Hook</p>
-                        <p className="text-sm text-[#78350F] italic">{result.opening_hook}</p>
-                      </div>
-                    )}
-                    {isEditing ? (
-                      <div className="relative">
-                        <textarea
-                          className="w-full text-sm text-gray-800 leading-relaxed p-0 border-none outline-none resize-none bg-transparent"
-                          rows={12}
-                          value={editedLetter}
-                          onChange={(e) => setEditedLetter(e.target.value)}
-                          aria-label="Edit cover letter"
-                          autoFocus
-                        />
-                        <button onClick={() => setIsEditing(false)} aria-label="Finish editing" className="absolute top-0 right-0 p-1 rounded text-gray-400 hover:text-gray-700">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{editedLetter || result.cover_letter}</p>
-                    )}
+
+                {result.opening_hook && (
+                  <div className="p-3 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/20">
+                    <p className="text-xs font-semibold text-[#F59E0B] uppercase tracking-wide mb-1">Opening Hook</p>
+                    <p className="text-sm text-[#FDE68A] italic">{result.opening_hook}</p>
+                  </div>
+                )}
+
+                {/* Letter document — scrollable preview */}
+                <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-auto">
+                  <div ref={letterCardRef}>
+                    <LetterDocument
+                      result={result}
+                      personal={personal}
+                      company={company}
+                      position={position}
+                      hiringManagerName={hiringManagerName}
+                      isEditing={isEditing}
+                      editedFields={editedFields}
+                      onFieldChange={handleFieldChange}
+                      onStopEditing={() => setIsEditing(false)}
+                    />
                   </div>
                 </div>
 

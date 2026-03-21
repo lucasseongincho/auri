@@ -75,6 +75,18 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
               ))}
             </div>
           )}
+
+          {data.languages && data.languages.length > 0 && (
+            <div className="sidebar-section" data-ats-field="languages">
+              <div className="sidebar-header">Languages</div>
+              {data.languages.map((lang) => (
+                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#e0e7ff', marginBottom: '3px' }}>
+                  <span>{lang.name}</span>
+                  <span style={{ color: '#a5b4fc', fontStyle: 'italic' }}>{lang.proficiency}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </aside>
 
         {/* Main */}
@@ -110,8 +122,44 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
               {data.education.map((edu) => (
                 <div key={edu.id} className="edu-row">
                   <div className="edu-degree">{edu.degree} in {edu.field}</div>
-                  <div className="edu-info">{edu.institution} · {edu.year}</div>
+                  <div className="edu-info">{edu.institution} · {edu.year}{edu.gpa ? ` · GPA ${edu.gpa}` : ''}</div>
                 </div>
+              ))}
+            </section>
+          )}
+
+          {data.leadership && data.leadership.length > 0 && (
+            <section data-ats-field="leadership">
+              <div className="main-section-header">Leadership</div>
+              {data.leadership.map((item) => (
+                <article key={item.id} style={{ marginBottom: '10px' }}>
+                  <div className="job-title-row">
+                    <span className="job-title">{item.role}</span>
+                    <span className="job-dates">{item.start} – {item.end}</span>
+                  </div>
+                  <div className="job-company">{item.organization}</div>
+                  <ul>
+                    {item.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                  </ul>
+                </article>
+              ))}
+            </section>
+          )}
+
+          {data.volunteer && data.volunteer.length > 0 && (
+            <section data-ats-field="volunteer">
+              <div className="main-section-header">Volunteer</div>
+              {data.volunteer.map((item) => (
+                <article key={item.id} style={{ marginBottom: '8px' }}>
+                  <div className="job-title-row">
+                    <div>
+                      <span className="job-title">{item.role}</span>
+                      {item.organization && <span className="job-company" style={{ marginLeft: '4px' }}> · {item.organization}</span>}
+                    </div>
+                    <span className="job-dates">{item.date}</span>
+                  </div>
+                  {item.description && <p style={{ fontSize: '11px', margin: '2px 0 0 0' }}>{item.description}</p>}
+                </article>
               ))}
             </section>
           )}

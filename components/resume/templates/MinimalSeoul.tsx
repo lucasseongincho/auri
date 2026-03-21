@@ -87,10 +87,50 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
               <div key={edu.id} className="edu-row">
                 <div>
                   <span className="edu-degree">{edu.degree} in {edu.field}</span>
-                  <div className="edu-info">{edu.institution}</div>
+                  <div className="edu-info">{edu.institution}{edu.gpa ? ` · GPA ${edu.gpa}` : ''}</div>
                 </div>
                 <div className="edu-info">{edu.year}</div>
               </div>
+            ))}
+          </section>
+        )}
+
+        {data.leadership && data.leadership.length > 0 && (
+          <section data-ats-field="leadership">
+            <div className="section-header">Leadership</div>
+            {data.leadership.map((item, idx) => (
+              <article key={item.id}>
+                {idx > 0 && <div className="divider" />}
+                <div className="job-row">
+                  <div>
+                    <div className="job-title">{item.role}</div>
+                    <div className="job-company">{item.organization}</div>
+                  </div>
+                  <div className="job-dates">{item.start} – {item.end}</div>
+                </div>
+                <ul>
+                  {item.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                </ul>
+              </article>
+            ))}
+          </section>
+        )}
+
+        {data.volunteer && data.volunteer.length > 0 && (
+          <section data-ats-field="volunteer">
+            <div className="section-header">Volunteer</div>
+            {data.volunteer.map((item, idx) => (
+              <article key={item.id}>
+                {idx > 0 && <div className="divider" />}
+                <div className="job-row">
+                  <div>
+                    <div className="job-title">{item.role}</div>
+                    <div className="job-company">{item.organization}</div>
+                  </div>
+                  <div className="job-dates">{item.date}</div>
+                </div>
+                {item.description && <p style={{ fontSize: '11px', color: '#555', margin: '2px 0 8px 0', fontWeight: 300 }}>{item.description}</p>}
+              </article>
             ))}
           </section>
         )}
@@ -106,6 +146,15 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
           <section data-ats-field="certifications">
             <div className="section-header">Certifications</div>
             <p className="skills-text">{data.certifications.join('   ·   ')}</p>
+          </section>
+        )}
+
+        {data.languages && data.languages.length > 0 && (
+          <section data-ats-field="languages">
+            <div className="section-header">Languages</div>
+            <p className="skills-text">
+              {data.languages.map((l) => `${l.name} — ${l.proficiency}`).join('   ·   ')}
+            </p>
           </section>
         )}
 

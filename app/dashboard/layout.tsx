@@ -239,7 +239,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ── Mobile bottom tab bar ── */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40
         border-t border-white/[0.06] bg-[#13131A]/95 backdrop-blur-xl
-        flex items-center justify-around px-2 py-2"
+        flex items-center justify-around px-2 pt-2"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}
         aria-label="Mobile navigation"
       >
         {[...NAV_ITEMS.slice(0, 4), ...BOTTOM_ITEMS].map((item) => {

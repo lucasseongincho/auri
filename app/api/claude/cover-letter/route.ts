@@ -12,13 +12,15 @@ interface CoverLetterRequestBody {
   company: string
   jobDescription: string
   experienceSummary: string
+  hiringManagerName?: string
+  cityState?: string
   uid?: string
   isPro?: boolean
 }
 
 async function attemptStream(prompt: string, retryCount = 0): Promise<ReadableStream<Uint8Array>> {
   try {
-    const claudeStream = await streamClaude(prompt, 1024)
+    const claudeStream = await streamClaude(prompt, 1500)
     return new ReadableStream<Uint8Array>({
       async start(controller) {
         try {
@@ -64,7 +66,9 @@ export async function POST(req: NextRequest) {
       body.position,
       body.company,
       body.jobDescription ?? '',
-      body.experienceSummary ?? ''
+      body.experienceSummary ?? '',
+      body.hiringManagerName,
+      body.cityState
     )
 
     const stream = await attemptStream(prompt)

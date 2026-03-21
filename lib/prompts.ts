@@ -210,35 +210,57 @@ Return ONLY valid JSON:
  * "start with a hook" because it eliminates the most likely
  * failure mode directly.
  *
- * Why under 200 words: Hiring managers spend < 30 seconds on cover
- * letters. Brevity is the constraint that forces quality.
+ * Why 3 structured paragraphs: Gives the UI the ability to render a
+ * proper formal letter with semantic sections rather than a single
+ * text blob — enables per-paragraph editing and a professional layout.
+ *
+ * Why 150-200 words per body: Long enough to be substantive, short
+ * enough for a hiring manager to read in < 45 seconds. The range
+ * (not a hard cap) allows Claude to fill a proper letter page.
  *
  * Why return opening_hook separately: Lets the UI highlight the
- * first sentence distinctively and lets users quickly judge impact.
+ * first sentence distinctively so users can quickly judge impact.
  */
 export function buildCoverLetterPrompt(
   position: string,
   company: string,
   jobDescription: string,
-  experienceSummary: string
+  experienceSummary: string,
+  hiringManagerName?: string,
+  cityState?: string
 ): string {
-  return `Write a cover letter for the position of ${position} at ${company}.
-Begin with a powerful, memorable idea — NOT "I am applying for..." and NOT "I am writing to express my interest...".
-Connect my specific experience to the company's exact needs and build genuine trust.
-Keep the total text STRICTLY under 200 words. Be human, direct, and compelling.
+  const salutation = hiringManagerName
+    ? `Dear ${hiringManagerName},`
+    : 'Dear Hiring Manager,'
+
+  return `Write a professional cover letter for the position of ${position} at ${company}.
+${cityState ? `The applicant is based in ${cityState}.` : ''}
+${hiringManagerName ? `Address it to ${hiringManagerName}.` : ''}
+
+STRUCTURE REQUIREMENTS:
+- Paragraph 1 (opening): Begin with a powerful, memorable hook. NOT "I am applying for..." and NOT "I am writing to express my interest...". Hook the reader immediately with insight, a bold claim, or a specific result.
+- Paragraph 2 (body): Connect specific experience to the company's exact needs. Be concrete — name technologies, metrics, or outcomes.
+- Paragraph 3 (closing): A confident call to action. Express genuine enthusiasm. Keep it brief.
+- Total body text: 150-200 words across the 3 paragraphs. Be substantive but tight.
+- Tone: human, direct, compelling. Not corporate. Not generic.
 
 My experience:
 ${experienceSummary}
 
 Job description:
-${jobDescription}
+${jobDescription || '(not provided — write for the role and company generally)'}
 
-Return ONLY valid JSON:
+Return ONLY valid JSON with exactly these fields:
 {
-  "cover_letter": "string",
-  "word_count": number,
-  "opening_hook": "string"
-}`
+  "opening": "string (paragraph 1 text only, no salutation)",
+  "body": "string (paragraph 2 text only)",
+  "closing": "string (paragraph 3 text only)",
+  "cover_letter": "string (full plain text: salutation + all 3 paragraphs + sign-off, for copy/paste)",
+  "word_count": number (count only the 3 paragraphs, not salutation/sign-off),
+  "opening_hook": "string (the first sentence of opening, for UI callout)"
+}
+
+Salutation to use: ${salutation}`
 }
 
 // ── Feature 9 — Interview Preparation System ─────────────────────────────────

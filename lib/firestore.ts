@@ -51,7 +51,9 @@ export async function getSavedResume(uid: string, resumeId: string): Promise<Sav
 export async function saveResume(uid: string, resume: Omit<SavedResume, 'id'>): Promise<string> {
   const col = collection(db, 'users', uid, 'resumes')
   const newRef = doc(col)
-  await setDoc(newRef, { ...resume, updatedAt: serverTimestamp() })
+  // Strip undefined fields — Firestore rejects documents containing undefined values
+  const sanitized = JSON.parse(JSON.stringify(resume))
+  await setDoc(newRef, { ...sanitized, updatedAt: serverTimestamp() })
   return newRef.id
 }
 

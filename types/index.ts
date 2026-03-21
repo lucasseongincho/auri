@@ -26,6 +26,30 @@ export interface Education {
   degree: string
   field: string
   year: string
+  gpa?: string  // e.g. "3.8/4.0" — omit if below 3.5
+}
+
+export interface Leadership {
+  id: string
+  role: string
+  organization: string
+  start: string
+  end: string
+  bullets: string[]
+}
+
+export interface Volunteer {
+  id: string
+  role: string
+  organization: string
+  date: string
+  description: string
+}
+
+export interface Language {
+  id: string
+  name: string
+  proficiency: 'Native' | 'Fluent' | 'Intermediate' | 'Basic'
 }
 
 export interface Project {
@@ -63,6 +87,9 @@ export interface CareerProfile {
   skills: string[]
   certifications: string[]
   projects: Project[]
+  leadership?: Leadership[]
+  volunteer?: Volunteer[]
+  languages?: Language[]
   target: TargetJob
   generated: GeneratedData
   updatedAt?: string
@@ -89,6 +116,9 @@ export interface ResumeData {
   skills: string[]
   certifications: string[]
   projects: Project[]
+  leadership?: Leadership[]
+  volunteer?: Volunteer[]
+  languages?: Language[]
   html?: string
   plain?: string
   templateId: TemplateId
@@ -144,9 +174,12 @@ export interface JobStrategy {
 }
 
 export interface CoverLetter {
-  cover_letter: string
+  cover_letter: string  // full plain text for copy/paste
   word_count: number
-  opening_hook: string
+  opening_hook: string  // first sentence highlight for UI callout
+  opening: string       // paragraph 1 — the hook
+  body: string          // paragraph 2 — experience + value match
+  closing: string       // paragraph 3 — call to action
 }
 
 export interface InterviewQuestion {

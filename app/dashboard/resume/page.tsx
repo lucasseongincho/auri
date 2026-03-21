@@ -23,6 +23,9 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
+  Star,
+  Heart,
+  Languages,
 } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
@@ -37,6 +40,9 @@ import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
 import type {
   Experience,
   Education,
+  Leadership,
+  Volunteer,
+  Language,
   Project,
   ResumeData,
   TemplateId,
@@ -54,7 +60,8 @@ const STEPS = [
   { id: 4, label: 'Skills', icon: Wrench },
   { id: 5, label: 'Certifications', icon: Award },
   { id: 6, label: 'Projects', icon: FolderOpen },
-  { id: 7, label: 'Target Job', icon: Target },
+  { id: 7, label: 'Extra', icon: Star },
+  { id: 8, label: 'Target Job', icon: Target },
 ] as const
 
 // ─── ID generator (nanoid-style) ──────────────────────────────────────────────
@@ -444,6 +451,16 @@ function StepEducation() {
                     aria-label={`Graduation year for education ${idx + 1}`}
                   />
                 </Field>
+                <Field label="GPA (optional — omit if below 3.5)">
+                  <input
+                    type="text"
+                    className={INPUT_CLASS}
+                    placeholder="3.8/4.0"
+                    value={edu.gpa ?? ''}
+                    onChange={(e) => updateEdu(edu.id, 'gpa', e.target.value)}
+                    aria-label={`GPA for education ${idx + 1}`}
+                  />
+                </Field>
               </div>
             </div>
           </motion.div>
@@ -766,15 +783,195 @@ function StepProjects() {
   )
 }
 
-// ─── Step 7: Target Job ───────────────────────────────────────────────────────
+// ─── Step 7: Leadership / Volunteer / Languages ───────────────────────────────
 
-interface Step7Errors {
+const PROFICIENCY_LEVELS: Language['proficiency'][] = ['Native', 'Fluent', 'Intermediate', 'Basic']
+
+function StepAdditional() {
+  const { profile, updateProfile } = useCareerStore()
+  const leadershipList: Leadership[] = profile?.leadership ?? []
+  const volunteerList: Volunteer[] = profile?.volunteer ?? []
+  const languageList: Language[] = profile?.languages ?? []
+
+  // ── Leadership ──
+  const addLeadership = () =>
+    updateProfile({ leadership: [...leadershipList, { id: genId(), role: '', organization: '', start: '', end: '', bullets: [''] }] })
+  const removeLeadership = (id: string) =>
+    updateProfile({ leadership: leadershipList.filter((l) => l.id !== id) })
+  const updateLeadership = (id: string, key: keyof Leadership, value: string | string[]) =>
+    updateProfile({ leadership: leadershipList.map((l) => l.id === id ? { ...l, [key]: value } : l) })
+  const updateLeadershipBullets = (id: string, raw: string) => {
+    const bullets = raw.split('\n').map((b) => b.trim()).filter(Boolean)
+    updateLeadership(id, 'bullets', bullets.length ? bullets : [''])
+  }
+
+  // ── Volunteer ──
+  const addVolunteer = () =>
+    updateProfile({ volunteer: [...volunteerList, { id: genId(), role: '', organization: '', date: '', description: '' }] })
+  const removeVolunteer = (id: string) =>
+    updateProfile({ volunteer: volunteerList.filter((v) => v.id !== id) })
+  const updateVolunteer = (id: string, key: keyof Volunteer, value: string) =>
+    updateProfile({ volunteer: volunteerList.map((v) => v.id === id ? { ...v, [key]: value } : v) })
+
+  // ── Languages ──
+  const addLanguage = () =>
+    updateProfile({ languages: [...languageList, { id: genId(), name: '', proficiency: 'Fluent' }] })
+  const removeLanguage = (id: string) =>
+    updateProfile({ languages: languageList.filter((l) => l.id !== id) })
+  const updateLanguage = (id: string, key: keyof Language, value: string) =>
+    updateProfile({ languages: languageList.map((l) => l.id === id ? { ...l, [key]: value } : l) })
+
+  return (
+    <div className="space-y-6">
+      <p className="text-xs text-[#A0A0B8]">
+        All sections below are optional. They appear on the resume only if you add data.
+      </p>
+
+      {/* Leadership */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Star className="w-4 h-4 text-[#6366F1]" />
+          <span className="text-sm font-semibold text-white">Leadership Experience</span>
+        </div>
+        <div className="space-y-3">
+          <AnimatePresence initial={false}>
+            {leadershipList.map((item, idx) => (
+              <motion.div key={item.id} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }} transition={SPRING}
+                className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
+                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide">Leadership {idx + 1}</span>
+                    <button onClick={() => removeLeadership(item.id)} aria-label={`Remove leadership ${idx + 1}`}
+                      className="p-1.5 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Field label="Role"><input type="text" className={INPUT_CLASS} placeholder="President" value={item.role}
+                      onChange={(e) => updateLeadership(item.id, 'role', e.target.value)} aria-label="Leadership role" /></Field>
+                    <Field label="Organization"><input type="text" className={INPUT_CLASS} placeholder="Student Government"
+                      value={item.organization} onChange={(e) => updateLeadership(item.id, 'organization', e.target.value)} aria-label="Organization" /></Field>
+                    <Field label="Start Date"><input type="text" className={INPUT_CLASS} placeholder="Sep 2022"
+                      value={item.start} onChange={(e) => updateLeadership(item.id, 'start', e.target.value)} aria-label="Start date" /></Field>
+                    <Field label="End Date"><input type="text" className={INPUT_CLASS} placeholder="May 2023 or Present"
+                      value={item.end} onChange={(e) => updateLeadership(item.id, 'end', e.target.value)} aria-label="End date" /></Field>
+                  </div>
+                  <Field label="Key Achievements (one per line)">
+                    <textarea className={TEXTAREA_CLASS} rows={3}
+                      placeholder={`Led team of 12 to increase fundraising by 40%\nImplemented new onboarding reducing member drop-off by 25%`}
+                      value={item.bullets.join('\n')}
+                      onChange={(e) => updateLeadershipBullets(item.id, e.target.value)} aria-label="Leadership achievements" />
+                  </Field>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          <button onClick={addLeadership} aria-label="Add leadership experience"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-white/[0.12]
+              text-[#A0A0B8] text-sm hover:border-[#6366F1]/40 hover:text-[#6366F1] hover:bg-[#6366F1]/5 transition-all">
+            <Plus className="w-4 h-4" /> Add Leadership
+          </button>
+        </div>
+      </div>
+
+      {/* Volunteer */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Heart className="w-4 h-4 text-[#EC4899]" />
+          <span className="text-sm font-semibold text-white">Volunteer Work</span>
+        </div>
+        <div className="space-y-3">
+          <AnimatePresence initial={false}>
+            {volunteerList.map((item, idx) => (
+              <motion.div key={item.id} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }} transition={SPRING}
+                className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
+                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-[#EC4899] uppercase tracking-wide">Volunteer {idx + 1}</span>
+                    <button onClick={() => removeVolunteer(item.id)} aria-label={`Remove volunteer ${idx + 1}`}
+                      className="p-1.5 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Field label="Role"><input type="text" className={INPUT_CLASS} placeholder="Tutor" value={item.role}
+                      onChange={(e) => updateVolunteer(item.id, 'role', e.target.value)} aria-label="Volunteer role" /></Field>
+                    <Field label="Organization"><input type="text" className={INPUT_CLASS} placeholder="Local Food Bank"
+                      value={item.organization} onChange={(e) => updateVolunteer(item.id, 'organization', e.target.value)} aria-label="Organization" /></Field>
+                    <Field label="Date / Period"><input type="text" className={INPUT_CLASS} placeholder="2022–Present"
+                      value={item.date} onChange={(e) => updateVolunteer(item.id, 'date', e.target.value)} aria-label="Date" /></Field>
+                  </div>
+                  <Field label="One-line Description">
+                    <input type="text" className={INPUT_CLASS}
+                      placeholder="Provided weekly math tutoring to 8 underprivileged students"
+                      value={item.description} onChange={(e) => updateVolunteer(item.id, 'description', e.target.value)} aria-label="Description" />
+                  </Field>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          <button onClick={addVolunteer} aria-label="Add volunteer work"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-white/[0.12]
+              text-[#A0A0B8] text-sm hover:border-[#EC4899]/40 hover:text-[#EC4899] hover:bg-[#EC4899]/5 transition-all">
+            <Plus className="w-4 h-4" /> Add Volunteer
+          </button>
+        </div>
+      </div>
+
+      {/* Languages */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Languages className="w-4 h-4 text-[#F59E0B]" />
+          <span className="text-sm font-semibold text-white">Languages</span>
+        </div>
+        <div className="space-y-2">
+          <AnimatePresence initial={false}>
+            {languageList.map((lang) => (
+              <motion.div key={lang.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }} transition={SPRING}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[#0A0A0F] border border-white/[0.08]">
+                <input type="text" className="flex-1 bg-transparent text-sm text-white placeholder-[#60607A] outline-none"
+                  placeholder="Language (e.g. Spanish)" value={lang.name}
+                  onChange={(e) => updateLanguage(lang.id, 'name', e.target.value)} aria-label="Language name" />
+                <select
+                  className="bg-[#1C1C26] border border-white/[0.08] rounded-lg px-2 py-1 text-xs text-[#A0A0B8] outline-none"
+                  value={lang.proficiency}
+                  onChange={(e) => updateLanguage(lang.id, 'proficiency', e.target.value)}
+                  aria-label="Proficiency level"
+                >
+                  {PROFICIENCY_LEVELS.map((level) => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
+                </select>
+                <button onClick={() => removeLanguage(lang.id)} aria-label={`Remove language ${lang.name}`}
+                  className="p-1 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          <button onClick={addLanguage} aria-label="Add language"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-white/[0.12]
+              text-[#A0A0B8] text-sm hover:border-[#F59E0B]/40 hover:text-[#F59E0B] hover:bg-[#F59E0B]/5 transition-all">
+            <Plus className="w-4 h-4" /> Add Language
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Step 8: Target Job ───────────────────────────────────────────────────────
+
+interface Step8Errors {
   position?: string
   company?: string
   job_description?: string
 }
 
-function StepTargetJob({ errors }: { errors: Step7Errors }) {
+function StepTargetJob({ errors }: { errors: Step8Errors }) {
   const { profile, updateProfile } = useCareerStore()
   const target = profile?.target ?? {
     position: '',
@@ -870,7 +1067,7 @@ function StepTargetJob({ errors }: { errors: Step7Errors }) {
 type ValidationErrors = {
   step1: { name?: string; email?: string }
   step2: { experience?: string }
-  step7: { position?: string; company?: string; job_description?: string }
+  step8: { position?: string; company?: string; job_description?: string }
 }
 
 // ─── Sign-up Prompt Modal ─────────────────────────────────────────────────────
@@ -949,7 +1146,7 @@ function Toast({ message, type, onDismiss }: ToastProps) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 32, scale: 0.95 }}
       transition={SPRING}
-      className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl
+      className={`fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[9999] flex items-center gap-3 px-4 py-3 rounded-xl
         border shadow-xl max-w-sm
         ${type === 'success'
           ? 'bg-[#22C55E]/10 border-[#22C55E]/30 text-[#22C55E]'
@@ -996,7 +1193,7 @@ export default function ResumePage() {
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({
     step1: {},
     step2: {},
-    step7: {},
+    step8: {},
   })
   const [generateError, setGenerateError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -1048,13 +1245,13 @@ export default function ResumePage() {
         setValidationErrors((prev) => ({ ...prev, step2: errors }))
         return Object.keys(errors).length === 0
       }
-      if (step === 7) {
-        const errors: ValidationErrors['step7'] = {}
+      if (step === 8) {
+        const errors: ValidationErrors['step8'] = {}
         if (!profile?.target.position?.trim()) errors.position = 'Target position is required'
         if (!profile?.target.company?.trim()) errors.company = 'Target company is required'
         if (!profile?.target.job_description?.trim())
           errors.job_description = 'Job description is required for ATS optimization'
-        setValidationErrors((prev) => ({ ...prev, step7: errors }))
+        setValidationErrors((prev) => ({ ...prev, step8: errors }))
         return Object.keys(errors).length === 0
       }
       return true
@@ -1196,6 +1393,10 @@ export default function ResumePage() {
           skills: parsed.skills ?? profile.skills,
           certifications: parsed.certifications ?? profile.certifications,
           projects: parsed.projects ?? profile.projects,
+          // User-controlled sections — always pull from profile, not AI
+          leadership: profile.leadership ?? [],
+          volunteer: profile.volunteer ?? [],
+          languages: profile.languages ?? [],
           html: parsed.html,
           plain: parsed.plain,
           templateId: selectedTemplate,
@@ -1273,7 +1474,9 @@ export default function ResumePage() {
       case 6:
         return <StepProjects />
       case 7:
-        return <StepTargetJob errors={validationErrors.step7} />
+        return <StepAdditional />
+      case 8:
+        return <StepTargetJob errors={validationErrors.step8} />
       default:
         return null
     }

@@ -175,9 +175,56 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
                   <div>
                     <span className="edu-degree">{edu.degree} in {edu.field}</span>
                     <span className="edu-school">{', '}{edu.institution}</span>
+                    {edu.gpa && <span className="edu-year" style={{ marginLeft: '8px' }}>GPA {edu.gpa}</span>}
                   </div>
                   <span className="edu-year">{edu.year}</span>
                 </div>
+              ))}
+            </section>
+          )}
+
+          {/* Leadership */}
+          {data.leadership && data.leadership.length > 0 && (
+            <section data-ats-field="leadership">
+              <div className="section-header">
+                <div className="section-accent" />
+                <span className="section-label">Leadership</span>
+              </div>
+              {data.leadership.map((item) => (
+                <article key={item.id} style={{ marginBottom: '12px' }}>
+                  <div className="job-header">
+                    <div>
+                      <span className="job-title">{item.role}</span>
+                      {item.organization && <span className="job-company">{' @ '}{item.organization}</span>}
+                    </div>
+                    <span className="job-dates">{item.start} – {item.end}</span>
+                  </div>
+                  <ul>
+                    {item.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                  </ul>
+                </article>
+              ))}
+            </section>
+          )}
+
+          {/* Volunteer */}
+          {data.volunteer && data.volunteer.length > 0 && (
+            <section data-ats-field="volunteer">
+              <div className="section-header">
+                <div className="section-accent" />
+                <span className="section-label">Volunteer</span>
+              </div>
+              {data.volunteer.map((item) => (
+                <article key={item.id} style={{ marginBottom: '10px' }}>
+                  <div className="job-header">
+                    <div>
+                      <span className="job-title">{item.role}</span>
+                      {item.organization && <span className="job-company">{' @ '}{item.organization}</span>}
+                    </div>
+                    <span className="job-dates">{item.date}</span>
+                  </div>
+                  {item.description && <p style={{ fontSize: '11px', color: '#374151', margin: '2px 0 0 0' }}>{item.description}</p>}
+                </article>
               ))}
             </section>
           )}
@@ -208,6 +255,22 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
                 <span className="section-label">Certifications</span>
               </div>
               <p style={{ fontSize: '11px', color: '#374151', lineHeight: '1.7' }}>{data.certifications.join(' · ')}</p>
+            </section>
+          )}
+
+          {/* Languages */}
+          {data.languages && data.languages.length > 0 && (
+            <section data-ats-field="languages">
+              <div className="section-header">
+                <div className="section-accent" />
+                <span className="section-label">Languages</span>
+              </div>
+              <div className="skills-wrap">
+                {data.languages.map((lang) => (
+                  <span key={lang.id} className="skill-pill">{lang.name} · {lang.proficiency}</span>
+                ))}
+              </div>
+              <p className="skills-plain">{data.languages.map((l) => `${l.name} (${l.proficiency})`).join(' · ')}</p>
             </section>
           )}
 

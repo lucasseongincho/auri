@@ -121,10 +121,70 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing }:
                   <div>
                     <span className="edu-degree">{edu.degree} in {edu.field}</span>
                     <span className="edu-school">, {edu.institution}</span>
+                    {edu.gpa && <span className="edu-school"> · GPA {edu.gpa}</span>}
                   </div>
                   <span className="edu-year">{edu.year}</span>
                 </div>
               ))}
+            </section>
+          )}
+
+          {/* Leadership */}
+          {data.leadership && data.leadership.length > 0 && (
+            <section data-ats-field="leadership">
+              <div className="section-header">
+                <span className="section-label">Leadership</span>
+                <div className="section-rule" />
+              </div>
+              {data.leadership.map((item) => (
+                <article key={item.id} style={{ marginBottom: '12px' }}>
+                  <div className="job-header">
+                    <div>
+                      <span className="job-title">{item.role}</span>
+                      {item.organization && <span className="job-company">{' — '}{item.organization}</span>}
+                    </div>
+                    <span className="job-dates">{item.start} – {item.end}</span>
+                  </div>
+                  <ul>
+                    {item.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                  </ul>
+                </article>
+              ))}
+            </section>
+          )}
+
+          {/* Volunteer */}
+          {data.volunteer && data.volunteer.length > 0 && (
+            <section data-ats-field="volunteer">
+              <div className="section-header">
+                <span className="section-label">Volunteer</span>
+                <div className="section-rule" />
+              </div>
+              {data.volunteer.map((item) => (
+                <article key={item.id} style={{ marginBottom: '10px' }}>
+                  <div className="job-header">
+                    <div>
+                      <span className="job-title">{item.role}</span>
+                      {item.organization && <span className="job-company">{' — '}{item.organization}</span>}
+                    </div>
+                    <span className="job-dates">{item.date}</span>
+                  </div>
+                  {item.description && <p style={{ fontSize: '11px', color: '#374151', margin: '2px 0 0 0' }}>{item.description}</p>}
+                </article>
+              ))}
+            </section>
+          )}
+
+          {/* Languages */}
+          {data.languages && data.languages.length > 0 && (
+            <section data-ats-field="languages">
+              <div className="section-header">
+                <span className="section-label">Languages</span>
+                <div className="section-rule" />
+              </div>
+              <p className="skills-list">
+                {data.languages.map((l) => `${l.name} (${l.proficiency})`).join(' · ')}
+              </p>
             </section>
           )}
 
