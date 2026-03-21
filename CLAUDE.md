@@ -8,7 +8,7 @@
 ## 1. PROJECT OVERVIEW
 
 **Product Name:** AURI (working title — can be changed)
-**Purpose:** An AI-powered, ATS-optimized career toolkit that helps job seekers generate tailored resumes, rewrite LinkedIn profiles, craft cover letters, prepare for interviews, build job-search strategies, and more — all powered by Claude AI (claude-sonnet-4-20250514).
+**Purpose:** An AI-powered, ATS-optimized career toolkit that helps job seekers generate tailored resumes, rewrite LinkedIn profiles, craft cover letters, prepare for interviews, build job-search strategies, and more — all powered by Claude AI (claude-sonnet-4-5).
 **Primary User:** English-speaking job seekers at any career stage.
 **Core Philosophy:** Every feature feeds every other feature. The app is one interconnected career operating system, not a collection of isolated tools.
 
@@ -20,7 +20,7 @@
 |---|---|
 | Frontend | Next.js 14+ (App Router) + Tailwind CSS |
 | Backend | Next.js API Routes (serverless) |
-| AI Engine | Anthropic Claude API (`claude-sonnet-4-20250514`) |
+| AI Engine | Anthropic Claude API (`claude-sonnet-4-5`) |
 | Auth | Firebase Auth (Google OAuth + Email/Password) |
 | Database | Firebase Firestore |
 | File Storage: None — PDFs generated client-side via html2pdf.js on demand|
@@ -411,7 +411,7 @@ POST /api/claude/resume
 
 **Streaming:** Use Claude's streaming API for all long-form generation. Frontend uses `useAIStream` hook to show progressive output.
 
-**Model:** Always use `claude-sonnet-4-20250514`. Never change the model without updating this file.
+**Model:** Always use `claude-sonnet-4-5`. Never change the model without updating this file.
 
 **Error handling:** All API routes return standardized error shapes. Client shows user-friendly messages. Retry logic: 1 automatic retry on 529 (overloaded), surface error to user on second failure.
 

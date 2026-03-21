@@ -9,7 +9,7 @@ const client = new Anthropic({
 })
 
 // The model is pinned per CLAUDE.md §7 — never change without updating spec
-export const CLAUDE_MODEL = 'claude-sonnet-4-20250514'
+export const CLAUDE_MODEL = 'claude-sonnet-4-5'
 
 // Standard max tokens for full resume generation
 export const MAX_TOKENS_RESUME = 4096
