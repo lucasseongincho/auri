@@ -1,0 +1,78 @@
+import { NextRequest } from 'next/server'
+import { streamClaude, buildErrorResponse } from '@/lib/claude'
+import { buildLinkedInPrompt } from '@/lib/prompts'
+import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
+
+export const runtime = 'nodejs'
+export const maxDuration = 60
+
+interface LinkedInRequestBody {
+  pastedProfile: string
+  targetPosition: string
+  sectorOrIndustry: string
+  uid?: string
+  isPro?: boolean
+}
+
+async function attemptStream(prompt: string, retryCount = 0): Promise<ReadableStream<Uint8Array>> {
+  try {
+    const claudeStream = await streamClaude(prompt, 2048)
+    return new ReadableStream<Uint8Array>({
+      async start(controller) {
+        try {
+          for await (const event of claudeStream) {
+            if (
+              event.type === 'content_block_delta' &&
+              event.delta.type === 'text_delta'
+            ) {
+              controller.enqueue(new TextEncoder().encode(event.delta.text))
+            }
+          }
+          controller.close()
+        } catch (err) {
+          controller.error(err)
+        }
+      },
+    })
+  } catch (err) {
+    const status = (err as { status?: number }).status
+    if (status === 529 && retryCount < 1) {
+      await new Promise((r) => setTimeout(r, 2000))
+      return attemptStream(prompt, retryCount + 1)
+    }
+    throw err
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json() as LinkedInRequestBody
+
+    // Rate limiting
+    const identifier = getIdentifier(req, body.uid)
+    const { allowed, retryAfter } = checkRateLimit(identifier, body.isPro ?? false)
+    if (!allowed) return rateLimitResponse(retryAfter)
+
+    if (!body.pastedProfile?.trim() || !body.targetPosition?.trim()) {
+      return buildErrorResponse('pastedProfile and targetPosition are required', 400)
+    }
+
+    const prompt = buildLinkedInPrompt(
+      body.pastedProfile,
+      body.targetPosition,
+      body.sectorOrIndustry ?? ''
+    )
+
+    const stream = await attemptStream(prompt)
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Transfer-Encoding': 'chunked',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    })
+  } catch (err) {
+    return buildErrorResponse(err instanceof Error ? err.message : 'LinkedIn rewrite failed')
+  }
+}

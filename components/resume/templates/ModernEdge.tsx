@@ -1,0 +1,140 @@
+import type { ResumeData } from '@/types'
+
+interface ModernEdgeProps {
+  data: ResumeData
+  personal: {
+    name: string
+    email: string
+    phone: string
+    location: string
+    linkedin_url: string
+    website: string
+  }
+  isEditing?: boolean
+}
+
+export default function ModernEdge({ data, personal, isEditing }: ModernEdgeProps) {
+  return (
+    <>
+      <style>{`
+        .modern-edge { font-family: Arial, Helvetica, sans-serif; color: #1a1a1a; background: white; display: flex; min-height: 297mm; }
+        .modern-edge .sidebar { width: 28%; background: #1e1b4b; color: white; padding: 28px 16px; flex-shrink: 0; }
+        .modern-edge .main { flex: 1; padding: 28px 24px; }
+        .modern-edge .name { font-size: 24px; font-weight: 900; color: white; margin: 0 0 2px 0; line-height: 1.1; }
+        .modern-edge .role-label { font-size: 11px; color: #a5b4fc; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px; }
+        .modern-edge .sidebar-section { margin-bottom: 18px; }
+        .modern-edge .sidebar-header { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #a5b4fc; border-bottom: 1px solid rgba(165,180,252,0.3); padding-bottom: 4px; margin-bottom: 8px; }
+        .modern-edge .contact-item { font-size: 10px; color: #e0e7ff; margin-bottom: 4px; word-break: break-all; line-height: 1.4; }
+        .modern-edge .skill-chip { display: inline-block; font-size: 10px; color: #c7d2fe; margin-bottom: 4px; padding: 1px 0; line-height: 1.5; }
+        .modern-edge .main-section-header { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #4338ca; border-bottom: 2px solid #6366f1; padding-bottom: 3px; margin: 14px 0 8px 0; }
+        .modern-edge .job-title-row { display: flex; justify-content: space-between; align-items: baseline; }
+        .modern-edge .job-title { font-size: 12px; font-weight: 700; }
+        .modern-edge .job-dates { font-size: 10px; color: #6b7280; }
+        .modern-edge .job-company { font-size: 11px; color: #4338ca; margin-bottom: 3px; }
+        .modern-edge ul { margin: 3px 0 8px 14px; padding: 0; }
+        .modern-edge li { font-size: 11px; margin-bottom: 2px; line-height: 1.45; }
+        .modern-edge .summary-text { font-size: 11px; line-height: 1.55; margin: 0; }
+        .modern-edge .edu-row { margin-bottom: 8px; }
+        .modern-edge .edu-degree { font-size: 12px; font-weight: 700; }
+        .modern-edge .edu-info { font-size: 11px; color: #555; }
+        @media print {
+          .modern-edge * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+      `}</style>
+      <div className="modern-edge" data-ats-field="resume-root" style={{ width: '100%', boxSizing: 'border-box' }}>
+        {/* Sidebar */}
+        <aside className="sidebar" data-ats-field="sidebar">
+          <div className="name" data-ats-field="name">{personal.name || 'Your Name'}</div>
+          {data.experience[0] && (
+            <div className="role-label">{data.experience[0].title}</div>
+          )}
+
+          <div className="sidebar-section" data-ats-field="contact">
+            <div className="sidebar-header">Contact</div>
+            {personal.email && <div className="contact-item">✉ {personal.email}</div>}
+            {personal.phone && <div className="contact-item">📱 {personal.phone}</div>}
+            {personal.location && <div className="contact-item">📍 {personal.location}</div>}
+            {personal.linkedin_url && <div className="contact-item">in {personal.linkedin_url}</div>}
+            {personal.website && <div className="contact-item">🌐 {personal.website}</div>}
+          </div>
+
+          {data.skills.length > 0 && (
+            <div className="sidebar-section" data-ats-field="skills">
+              <div className="sidebar-header">Skills</div>
+              {data.skills.map((skill, i) => (
+                <div key={i} className="skill-chip">{skill}</div>
+              ))}
+            </div>
+          )}
+
+          {data.certifications.length > 0 && (
+            <div className="sidebar-section" data-ats-field="certifications">
+              <div className="sidebar-header">Certifications</div>
+              {data.certifications.map((cert, i) => (
+                <div key={i} className="contact-item">{cert}</div>
+              ))}
+            </div>
+          )}
+        </aside>
+
+        {/* Main */}
+        <main className="main">
+          {data.summary && (
+            <section data-ats-field="summary">
+              <div className="main-section-header">Profile</div>
+              <p className="summary-text">{data.summary}</p>
+            </section>
+          )}
+
+          {data.experience.length > 0 && (
+            <section data-ats-field="experience">
+              <div className="main-section-header">Experience</div>
+              {data.experience.map((exp) => (
+                <article key={exp.id} style={{ marginBottom: '10px' }}>
+                  <div className="job-title-row">
+                    <span className="job-title">{exp.title}</span>
+                    <span className="job-dates">{exp.start} – {exp.end}</span>
+                  </div>
+                  <div className="job-company">{exp.company}</div>
+                  <ul>
+                    {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                  </ul>
+                </article>
+              ))}
+            </section>
+          )}
+
+          {data.education.length > 0 && (
+            <section data-ats-field="education">
+              <div className="main-section-header">Education</div>
+              {data.education.map((edu) => (
+                <div key={edu.id} className="edu-row">
+                  <div className="edu-degree">{edu.degree} in {edu.field}</div>
+                  <div className="edu-info">{edu.institution} · {edu.year}</div>
+                </div>
+              ))}
+            </section>
+          )}
+
+          {data.projects.length > 0 && (
+            <section data-ats-field="projects">
+              <div className="main-section-header">Projects</div>
+              {data.projects.map((proj) => (
+                <article key={proj.id} style={{ marginBottom: '8px' }}>
+                  <div className="job-title-row">
+                    <span className="job-title">{proj.name}</span>
+                    {proj.url && <span className="job-dates">{proj.url}</span>}
+                  </div>
+                  {proj.description && <p style={{ fontSize: '11px', margin: '2px 0 3px 0' }}>{proj.description}</p>}
+                  {proj.bullets.length > 0 && (
+                    <ul>{proj.bullets.map((b, i) => <li key={i}>{b}</li>)}</ul>
+                  )}
+                </article>
+              ))}
+            </section>
+          )}
+        </main>
+      </div>
+    </>
+  )
+}

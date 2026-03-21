@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google Fonts — Inter (headings) + DM Sans (body) per CLAUDE.md §9 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: #0A0A0F;
+    --surface: #13131A;
+    --surface-elevated: #1C1C26;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.15);
+    --accent-primary: #6366F1;
+    --accent-secondary: #8B5CF6;
+    --accent-glow: rgba(99, 102, 241, 0.3);
+    --text-primary: #F8F8FF;
+    --text-secondary: #A0A0B8;
+    --text-muted: #60607A;
+    --success: #22C55E;
+    --warning: #F59E0B;
+    --error: #EF4444;
+  }
+
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  html,
+  body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Scrollbar — subtle dark styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--surface);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Focus ring — accessible, brand-colored */
+  :focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Double-Bezel Card Architecture per CLAUDE.md §9 */
+  .card-outer {
+    @apply rounded-2xl border p-1;
+    border-color: var(--border);
+    background-color: var(--surface);
+  }
+
+  .card-inner {
+    @apply rounded-xl p-6;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: var(--surface-elevated);
+  }
+
+  /* Primary CTA button */
+  .btn-primary {
+    @apply relative px-6 py-3 rounded-xl text-white font-semibold tracking-tight
+           shadow-lg transition-all duration-200
+           hover:scale-[1.02] active:scale-[0.98];
+    background: linear-gradient(135deg, #6366F1, #8B5CF6);
+    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.25);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 4px 32px rgba(99, 102, 241, 0.5);
+  }
+
+  /* Secondary / ghost button */
+  .btn-secondary {
+    @apply px-6 py-3 rounded-xl font-medium tracking-tight transition-all duration-200
+           hover:bg-white/5 active:scale-[0.98];
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+  }
+
+  /* Glass surface */
+  .glass {
+    @apply backdrop-blur-xl;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #6366F1, #8B5CF6, #A78BFA);
+  }
+
+  /* Skeleton loader */
+  .skeleton {
+    @apply rounded-lg animate-pulse;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+  }
+
+  @keyframes skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+}

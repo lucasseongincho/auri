@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@14 . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --no-git --yes)",
+      "Bash(npx create-next-app@14 . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --no-git --yes --skip-install)",
+      "Bash(ls /c/resume_builder/app/\\\\\\(auth\\\\\\)/)",
+      "Bash(ls /c/resume_builder/app/\\\\\\(dashboard\\\\\\)/)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard)",
+      "Bash(curl -s -o /dev/null -w \" %{http_code}\" http://localhost:3000/login)",
+      "Bash(curl -s http://localhost:3000/dashboard)",
+      "Bash(netstat -ano)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001)",
+      "Bash(curl -s -o /dev/null -w \"/ → %{http_code}\\\\n/dashboard → \" http://localhost:3001)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n/login → \" http://localhost:3001/dashboard)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n/api/claude/resume → \" http://localhost:3001/login)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/api/claude/resume)",
+      "Bash(cd:*)",
+      "Bash(cp \"app/\\(dashboard\\)/layout.tsx\" \"app/dashboard/layout.tsx\")",
+      "Bash(cp \"app/\\(dashboard\\)/page.tsx\" \"app/dashboard/page.tsx\")",
+      "Bash(cp \"app/\\(dashboard\\)/resume/page.tsx\" \"app/dashboard/resume/page.tsx\")",
+      "Bash(cp \"app/\\(dashboard\\)/resume/[id]/page.tsx\" \"app/dashboard/resume/[id]/page.tsx\")",
+      "Bash(cp \"app/\\(dashboard\\)/rewriter/page.tsx\" \"app/dashboard/rewriter/page.tsx\")",
+      "Bash(curl:*)",
+      "Bash(npx next:*)",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npx next build)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(echo \"TSC exit: $?\")",
+      "Bash(grep -v \"^$\")",
+      "Bash(node:*)",
+      "Bash(grep -rl \"ResumeAI\\\\|resumeai\\\\|Resume AI\\\\|resume-ai\" --include=*.ts --include=*.tsx --include=*.json --include=*.md --include=*.js .)",
+      "Bash(git init:*)",
+      "Bash(git remote:*)"
+    ]
+  }
+}
