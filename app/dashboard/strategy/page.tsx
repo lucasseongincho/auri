@@ -184,8 +184,13 @@ export default function StrategyPage() {
 
     if (fullText) {
       try {
-        const cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
-        const parsed = JSON.parse(cleaned) as JobStrategy
+        // Strip markdown fences, then extract the outermost JSON object
+        const stripped = fullText.replace(/```json\n?|```\n?/g, '').trim()
+        const start = stripped.indexOf('{')
+        const end = stripped.lastIndexOf('}')
+        if (start === -1 || end === -1) throw new Error('No JSON object found')
+        const parsed = JSON.parse(stripped.slice(start, end + 1)) as JobStrategy
+        if (!parsed.days || !Array.isArray(parsed.days)) throw new Error('Invalid structure')
         setStrategy(parsed)
         setCompleted({})
         // Save to careerStore

@@ -192,14 +192,8 @@ Create a 7-day approach plan, focused on ${companySizeOrType}, which includes:
 
 Be specific, actionable, and realistic for a 7-day sprint. No vague advice.
 
-Return ONLY valid JSON:
-{
-  "days": [{
-    "day": number,
-    "theme": "string",
-    "actions": [{ "time": "string", "action": "string", "resource": "string" }]
-  }]
-}`
+Respond with ONLY the raw JSON object below — no markdown, no code fences, no explanation, no preamble:
+{"days":[{"day":1,"theme":"string","actions":[{"time":"string","action":"string","resource":"string"}]}]}`
 }
 
 // ── Feature 8 — Cover Letter Generator ───────────────────────────────────────
