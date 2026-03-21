@@ -98,6 +98,15 @@ export async function deleteInterviewPrep(uid: string, prepId: string): Promise<
   await deleteDoc(ref)
 }
 
+// ── Single interview prep lookup ──────────────────────────────────────────────
+
+export async function getSavedInterviewPrep(uid: string, prepId: string): Promise<SavedInterviewPrep | null> {
+  const ref = doc(db, 'users', uid, 'interview-prep', prepId)
+  const snap = await getDoc(ref)
+  if (!snap.exists()) return null
+  return { id: snap.id, ...snap.data() } as SavedInterviewPrep
+}
+
 // ── localStorage helpers for guest users ─────────────────────────────────────
 
 const GUEST_STORAGE_KEY = 'auri_guest_profile'
@@ -128,6 +137,43 @@ export function clearGuestProfile(): void {
 }
 
 // ── Migration: localStorage → Firestore on sign-in ───────────────────────────
+
+// ── Guest interview prep (localStorage) ──────────────────────────────────────
+
+const GUEST_INTERVIEW_KEY = 'auri_guest_interview_preps'
+
+export function getGuestInterviewPreps(): SavedInterviewPrep[] {
+  if (typeof window === 'undefined') return []
+  const raw = localStorage.getItem(GUEST_INTERVIEW_KEY)
+  if (!raw) return []
+  try { return JSON.parse(raw) as SavedInterviewPrep[] } catch { return [] }
+}
+
+export function saveGuestInterviewPrep(
+  position: string,
+  company: string,
+  prep: InterviewPrep
+): string {
+  if (typeof window === 'undefined') return ''
+  const preps = getGuestInterviewPreps()
+  const id = `guest_${Date.now()}`
+  preps.unshift({ id, position, company, prep, createdAt: new Date().toISOString() })
+  localStorage.setItem(GUEST_INTERVIEW_KEY, JSON.stringify(preps))
+  return id
+}
+
+export function deleteGuestInterviewPrep(id: string): void {
+  if (typeof window === 'undefined') return
+  const preps = getGuestInterviewPreps().filter((p) => p.id !== id)
+  localStorage.setItem(GUEST_INTERVIEW_KEY, JSON.stringify(preps))
+}
+
+export async function migrateGuestInterviewPrepsToFirestore(uid: string): Promise<void> {
+  const preps = getGuestInterviewPreps()
+  if (preps.length === 0) return
+  await Promise.all(preps.map((p) => saveInterviewPrep(uid, p.position, p.company, p.prep)))
+  localStorage.removeItem(GUEST_INTERVIEW_KEY)
+}
 
 export async function migrateGuestToFirestore(uid: string): Promise<void> {
   const guestProfile = getGuestProfile()

@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   MessageSquare,
@@ -12,11 +13,11 @@ import {
   CheckCircle,
   AlertCircle,
   BookOpen,
-  Mic,
   Send,
   Star,
   BookMarked,
   Copy,
+  ExternalLink,
 } from 'lucide-react'
 import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
@@ -24,7 +25,7 @@ import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
-import { saveInterviewPrep } from '@/lib/firestore'
+import { saveInterviewPrep, saveGuestInterviewPrep } from '@/lib/firestore'
 import type { InterviewPrep, InterviewQuestion } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -41,6 +42,8 @@ interface PracticeFeedback {
   improvements: string[]
   improved_answer: string
 }
+
+// ── FlipCard ────────────────────────────────────────────────────────────────
 
 function FlipCard({
   question,
@@ -68,7 +71,7 @@ function FlipCard({
     try {
       let idToken: string | undefined
       if (auth.currentUser) {
-        try { idToken = await getIdToken(auth.currentUser) } catch { /* guest — IP rate limit applies */ }
+        try { idToken = await getIdToken(auth.currentUser) } catch { /* guest */ }
       }
       const res = await fetch('/api/claude/interview', {
         method: 'POST',
@@ -95,22 +98,23 @@ function FlipCard({
 
   const scoreColor = (n: number) => n >= 8 ? '#22C55E' : n >= 6 ? '#F59E0B' : '#EF4444'
 
+  // ── CSS grid overlay: both front and back share the same grid cell.
+  // Grid cell height = max(front height, back height) → no overflow, no absolute positioning.
   return (
-    <div className="w-full" style={{ perspective: '1200px' }}>
+    <div style={{ perspective: '1200px' }}>
       <motion.div
-        className="relative w-full"
-        style={{ transformStyle: 'preserve-3d' }}
+        style={{ display: 'grid', transformStyle: 'preserve-3d' }}
         animate={{ rotateY: flipped ? 180 : 0 }}
         transition={CARD_SPRING}
       >
-        {/* Front — Question */}
+        {/* ── Front: Question ─────────────────────────────── */}
         <div
           className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 cursor-pointer"
-          style={{ backfaceVisibility: 'hidden' }}
+          style={{ gridArea: '1/1', backfaceVisibility: 'hidden' }}
           onClick={() => !isPracticeMode && setFlipped(true)}
         >
-          <div className="rounded-xl border border-white/[0.05] bg-gradient-to-br from-[#1C1C26] to-[#0F0F1A] p-6 min-h-[200px] flex flex-col">
-            <div className="flex items-start justify-between mb-4">
+          <div className="rounded-xl border border-white/[0.05] bg-gradient-to-br from-[#1C1C26] to-[#0F0F1A] p-6 flex flex-col gap-4">
+            <div className="flex items-start justify-between">
               <span className="px-2.5 py-1 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/20 text-xs font-semibold text-[#F87171] uppercase tracking-wide">
                 Q{index + 1}
               </span>
@@ -120,11 +124,22 @@ function FlipCard({
                 </span>
               )}
             </div>
-            <p className="text-white font-medium text-base leading-relaxed flex-1">{question.question}</p>
+            <p className="text-white font-medium text-base leading-relaxed">{question.question}</p>
             {isPracticeMode && (
-              <div className="mt-4 space-y-3" onClick={(e) => e.stopPropagation()}>
-                <textarea className={`${TEXTAREA_CLASS} text-sm`} rows={4} placeholder="Type your answer here…" value={userAnswer} onChange={(e) => setUserAnswer(e.target.value)} aria-label="Your answer" />
-                {scoreError && <p className="text-xs text-[#EF4444] flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {scoreError}</p>}
+              <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
+                <textarea
+                  className={`${TEXTAREA_CLASS} text-sm`}
+                  rows={4}
+                  placeholder="Type your answer here using the STAR method…"
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  aria-label="Your answer"
+                />
+                {scoreError && (
+                  <p className="text-xs text-[#EF4444] flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" /> {scoreError}
+                  </p>
+                )}
                 {feedback ? (
                   <div className="space-y-3">
                     <div className="flex gap-2 flex-wrap">
@@ -151,7 +166,9 @@ function FlipCard({
                         {feedback.improvements.map((s, i) => <p key={i} className="text-xs text-[#A0A0B8]">→ {s}</p>)}
                       </div>
                     )}
-                    <button onClick={() => { setFeedback(null); setUserAnswer('') }} className="text-xs text-[#6366F1] underline">Try again</button>
+                    <button onClick={() => { setFeedback(null); setUserAnswer('') }} className="text-xs text-[#6366F1] underline">
+                      Try again
+                    </button>
                   </div>
                 ) : (
                   <button
@@ -159,7 +176,10 @@ function FlipCard({
                     disabled={!userAnswer.trim() || isScoring}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#EF4444] to-[#DC2626] text-white shadow-lg shadow-[#EF4444]/25 hover:shadow-[#EF4444]/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isScoring ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Scoring…</> : <><Send className="w-3.5 h-3.5" /> Get AI Feedback</>}
+                    {isScoring
+                      ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Scoring…</>
+                      : <><Send className="w-3.5 h-3.5" /> Submit Answer</>
+                    }
                   </button>
                 )}
               </div>
@@ -167,32 +187,36 @@ function FlipCard({
           </div>
         </div>
 
-        {/* Back — STAR Framework */}
+        {/* ── Back: STAR Framework ─────────────────────────── */}
         <div
-          className="absolute inset-0 rounded-2xl border border-[#6366F1]/20 bg-[#13131A] p-1 cursor-pointer"
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          className="rounded-2xl border border-[#6366F1]/20 bg-[#13131A] p-1 cursor-pointer"
+          style={{ gridArea: '1/1', backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           onClick={() => setFlipped(false)}
         >
-          <div className="rounded-xl border border-[#6366F1]/10 bg-gradient-to-br from-[#1C1C26] to-[#0F0F1A] p-6 min-h-[200px] flex flex-col">
-            <div className="flex items-start justify-between mb-4">
-              <span className="px-2.5 py-1 rounded-lg bg-[#6366F1]/10 border border-[#6366F1]/20 text-xs font-semibold text-[#818CF8] uppercase tracking-wide">STAR Framework</span>
-              <span className="text-xs text-[#60607A] flex items-center gap-1"><RotateCcw className="w-3 h-3" /> Tap to flip back</span>
+          <div className="rounded-xl border border-[#6366F1]/10 bg-gradient-to-br from-[#1C1C26] to-[#0F0F1A] p-6 flex flex-col gap-3">
+            <div className="flex items-start justify-between">
+              <span className="px-2.5 py-1 rounded-lg bg-[#6366F1]/10 border border-[#6366F1]/20 text-xs font-semibold text-[#818CF8] uppercase tracking-wide">
+                STAR Framework
+              </span>
+              <span className="text-xs text-[#60607A] flex items-center gap-1">
+                <RotateCcw className="w-3 h-3" /> Tap to flip back
+              </span>
             </div>
-            <div className="flex-1 space-y-3">
-              <p className="text-sm text-[#A0A0B8] leading-relaxed">{question.answer_framework}</p>
-              {question.star_example && (
-                <div className="p-3 rounded-xl bg-[#6366F1]/5 border border-[#6366F1]/15">
-                  <p className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide mb-1.5">Example</p>
-                  <p className="text-xs text-[#A0A0B8] leading-relaxed">{question.star_example}</p>
-                </div>
-              )}
-            </div>
+            <p className="text-sm text-[#A0A0B8] leading-relaxed">{question.answer_framework}</p>
+            {question.star_example && (
+              <div className="p-3 rounded-xl bg-[#6366F1]/5 border border-[#6366F1]/15">
+                <p className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide mb-1.5">Example</p>
+                <p className="text-xs text-[#A0A0B8] leading-relaxed">{question.star_example}</p>
+              </div>
+            )}
           </div>
         </div>
       </motion.div>
     </div>
   )
 }
+
+// ── QuestionsToAsk ───────────────────────────────────────────────────────────
 
 function QuestionsToAsk({ questions }: { questions: string[] }) {
   const [copied, setCopied] = useState<number | null>(null)
@@ -231,6 +255,16 @@ function QuestionsToAsk({ questions }: { questions: string[] }) {
   )
 }
 
+// ── Toast ────────────────────────────────────────────────────────────────────
+
+interface Toast {
+  type: 'success' | 'error'
+  message: string
+  link?: { label: string; href: string }
+}
+
+// ── Main page ────────────────────────────────────────────────────────────────
+
 export default function InterviewPage() {
   const { user } = useAuth()
   const { profile, updateProfile } = useCareerStore()
@@ -245,8 +279,18 @@ export default function InterviewPage() {
   const [currentCard, setCurrentCard] = useState(0)
   const [savedToStudyList, setSavedToStudyList] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [toast, setToast] = useState<Toast | null>(null)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const { isStreaming, stream } = useAIStream()
+
+  const showToast = useCallback((t: Toast) => {
+    setToast(t)
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToast(null), 4000)
+  }, [])
+
+  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current) }, [])
 
   const handleGenerate = useCallback(async () => {
     if (!position.trim() || !company.trim()) return
@@ -254,6 +298,7 @@ export default function InterviewPage() {
     setGenerateError('')
     setCurrentCard(0)
     setSavedToStudyList(false)
+    setIsPracticeMode(false)
 
     const fullText = await stream('/api/claude/interview', {
       mode: 'generate',
@@ -271,7 +316,6 @@ export default function InterviewPage() {
         const cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
         const parsed = JSON.parse(cleaned) as InterviewPrep
         setPrep(parsed)
-        // Save to careerStore
         if (profile) {
           updateProfile({ generated: { ...profile.generated, interview_prep: parsed } })
         }
@@ -282,32 +326,80 @@ export default function InterviewPage() {
   }, [position, company, experienceSummary, user?.uid, stream, profile, updateProfile])
 
   const handleSaveToStudyList = useCallback(async () => {
-    if (!prep || !user?.uid) return
+    if (!prep) return
     setIsSaving(true)
     try {
-      await saveInterviewPrep(user.uid, position, company, prep)
+      if (user?.uid) {
+        // Authenticated: save to Firestore
+        await saveInterviewPrep(user.uid, position, company, prep)
+      } else {
+        // Guest: save to localStorage
+        saveGuestInterviewPrep(position, company, prep)
+      }
       setSavedToStudyList(true)
-    } catch { /* silent fail */ } finally {
+      showToast({
+        type: 'success',
+        message: 'Saved to study list!',
+        link: { label: 'View all sessions →', href: '/dashboard/interview/saved' },
+      })
+    } catch {
+      showToast({ type: 'error', message: 'Failed to save. Please try again.' })
+    } finally {
       setIsSaving(false)
     }
-  }, [prep, user?.uid, position, company])
+  }, [prep, user?.uid, position, company, showToast])
 
   return (
     <div className="space-y-6 pb-20 md:pb-0">
+      {/* ── Toast ─────────────────────────────────────────── */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key="toast"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            className={`fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[9999] flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border
+              ${toast.type === 'success'
+                ? 'bg-[#22C55E]/20 border-[#22C55E]/30 text-[#22C55E]'
+                : 'bg-[#EF4444]/20 border-[#EF4444]/30 text-[#EF4444]'
+              }`}
+          >
+            {toast.type === 'success' ? <CheckCircle className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
+            <span className="text-sm font-medium">{toast.message}</span>
+            {toast.link && (
+              <Link href={toast.link.href} className="text-sm font-semibold underline flex items-center gap-1">
+                {toast.link.label} <ExternalLink className="w-3 h-3" />
+              </Link>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Page header ─────────────────────────────────────── */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#EF4444] to-[#DC2626] flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 text-white" />
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#EF4444] to-[#DC2626] flex items-center justify-center">
+              <MessageSquare className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="font-heading text-2xl font-bold text-white">Interview Prep</h1>
           </div>
-          <h1 className="font-heading text-2xl font-bold text-white">Interview Prep</h1>
+          <Link
+            href="/dashboard/interview/saved"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all"
+          >
+            <BookMarked className="w-3.5 h-3.5" />
+            Saved Sessions
+          </Link>
         </div>
         <p className="text-[#A0A0B8] text-sm ml-12">
-          8 likely questions with STAR frameworks, plus 3 strategic questions to ask the interviewer.
+          8 likely questions with STAR frameworks, plus 3 strategic questions to ask.
         </p>
       </motion.div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr] gap-6">
-        {/* ── Left: Form + Controls ────────────────────────────────────────────── */}
+        {/* ── Left: Form + Controls ─────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -346,7 +438,10 @@ export default function InterviewPage() {
                   shadow-lg shadow-[#EF4444]/25 hover:shadow-[#EF4444]/50 hover:scale-[1.01]
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                {isStreaming ? <><Loader2 className="w-4 h-4 animate-spin" /> Preparing…</> : <><Sparkles className="w-4 h-4" /> Generate Interview Prep</>}
+                {isStreaming
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Preparing…</>
+                  : <><Sparkles className="w-4 h-4" /> Generate Interview Prep</>
+                }
               </button>
             </div>
           </div>
@@ -355,16 +450,24 @@ export default function InterviewPage() {
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}
               className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
               <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
+
+                {/* Practice Mode toggle — fixed overflow */}
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-[#A0A0B8] uppercase tracking-wide">Practice Mode</span>
                   <button
                     onClick={() => setIsPracticeMode(!isPracticeMode)}
-                    className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${isPracticeMode ? 'bg-[#EF4444]' : 'bg-white/10'}`}
+                    className={`relative inline-flex items-center w-12 h-6 rounded-full
+                      transition-colors duration-200 focus:outline-none
+                      ${isPracticeMode ? 'bg-[#EF4444]' : 'bg-white/10'}`}
                     role="switch"
                     aria-checked={isPracticeMode}
                     aria-label="Toggle practice mode"
                   >
-                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${isPracticeMode ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                    <span
+                      className={`inline-block w-5 h-5 bg-white rounded-full shadow-md
+                        transform transition-transform duration-200
+                        ${isPracticeMode ? 'translate-x-6' : 'translate-x-1'}`}
+                    />
                   </button>
                 </div>
 
@@ -390,24 +493,35 @@ export default function InterviewPage() {
                   </div>
                 </div>
 
-                {user?.uid && (
-                  <button
-                    onClick={handleSaveToStudyList}
-                    disabled={savedToStudyList || isSaving}
-                    className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium transition-all ${
-                      savedToStudyList ? 'bg-[#22C55E]/20 text-[#22C55E] border border-[#22C55E]/30 cursor-default' : 'border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : savedToStudyList ? <CheckCircle className="w-3.5 h-3.5" /> : <BookMarked className="w-3.5 h-3.5" />}
-                    {savedToStudyList ? 'Saved to Study List' : 'Save to Study List'}
-                  </button>
+                <button
+                  onClick={handleSaveToStudyList}
+                  disabled={savedToStudyList || isSaving}
+                  className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium transition-all ${
+                    savedToStudyList
+                      ? 'bg-[#22C55E]/20 text-[#22C55E] border border-[#22C55E]/30 cursor-default'
+                      : 'border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {isSaving
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    : savedToStudyList
+                    ? <CheckCircle className="w-3.5 h-3.5" />
+                    : <BookMarked className="w-3.5 h-3.5" />
+                  }
+                  {savedToStudyList ? 'Saved!' : 'Save to Study List'}
+                </button>
+
+                {!user && (
+                  <p className="text-xs text-[#60607A] text-center">
+                    Saving without sign-in stores locally on this device.
+                  </p>
                 )}
               </div>
             </motion.div>
           )}
         </motion.div>
 
-        {/* ── Right: Cards ─────────────────────────────────────────────────────── */}
+        {/* ── Right: Cards ──────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -433,11 +547,12 @@ export default function InterviewPage() {
               </motion.div>
             ) : prep ? (
               <motion.div key="result" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={SPRING} className="space-y-6">
+                {/* Mode indicator */}
                 <div className="flex items-center gap-2">
                   {isPracticeMode ? (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#EF4444]/10 border border-[#EF4444]/20">
-                      <Mic className="w-3.5 h-3.5 text-[#EF4444]" />
-                      <span className="text-xs font-medium text-[#EF4444]">Practice Mode Active</span>
+                      <span className="w-2 h-2 rounded-full bg-[#EF4444]" />
+                      <span className="text-xs font-medium text-[#EF4444]">Practice Mode Active — Type your answers below</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/[0.08]">
@@ -447,21 +562,45 @@ export default function InterviewPage() {
                   )}
                 </div>
 
+                {/* Flip card — key includes isPracticeMode so toggling remounts card (resets flipped state) */}
                 <AnimatePresence mode="wait">
-                  <motion.div key={currentCard} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={SPRING}>
-                    <FlipCard question={prep.questions[currentCard]} index={currentCard} isPracticeMode={isPracticeMode} targetPosition={position} uid={user?.uid} />
+                  <motion.div
+                    key={`${currentCard}-${isPracticeMode ? 1 : 0}`}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={SPRING}
+                  >
+                    <FlipCard
+                      question={prep.questions[currentCard]}
+                      index={currentCard}
+                      isPracticeMode={isPracticeMode}
+                      targetPosition={position}
+                      uid={user?.uid}
+                    />
                   </motion.div>
                 </AnimatePresence>
 
-                <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                {/* Navigation dots — in own container with clearance from card and QuestionsToAsk */}
+                <div className="flex items-center justify-center gap-1.5 flex-wrap py-1">
                   {prep.questions.map((_, i) => (
-                    <button key={i} onClick={() => setCurrentCard(i)} aria-label={`Go to question ${i + 1}`}
-                      className={`w-2 h-2 rounded-full transition-all duration-200 ${i === currentCard ? 'bg-[#EF4444] scale-125' : 'bg-white/20 hover:bg-white/40'}`}
+                    <button
+                      key={i}
+                      onClick={() => setCurrentCard(i)}
+                      aria-label={`Go to question ${i + 1}`}
+                      className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                        i === currentCard ? 'bg-[#EF4444]' : 'bg-white/20 hover:bg-white/40'
+                      }`}
                     />
                   ))}
                 </div>
 
-                {prep.questions_to_ask.length > 0 && <QuestionsToAsk questions={prep.questions_to_ask} />}
+                {/* Questions to Ask — clear separation from dots */}
+                {prep.questions_to_ask.length > 0 && (
+                  <div className="mt-2">
+                    <QuestionsToAsk questions={prep.questions_to_ask} />
+                  </div>
+                )}
               </motion.div>
             ) : (
               <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
