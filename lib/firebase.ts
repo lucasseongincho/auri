@@ -12,11 +12,18 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
 
-// Singleton pattern — prevents re-initialization on hot reload in dev
-const app: FirebaseApp = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)
+// Guard against Next.js SSG build crash: Firebase throws auth/invalid-api-key
+// at module-load time when NEXT_PUBLIC_FIREBASE_API_KEY is missing in the build env.
+// All Firebase operations are inside useEffect → never called during SSG, so the
+// empty-object fallback is safe. Real env vars are required at runtime.
+const hasConfig = Boolean(process.env.NEXT_PUBLIC_FIREBASE_API_KEY)
 
-const auth: Auth = getAuth(app)
-const db: Firestore = getFirestore(app)
+const app: FirebaseApp = hasConfig
+  ? (getApps().length > 0 ? getApp() : initializeApp(firebaseConfig))
+  : ({} as FirebaseApp)
+
+const auth: Auth = hasConfig ? getAuth(app) : ({} as Auth)
+const db: Firestore = hasConfig ? getFirestore(app) : ({} as Firestore)
 
 // No Firebase Storage — PDFs generated client-side via html2pdf.js
 
