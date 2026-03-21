@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { streamClaude, callClaude, buildErrorResponse, parseClaudeJSON, MAX_TOKENS_RESUME, MAX_TOKENS_ASSIST } from '@/lib/claude'
 import { buildResumePrompt, buildEasyTunePrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
+import { getAuthenticatedUser } from '@/lib/verifyAuth'
 import type { CareerProfile, TargetJob, APIMode } from '@/types'
 
 export const runtime = 'nodejs'
@@ -58,9 +59,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json() as ResumeRequestBody
     const { careerProfile, target, mode, selectedText } = body
 
-    // Rate limiting
-    const identifier = getIdentifier(req, body.uid)
-    const { allowed, retryAfter } = checkRateLimit(identifier, body.isPro ?? false)
+    // Server-side auth + rate limiting
+    const verifiedUser = await getAuthenticatedUser(req)
+    const identifier = getIdentifier(req, verifiedUser?.uid)
+    const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)
 
     // Easy Tune (assist mode) — short non-streaming response

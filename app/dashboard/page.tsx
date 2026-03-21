@@ -1,15 +1,75 @@
 'use client'
 
+import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   FileText, Target, Linkedin, Map, Mail, MessageSquare,
-  ChevronRight, TrendingUp, CheckCircle, AlertCircle,
+  ChevronRight, TrendingUp, CheckCircle, AlertCircle, Sparkles, X,
 } from 'lucide-react'
 import { useCareerProfile } from '@/hooks/useCareerProfile'
 import { useAuth } from '@/hooks/useAuth'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
+
+// ── Upgrade success toast — shown after Stripe checkout redirect ──────────────
+function UpgradedToast({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -24, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -24, scale: 0.95 }}
+      transition={SPRING}
+      className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4"
+    >
+      <div className="rounded-2xl border border-[#6366F1]/40 bg-[#13131A] p-1 shadow-2xl shadow-[#6366F1]/20">
+        <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] px-5 py-4 flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-heading font-bold text-white text-sm">Welcome to AURI Pro! 🎉</p>
+            <p className="text-xs text-[#A0A0B8] mt-0.5">Unlimited generations unlocked. You&apos;re ready to land the job.</p>
+          </div>
+          <button onClick={onDismiss} aria-label="Dismiss" className="text-[#60607A] hover:text-white transition-colors flex-shrink-0">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// Inner component that reads search params (must be inside Suspense)
+function UpgradeSuccessHandler() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [showToast, setShowToast] = useState(false)
+
+  useEffect(() => {
+    if (searchParams.get('upgraded') === 'true') {
+      setShowToast(true)
+      // Remove query param from URL without navigation
+      router.replace('/dashboard', { scroll: false })
+    }
+  }, [searchParams, router])
+
+  const dismiss = () => setShowToast(false)
+
+  // Auto-dismiss after 6 seconds
+  useEffect(() => {
+    if (!showToast) return
+    const t = setTimeout(() => setShowToast(false), 6000)
+    return () => clearTimeout(t)
+  }, [showToast])
+
+  return (
+    <AnimatePresence>
+      {showToast && <UpgradedToast onDismiss={dismiss} />}
+    </AnimatePresence>
+  )
+}
 
 const QUICK_ACTIONS = [
   { label: 'Build Resume', desc: 'Generate ATS-optimized resume', icon: FileText, href: '/dashboard/resume', color: 'from-[#6366F1] to-[#4F46E5]' },
@@ -46,6 +106,11 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 pb-20 md:pb-0">
+      {/* Upgrade success toast */}
+      <Suspense fallback={null}>
+        <UpgradeSuccessHandler />
+      </Suspense>
+
       {/* Welcome */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

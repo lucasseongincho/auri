@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { getIdToken } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 
 interface StreamOptions {
@@ -47,9 +49,20 @@ export function useAIStream() {
       const MAX_RETRIES = 1 // Per CLAUDE.md §7: 1 retry on 529
 
       const attempt = async (): Promise<string> => {
+        // Attach Firebase ID token for server-side auth verification + isPro check
+        let idToken: string | undefined
+        if (auth.currentUser) {
+          try {
+            idToken = await getIdToken(auth.currentUser)
+          } catch { /* guest users have no token — IP-based rate limiting applies */ }
+        }
+
         const response = await fetch(endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+          },
           body: JSON.stringify(body),
         })
 

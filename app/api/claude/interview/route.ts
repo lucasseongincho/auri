@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { streamClaude, callClaude, buildErrorResponse, parseClaudeJSON } from '@/lib/claude'
 import { buildInterviewPrepPrompt, buildPracticeFeedbackPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
+import { getAuthenticatedUser } from '@/lib/verifyAuth'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -55,9 +56,10 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as InterviewRequestBody
 
-    // Rate limiting
-    const identifier = getIdentifier(req, body.uid)
-    const { allowed, retryAfter } = checkRateLimit(identifier, body.isPro ?? false)
+    // Server-side auth + rate limiting
+    const verifiedUser = await getAuthenticatedUser(req)
+    const identifier = getIdentifier(req, verifiedUser?.uid)
+    const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)
 
     // Practice mode — short non-streaming response

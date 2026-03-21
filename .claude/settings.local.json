@@ -32,7 +32,11 @@
       "Bash(node:*)",
       "Bash(grep -rl \"ResumeAI\\\\|resumeai\\\\|Resume AI\\\\|resume-ai\" --include=*.ts --include=*.tsx --include=*.json --include=*.md --include=*.js .)",
       "Bash(git init:*)",
-      "Bash(git remote:*)"
+      "Bash(git remote:*)",
+      "Bash(npm run:*)",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npm run build)",
+      "Bash(echo \"EXIT_CODE: $?\")",
+      "Bash(grep -r \"localhost:3000\\\\|NEXT_PUBLIC_APP_URL\" C:resume_builder --include=*.ts --include=*.tsx --include=*.env* -l)"
     ]
   }
 }

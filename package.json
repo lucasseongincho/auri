@@ -11,8 +11,11 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
     "@types/pdf-parse": "^1.1.5",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.37.0",
     "clsx": "^2.1.1",
     "firebase": "^10.14.1",
+    "firebase-admin": "^13.7.0",
     "framer-motion": "^11.11.11",
     "html2pdf.js": "^0.10.2",
     "lucide-react": "^0.453.0",
@@ -20,6 +23,7 @@
     "pdf-parse": "^2.4.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "stripe": "^20.4.1",
     "tailwind-merge": "^2.5.4",
     "zustand": "^4.5.5"
   },

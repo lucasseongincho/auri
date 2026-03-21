@@ -1,56 +1,98 @@
-// ── Rate Limiter — in-memory sliding window ───────────────────────────────────
-// Per CLAUDE.md Phase 3: 10 calls/min free tier, 60 calls/min Pro tier.
+// ── Rate Limiter — Upstash Redis sliding window with in-memory fallback ───────
 //
-// Why in-memory: Avoids Upstash/Redis dependency for Phase 3. Works correctly
-// for single-process deployments (local dev, single Vercel instance). A Redis
-// backend would be needed for multi-region deploys — noted as Phase 4 upgrade.
+// Primary backend: Upstash Redis (production Vercel deploys)
+//   - Persists across serverless function invocations and multiple instances
+//   - Configured via UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN
 //
-// Why sliding window vs fixed window: Prevents burst abuse at window boundaries
-// (a fixed window allows 2× the limit by hitting end + start of adjacent windows).
+// Fallback: In-memory sliding window (local dev / when Upstash not configured)
+//   - Correct for single-process use; resets on function cold start
+//
+// Limits per CLAUDE.md §12: 10 calls/min free, 60 calls/min Pro
+// Sliding window prevents burst abuse at window boundaries.
+
+import { Redis } from '@upstash/redis'
+import { Ratelimit } from '@upstash/ratelimit'
+
+const WINDOW_MS = 60_000
+const LIMITS = { free: 10, pro: 60 } as const
+
+// ── In-memory fallback ────────────────────────────────────────────────────────
 
 interface WindowEntry {
   timestamps: number[]
 }
 
-const store = new Map<string, WindowEntry>()
+const memoryStore = new Map<string, WindowEntry>()
 
-const WINDOW_MS = 60_000 // 1 minute
-
-const LIMITS = {
-  free: 10,
-  pro: 60,
-} as const
-
-/**
- * Check whether the given identifier is within its rate limit.
- * @param identifier - uid for authenticated users, IP for guests
- * @param isPro      - whether the user is on the Pro tier
- * @returns { allowed: boolean; retryAfter: number } — retryAfter is in seconds
- */
-export function checkRateLimit(
+function checkInMemory(
   identifier: string,
   isPro: boolean
 ): { allowed: boolean; retryAfter: number } {
   const limit = isPro ? LIMITS.pro : LIMITS.free
   const now = Date.now()
-
-  const entry = store.get(identifier) ?? { timestamps: [] }
-
-  // Prune timestamps outside the sliding window
-  const windowStart = now - WINDOW_MS
-  entry.timestamps = entry.timestamps.filter((t) => t > windowStart)
+  const entry = memoryStore.get(identifier) ?? { timestamps: [] }
+  entry.timestamps = entry.timestamps.filter((t) => t > now - WINDOW_MS)
 
   if (entry.timestamps.length >= limit) {
-    // Oldest timestamp in window + 1 minute = when the earliest slot frees up
     const oldest = entry.timestamps[0]
     const retryAfter = Math.ceil((oldest + WINDOW_MS - now) / 1000)
-    store.set(identifier, entry)
+    memoryStore.set(identifier, entry)
     return { allowed: false, retryAfter: Math.max(1, retryAfter) }
   }
 
   entry.timestamps.push(now)
-  store.set(identifier, entry)
+  memoryStore.set(identifier, entry)
   return { allowed: true, retryAfter: 0 }
+}
+
+// ── Upstash Redis ─────────────────────────────────────────────────────────────
+
+const hasUpstash = Boolean(
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+)
+
+let ratelimitFree: Ratelimit | null = null
+let ratelimitPro: Ratelimit | null = null
+
+if (hasUpstash) {
+  const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL!,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  })
+  ratelimitFree = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(LIMITS.free, '1 m'),
+    prefix: 'auri:rl',
+  })
+  ratelimitPro = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(LIMITS.pro, '1 m'),
+    prefix: 'auri:rl:pro',
+  })
+}
+
+// ── Public API ────────────────────────────────────────────────────────────────
+
+/**
+ * Check whether the given identifier is within its rate limit.
+ * Uses Upstash Redis in production, falls back to in-memory if not configured.
+ */
+export async function checkRateLimit(
+  identifier: string,
+  isPro: boolean
+): Promise<{ allowed: boolean; retryAfter: number }> {
+  if (hasUpstash && ratelimitFree && ratelimitPro) {
+    try {
+      const limiter = isPro ? ratelimitPro : ratelimitFree
+      const { success, reset } = await limiter.limit(identifier)
+      if (success) return { allowed: true, retryAfter: 0 }
+      const retryAfter = Math.ceil((reset - Date.now()) / 1000)
+      return { allowed: false, retryAfter: Math.max(1, retryAfter) }
+    } catch {
+      // Redis error — fall through to in-memory
+    }
+  }
+  return checkInMemory(identifier, isPro)
 }
 
 /**
@@ -67,22 +109,17 @@ export function getIdentifier(req: Request, uid?: string): string {
 }
 
 /**
- * Build a standardized 429 rate-limit response.
+ * Build a standardized 429 rate-limit response per task spec:
+ * { error: "Rate limit reached", retryAfter: seconds }
  */
 export function rateLimitResponse(retryAfter: number): Response {
   return Response.json(
-    {
-      success: false,
-      data: null,
-      usage: { input_tokens: 0, output_tokens: 0 },
-      error: 'Rate limit reached',
-      retryAfter,
-    },
+    { error: 'Rate limit reached', retryAfter },
     {
       status: 429,
       headers: {
         'Retry-After': String(retryAfter),
-        'X-RateLimit-Limit': '10',
+        'X-RateLimit-Limit': String(LIMITS.free),
         'X-RateLimit-Remaining': '0',
       },
     }

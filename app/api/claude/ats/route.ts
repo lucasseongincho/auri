@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { callClaude, buildErrorResponse, parseClaudeJSON, MAX_TOKENS_ANALYSIS } from '@/lib/claude'
 import { buildATSScorePrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
+import { getAuthenticatedUser } from '@/lib/verifyAuth'
 import type { ATSScore } from '@/types'
 
 export const runtime = 'nodejs'
@@ -15,9 +16,10 @@ export async function POST(req: NextRequest) {
       isPro?: boolean
     }
 
-    // Rate limiting
-    const identifier = getIdentifier(req, body.uid)
-    const { allowed, retryAfter } = checkRateLimit(identifier, body.isPro ?? false)
+    // Server-side auth + rate limiting
+    const verifiedUser = await getAuthenticatedUser(req)
+    const identifier = getIdentifier(req, verifiedUser?.uid)
+    const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)
 
     if (!body.resumePlainText || !body.jobDescription) {
