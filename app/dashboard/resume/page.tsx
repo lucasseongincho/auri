@@ -1313,7 +1313,7 @@ export default function ResumePage() {
   const isLastStep = currentStep === STEPS.length
 
   return (
-    <div className="h-full flex flex-col" style={{ minHeight: 'calc(100vh - 64px)' }}>
+    <div className="h-full flex flex-col pb-20 md:pb-0" style={{ minHeight: 'calc(100vh - 64px)' }}>
       {/* ── Page Header ── */}
       <motion.div
         initial={{ opacity: 0, y: -12 }}

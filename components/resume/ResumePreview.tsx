@@ -7,6 +7,8 @@ import { useCareerStore } from '@/store/careerStore'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
 import ModernEdge from '@/components/resume/templates/ModernEdge'
 import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
+import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
+import CreativePulse from '@/components/resume/templates/CreativePulse'
 import type { ResumeData, TemplateId, PersonalInfo } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -15,6 +17,8 @@ const TEMPLATES: { id: TemplateId; label: string }[] = [
   { id: 'classic-pro', label: 'Classic Pro' },
   { id: 'modern-edge', label: 'Modern Edge' },
   { id: 'minimal-seoul', label: 'Minimal Seoul' },
+  { id: 'executive-dark', label: 'Executive Dark' },
+  { id: 'creative-pulse', label: 'Creative Pulse' },
 ]
 
 interface ResumePreviewProps {
@@ -84,10 +88,10 @@ export default function ResumePreview({
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
-        {/* Template switcher */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#13131A] border border-white/[0.08]">
-          <Layout className="w-3.5 h-3.5 text-[#60607A] ml-2" />
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
+        {/* Template switcher — scrollable on mobile for all 5 templates */}
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#13131A] border border-white/[0.08] overflow-x-auto max-w-full">
+          <Layout className="w-3.5 h-3.5 text-[#60607A] ml-2 flex-shrink-0" />
           {TEMPLATES.map((t) => (
             <button
               key={t.id}
@@ -105,7 +109,7 @@ export default function ResumePreview({
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={handleCopyATS}
             disabled={!data || isStreaming}
@@ -201,6 +205,12 @@ export default function ResumePreview({
                 )}
                 {selectedTemplate === 'minimal-seoul' && (
                   <MinimalSeoul data={data} personal={personal} />
+                )}
+                {selectedTemplate === 'executive-dark' && (
+                  <ExecutiveDark data={data} personal={personal} />
+                )}
+                {selectedTemplate === 'creative-pulse' && (
+                  <CreativePulse data={data} personal={personal} />
                 )}
               </motion.div>
             ) : (

@@ -247,7 +247,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           return (
             <Link key={item.id} href={item.href} aria-label={item.label}
               className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl
-                transition-colors duration-200 min-w-0">
+                transition-colors duration-200 min-w-0 min-h-[44px] justify-center">
               <item.icon className={`w-5 h-5 ${active ? 'text-[#818CF8]' : 'text-[#60607A]'}`} />
               <span className={`text-[9px] font-medium truncate ${active ? 'text-[#818CF8]' : 'text-[#60607A]'}`}>
                 {item.label}
