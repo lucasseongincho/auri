@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { Providers } from './providers'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://auri-beta.vercel.app'
 
@@ -93,7 +94,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-text-primary font-body antialiased">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

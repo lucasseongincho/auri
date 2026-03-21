@@ -18,6 +18,8 @@ import {
   BookMarked,
   Copy,
 } from 'lucide-react'
+import { getIdToken } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
@@ -64,9 +66,16 @@ function FlipCard({
     setIsScoring(true)
     setScoreError('')
     try {
+      let idToken: string | undefined
+      if (auth.currentUser) {
+        try { idToken = await getIdToken(auth.currentUser) } catch { /* guest — IP rate limit applies */ }
+      }
       const res = await fetch('/api/claude/interview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+        },
         body: JSON.stringify({ mode: 'practice', question: question.question, userAnswer, targetPosition, uid, isPro: false }),
       })
       if (res.status === 429) {

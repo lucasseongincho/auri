@@ -105,7 +105,11 @@ export function getGuestProfile(): CareerProfile | null {
   const raw = localStorage.getItem(GUEST_STORAGE_KEY)
   if (!raw) return null
   try {
-    return JSON.parse(raw) as CareerProfile
+    const parsed = JSON.parse(raw)
+    // Zustand persist wraps state as { state: { profile, ... }, version: 0 }
+    if (parsed?.state?.profile) return parsed.state.profile as CareerProfile
+    // Fallback: raw CareerProfile (legacy format before Zustand persist was added)
+    return parsed as CareerProfile
   } catch {
     return null
   }
