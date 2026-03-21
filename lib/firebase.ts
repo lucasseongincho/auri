@@ -27,4 +27,4 @@ const db: Firestore = hasConfig ? getFirestore(app) : ({} as Firestore)
 
 // No Firebase Storage — PDFs generated client-side via html2pdf.js
 
-export { app, auth, db }
+export { app, auth, db, hasConfig }

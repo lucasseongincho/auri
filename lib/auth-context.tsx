@@ -10,7 +10,7 @@ import {
   GoogleAuthProvider,
   User,
 } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
+import { auth, hasConfig } from '@/lib/firebase'
 import { migrateGuestToFirestore } from '@/lib/firestore'
 import { useCareerStore } from '@/store/careerStore'
 import type { AuthUser } from '@/types'
@@ -35,6 +35,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Guard: Firebase env vars not set (e.g. Vercel preview without env config)
+    if (!hasConfig) {
+      setLoading(false)
+      return
+    }
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
       if (firebaseUser) {
         setUser({
@@ -57,19 +62,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signInWithGoogle = useCallback(async () => {
+    if (!hasConfig) throw new Error('Firebase is not configured.')
     const result = await signInWithPopup(auth, googleProvider)
-    // Migrate guest localStorage data before the listener re-loads Firestore
     await migrateGuestToFirestore(result.user.uid)
     return result.user
   }, [])
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
+    if (!hasConfig) throw new Error('Firebase is not configured.')
     const result = await signInWithEmailAndPassword(auth, email, password)
     await migrateGuestToFirestore(result.user.uid)
     return result.user
   }, [])
 
   const signUpWithEmail = useCallback(async (email: string, password: string) => {
+    if (!hasConfig) throw new Error('Firebase is not configured.')
     const result = await createUserWithEmailAndPassword(auth, email, password)
     await migrateGuestToFirestore(result.user.uid)
     return result.user
