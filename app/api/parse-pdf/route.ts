@@ -23,6 +23,17 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
+    // pdfjs-dist (used internally by pdf-parse) requires DOMMatrix which doesn't
+    // exist in the Node.js serverless runtime — polyfill it before importing.
+    if (typeof globalThis.DOMMatrix === 'undefined') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(globalThis as any).DOMMatrix = class DOMMatrix {
+        // pdfjs only reads numeric properties off DOMMatrix; return 0 for all
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        constructor() { return new Proxy(this, { get: (_t, _p) => 0 }) }
+      }
+    }
+
     // Dynamic import avoids issues with pdf-parse's test-file side-effect on import
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>
