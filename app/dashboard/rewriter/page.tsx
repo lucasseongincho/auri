@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   RefreshCw,
@@ -19,7 +19,41 @@ import { useRouter } from 'next/navigation'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
-import type { ResumeData, TemplateId } from '@/types'
+import { getSavedResumes } from '@/lib/firestore'
+import type { ResumeData, TemplateId, SavedResume } from '@/types'
+
+// Convert ResumeData → plain text for the rewriter API
+function resumeToPlainText(r: ResumeData, personal?: { name?: string; email?: string; phone?: string; location?: string }): string {
+  const lines: string[] = []
+  if (personal?.name) lines.push(personal.name)
+  const contact = [personal?.email, personal?.phone, personal?.location].filter(Boolean).join(' | ')
+  if (contact) lines.push(contact)
+  if (r.summary) { lines.push('', 'SUMMARY', r.summary) }
+  if (r.experience.length > 0) {
+    lines.push('', 'EXPERIENCE')
+    for (const exp of r.experience) {
+      lines.push(`${exp.title} at ${exp.company} (${exp.start} – ${exp.end})`)
+      for (const b of exp.bullets) lines.push(`• ${b}`)
+    }
+  }
+  if (r.education.length > 0) {
+    lines.push('', 'EDUCATION')
+    for (const edu of r.education) {
+      lines.push(`${edu.degree} in ${edu.field}, ${edu.institution} (${edu.year})${edu.gpa ? ` — GPA ${edu.gpa}` : ''}`)
+    }
+  }
+  if (r.skills.length > 0) lines.push('', 'SKILLS', r.skills.join(', '))
+  if (r.certifications.length > 0) lines.push('', 'CERTIFICATIONS', r.certifications.join(', '))
+  if (r.projects.length > 0) {
+    lines.push('', 'PROJECTS')
+    for (const p of r.projects) {
+      lines.push(p.name)
+      if (p.description) lines.push(p.description)
+      for (const b of p.bullets) lines.push(`• ${b}`)
+    }
+  }
+  return lines.join('\n').trim()
+}
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 const INPUT_CLASS =
@@ -27,7 +61,7 @@ const INPUT_CLASS =
 const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
 const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
-type InputMethod = 'paste' | 'upload'
+type InputMethod = 'paste' | 'upload' | 'auri'
 
 interface SectionAcceptance {
   summary: boolean
@@ -219,12 +253,18 @@ export default function RewriterPage() {
   const { user } = useAuth()
   const { profile, updateProfile } = useCareerStore()
 
-  const [inputMethod, setInputMethod] = useState<InputMethod>('paste')
+  const [inputMethod, setInputMethod] = useState<InputMethod>('auri')
   const [pastedText, setPastedText] = useState('')
   const [uploadedText, setUploadedText] = useState('')
   const [uploadedFileName, setUploadedFileName] = useState('')
   const [isUploadLoading, setIsUploadLoading] = useState(false)
   const [uploadError, setUploadError] = useState('')
+
+  // AURI saved resumes
+  const [savedResumes, setSavedResumes] = useState<SavedResume[]>([])
+  const [savedResumesLoading, setSavedResumesLoading] = useState(false)
+  const [selectedResumeId, setSelectedResumeId] = useState<string | null>(null)
+  const [auriText, setAuriText] = useState('')
 
   const [targetPosition, setTargetPosition] = useState(profile?.target?.position ?? '')
   const [targetCompany, setTargetCompany] = useState(profile?.target?.company ?? '')
@@ -241,6 +281,48 @@ export default function RewriterPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { isStreaming, streamedText, stream } = useAIStream()
+
+  // Load saved AURI resumes when tab is selected or user is known
+  useEffect(() => {
+    if (inputMethod !== 'auri') return
+    if (!user?.uid) return
+    setSavedResumesLoading(true)
+    getSavedResumes(user.uid)
+      .then((list) => {
+        setSavedResumes(list)
+        // Auto-select most recent if nothing selected yet
+        if (list.length > 0 && !selectedResumeId) {
+          const first = list[0]
+          setSelectedResumeId(first.id)
+          setAuriText(resumeToPlainText(first.resumeData, first.personalInfo))
+        }
+      })
+      .finally(() => setSavedResumesLoading(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputMethod, user?.uid])
+
+  // Also auto-populate from current profile if guest or no saved resumes
+  useEffect(() => {
+    if (inputMethod !== 'auri') return
+    if (user?.uid) return // handled above via Firestore
+    if (!profile) return
+    // Guest: use current in-memory resume data
+    const r = profile.generated?.resume_html ? null : null // no saved resume data for guests
+    if (!auriText && profile.experience.length > 0) {
+      const fakeResume: ResumeData = {
+        summary: (profile.generated as { resume_plain?: string })?.resume_plain ?? '',
+        experience: profile.experience,
+        education: profile.education,
+        skills: profile.skills,
+        certifications: profile.certifications,
+        projects: profile.projects,
+        templateId: 'classic-pro' as TemplateId,
+      }
+      void r
+      setAuriText(resumeToPlainText(fakeResume, profile.personal))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputMethod, user?.uid, profile])
 
   const handleFileUpload = useCallback(async (file: File) => {
     setUploadError('')
@@ -261,7 +343,7 @@ export default function RewriterPage() {
   }, [])
 
   const handleGenerate = useCallback(async () => {
-    const text = inputMethod === 'paste' ? pastedText : uploadedText
+    const text = inputMethod === 'paste' ? pastedText : inputMethod === 'auri' ? auriText : uploadedText
     if (!text.trim() || !targetPosition.trim()) return
 
     setRewrittenData(null)
@@ -289,7 +371,7 @@ export default function RewriterPage() {
         setGenerateError('Could not parse the rewritten resume. Please try again.')
       }
     }
-  }, [inputMethod, pastedText, uploadedText, targetPosition, targetCompany, companyType, jobDescription, user?.uid, stream])
+  }, [inputMethod, pastedText, uploadedText, auriText, targetPosition, targetCompany, companyType, jobDescription, user?.uid, stream])
 
   const toggleSection = (key: keyof SectionAcceptance) => {
     setAccepted((prev) => ({ ...prev, [key]: !prev[key] }))
@@ -311,8 +393,8 @@ export default function RewriterPage() {
     router.push('/dashboard/resume')
   }
 
-  const originalText = inputMethod === 'paste' ? pastedText : uploadedText
-  const isGenerateDisabled = !originalText.trim() || !targetPosition.trim() || isStreaming || isUploadLoading
+  const originalText = inputMethod === 'paste' ? pastedText : inputMethod === 'auri' ? auriText : uploadedText
+  const isGenerateDisabled = !originalText.trim() || !targetPosition.trim() || isStreaming || isUploadLoading || savedResumesLoading
 
   return (
     <div className="space-y-6 pb-20 md:pb-0">
@@ -324,7 +406,7 @@ export default function RewriterPage() {
           <h1 className="font-heading text-2xl font-bold text-white">Resume Rewriter</h1>
         </div>
         <p className="text-[#A0A0B8] text-sm ml-12">
-          Paste or upload your existing resume — Claude will rewrite it for your target role.
+          Load a saved AURI resume or paste your own — Claude will rewrite it for your target role.
         </p>
       </motion.div>
 
@@ -339,23 +421,83 @@ export default function RewriterPage() {
           <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
             <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-4">
               {/* Toggle */}
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-[#0A0A0F] border border-white/[0.08] w-fit">
-                {(['paste', 'upload'] as const).map((method) => (
+              <div className="flex items-center gap-1 p-1 rounded-xl bg-[#0A0A0F] border border-white/[0.08]">
+                {([
+                  { id: 'auri', icon: <Sparkles className="w-3.5 h-3.5" />, label: 'From AURI' },
+                  { id: 'paste', icon: <FileText className="w-3.5 h-3.5" />, label: 'Paste Text' },
+                  { id: 'upload', icon: <Upload className="w-3.5 h-3.5" />, label: 'Upload PDF' },
+                ] as const).map(({ id, icon, label }) => (
                   <button
-                    key={method}
-                    onClick={() => setInputMethod(method)}
-                    className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                      inputMethod === method ? 'bg-[#6366F1] text-white' : 'text-[#60607A] hover:text-[#A0A0B8]'
+                    key={id}
+                    onClick={() => setInputMethod(id)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex-1 justify-center ${
+                      inputMethod === id ? 'bg-[#6366F1] text-white' : 'text-[#60607A] hover:text-[#A0A0B8]'
                     }`}
                   >
-                    {method === 'paste' ? <FileText className="w-3.5 h-3.5" /> : <Upload className="w-3.5 h-3.5" />}
-                    {method === 'paste' ? 'Paste Text' : 'Upload PDF'}
+                    {icon}{label}
                   </button>
                 ))}
               </div>
 
               <AnimatePresence mode="wait">
-                {inputMethod === 'paste' ? (
+                {inputMethod === 'auri' ? (
+                  <motion.div key="auri" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+                    {savedResumesLoading ? (
+                      <div className="flex items-center gap-2 py-4 text-[#60607A] text-sm">
+                        <Loader2 className="w-4 h-4 animate-spin" /> Loading your saved resumes…
+                      </div>
+                    ) : !user?.uid ? (
+                      <div className="rounded-xl border border-white/[0.08] bg-[#0A0A0F]/50 p-4 text-center">
+                        <p className="text-sm text-[#A0A0B8] mb-1">Sign in to load your saved AURI resumes</p>
+                        <p className="text-xs text-[#60607A]">Or use Paste Text to paste your resume manually</p>
+                      </div>
+                    ) : savedResumes.length === 0 ? (
+                      <div className="rounded-xl border border-white/[0.08] bg-[#0A0A0F]/50 p-4 text-center">
+                        <p className="text-sm text-[#A0A0B8] mb-1">No saved resumes found</p>
+                        <p className="text-xs text-[#60607A]">Build a resume first, then come back to rewrite it for a new role.</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div>
+                          <label className={LABEL_CLASS}>Select a saved resume</label>
+                          <div className="space-y-2">
+                            {savedResumes.map((r) => (
+                              <button
+                                key={r.id}
+                                onClick={() => {
+                                  setSelectedResumeId(r.id)
+                                  setAuriText(resumeToPlainText(r.resumeData, r.personalInfo))
+                                }}
+                                className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${
+                                  selectedResumeId === r.id
+                                    ? 'border-[#6366F1]/50 bg-[#6366F1]/8'
+                                    : 'border-white/[0.08] bg-[#0A0A0F]/50 hover:border-white/[0.14]'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="text-sm font-medium text-white">{r.name || r.targetPosition}</p>
+                                    <p className="text-xs text-[#60607A] mt-0.5">{r.targetCompany ? `${r.targetPosition} @ ${r.targetCompany}` : r.targetPosition}</p>
+                                  </div>
+                                  <div className="flex items-center gap-2 flex-shrink-0">
+                                    {selectedResumeId === r.id && <CheckCircle className="w-4 h-4 text-[#6366F1]" />}
+                                    <span className="text-xs text-[#60607A]">{new Date(r.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        {auriText && (
+                          <div className="rounded-xl border border-[#22C55E]/20 bg-[#22C55E]/5 p-3 flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-[#22C55E] flex-shrink-0" />
+                            <p className="text-xs text-[#22C55E]">Resume loaded — {auriText.length.toLocaleString()} characters ready</p>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </motion.div>
+                ) : inputMethod === 'paste' ? (
                   <motion.div key="paste" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                     <label className={LABEL_CLASS}>Paste your current resume</label>
                     <textarea
@@ -403,7 +545,7 @@ export default function RewriterPage() {
                         {isUploadLoading ? <Loader2 className="w-8 h-8 text-[#6366F1] animate-spin" /> : <Upload className="w-8 h-8 text-[#60607A]" />}
                         <div className="text-center">
                           <p className="text-sm font-medium text-[#A0A0B8]">{isUploadLoading ? 'Extracting text…' : 'Click to upload PDF'}</p>
-                          <p className="text-xs text-[#60607A] mt-0.5">Maximum 5 MB</p>
+                          <p className="text-xs text-[#60607A] mt-0.5">External PDFs only (Word exports, Google Docs, etc.)</p>
                         </div>
                       </button>
                     ) : (
@@ -505,7 +647,7 @@ export default function RewriterPage() {
                     <RefreshCw className="w-6 h-6 text-[#6366F1]" />
                   </div>
                   <p className="text-sm font-medium text-[#A0A0B8]">Rewritten resume will appear here</p>
-                  <p className="text-xs text-[#60607A] mt-1">Paste your resume and click Rewrite Resume</p>
+                  <p className="text-xs text-[#60607A] mt-1">Select a resume on the left and click Rewrite Resume</p>
                 </motion.div>
               )}
             </AnimatePresence>
