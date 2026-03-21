@@ -31,10 +31,10 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
           background-size: 24px 24px;
         }
 
-        /* Name block — oversized, confident */
-        .creative-pulse .name-block { padding: 32px 40px 0; }
+        /* Name block */
+        .creative-pulse .name-block { padding: 22px 32px 0; }
         .creative-pulse h1 {
-          font-size: 36px;
+          font-size: 28px;
           font-weight: 900;
           letter-spacing: -0.02em;
           color: #0F0F0F;
@@ -42,61 +42,61 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
           line-height: 1;
         }
         .creative-pulse .tagline {
-          font-size: 12px;
+          font-size: 10px;
           font-weight: 500;
           letter-spacing: 0.14em;
           text-transform: uppercase;
           color: #6366F1;
-          margin-bottom: 10px;
+          margin-bottom: 6px;
         }
         .creative-pulse .contact-line {
-          font-size: 10.5px;
+          font-size: 9.5px;
           color: #666;
-          margin-bottom: 20px;
+          margin-bottom: 12px;
         }
         .creative-pulse .contact-sep { color: #6366F1; margin: 0 5px; font-weight: 700; }
-        .creative-pulse .header-rule { height: 3px; background: linear-gradient(to right, #6366F1, #8B5CF6, transparent); margin: 0 40px; }
+        .creative-pulse .header-rule { height: 3px; background: linear-gradient(to right, #6366F1, #8B5CF6, transparent); margin: 0 32px; }
 
         /* Body */
-        .creative-pulse .body-wrap { padding: 20px 40px 32px; }
+        .creative-pulse .body-wrap { padding: 14px 32px 22px; }
 
         /* Section headers with left accent bar */
-        .creative-pulse .section-header { display: flex; align-items: center; gap: 10px; margin: 18px 0 8px 0; }
-        .creative-pulse .section-accent { width: 4px; height: 16px; background: linear-gradient(to bottom, #6366F1, #8B5CF6); border-radius: 2px; flex-shrink: 0; }
-        .creative-pulse .section-label { font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #111827; }
+        .creative-pulse .section-header { display: flex; align-items: center; gap: 10px; margin: 12px 0 6px 0; }
+        .creative-pulse .section-accent { width: 4px; height: 14px; background: linear-gradient(to bottom, #6366F1, #8B5CF6); border-radius: 2px; flex-shrink: 0; }
+        .creative-pulse .section-label { font-size: 9px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #111827; }
 
         /* Experience */
-        .creative-pulse .job-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
-        .creative-pulse .job-title { font-size: 12px; font-weight: 700; color: #111827; }
-        .creative-pulse .job-company { font-size: 11.5px; color: #6366F1; font-weight: 500; }
-        .creative-pulse .job-dates { font-size: 10.5px; color: #888; }
-        .creative-pulse ul { margin: 4px 0 8px 14px; padding: 0; list-style: none; }
-        .creative-pulse li { font-size: 11px; margin-bottom: 3px; line-height: 1.5; color: #374151; }
-        .creative-pulse li::before { content: '▸'; color: #6366F1; font-size: 8px; margin-right: 6px; vertical-align: middle; }
+        .creative-pulse .job-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1px; }
+        .creative-pulse .job-title { font-size: 11px; font-weight: 700; color: #111827; }
+        .creative-pulse .job-company { font-size: 10px; color: #6366F1; font-weight: 500; }
+        .creative-pulse .job-dates { font-size: 9.5px; color: #888; white-space: nowrap; margin-left: 6px; flex-shrink: 0; }
+        .creative-pulse ul { margin: 3px 0 6px 13px; padding: 0; list-style: none; }
+        .creative-pulse li { font-size: 10px; margin-bottom: 2px; line-height: 1.4; color: #374151; }
+        .creative-pulse li::before { content: '▸'; color: #6366F1; font-size: 7px; margin-right: 5px; vertical-align: middle; }
 
         /* Summary */
-        .creative-pulse .summary-text { font-size: 11.5px; line-height: 1.65; color: #374151; margin: 0; }
+        .creative-pulse .summary-text { font-size: 10px; line-height: 1.5; color: #374151; margin: 0; }
 
         /* Skills — pill style */
-        .creative-pulse .skills-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+        .creative-pulse .skills-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
         .creative-pulse .skill-pill {
           display: inline-block;
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 600;
           color: #4338CA;
           background: rgba(99,102,241,0.08);
           border: 1px solid rgba(99,102,241,0.2);
           border-radius: 20px;
-          padding: 2px 10px;
+          padding: 1px 8px;
           letter-spacing: 0.02em;
         }
         /* ATS plain-text fallback — skills list also present as text */
-        .creative-pulse .skills-plain { font-size: 11px; color: #374151; line-height: 1.7; display: none; }
+        .creative-pulse .skills-plain { font-size: 10px; color: #374151; line-height: 1.6; display: none; }
 
-        .creative-pulse .edu-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
-        .creative-pulse .edu-degree { font-size: 12px; font-weight: 700; color: #111827; }
-        .creative-pulse .edu-school { font-size: 11px; color: #6366F1; }
-        .creative-pulse .edu-year { font-size: 10.5px; color: #888; }
+        .creative-pulse .edu-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+        .creative-pulse .edu-degree { font-size: 11px; font-weight: 700; color: #111827; }
+        .creative-pulse .edu-school { font-size: 10px; color: #6366F1; }
+        .creative-pulse .edu-year { font-size: 9.5px; color: #888; white-space: nowrap; margin-left: 6px; flex-shrink: 0; }
 
         @media print {
           .creative-pulse { background-image: none !important; }
@@ -105,7 +105,7 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
           .creative-pulse .skills-wrap { display: none; }
         }
       `}</style>
-      <div className="creative-pulse" style={{ minHeight: '297mm', width: '100%', boxSizing: 'border-box' }} data-ats-field="resume-root">
+      <div className="creative-pulse" style={{ width: '210mm', minHeight: '297mm', boxSizing: 'border-box' }} data-ats-field="resume-root">
 
         {/* Name block */}
         <div className="name-block" data-ats-field="header">
@@ -145,7 +145,7 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
                 <span className="section-label">Experience</span>
               </div>
               {data.experience.map((exp) => (
-                <article key={exp.id} style={{ marginBottom: '12px' }}>
+                <article key={exp.id} style={{ marginBottom: '8px' }}>
                   <div className="job-header">
                     <div>
                       <span className="job-title">{exp.title}</span>
@@ -191,7 +191,7 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
                 <span className="section-label">Leadership</span>
               </div>
               {data.leadership.map((item) => (
-                <article key={item.id} style={{ marginBottom: '12px' }}>
+                <article key={item.id} style={{ marginBottom: '8px' }}>
                   <div className="job-header">
                     <div>
                       <span className="job-title">{item.role}</span>
@@ -215,7 +215,7 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
                 <span className="section-label">Volunteer</span>
               </div>
               {data.volunteer.map((item) => (
-                <article key={item.id} style={{ marginBottom: '10px' }}>
+                <article key={item.id} style={{ marginBottom: '7px' }}>
                   <div className="job-header">
                     <div>
                       <span className="job-title">{item.role}</span>
@@ -282,7 +282,7 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
                 <span className="section-label">Projects</span>
               </div>
               {data.projects.map((proj) => (
-                <article key={proj.id} style={{ marginBottom: '10px' }}>
+                <article key={proj.id} style={{ marginBottom: '7px' }}>
                   <div className="job-header">
                     <span className="job-title">{proj.name}</span>
                     {proj.url && <span className="job-dates">{proj.url}</span>}

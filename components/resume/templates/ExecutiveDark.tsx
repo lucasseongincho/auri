@@ -20,32 +20,32 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing }:
   return (
     <>
       <style>{`
-        .exec-dark { font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #1a1a1a; background: white; }
+        .exec-dark { font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #1a1a1a; background: white; width: 210mm; min-height: 297mm; box-sizing: border-box; }
 
         /* Header — dark background with gold accent */
-        .exec-dark .header-wrap { background: #111827; padding: 28px 40px 24px; border-bottom: 3px solid #C9A84C; }
-        .exec-dark h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 30px; font-weight: 700; color: #F9FAFB; letter-spacing: 0.03em; margin: 0 0 6px 0; }
-        .exec-dark .contact-line { font-size: 10.5px; color: #9CA3AF; letter-spacing: 0.04em; }
-        .exec-dark .contact-sep { color: #C9A84C; margin: 0 6px; }
+        .exec-dark .header-wrap { background: #111827; padding: 20px 32px 16px; border-bottom: 3px solid #C9A84C; }
+        .exec-dark h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 24px; font-weight: 700; color: #F9FAFB; letter-spacing: 0.03em; margin: 0 0 4px 0; }
+        .exec-dark .contact-line { font-size: 9.5px; color: #9CA3AF; letter-spacing: 0.04em; }
+        .exec-dark .contact-sep { color: #C9A84C; margin: 0 5px; }
 
         /* Body */
-        .exec-dark .body-wrap { padding: 24px 40px 32px; }
-        .exec-dark .section-header { display: flex; align-items: center; gap: 10px; margin: 18px 0 8px 0; }
-        .exec-dark .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111827; white-space: nowrap; }
+        .exec-dark .body-wrap { padding: 16px 32px 20px; }
+        .exec-dark .section-header { display: flex; align-items: center; gap: 10px; margin: 12px 0 6px 0; }
+        .exec-dark .section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111827; white-space: nowrap; }
         .exec-dark .section-rule { flex: 1; height: 1px; background: linear-gradient(to right, #C9A84C, transparent); }
 
-        .exec-dark .job-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
-        .exec-dark .job-title { font-size: 12px; font-weight: 700; color: #111827; }
-        .exec-dark .job-company { font-size: 12px; color: #374151; font-style: italic; }
-        .exec-dark .job-dates { font-size: 10.5px; color: #C9A84C; font-weight: 600; white-space: nowrap; }
-        .exec-dark ul { margin: 4px 0 8px 16px; padding: 0; }
-        .exec-dark li { font-size: 11px; margin-bottom: 3px; line-height: 1.5; color: #374151; }
-        .exec-dark .summary-text { font-size: 11.5px; line-height: 1.6; color: #374151; margin: 0; font-style: italic; }
-        .exec-dark .skills-list { font-size: 11px; color: #374151; line-height: 1.7; }
-        .exec-dark .edu-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
-        .exec-dark .edu-degree { font-size: 12px; font-weight: 700; color: #111827; }
-        .exec-dark .edu-school { font-size: 11px; color: #374151; font-style: italic; }
-        .exec-dark .edu-year { font-size: 10.5px; color: #C9A84C; font-weight: 600; }
+        .exec-dark .job-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1px; }
+        .exec-dark .job-title { font-size: 11px; font-weight: 700; color: #111827; }
+        .exec-dark .job-company { font-size: 11px; color: #374151; font-style: italic; }
+        .exec-dark .job-dates { font-size: 9.5px; color: #C9A84C; font-weight: 600; white-space: nowrap; margin-left: 8px; flex-shrink: 0; }
+        .exec-dark ul { margin: 3px 0 6px 15px; padding: 0; }
+        .exec-dark li { font-size: 10px; margin-bottom: 2px; line-height: 1.4; color: #374151; }
+        .exec-dark .summary-text { font-size: 10px; line-height: 1.5; color: #374151; margin: 0; font-style: italic; }
+        .exec-dark .skills-list { font-size: 10px; color: #374151; line-height: 1.6; }
+        .exec-dark .edu-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+        .exec-dark .edu-degree { font-size: 11px; font-weight: 700; color: #111827; }
+        .exec-dark .edu-school { font-size: 10px; color: #374151; font-style: italic; }
+        .exec-dark .edu-year { font-size: 9.5px; color: #C9A84C; font-weight: 600; white-space: nowrap; margin-left: 8px; flex-shrink: 0; }
 
         @media print {
           .exec-dark { }
@@ -53,7 +53,7 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing }:
           .exec-dark .header-wrap { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
       `}</style>
-      <div className="exec-dark" style={{ minHeight: '297mm', width: '100%', boxSizing: 'border-box' }} data-ats-field="resume-root">
+      <div className="exec-dark" data-ats-field="resume-root">
 
         {/* Dark header */}
         <div className="header-wrap" data-ats-field="header">
@@ -91,7 +91,7 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing }:
                 <div className="section-rule" />
               </div>
               {data.experience.map((exp) => (
-                <article key={exp.id} style={{ marginBottom: '12px' }}>
+                <article key={exp.id} style={{ marginBottom: '8px' }}>
                   <div className="job-header">
                     <div>
                       <span className="job-title">{exp.title}</span>
@@ -137,7 +137,7 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing }:
                 <div className="section-rule" />
               </div>
               {data.leadership.map((item) => (
-                <article key={item.id} style={{ marginBottom: '12px' }}>
+                <article key={item.id} style={{ marginBottom: '8px' }}>
                   <div className="job-header">
                     <div>
                       <span className="job-title">{item.role}</span>

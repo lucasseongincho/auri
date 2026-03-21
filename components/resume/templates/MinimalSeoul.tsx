@@ -17,30 +17,30 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
   return (
     <>
       <style>{`
-        .minimal-seoul { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #111; background: white; }
-        .minimal-seoul h1 { font-size: 32px; font-weight: 200; letter-spacing: 0.08em; margin: 0 0 6px 0; color: #0a0a0a; }
-        .minimal-seoul .contact-line { font-size: 10px; color: #888; letter-spacing: 0.06em; margin-bottom: 32px; }
-        .minimal-seoul .section-header { font-size: 9px; font-weight: 400; letter-spacing: 0.25em; text-transform: uppercase; color: #999; margin: 28px 0 12px 0; }
-        .minimal-seoul .job-row { display: flex; justify-content: space-between; margin-bottom: 3px; }
-        .minimal-seoul .job-title { font-size: 12px; font-weight: 600; }
-        .minimal-seoul .job-company { font-size: 11px; color: #555; margin-bottom: 2px; }
-        .minimal-seoul .job-dates { font-size: 10px; color: #aaa; }
-        .minimal-seoul ul { margin: 6px 0 12px 0; padding: 0; list-style: none; }
-        .minimal-seoul li { font-size: 11px; color: #333; padding-left: 12px; position: relative; margin-bottom: 3px; line-height: 1.55; }
+        .minimal-seoul { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #111; background: white; width: 210mm; min-height: 297mm; box-sizing: border-box; }
+        .minimal-seoul h1 { font-size: 26px; font-weight: 200; letter-spacing: 0.08em; margin: 0 0 5px 0; color: #0a0a0a; }
+        .minimal-seoul .contact-line { font-size: 9.5px; color: #888; letter-spacing: 0.06em; margin-bottom: 20px; }
+        .minimal-seoul .section-header { font-size: 8.5px; font-weight: 400; letter-spacing: 0.25em; text-transform: uppercase; color: #999; margin: 18px 0 8px 0; }
+        .minimal-seoul .job-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+        .minimal-seoul .job-title { font-size: 11px; font-weight: 600; }
+        .minimal-seoul .job-company { font-size: 10px; color: #555; margin-bottom: 1px; }
+        .minimal-seoul .job-dates { font-size: 9.5px; color: #aaa; white-space: nowrap; margin-left: 6px; flex-shrink: 0; }
+        .minimal-seoul ul { margin: 4px 0 8px 0; padding: 0; list-style: none; }
+        .minimal-seoul li { font-size: 10px; color: #333; padding-left: 12px; position: relative; margin-bottom: 2px; line-height: 1.45; }
         .minimal-seoul li::before { content: '—'; position: absolute; left: 0; color: #bbb; font-weight: 200; }
-        .minimal-seoul .summary-text { font-size: 11.5px; color: #333; line-height: 1.7; margin: 0; font-weight: 300; }
-        .minimal-seoul .skills-text { font-size: 11px; color: #555; letter-spacing: 0.04em; line-height: 1.8; }
-        .minimal-seoul .edu-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-        .minimal-seoul .edu-degree { font-size: 12px; font-weight: 500; }
-        .minimal-seoul .edu-info { font-size: 10.5px; color: #777; }
-        .minimal-seoul .divider { height: 1px; background: #f0f0f0; margin: 8px 0; }
+        .minimal-seoul .summary-text { font-size: 10px; color: #333; line-height: 1.55; margin: 0; font-weight: 300; }
+        .minimal-seoul .skills-text { font-size: 10px; color: #555; letter-spacing: 0.04em; line-height: 1.6; }
+        .minimal-seoul .edu-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+        .minimal-seoul .edu-degree { font-size: 11px; font-weight: 500; }
+        .minimal-seoul .edu-info { font-size: 9.5px; color: #777; }
+        .minimal-seoul .divider { height: 1px; background: #f0f0f0; margin: 5px 0; }
         @media print {
           .minimal-seoul * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
       `}</style>
       <div
         className="minimal-seoul"
-        style={{ padding: '48px 52px', minHeight: '297mm', width: '100%', boxSizing: 'border-box' }}
+        style={{ padding: '28px 36px 24px' }}
         data-ats-field="resume-root"
       >
         <header data-ats-field="header">

@@ -17,428 +17,262 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
   return (
     <>
       <style>{`
-        .cp-root {
+        .classic-pro {
           font-family: 'Times New Roman', Times, serif;
           color: #1a1a1a;
           background: white;
           width: 210mm;
           min-height: 297mm;
-          max-height: 297mm;
           box-sizing: border-box;
-          padding: 12mm;
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
+          padding: 18mm 20mm 16mm;
         }
-
-        /* ── Name block ─────────────────────────────── */
-        .cp-name {
-          font-size: 20px;
+        .classic-pro h1 {
+          font-size: 22px;
           font-weight: 700;
           letter-spacing: 0.02em;
-          margin: 0 0 2px 0;
-          line-height: 1.1;
-          font-family: 'Arial', sans-serif;
+          margin: 0 0 4px 0;
+          text-align: center;
         }
-        .cp-title-line {
-          font-size: 9px;
-          color: #555;
-          font-family: Arial, sans-serif;
-          margin-bottom: 6px;
-          letter-spacing: 0.05em;
-        }
-
-        /* ── Two-column body ────────────────────────── */
-        .cp-body {
-          display: flex;
-          gap: 8mm;
-          flex: 1;
-          min-height: 0;
-        }
-        .cp-left {
-          width: 30%;
-          flex-shrink: 0;
-          border-right: 1px solid #d0d0d0;
-          padding-right: 6mm;
-        }
-        .cp-right {
-          flex: 1;
-          min-width: 0;
-        }
-
-        /* ── Section headers ────────────────────────── */
-        .cp-sh {
-          font-size: 8px;
-          font-weight: 700;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: #1a1a1a;
-          border-bottom: 1px solid #1a1a1a;
-          padding-bottom: 2px;
-          margin: 9px 0 5px 0;
-          font-family: Arial, sans-serif;
-        }
-        .cp-sh:first-child {
-          margin-top: 0;
-        }
-
-        /* ── Contact block ──────────────────────────── */
-        .cp-contact-item {
-          font-size: 8px;
-          line-height: 1.5;
-          color: #333;
-          word-break: break-all;
-          font-family: Arial, sans-serif;
-        }
-        .cp-contact-label {
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          font-size: 7px;
-          color: #666;
-          display: block;
-          margin-top: 4px;
-        }
-
-        /* ── Skills ─────────────────────────────────── */
-        .cp-skill-item {
-          font-size: 8.5px;
-          line-height: 1.5;
-          color: #1a1a1a;
-        }
-
-        /* ── Education (left) ───────────────────────── */
-        .cp-edu-block {
-          margin-bottom: 6px;
-        }
-        .cp-edu-degree {
-          font-size: 8.5px;
-          font-weight: 700;
-          font-family: Arial, sans-serif;
-          line-height: 1.3;
-        }
-        .cp-edu-school {
-          font-size: 8px;
-          font-style: italic;
-          line-height: 1.3;
-          color: #333;
-        }
-        .cp-edu-year {
-          font-size: 8px;
-          color: #666;
-          font-family: Arial, sans-serif;
-        }
-        .cp-edu-gpa {
-          font-size: 8px;
+        .classic-pro .contact-line {
+          font-size: 10px;
           color: #444;
+          text-align: center;
+          margin-bottom: 10px;
+          font-family: Arial, sans-serif;
+          letter-spacing: 0.02em;
+        }
+        .classic-pro .section-header {
+          font-size: 10.5px;
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #1a1a1a;
+          border-bottom: 1.5px solid #1a1a1a;
+          padding-bottom: 2px;
+          margin: 11px 0 6px 0;
           font-family: Arial, sans-serif;
         }
-
-        /* ── Certifications (left) ──────────────────── */
-        .cp-cert-item {
-          font-size: 8.5px;
-          line-height: 1.5;
-          color: #1a1a1a;
-        }
-
-        /* ── Languages (left) ───────────────────────── */
-        .cp-lang-row {
+        .classic-pro .job-header {
           display: flex;
           justify-content: space-between;
-          font-size: 8.5px;
-          line-height: 1.5;
+          align-items: baseline;
+          margin-bottom: 1px;
         }
-        .cp-lang-name { color: #1a1a1a; }
-        .cp-lang-prof { color: #666; font-style: italic; font-size: 8px; }
-
-        /* ── Summary (right) ────────────────────────── */
-        .cp-summary {
-          font-size: 9px;
-          line-height: 1.45;
-          color: #1a1a1a;
+        .classic-pro .job-title {
+          font-size: 11px;
+          font-weight: 700;
+          font-family: Arial, sans-serif;
+        }
+        .classic-pro .job-company {
+          font-size: 11px;
+          font-style: italic;
+        }
+        .classic-pro .job-dates {
+          font-size: 10px;
+          color: #555;
+          font-family: Arial, sans-serif;
+          white-space: nowrap;
+          margin-left: 8px;
+          flex-shrink: 0;
+        }
+        .classic-pro ul {
+          margin: 3px 0 7px 15px;
+          padding: 0;
+        }
+        .classic-pro li {
+          font-size: 10.5px;
+          margin-bottom: 1.5px;
+          line-height: 1.4;
+        }
+        .classic-pro .summary-text {
+          font-size: 10.5px;
+          line-height: 1.5;
           margin: 0;
         }
-
-        /* ── Experience / Leadership (right) ─────────── */
-        .cp-job-block {
-          margin-bottom: 7px;
+        .classic-pro .skills-list {
+          font-size: 10.5px;
+          line-height: 1.5;
         }
-        .cp-job-header {
+        .classic-pro .edu-row {
           display: flex;
           justify-content: space-between;
           align-items: baseline;
-          margin-bottom: 1px;
+          margin-bottom: 4px;
         }
-        .cp-job-title {
-          font-size: 9px;
+        .classic-pro .edu-degree {
+          font-size: 11px;
           font-weight: 700;
           font-family: Arial, sans-serif;
         }
-        .cp-job-company {
-          font-size: 9px;
+        .classic-pro .edu-school {
+          font-size: 10.5px;
           font-style: italic;
         }
-        .cp-job-dates {
-          font-size: 8px;
+        .classic-pro .edu-year {
+          font-size: 10px;
           color: #555;
           font-family: Arial, sans-serif;
           white-space: nowrap;
-          margin-left: 6px;
           flex-shrink: 0;
+          margin-left: 8px;
         }
-        .cp-bullets {
-          margin: 2px 0 0 12px;
-          padding: 0;
-          list-style-type: disc;
-        }
-        .cp-bullets li {
-          font-size: 8.5px;
-          margin-bottom: 1px;
-          line-height: 1.3;
-          color: #1a1a1a;
-        }
-
-        /* ── Volunteer (right) ───────────────────────── */
-        .cp-vol-block {
-          margin-bottom: 5px;
-        }
-        .cp-vol-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: baseline;
-        }
-        .cp-vol-title {
-          font-size: 9px;
-          font-weight: 700;
-          font-family: Arial, sans-serif;
-        }
-        .cp-vol-org {
-          font-size: 9px;
-          font-style: italic;
-        }
-        .cp-vol-date {
-          font-size: 8px;
-          color: #555;
-          font-family: Arial, sans-serif;
-          white-space: nowrap;
-          margin-left: 6px;
-          flex-shrink: 0;
-        }
-        .cp-vol-desc {
-          font-size: 8.5px;
-          line-height: 1.3;
-          color: #444;
-          margin: 2px 0 0 0;
-        }
-
-        /* ── Projects (right) ───────────────────────── */
-        .cp-proj-block {
-          margin-bottom: 6px;
-        }
-        .cp-proj-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: baseline;
-        }
-        .cp-proj-name {
-          font-size: 9px;
-          font-weight: 700;
-          font-family: Arial, sans-serif;
-        }
-        .cp-proj-url {
-          font-size: 8px;
-          color: #555;
-          font-family: Arial, sans-serif;
-        }
-        .cp-proj-desc {
-          font-size: 8.5px;
-          line-height: 1.3;
-          color: #444;
-          margin: 2px 0 0 0;
-        }
-
         @media print {
-          .cp-root {
-            padding: 12mm !important;
-            width: 210mm !important;
-            min-height: 297mm !important;
-            max-height: 297mm !important;
-          }
-          .cp-root * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .classic-pro { padding: 18mm 20mm 16mm !important; }
+          .classic-pro * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
       `}</style>
-      <div className="cp-root" data-ats-field="resume-root">
+      <div className="classic-pro" data-ats-field="resume-root">
 
-        {/* ── Name + contact header ─────────────────── */}
-        <header data-ats-field="header" style={{ marginBottom: '5px' }}>
-          <h1 className="cp-name" data-ats-field="name">{personal.name || 'Your Name'}</h1>
-          <div className="cp-title-line" data-ats-field="contact">
+        {/* Header */}
+        <header data-ats-field="header">
+          <h1 data-ats-field="name">{personal.name || 'Your Name'}</h1>
+          <div className="contact-line" data-ats-field="contact">
             {[personal.email, personal.phone, personal.location, personal.linkedin_url, personal.website]
               .filter(Boolean)
-              .join('  ·  ')}
+              .join(' · ')}
           </div>
-          <div style={{ borderBottom: '1.5px solid #1a1a1a', marginBottom: '6px' }} />
         </header>
 
-        {/* ── Two-column body ──────────────────────── */}
-        <div className="cp-body">
+        {/* Summary */}
+        {data.summary && (
+          <section data-ats-field="summary">
+            <div className="section-header">Summary</div>
+            <p className="summary-text">{data.summary}</p>
+          </section>
+        )}
 
-          {/* LEFT COLUMN — contact details, skills, education, certs, languages */}
-          <div className="cp-left">
-
-            {/* Skills */}
-            {data.skills.length > 0 && (
-              <section data-ats-field="skills">
-                <div className="cp-sh">Skills</div>
-                {data.skills.map((s, i) => (
-                  <div key={i} className="cp-skill-item">{s}</div>
-                ))}
-              </section>
-            )}
-
-            {/* Education */}
-            {data.education.length > 0 && (
-              <section data-ats-field="education">
-                <div className="cp-sh">Education</div>
-                {data.education.map((edu) => (
-                  <div key={edu.id} className="cp-edu-block">
-                    <div className="cp-edu-degree">{edu.degree}{edu.field ? ` in ${edu.field}` : ''}</div>
-                    <div className="cp-edu-school">{edu.institution}</div>
-                    <div className="cp-edu-year">{edu.year}</div>
-                    {edu.gpa && (
-                      <div className="cp-edu-gpa">GPA: {edu.gpa}</div>
-                    )}
+        {/* Experience */}
+        {data.experience.length > 0 && (
+          <section data-ats-field="experience">
+            <div className="section-header">Experience</div>
+            {data.experience.map((exp) => (
+              <article key={exp.id} style={{ marginBottom: '8px' }}>
+                <div className="job-header">
+                  <div>
+                    <span className="job-title">{exp.title}</span>
+                    {exp.company && <span className="job-company">, {exp.company}</span>}
                   </div>
-                ))}
-              </section>
-            )}
+                  <span className="job-dates">{exp.start} – {exp.end}</span>
+                </div>
+                <ul>
+                  {exp.bullets.map((bullet, i) => (
+                    <li key={i}>{bullet}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </section>
+        )}
 
-            {/* Certifications */}
-            {data.certifications.length > 0 && (
-              <section data-ats-field="certifications">
-                <div className="cp-sh">Certifications</div>
-                {data.certifications.map((c, i) => (
-                  <div key={i} className="cp-cert-item">{c}</div>
-                ))}
-              </section>
-            )}
+        {/* Education */}
+        {data.education.length > 0 && (
+          <section data-ats-field="education">
+            <div className="section-header">Education</div>
+            {data.education.map((edu) => (
+              <div key={edu.id} className="edu-row">
+                <div>
+                  <span className="edu-degree">{edu.degree}{edu.field ? ` in ${edu.field}` : ''}</span>
+                  <span className="edu-school">, {edu.institution}</span>
+                  {edu.gpa && <span className="edu-school"> · GPA {edu.gpa}</span>}
+                </div>
+                <span className="edu-year">{edu.year}</span>
+              </div>
+            ))}
+          </section>
+        )}
 
-            {/* Languages */}
-            {data.languages && data.languages.length > 0 && (
-              <section data-ats-field="languages">
-                <div className="cp-sh">Languages</div>
-                {data.languages.map((lang) => (
-                  <div key={lang.id} className="cp-lang-row">
-                    <span className="cp-lang-name">{lang.name}</span>
-                    <span className="cp-lang-prof">{lang.proficiency}</span>
+        {/* Skills */}
+        {data.skills.length > 0 && (
+          <section data-ats-field="skills">
+            <div className="section-header">Skills</div>
+            <p className="skills-list">{data.skills.join(' · ')}</p>
+          </section>
+        )}
+
+        {/* Certifications — only if present */}
+        {data.certifications.length > 0 && (
+          <section data-ats-field="certifications">
+            <div className="section-header">Certifications</div>
+            <p className="skills-list">{data.certifications.join(' · ')}</p>
+          </section>
+        )}
+
+        {/* Projects — only if present */}
+        {data.projects.length > 0 && (
+          <section data-ats-field="projects">
+            <div className="section-header">Projects</div>
+            {data.projects.map((proj) => (
+              <article key={proj.id} style={{ marginBottom: '6px' }}>
+                <div className="job-header">
+                  <span className="job-title">{proj.name}</span>
+                  {proj.url && <span className="job-dates">{proj.url}</span>}
+                </div>
+                {proj.description && (
+                  <p style={{ fontSize: '10.5px', margin: '1px 0 3px 0', lineHeight: 1.4 }}>{proj.description}</p>
+                )}
+                {proj.bullets.length > 0 && (
+                  <ul>
+                    {proj.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                  </ul>
+                )}
+              </article>
+            ))}
+          </section>
+        )}
+
+        {/* Leadership — only if present */}
+        {data.leadership && data.leadership.length > 0 && (
+          <section data-ats-field="leadership">
+            <div className="section-header">Leadership</div>
+            {data.leadership.map((item) => (
+              <article key={item.id} style={{ marginBottom: '7px' }}>
+                <div className="job-header">
+                  <div>
+                    <span className="job-title">{item.role}</span>
+                    {item.organization && <span className="job-company">, {item.organization}</span>}
                   </div>
-                ))}
-              </section>
-            )}
-          </div>
+                  <span className="job-dates">{item.start} – {item.end}</span>
+                </div>
+                {item.bullets.length > 0 && (
+                  <ul>
+                    {item.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                  </ul>
+                )}
+              </article>
+            ))}
+          </section>
+        )}
 
-          {/* RIGHT COLUMN — summary, experience, leadership, volunteer, projects */}
-          <div className="cp-right">
-
-            {/* Summary */}
-            {data.summary && (
-              <section data-ats-field="summary" style={{ marginBottom: '4px' }}>
-                <div className="cp-sh" style={{ marginTop: 0 }}>Summary</div>
-                <p className="cp-summary">{data.summary}</p>
-              </section>
-            )}
-
-            {/* Experience */}
-            {data.experience.length > 0 && (
-              <section data-ats-field="experience">
-                <div className="cp-sh">Experience</div>
-                {data.experience.map((exp) => (
-                  <div key={exp.id} className="cp-job-block">
-                    <div className="cp-job-header">
-                      <div>
-                        <span className="cp-job-title">{exp.title}</span>
-                        {exp.company && <span className="cp-job-company">, {exp.company}</span>}
-                      </div>
-                      <span className="cp-job-dates">{exp.start} – {exp.end}</span>
-                    </div>
-                    {exp.bullets.length > 0 && (
-                      <ul className="cp-bullets">
-                        {exp.bullets.map((bullet, i) => (
-                          <li key={i}>{bullet}</li>
-                        ))}
-                      </ul>
-                    )}
+        {/* Volunteer — only if present */}
+        {data.volunteer && data.volunteer.length > 0 && (
+          <section data-ats-field="volunteer">
+            <div className="section-header">Volunteer</div>
+            {data.volunteer.map((item) => (
+              <article key={item.id} style={{ marginBottom: '6px' }}>
+                <div className="job-header">
+                  <div>
+                    <span className="job-title">{item.role}</span>
+                    {item.organization && <span className="job-company">, {item.organization}</span>}
                   </div>
-                ))}
-              </section>
-            )}
+                  <span className="job-dates">{item.date}</span>
+                </div>
+                {item.description && (
+                  <p style={{ fontSize: '10.5px', margin: '1px 0 0 0', lineHeight: 1.4 }}>{item.description}</p>
+                )}
+              </article>
+            ))}
+          </section>
+        )}
 
-            {/* Leadership */}
-            {data.leadership && data.leadership.length > 0 && (
-              <section data-ats-field="leadership">
-                <div className="cp-sh">Leadership</div>
-                {data.leadership.map((item) => (
-                  <div key={item.id} className="cp-job-block">
-                    <div className="cp-job-header">
-                      <div>
-                        <span className="cp-job-title">{item.role}</span>
-                        {item.organization && <span className="cp-job-company">, {item.organization}</span>}
-                      </div>
-                      <span className="cp-job-dates">{item.start} – {item.end}</span>
-                    </div>
-                    {item.bullets.length > 0 && (
-                      <ul className="cp-bullets">
-                        {item.bullets.map((bullet, i) => (
-                          <li key={i}>{bullet}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </section>
-            )}
-
-            {/* Volunteer */}
-            {data.volunteer && data.volunteer.length > 0 && (
-              <section data-ats-field="volunteer">
-                <div className="cp-sh">Volunteer</div>
-                {data.volunteer.map((item) => (
-                  <div key={item.id} className="cp-vol-block">
-                    <div className="cp-vol-header">
-                      <div>
-                        <span className="cp-vol-title">{item.role}</span>
-                        {item.organization && <span className="cp-vol-org">, {item.organization}</span>}
-                      </div>
-                      <span className="cp-vol-date">{item.date}</span>
-                    </div>
-                    {item.description && <p className="cp-vol-desc">{item.description}</p>}
-                  </div>
-                ))}
-              </section>
-            )}
-
-            {/* Projects */}
-            {data.projects.length > 0 && (
-              <section data-ats-field="projects">
-                <div className="cp-sh">Projects</div>
-                {data.projects.map((proj) => (
-                  <div key={proj.id} className="cp-proj-block">
-                    <div className="cp-proj-header">
-                      <span className="cp-proj-name">{proj.name}</span>
-                      {proj.url && <span className="cp-proj-url">{proj.url}</span>}
-                    </div>
-                    {proj.description && <p className="cp-proj-desc">{proj.description}</p>}
-                    {proj.bullets.length > 0 && (
-                      <ul className="cp-bullets">
-                        {proj.bullets.map((b, i) => <li key={i}>{b}</li>)}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </section>
-            )}
-          </div>
-        </div>
+        {/* Languages — only if present */}
+        {data.languages && data.languages.length > 0 && (
+          <section data-ats-field="languages">
+            <div className="section-header">Languages</div>
+            <p className="skills-list">
+              {data.languages.map((l) => `${l.name} (${l.proficiency})`).join(' · ')}
+            </p>
+          </section>
+        )}
       </div>
     </>
   )

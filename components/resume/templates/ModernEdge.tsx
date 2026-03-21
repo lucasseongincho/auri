@@ -17,26 +17,26 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
   return (
     <>
       <style>{`
-        .modern-edge { font-family: Arial, Helvetica, sans-serif; color: #1a1a1a; background: white; display: flex; min-height: 297mm; }
-        .modern-edge .sidebar { width: 28%; background: #1e1b4b; color: white; padding: 28px 16px; flex-shrink: 0; }
-        .modern-edge .main { flex: 1; padding: 28px 24px; }
-        .modern-edge .name { font-size: 24px; font-weight: 900; color: white; margin: 0 0 2px 0; line-height: 1.1; }
-        .modern-edge .role-label { font-size: 11px; color: #a5b4fc; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px; }
-        .modern-edge .sidebar-section { margin-bottom: 18px; }
-        .modern-edge .sidebar-header { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #a5b4fc; border-bottom: 1px solid rgba(165,180,252,0.3); padding-bottom: 4px; margin-bottom: 8px; }
-        .modern-edge .contact-item { font-size: 10px; color: #e0e7ff; margin-bottom: 4px; word-break: break-all; line-height: 1.4; }
-        .modern-edge .skill-chip { display: inline-block; font-size: 10px; color: #c7d2fe; margin-bottom: 4px; padding: 1px 0; line-height: 1.5; }
-        .modern-edge .main-section-header { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #4338ca; border-bottom: 2px solid #6366f1; padding-bottom: 3px; margin: 14px 0 8px 0; }
+        .modern-edge { font-family: Arial, Helvetica, sans-serif; color: #1a1a1a; background: white; display: flex; min-height: 297mm; width: 210mm; box-sizing: border-box; }
+        .modern-edge .sidebar { width: 27%; background: #1e1b4b; color: white; padding: 22px 14px; flex-shrink: 0; }
+        .modern-edge .main { flex: 1; padding: 22px 20px; }
+        .modern-edge .name { font-size: 20px; font-weight: 900; color: white; margin: 0 0 2px 0; line-height: 1.1; }
+        .modern-edge .role-label { font-size: 9px; color: #a5b4fc; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 14px; }
+        .modern-edge .sidebar-section { margin-bottom: 13px; }
+        .modern-edge .sidebar-header { font-size: 8px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #a5b4fc; border-bottom: 1px solid rgba(165,180,252,0.3); padding-bottom: 3px; margin-bottom: 6px; }
+        .modern-edge .contact-item { font-size: 9px; color: #e0e7ff; margin-bottom: 3px; word-break: break-all; line-height: 1.4; }
+        .modern-edge .skill-chip { display: inline-block; font-size: 9px; color: #c7d2fe; margin-bottom: 3px; padding: 1px 0; line-height: 1.4; }
+        .modern-edge .main-section-header { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #4338ca; border-bottom: 2px solid #6366f1; padding-bottom: 2px; margin: 10px 0 6px 0; }
         .modern-edge .job-title-row { display: flex; justify-content: space-between; align-items: baseline; }
-        .modern-edge .job-title { font-size: 12px; font-weight: 700; }
-        .modern-edge .job-dates { font-size: 10px; color: #6b7280; }
-        .modern-edge .job-company { font-size: 11px; color: #4338ca; margin-bottom: 3px; }
-        .modern-edge ul { margin: 3px 0 8px 14px; padding: 0; }
-        .modern-edge li { font-size: 11px; margin-bottom: 2px; line-height: 1.45; }
-        .modern-edge .summary-text { font-size: 11px; line-height: 1.55; margin: 0; }
-        .modern-edge .edu-row { margin-bottom: 8px; }
-        .modern-edge .edu-degree { font-size: 12px; font-weight: 700; }
-        .modern-edge .edu-info { font-size: 11px; color: #555; }
+        .modern-edge .job-title { font-size: 11px; font-weight: 700; }
+        .modern-edge .job-dates { font-size: 9px; color: #6b7280; white-space: nowrap; margin-left: 6px; flex-shrink: 0; }
+        .modern-edge .job-company { font-size: 10px; color: #4338ca; margin-bottom: 2px; }
+        .modern-edge ul { margin: 2px 0 6px 13px; padding: 0; }
+        .modern-edge li { font-size: 10px; margin-bottom: 1.5px; line-height: 1.4; }
+        .modern-edge .summary-text { font-size: 10px; line-height: 1.5; margin: 0; }
+        .modern-edge .edu-row { margin-bottom: 6px; }
+        .modern-edge .edu-degree { font-size: 11px; font-weight: 700; }
+        .modern-edge .edu-info { font-size: 10px; color: #555; }
         @media print {
           .modern-edge * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
