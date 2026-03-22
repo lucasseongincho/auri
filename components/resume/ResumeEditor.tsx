@@ -174,13 +174,6 @@ export default function ResumeEditor({
     onDataChange(updated)
   }, [resumeData, pushToHistory, onDataChange])
 
-  // Debounce sync on contenteditable input
-  const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const handleInput = useCallback(() => {
-    if (syncTimer.current) clearTimeout(syncTimer.current)
-    syncTimer.current = setTimeout(syncDOMToData, 800)
-  }, [syncDOMToData])
-
   return (
     <div className="relative" ref={editorRef} onMouseUp={handleMouseUp}>
       {/* Undo / Redo toolbar */}
@@ -261,12 +254,9 @@ export default function ResumeEditor({
       <div
         contentEditable
         suppressContentEditableWarning
-        onInput={handleInput}
         onBlur={syncDOMToData}
         className="outline-none"
-        style={{
-          cursor: 'text',
-        }}
+        style={{ cursor: 'text' }}
         aria-label="Editable resume content"
       >
         {children}

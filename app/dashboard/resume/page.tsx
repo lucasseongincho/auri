@@ -38,6 +38,8 @@ import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
 import ModernEdge from '@/components/resume/templates/ModernEdge'
 import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
+import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
+import CreativePulse from '@/components/resume/templates/CreativePulse'
 import type {
   Experience,
   Education,
@@ -64,6 +66,41 @@ const STEPS = [
   { id: 7, label: 'Extra', icon: Star },
   { id: 8, label: 'Target Job', icon: Target },
 ] as const
+
+// ─── Plain-text builder (used for ATS scoring) ────────────────────────────────
+
+function buildPlainText(
+  data: ResumeData,
+  personal: { name?: string; email?: string; phone?: string; location?: string }
+): string {
+  const lines: string[] = []
+  if (personal.name) lines.push(personal.name)
+  const contact = [personal.email, personal.phone, personal.location].filter(Boolean).join(' | ')
+  if (contact) lines.push(contact)
+  if (data.summary) lines.push('', 'SUMMARY', data.summary)
+  if (data.experience?.length) {
+    lines.push('', 'EXPERIENCE')
+    for (const exp of data.experience) {
+      lines.push(`${exp.title} at ${exp.company} (${exp.start} – ${exp.end})`)
+      for (const b of (exp.bullets ?? [])) lines.push(`• ${b}`)
+    }
+  }
+  if (data.education?.length) {
+    lines.push('', 'EDUCATION')
+    for (const edu of data.education)
+      lines.push(`${edu.degree} in ${edu.field}, ${edu.institution} (${edu.year})`)
+  }
+  if (data.skills?.length) lines.push('', 'SKILLS', data.skills.join(', '))
+  if (data.certifications?.length) lines.push('', 'CERTIFICATIONS', data.certifications.join(', '))
+  if (data.projects?.length) {
+    lines.push('', 'PROJECTS')
+    for (const p of data.projects) {
+      lines.push(p.name)
+      for (const b of (p.bullets ?? [])) lines.push(`• ${b}`)
+    }
+  }
+  return lines.join('\n').trim()
+}
 
 // ─── ID generator (nanoid-style) ──────────────────────────────────────────────
 
@@ -1216,14 +1253,9 @@ export default function ResumePage() {
 
   // Auto-run ATS scoring when resume generation completes
   useEffect(() => {
-    if (
-      currentResume &&
-      !isStreaming &&
-      profile?.target.job_description &&
-      currentResume.plain
-    ) {
-      runATSScore(currentResume.plain, profile.target.job_description)
-    }
+    if (!currentResume || isStreaming || !profile?.target.job_description) return
+    const plainText = currentResume.plain ?? buildPlainText(currentResume, profile.personal)
+    if (plainText) runATSScore(plainText, profile.target.job_description)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentResume?.id, isStreaming])
 
@@ -1399,14 +1431,18 @@ export default function ResumePage() {
           volunteer: (profile.volunteer ?? []).slice(0, 1),
           languages: (profile.languages ?? []).slice(0, 4),
           html: parsed.html,
-          plain: parsed.plain,
+          // Build plain text for ATS scoring from the structured data
+          plain: buildPlainText(
+            { ...parsed, templateId: selectedTemplate },
+            profile.personal
+          ),
           templateId: selectedTemplate,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }
         setResume(resume)
         setEditedResume(resume)
-        setIsEditing(true)
+        setIsEditing(false) // start in preview mode; user clicks Edit to enter inline editing
       } catch {
         setGenerateError('Failed to parse AI response. Please try again.')
       }
@@ -1494,13 +1530,13 @@ export default function ResumePage() {
       linkedin_url: '',
       website: '',
     }
-    if (selectedTemplate === 'modern-edge') {
-      return <ModernEdge data={data} personal={personal} isEditing />
+    switch (selectedTemplate) {
+      case 'modern-edge':    return <ModernEdge data={data} personal={personal} isEditing />
+      case 'minimal-seoul':  return <MinimalSeoul data={data} personal={personal} isEditing />
+      case 'executive-dark': return <ExecutiveDark data={data} personal={personal} isEditing />
+      case 'creative-pulse': return <CreativePulse data={data} personal={personal} isEditing />
+      default:               return <ClassicPro data={data} personal={personal} isEditing />
     }
-    if (selectedTemplate === 'minimal-seoul') {
-      return <MinimalSeoul data={data} personal={personal} isEditing />
-    }
-    return <ClassicPro data={data} personal={personal} isEditing />
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -1872,6 +1908,39 @@ export default function ResumePage() {
                       Easy Tune — Edit Inline
                     </>
                   )}
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Run ATS Score button — shown when resume exists but no score yet */}
+          <AnimatePresence>
+            {activeResume && !isStreaming && !atsScore && !isATSLoading && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={SPRING}
+                className="flex-shrink-0"
+              >
+                <button
+                  onClick={() => {
+                    const jd = profile?.target.job_description
+                    if (!jd) return
+                    const plainText = activeResume.plain ?? buildPlainText(activeResume, profile?.personal ?? {})
+                    runATSScore(plainText, jd)
+                  }}
+                  disabled={!profile?.target.job_description}
+                  aria-label="Run ATS compatibility score"
+                  title={!profile?.target.job_description ? 'Add a job description in Step 8 to run ATS scoring' : undefined}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium
+                    border border-[#6366F1]/30 text-[#818CF8] bg-[#6366F1]/5
+                    hover:bg-[#6366F1]/10 hover:border-[#6366F1]/50
+                    disabled:opacity-40 disabled:cursor-not-allowed
+                    transition-all duration-200"
+                >
+                  <Target className="w-4 h-4" />
+                  {profile?.target.job_description ? 'Run ATS Score' : 'Add a job description to run ATS Score'}
                 </button>
               </motion.div>
             )}
