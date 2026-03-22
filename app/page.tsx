@@ -367,22 +367,23 @@ export default function LandingPage() {
             </p>
           </FadeInSection>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            style={{ gridAutoRows: '1fr' }}>
             {FEATURES.map((f, i) => (
-              <FadeInSection key={f.label} delay={i * 0.05}>
-                <Link href={f.href}>
+              <FadeInSection key={f.label} delay={i * 0.05} className="h-full">
+                <Link href={f.href} className="h-full block">
                   <motion.div
                     whileHover={{ scale: 1.02, y: -2 }}
                     transition={SPRING}
-                    className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 cursor-pointer group"
+                    className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 cursor-pointer group h-full"
                   >
-                    <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5">
-                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4
+                    <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 h-full flex flex-col justify-start">
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4 flex-shrink-0
                         group-hover:shadow-lg group-hover:shadow-[#6366F1]/20 transition-shadow duration-300`}>
                         <f.icon className="w-5 h-5 text-white" />
                       </div>
                       <h3 className="font-heading font-semibold text-white mb-1.5">{f.label}</h3>
-                      <p className="text-sm text-[#60607A] leading-relaxed">{f.desc}</p>
+                      <p className="text-sm text-[#60607A] leading-relaxed flex-1">{f.desc}</p>
                       <div className="flex items-center gap-1 mt-3 text-[#6366F1] text-xs font-medium
                         opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         Try it <ChevronRight className="w-3 h-3" />
@@ -405,8 +406,9 @@ export default function LandingPage() {
           </FadeInSection>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Connecting line */}
-            <div className="hidden md:block absolute top-10 left-1/3 right-1/3 h-px bg-gradient-to-r from-[#6366F1]/50 to-[#8B5CF6]/50" />
+            {/* Connecting line — z-0 so it sits behind the step boxes */}
+            <div className="hidden md:block absolute left-0 right-0 h-px bg-gradient-to-r from-[#6366F1]/50 to-[#8B5CF6]/50"
+              style={{ top: '40px', zIndex: 0 }} />
 
             {[
               { step: '01', title: 'Add Your Experience', desc: 'Fill in your background or paste your existing resume. Takes 3 minutes.' },
@@ -414,10 +416,10 @@ export default function LandingPage() {
               { step: '03', title: 'Get Hired', desc: 'Download your ATS-optimized resume, apply, and land the interview.' },
             ].map((item, i) => (
               <FadeInSection key={item.step} delay={i * 0.15}>
-                <div className="text-center">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#6366F1]/20 to-[#8B5CF6]/20
+                <div className="text-center relative" style={{ zIndex: 1 }}>
+                  <div className="w-20 h-20 rounded-2xl bg-[#0A0A0F] bg-gradient-to-br from-[#6366F1]/20 to-[#8B5CF6]/20
                     border border-[#6366F1]/30 flex items-center justify-center mx-auto mb-4">
-                    <span className="font-heading font-bold text-2xl text-gradient
+                    <span className="font-heading font-bold text-2xl
                       bg-clip-text text-transparent bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]">
                       {item.step}
                     </span>
