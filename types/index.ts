@@ -174,12 +174,10 @@ export interface JobStrategy {
 }
 
 export interface CoverLetter {
-  cover_letter: string  // full plain text for copy/paste
+  cover_letter: string   // full plain text for copy/paste
   word_count: number
-  opening_hook: string  // first sentence highlight for UI callout
-  opening: string       // paragraph 1 — the hook
-  body: string          // paragraph 2 — experience + value match
-  closing: string       // paragraph 3 — call to action
+  opening_hook: string   // first sentence highlight for UI callout
+  paragraphs: string[]   // 3–6 paragraphs: opening hook → body → closing
 }
 
 export interface InterviewQuestion {

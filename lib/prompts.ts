@@ -213,13 +213,13 @@ Respond with ONLY the raw JSON object below — no markdown, no code fences, no 
  * "start with a hook" because it eliminates the most likely
  * failure mode directly.
  *
- * Why 3 structured paragraphs: Gives the UI the ability to render a
- * proper formal letter with semantic sections rather than a single
- * text blob — enables per-paragraph editing and a professional layout.
+ * Why 3-6 flexible paragraphs: Mirrors how real cover letters are
+ * written — the number of paragraphs depends on how much substantive
+ * content the user's experience provides. Enables per-paragraph editing
+ * in the UI and a professional letter layout.
  *
- * Why 150-200 words per body: Long enough to be substantive, short
- * enough for a hiring manager to read in < 45 seconds. The range
- * (not a hard cap) allows Claude to fill a proper letter page.
+ * Why 300-380 words: Long enough to fill one page and give a complete
+ * narrative, short enough for a hiring manager to read in < 90 seconds.
  *
  * Why return opening_hook separately: Lets the UI highlight the
  * first sentence distinctively so users can quickly judge impact.
@@ -241,10 +241,11 @@ ${cityState ? `The applicant is based in ${cityState}.` : ''}
 ${hiringManagerName ? `Address it to ${hiringManagerName}.` : ''}
 
 STRUCTURE REQUIREMENTS:
+- Write 3 to 6 paragraphs total. The exact number should match the depth of the candidate's experience — use more paragraphs when there is enough substance to warrant them, fewer when concision is stronger.
 - Paragraph 1 (opening): Begin with a powerful, memorable hook. NOT "I am applying for..." and NOT "I am writing to express my interest...". Hook the reader immediately with insight, a bold claim, or a specific result.
-- Paragraph 2 (body): Connect specific experience to the company's exact needs. Be concrete — name technologies, metrics, or outcomes.
-- Paragraph 3 (closing): A confident call to action. Express genuine enthusiasm. Keep it brief.
-- Total body text: 150-200 words across the 3 paragraphs. Be substantive but tight.
+- Middle paragraphs (body): Connect specific experience to the company's exact needs. Be concrete — name technologies, metrics, or outcomes. Can span 1–4 paragraphs depending on how many distinct points deserve their own paragraph.
+- Final paragraph (closing): A confident call to action. Express genuine enthusiasm. Keep it brief.
+- Total body text: 300-380 words across all paragraphs. Aim to fill a single page.
 - Tone: human, direct, compelling. Not corporate. Not generic.
 
 My experience:
@@ -255,12 +256,10 @@ ${jobDescription || '(not provided — write for the role and company generally)
 
 Return ONLY valid JSON with exactly these fields:
 {
-  "opening": "string (paragraph 1 text only, no salutation)",
-  "body": "string (paragraph 2 text only)",
-  "closing": "string (paragraph 3 text only)",
-  "cover_letter": "string (full plain text: salutation + all 3 paragraphs + sign-off, for copy/paste)",
-  "word_count": number (count only the 3 paragraphs, not salutation/sign-off),
-  "opening_hook": "string (the first sentence of opening, for UI callout)"
+  "paragraphs": ["string", "string", ...],  // array of 3-6 paragraph strings, no salutation or sign-off
+  "cover_letter": "string (full plain text: salutation + all paragraphs + sign-off, for copy/paste)",
+  "word_count": number (count only the paragraphs, not salutation/sign-off),
+  "opening_hook": "string (the first sentence of paragraph 1, for UI callout)"
 }
 
 Salutation to use: ${salutation}`

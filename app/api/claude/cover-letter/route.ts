@@ -20,7 +20,7 @@ interface CoverLetterRequestBody {
 
 async function attemptStream(prompt: string, retryCount = 0): Promise<ReadableStream<Uint8Array>> {
   try {
-    const claudeStream = await streamClaude(prompt, 1500)
+    const claudeStream = await streamClaude(prompt, 2500)
     return new ReadableStream<Uint8Array>({
       async start(controller) {
         try {

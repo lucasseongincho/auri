@@ -25,9 +25,9 @@ const INPUT_CLASS =
 const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
 const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
-const MIN_WORDS = 150
-const MAX_WORDS = 200
-const WARN_WORDS = 185
+const MIN_WORDS = 280
+const MAX_WORDS = 380
+const WARN_WORDS = 355
 
 function countWords(text: string): number {
   return text.trim() ? text.trim().split(/\s+/).length : 0
@@ -84,8 +84,8 @@ interface LetterDocProps {
   position: string
   hiringManagerName: string
   isEditing: boolean
-  editedFields: { opening: string; body: string; closing: string }
-  onFieldChange: (field: 'opening' | 'body' | 'closing', value: string) => void
+  editedParagraphs: string[]
+  onParagraphChange: (index: number, value: string) => void
   onStopEditing: () => void
 }
 
@@ -95,8 +95,8 @@ function LetterDocument({
   company,
   hiringManagerName,
   isEditing,
-  editedFields,
-  onFieldChange,
+  editedParagraphs,
+  onParagraphChange,
   onStopEditing,
 }: LetterDocProps) {
   const today = new Date().toLocaleDateString('en-US', {
@@ -109,11 +109,7 @@ function LetterDocument({
     ? `Dear ${hiringManagerName},`
     : 'Dear Hiring Manager,'
 
-  const openingText = isEditing ? editedFields.opening : result.opening || result.cover_letter
-  const bodyText = isEditing ? editedFields.body : result.body || ''
-  const closingText = isEditing ? editedFields.closing : result.closing || ''
-
-  const hasStructured = Boolean(result.opening && result.body && result.closing)
+  const paragraphs = isEditing ? editedParagraphs : (result.paragraphs?.length ? result.paragraphs : [result.cover_letter])
 
   return (
     <div
@@ -157,85 +153,32 @@ function LetterDocument({
       <p style={{ marginBottom: '16px', fontWeight: 500 }}>{salutation}</p>
 
       {/* ── Body paragraphs ─────────────────────────── */}
-      {hasStructured ? (
-        isEditing ? (
-          <div style={{ position: 'relative' }}>
-            <button
-              onClick={onStopEditing}
-              style={{
-                position: 'absolute',
-                top: -28,
-                right: 0,
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: '#999',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '11px',
-              }}
-              aria-label="Done editing"
-            >
-              <X size={14} /> Done
-            </button>
-            {(['opening', 'body', 'closing'] as const).map((field) => (
-              <textarea
-                key={field}
-                value={editedFields[field]}
-                onChange={(e) => onFieldChange(field, e.target.value)}
-                style={{
-                  width: '100%',
-                  fontFamily: 'Georgia, "Times New Roman", serif',
-                  fontSize: '11pt',
-                  lineHeight: '1.6',
-                  color: '#1a1a1a',
-                  background: 'rgba(99,102,241,0.04)',
-                  border: '1px dashed rgba(99,102,241,0.3)',
-                  borderRadius: '4px',
-                  padding: '8px',
-                  resize: 'vertical',
-                  marginBottom: '14px',
-                  boxSizing: 'border-box',
-                  outline: 'none',
-                }}
-                rows={4}
-                aria-label={`Edit ${field} paragraph`}
-              />
-            ))}
-          </div>
-        ) : (
-          <>
-            <p style={{ marginBottom: '14px', textIndent: '0' }}>{openingText}</p>
-            <p style={{ marginBottom: '14px' }}>{bodyText}</p>
-            <p style={{ marginBottom: '14px' }}>{closingText}</p>
-          </>
-        )
-      ) : (
-        isEditing ? (
-          <div style={{ position: 'relative' }}>
-            <button
-              onClick={onStopEditing}
-              style={{
-                position: 'absolute',
-                top: -28,
-                right: 0,
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: '#999',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '11px',
-              }}
-              aria-label="Done editing"
-            >
-              <X size={14} /> Done
-            </button>
+      {isEditing ? (
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={onStopEditing}
+            style={{
+              position: 'absolute',
+              top: -28,
+              right: 0,
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#999',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '11px',
+            }}
+            aria-label="Done editing"
+          >
+            <X size={14} /> Done
+          </button>
+          {editedParagraphs.map((text, i) => (
             <textarea
-              value={editedFields.opening}
-              onChange={(e) => onFieldChange('opening', e.target.value)}
+              key={i}
+              value={text}
+              onChange={(e) => onParagraphChange(i, e.target.value)}
               style={{
                 width: '100%',
                 fontFamily: 'Georgia, "Times New Roman", serif',
@@ -251,13 +194,17 @@ function LetterDocument({
                 boxSizing: 'border-box',
                 outline: 'none',
               }}
-              rows={10}
-              aria-label="Edit cover letter"
+              rows={4}
+              aria-label={`Edit paragraph ${i + 1}`}
             />
-          </div>
-        ) : (
-          <p style={{ whiteSpace: 'pre-wrap', marginBottom: '14px' }}>{openingText}</p>
-        )
+          ))}
+        </div>
+      ) : (
+        <>
+          {paragraphs.map((p, i) => (
+            <p key={i} style={{ marginBottom: '14px', whiteSpace: 'pre-wrap' }}>{p}</p>
+          ))}
+        </>
       )}
 
       {/* ── Closing ─────────────────────────────────── */}
@@ -286,7 +233,7 @@ export default function CoverLetterPage() {
 
   const [result, setResult] = useState<CoverLetter | null>(null)
   const [isEditing, setIsEditing] = useState(false)
-  const [editedFields, setEditedFields] = useState({ opening: '', body: '', closing: '' })
+  const [editedParagraphs, setEditedParagraphs] = useState<string[]>([])
   const [generateError, setGenerateError] = useState('')
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
@@ -318,11 +265,7 @@ export default function CoverLetterPage() {
         const cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
         const parsed = JSON.parse(cleaned) as CoverLetter
         setResult(parsed)
-        setEditedFields({
-          opening: parsed.opening || parsed.cover_letter,
-          body: parsed.body || '',
-          closing: parsed.closing || '',
-        })
+        setEditedParagraphs(parsed.paragraphs?.length ? parsed.paragraphs : [parsed.cover_letter])
       } catch {
         setGenerateError('Could not parse the cover letter. Please try again.')
       }
@@ -332,7 +275,7 @@ export default function CoverLetterPage() {
   const handleCopy = useCallback(async () => {
     if (!result) return
     const body = isEditing
-      ? [editedFields.opening, editedFields.body, editedFields.closing].filter(Boolean).join('\n\n')
+      ? editedParagraphs.filter(Boolean).join('\n\n')
       : result.cover_letter
     await navigator.clipboard.writeText(body)
     setCopied(true)
@@ -351,20 +294,17 @@ export default function CoverLetterPage() {
     }
   }, [company])
 
-  const handleFieldChange = useCallback(
-    (field: 'opening' | 'body' | 'closing', value: string) => {
-      setEditedFields((prev) => ({ ...prev, [field]: value }))
-    },
-    []
-  )
+  const handleParagraphChange = useCallback((index: number, value: string) => {
+    setEditedParagraphs((prev) => prev.map((p, i) => (i === index ? value : p)))
+  }, [])
 
-  // Count words across body paragraphs only
-  const bodyText = isEditing
-    ? [editedFields.opening, editedFields.body, editedFields.closing].filter(Boolean).join(' ')
+  // Count words across all body paragraphs
+  const allBodyText = isEditing
+    ? editedParagraphs.join(' ')
     : result
-    ? [result.opening, result.body, result.closing].filter(Boolean).join(' ') || result.cover_letter
+    ? (result.paragraphs?.join(' ') || result.cover_letter)
     : ''
-  const currentWordCount = countWords(bodyText)
+  const currentWordCount = countWords(allBodyText)
 
   const personal = {
     name: profile?.personal?.name ?? '',
@@ -383,7 +323,7 @@ export default function CoverLetterPage() {
           <h1 className="font-heading text-2xl font-bold text-white">Cover Letter Generator</h1>
         </div>
         <p className="text-[#A0A0B8] text-sm ml-12">
-          Professional letter structure, 150–200 words, opens with a powerful hook — never &quot;I am applying for...&quot;
+          Professional letter structure, 300–380 words, 3–6 paragraphs, opens with a powerful hook — never &quot;I am applying for...&quot;
         </p>
       </motion.div>
 
@@ -542,8 +482,8 @@ export default function CoverLetterPage() {
                       position={position}
                       hiringManagerName={hiringManagerName}
                       isEditing={isEditing}
-                      editedFields={editedFields}
-                      onFieldChange={handleFieldChange}
+                      editedParagraphs={editedParagraphs}
+                      onParagraphChange={handleParagraphChange}
                       onStopEditing={() => setIsEditing(false)}
                     />
                   </div>
