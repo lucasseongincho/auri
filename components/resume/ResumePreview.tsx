@@ -29,6 +29,32 @@ interface ResumePreviewProps {
   onTemplateChange?: (id: TemplateId) => void
 }
 
+// Normalise resume data from Firestore: arrays may be null/undefined if the AI
+// returned null or if optional fields were stripped during JSON serialisation.
+// All templates assume arrays are non-null, so guard here in one place.
+function sanitizeResumeData(data: ResumeData): ResumeData {
+  return {
+    ...data,
+    experience: (data.experience ?? []).map((exp) => ({
+      ...exp,
+      bullets: exp.bullets ?? [],
+    })),
+    education: data.education ?? [],
+    skills: data.skills ?? [],
+    certifications: data.certifications ?? [],
+    projects: (data.projects ?? []).map((proj) => ({
+      ...proj,
+      bullets: proj.bullets ?? [],
+    })),
+    leadership: (data.leadership ?? []).map((item) => ({
+      ...item,
+      bullets: item.bullets ?? [],
+    })),
+    volunteer: data.volunteer ?? [],
+    languages: data.languages ?? [],
+  }
+}
+
 // Extract plain text from the resume element for ATS copy
 function extractPlainTextFromElement(el: HTMLElement): string {
   const fields = el.querySelectorAll('[data-ats-field]')
@@ -55,13 +81,16 @@ export default function ResumePreview({
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
 
+  // Sanitise data once so all 5 templates receive guaranteed non-null arrays.
+  const safeData = data ? sanitizeResumeData(data) : null
+
   const handleTemplateChange = (id: TemplateId) => {
     setSelectedTemplate(id)
     onTemplateChange?.(id)
   }
 
   const handleDownloadPDF = useCallback(async () => {
-    if (!previewRef.current || !data) return
+    if (!previewRef.current || !safeData) return
     setDownloading(true)
     try {
       const { generatePDFFromElement } = await import('@/lib/pdf')
@@ -75,15 +104,15 @@ export default function ResumePreview({
     } finally {
       setDownloading(false)
     }
-  }, [data, personal])
+  }, [safeData, personal])
 
   const handleCopyATS = useCallback(async () => {
-    if (!previewRef.current || !data) return
+    if (!previewRef.current || !safeData) return
     const text = extractPlainTextFromElement(previewRef.current)
     await navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }, [data])
+  }, [safeData])
 
   return (
     <div className="flex flex-col h-full">
@@ -112,7 +141,7 @@ export default function ResumePreview({
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={handleCopyATS}
-            disabled={!data || isStreaming}
+            disabled={!safeData || isStreaming}
             aria-label="Copy plain text for ATS portals"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
               border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
@@ -123,7 +152,7 @@ export default function ResumePreview({
           </button>
           <button
             onClick={handleDownloadPDF}
-            disabled={!data || isStreaming || downloading}
+            disabled={!safeData || isStreaming || downloading}
             aria-label="Download resume as PDF"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold
               bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
@@ -188,7 +217,7 @@ export default function ResumePreview({
                   )}
                 </div>
               </motion.div>
-            ) : data ? (
+            ) : safeData ? (
               <motion.div
                 key="resume"
                 initial={{ opacity: 0, y: 10 }}
@@ -198,19 +227,19 @@ export default function ResumePreview({
                 className="w-full"
               >
                 {selectedTemplate === 'classic-pro' && (
-                  <ClassicPro data={data} personal={personal} />
+                  <ClassicPro data={safeData} personal={personal} />
                 )}
                 {selectedTemplate === 'modern-edge' && (
-                  <ModernEdge data={data} personal={personal} />
+                  <ModernEdge data={safeData} personal={personal} />
                 )}
                 {selectedTemplate === 'minimal-seoul' && (
-                  <MinimalSeoul data={data} personal={personal} />
+                  <MinimalSeoul data={safeData} personal={personal} />
                 )}
                 {selectedTemplate === 'executive-dark' && (
-                  <ExecutiveDark data={data} personal={personal} />
+                  <ExecutiveDark data={safeData} personal={personal} />
                 )}
                 {selectedTemplate === 'creative-pulse' && (
-                  <CreativePulse data={data} personal={personal} />
+                  <CreativePulse data={safeData} personal={personal} />
                 )}
               </motion.div>
             ) : (

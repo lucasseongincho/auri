@@ -397,7 +397,7 @@ export default function SavedResumePage() {
     try {
       const { generatePDFFromElement } = await import('@/lib/pdf')
       const filename =
-        `${resume.personalInfo.name.replace(/\s+/g, '-').toLowerCase() || 'resume'}-` +
+        `${(resume.personalInfo?.name ?? '').replace(/\s+/g, '-').toLowerCase() || 'resume'}-` +
         `${resume.targetPosition.replace(/\s+/g, '-').toLowerCase() || 'resume'}.pdf`
       await generatePDFFromElement(previewRef.current, { filename, imageQuality: 0.98 })
     } finally {
@@ -813,7 +813,7 @@ export default function SavedResumePage() {
             <div ref={previewRef}>
               <ResumePreview
                 data={resume.resumeData}
-                personal={resume.personalInfo}
+                personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
                 isStreaming={false}
                 onTemplateChange={handleTemplateChange}
               />
