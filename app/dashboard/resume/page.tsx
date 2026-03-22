@@ -1251,14 +1251,6 @@ export default function ResumePage() {
     }
   }, [profile, isAuthenticated, user?.uid, syncToFirestore])
 
-  // Auto-run ATS scoring when resume generation completes
-  useEffect(() => {
-    if (!currentResume || isStreaming || !profile?.target.job_description) return
-    const plainText = currentResume.plain ?? buildPlainText(currentResume, profile.personal)
-    if (plainText) runATSScore(plainText, profile.target.job_description)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentResume?.id, isStreaming])
-
   // ── Validation ──────────────────────────────────────────────────────────────
 
   const validateStep = useCallback(
