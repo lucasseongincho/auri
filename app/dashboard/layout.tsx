@@ -44,15 +44,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const betaUsage = useBetaUsage(APP_CONFIG.BETA_MODE && !user?.isGuest ? user?.uid : undefined)
   const isOwner = user?.email === process.env.NEXT_PUBLIC_OWNER_EMAIL && !!process.env.NEXT_PUBLIC_OWNER_EMAIL
 
-  // Beta gate: redirect unapproved users to /beta-access
+  // Beta gate: redirect unapproved users to /beta-access (owner is always exempt)
   useEffect(() => {
     if (!APP_CONFIG.BETA_MODE) return
     if (!user || user.isGuest) return
+    if (isOwner) return
     // Only redirect once we have usage data confirming they're not approved
     if (betaUsage && !betaUsage.betaApproved) {
       router.replace('/beta-access')
     }
-  }, [betaUsage, user, router])
+  }, [betaUsage, user, router, isOwner])
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard'
