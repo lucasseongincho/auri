@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server'
 import { adminDb } from '@/lib/firebaseAdmin'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
-import { APP_CONFIG } from '@/lib/config'
 
 export const runtime = 'nodejs'
 
@@ -59,22 +58,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Check total beta user cap
-    console.log('[invite/validate] Checking total beta user count')
-    const usersSnap = await adminDb
-      .collectionGroup('profile')
-      .where('betaApproved', '==', true)
-      .count()
-      .get()
-    const totalApproved = usersSnap.data().count
-    console.log('[invite/validate] Total approved users:', totalApproved, '/ max:', APP_CONFIG.BETA_MAX_USERS)
-
-    if (totalApproved >= APP_CONFIG.BETA_MAX_USERS) {
-      return Response.json({
-        valid: false,
-        reason: 'Beta is currently full. You have been added to the waitlist.',
-      })
-    }
+    // NOTE: Beta user cap check (collectionGroup count) requires a Firestore composite index.
+    // To enable: Firebase Console → Firestore → Indexes → create index on collectionGroup "profile"
+    // field: betaApproved (ASC). Until then, the cap is not enforced at validate time.
 
     console.log('[invite/validate] Code is valid')
     return Response.json({ valid: true })
