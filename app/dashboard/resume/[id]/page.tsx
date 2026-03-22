@@ -38,15 +38,23 @@ const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function formatDate(iso: string): string {
+function formatDate(iso: unknown): string {
   try {
+    // Firestore serverTimestamp() returns a Timestamp object {seconds, nanoseconds}.
+    // Convert it to a JS Date before formatting; fall back to ISO string parsing.
+    let date: Date
+    if (iso && typeof iso === 'object' && 'seconds' in iso) {
+      date = new Date((iso as { seconds: number }).seconds * 1000)
+    } else {
+      date = new Date(iso as string)
+    }
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
-    }).format(new Date(iso))
+    }).format(date)
   } catch {
-    return iso
+    return ''
   }
 }
 
@@ -771,7 +779,7 @@ export default function SavedResumePage() {
                         <Calendar className="w-3.5 h-3.5" />
                         Created {formatDate(resume.createdAt)}
                       </span>
-                      {resume.updatedAt !== resume.createdAt && (
+                      {formatDate(resume.updatedAt) !== formatDate(resume.createdAt) && (
                         <span className="text-sm text-[#60607A]">
                           · Updated {formatDate(resume.updatedAt)}
                         </span>

@@ -24,9 +24,15 @@ const TEMPLATE_LABELS: Record<string, string> = {
   'creative-pulse': 'Creative Pulse',
 }
 
-function formatDate(iso: string) {
-  const d = new Date(iso)
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+function formatDate(iso: unknown) {
+  try {
+    const d = iso && typeof iso === 'object' && 'seconds' in iso
+      ? new Date((iso as { seconds: number }).seconds * 1000)
+      : new Date(iso as string)
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  } catch {
+    return ''
+  }
 }
 
 function ATSBadge({ score }: { score?: number }) {
