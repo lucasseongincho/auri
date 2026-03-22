@@ -69,9 +69,10 @@ export default function BetaAccessPage() {
         setStatus('error')
         setErrorMsg(redeemData.error ?? 'Could not redeem code. Please try again.')
       }
-    } catch {
+    } catch (err) {
       setStatus('error')
-      setErrorMsg('Something went wrong. Please try again.')
+      const message = err instanceof Error ? err.message : String(err)
+      setErrorMsg(`Unknown error — check console: ${message}`)
     }
   }
 
