@@ -9,11 +9,9 @@ import {
   Calendar,
   ChevronRight,
   Download,
-  Edit3,
   FileText,
   Loader2,
   LogIn,
-  PenLine,
   Plus,
   Target,
   Trash2,
@@ -22,14 +20,13 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
 import ResumePreview from '@/components/resume/ResumePreview'
-import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import {
   deleteSavedResume,
   getSavedResume,
   getSavedResumes,
   updateSavedResume,
 } from '@/lib/firestore'
-import type { ATSScore, SavedResume, TemplateId } from '@/types'
+import type { SavedResume, TemplateId } from '@/types'
 import { TEMPLATE_LABELS } from '@/types'
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
@@ -58,16 +55,10 @@ function formatDate(iso: unknown): string {
   }
 }
 
-function atsScoreColor(score: number): string {
-  if (score >= 85) return 'text-[#22C55E]'
-  if (score >= 70) return 'text-[#F59E0B]'
-  return 'text-[#EF4444]'
-}
-
 function atsScoreBg(score: number): string {
-  if (score >= 85) return 'bg-[#22C55E]/10 border-[#22C55E]/20'
-  if (score >= 70) return 'bg-[#F59E0B]/10 border-[#F59E0B]/20'
-  return 'bg-[#EF4444]/10 border-[#EF4444]/20'
+  if (score >= 85) return 'bg-[#22C55E]/10 border-[#22C55E]/20 text-[#22C55E]'
+  if (score >= 70) return 'bg-[#F59E0B]/10 border-[#F59E0B]/20 text-[#F59E0B]'
+  return 'bg-[#EF4444]/10 border-[#EF4444]/20 text-[#EF4444]'
 }
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
@@ -313,9 +304,6 @@ export default function SavedResumePage() {
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Edit mode
-  const [editMode, setEditMode] = useState(false)
-
   // Delete flow
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -323,11 +311,6 @@ export default function SavedResumePage() {
   // Download
   const [isDownloading, setIsDownloading] = useState(false)
   const previewRef = useRef<HTMLDivElement>(null)
-
-  // ATS panel
-  const [atsScore, setAtsScore] = useState<ATSScore | null>(null)
-  const [atsLoading, setAtsLoading] = useState(false)
-  const [atsFixing, setAtsFixing] = useState(false)
 
   // Sidebar collapsed on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -424,28 +407,6 @@ export default function SavedResumePage() {
       setShowDeleteModal(false)
     }
   }, [user, resume, router])
-
-  const handleFixAll = useCallback(async () => {
-    if (!resume) return
-    setAtsFixing(true)
-    try {
-      const res = await fetch('/api/claude/ats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resumePlainText: resume.resumeData.plain ?? '',
-          jobDescription: resume.resumeData.html ?? '',
-          mode: 'fix',
-        }),
-      })
-      if (res.ok) {
-        const json = (await res.json()) as { success: boolean; data: ATSScore }
-        if (json.success) setAtsScore(json.data)
-      }
-    } finally {
-      setAtsFixing(false)
-    }
-  }, [resume])
 
   // ── Auth / loading gates ──────────────────────────────────────────────────────
 
@@ -547,8 +508,7 @@ export default function SavedResumePage() {
                             {r.atsScore !== undefined && (
                               <span className={`
                                 text-[10px] font-semibold px-1.5 py-0.5 rounded-full
-                                border ${atsScoreBg(r.atsScore)} ${atsScoreColor(r.atsScore)}
-                              `}>
+                                border ${atsScoreBg(r.atsScore)}                              `}>
                                 {r.atsScore}%
                               </span>
                             )}
@@ -628,7 +588,7 @@ export default function SavedResumePage() {
                             </span>
                             {r.atsScore !== undefined && (
                               <span className={`text-[10px] font-semibold px-1.5 py-0.5
-                                rounded-full border ${atsScoreBg(r.atsScore)} ${atsScoreColor(r.atsScore)}`}>
+                                rounded-full border ${atsScoreBg(r.atsScore)}`}>
                                 {r.atsScore}%
                               </span>
                             )}
@@ -707,22 +667,6 @@ export default function SavedResumePage() {
                   Back
                 </Link>
 
-                {/* Edit toggle */}
-                <button
-                  onClick={() => setEditMode((v) => !v)}
-                  aria-label={editMode ? 'Exit edit mode' : 'Enter edit mode'}
-                  aria-pressed={editMode}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-                    transition-all duration-200
-                    ${editMode
-                      ? 'bg-[#6366F1]/10 border border-[#6366F1]/30 text-[#818CF8]'
-                      : 'border border-white/[0.08] text-[#A0A0B8] hover:bg-white/5 hover:text-white'
-                    }`}
-                >
-                  {editMode ? <PenLine className="w-3.5 h-3.5" /> : <Edit3 className="w-3.5 h-3.5" />}
-                  {editMode ? 'Editing' : 'Edit'}
-                </button>
-
                 {/* Download PDF */}
                 <button
                   onClick={handleDownload}
@@ -798,20 +742,11 @@ export default function SavedResumePage() {
                     {/* ATS score badge */}
                     {resume.atsScore !== undefined && (
                       <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold
-                        border ${atsScoreBg(resume.atsScore)} ${atsScoreColor(resume.atsScore)}`}>
+                        border ${atsScoreBg(resume.atsScore)}`}>
                         ATS {resume.atsScore}%
                       </span>
                     )}
 
-                    {/* Edit mode indicator */}
-                    {editMode && (
-                      <span className="px-2.5 py-1 rounded-lg text-xs font-medium
-                        bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B]
-                        flex items-center gap-1">
-                        <PenLine className="w-3 h-3" />
-                        Edit mode
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>
@@ -827,63 +762,6 @@ export default function SavedResumePage() {
               />
             </div>
 
-            {/* ATS Score Panel */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Target className="w-4 h-4 text-[#6366F1]" />
-                <span className="text-sm font-semibold text-white">ATS Analysis</span>
-                {!atsScore && !atsLoading && (
-                  <button
-                    onClick={async () => {
-                      if (!resume) return
-                      setAtsLoading(true)
-                      try {
-                        const res = await fetch('/api/claude/ats', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            resumePlainText: resume.resumeData.plain ?? '',
-                            jobDescription: resume.resumeData.html ?? '',
-                            mode: 'score',
-                          }),
-                        })
-                        if (res.ok) {
-                          const json = (await res.json()) as { success: boolean; data: ATSScore }
-                          if (json.success) setAtsScore(json.data)
-                        }
-                      } finally {
-                        setAtsLoading(false)
-                      }
-                    }}
-                    aria-label="Run ATS analysis"
-                    className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-                      border border-white/[0.08] text-[#A0A0B8]
-                      hover:bg-white/5 hover:text-white transition-all duration-200"
-                  >
-                    <Target className="w-3.5 h-3.5" />
-                    Run ATS check
-                  </button>
-                )}
-              </div>
-
-              <ATSScorePanel
-                score={atsScore}
-                isLoading={atsLoading}
-                onFixAll={handleFixAll}
-                isFixing={atsFixing}
-              />
-
-              {!atsScore && !atsLoading && (
-                <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] px-5 py-6 text-center">
-                    <Target className="w-8 h-8 text-[#60607A] mx-auto mb-2" />
-                    <p className="text-sm text-[#A0A0B8]">
-                      Run an ATS check to see how well this resume matches the job description.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
           </motion.div>
         )}
       </div>
