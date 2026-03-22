@@ -171,6 +171,9 @@ export interface JobStrategyDay {
 
 export interface JobStrategy {
   days: JobStrategyDay[]
+  overview?: string
+  search_terms?: string[]
+  recommended_sites?: { name: string; url: string; why: string }[]
 }
 
 export interface CoverLetter {

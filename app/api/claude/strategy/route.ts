@@ -18,7 +18,7 @@ interface StrategyRequestBody {
 
 async function attemptStream(prompt: string, retryCount = 0): Promise<ReadableStream<Uint8Array>> {
   try {
-    const claudeStream = await streamClaude(prompt, 3000)
+    const claudeStream = await streamClaude(prompt, 4096)
     return new ReadableStream<Uint8Array>({
       async start(controller) {
         try {

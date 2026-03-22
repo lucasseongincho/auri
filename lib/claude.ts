@@ -54,19 +54,39 @@ export async function streamClaude(
   })
 }
 
-// ── JSON parse helper with single retry ───────────────────────────────────────
-// Claude occasionally wraps JSON in markdown code fences — this strips them
+// ── JSON parse helper ─────────────────────────────────────────────────────────
+// Handles markdown fences, preamble text, trailing commas, and other common
+// Claude formatting quirks that break a raw JSON.parse call.
 
-export function parseClaudeJSON<T>(raw: string): T {
-  // Strip markdown code fences if present
-  const cleaned = raw
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/```\s*$/i, '')
-    .trim()
+export function safeParseJSON<T>(raw: string): T {
+  // Step 1: Strip markdown code fences
+  let cleaned = raw.trim()
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned
+      .replace(/^```json\n?/i, '')
+      .replace(/^```\n?/, '')
+      .replace(/```\s*$/, '')
+      .trim()
+  }
 
-  return JSON.parse(cleaned) as T
+  // Step 2: Extract JSON between the outermost { } in case there is preamble text
+  const firstBrace = cleaned.indexOf('{')
+  const lastBrace = cleaned.lastIndexOf('}')
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    cleaned = cleaned.slice(firstBrace, lastBrace + 1)
+  }
+
+  // Step 3: Parse — on failure, fix trailing commas and retry once
+  try {
+    return JSON.parse(cleaned) as T
+  } catch {
+    const fixed = cleaned.replace(/,(\s*[}\]])/g, '$1')
+    return JSON.parse(fixed) as T
+  }
 }
+
+// Alias kept for backwards-compatibility with existing route imports
+export const parseClaudeJSON = safeParseJSON
 
 // ── Standardized error shape per CLAUDE.md §7 ─────────────────────────────────
 

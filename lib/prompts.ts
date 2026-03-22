@@ -192,17 +192,40 @@ export function buildJobStrategyPrompt(
   cityOrRemote: string,
   companySizeOrType: string
 ): string {
-  return `I want to get a position as ${targetPosition} in ${sectorOrIndustry} in ${cityOrRemote}.
-Create a 7-day approach plan, focused on ${companySizeOrType}, which includes:
-- Specific job sites where vacancies can be found (with full URLs)
-- Exact search terms to use on each site
-- A daily list of actions that can be executed immediately
-- Networking targets and outreach templates
+  return `You are a job search strategist.
+I want to get a position as ${targetPosition}${sectorOrIndustry ? ` in ${sectorOrIndustry}` : ''} in ${cityOrRemote}.${companySizeOrType ? `\nFocus on ${companySizeOrType} companies.` : ''}
 
-Be specific, actionable, and realistic for a 7-day sprint. No vague advice.
+YOU MUST RESPOND WITH VALID JSON ONLY.
+NO preamble. NO explanation. NO markdown. NO code blocks.
+Your response must START with { and END with }
 
-Respond with ONLY the raw JSON object below — no markdown, no code fences, no explanation, no preamble:
-{"days":[{"day":1,"theme":"string","actions":[{"time":"string","action":"string","resource":"string"}]}]}`
+Return this exact JSON structure with EXACTLY 7 days and 3-5 actions per day:
+{
+  "overview": "One sentence summary of the strategy",
+  "days": [
+    {
+      "day": 1,
+      "theme": "Day theme title",
+      "actions": [
+        {
+          "time": "Morning",
+          "action": "Specific action to take",
+          "resource": "Specific website URL or tool to use"
+        }
+      ]
+    }
+  ],
+  "search_terms": ["exact search term 1", "exact search term 2", "exact search term 3"],
+  "recommended_sites": [
+    {
+      "name": "Site name",
+      "url": "https://...",
+      "why": "Why this site for this specific role"
+    }
+  ]
+}
+
+Be specific and immediately executable. Include real URLs. No vague advice.`
 }
 
 // ── Feature 8 — Cover Letter Generator ───────────────────────────────────────

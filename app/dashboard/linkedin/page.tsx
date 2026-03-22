@@ -131,7 +131,9 @@ export default function LinkedInPage() {
 
     if (fullText) {
       try {
-        const cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
+        let cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
+        const fb = cleaned.indexOf('{'), lb = cleaned.lastIndexOf('}')
+        if (fb !== -1 && lb > fb) cleaned = cleaned.slice(fb, lb + 1)
         const parsed = JSON.parse(cleaned) as LinkedInRewrite
         setResult(parsed)
         // Save to careerStore
