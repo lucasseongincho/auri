@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { motion, useInView } from 'framer-motion'
 import {
   FileText, Edit3, Layout, RefreshCw, Linkedin,
-  Map, Mail, MessageSquare, Star, CheckCircle, ArrowRight,
-  Sparkles, Target, ChevronRight, Users,
+  Map, Mail, MessageSquare, CheckCircle, ArrowRight,
+  Sparkles, Target, ChevronRight,
 } from 'lucide-react'
 
 // Spring config per CLAUDE.md §9
@@ -112,11 +112,7 @@ const FEATURES = [
   { icon: MessageSquare, label: 'Interview Prep', desc: '8 likely questions + STAR frameworks + flip cards', href: '/dashboard/interview', color: 'from-[#EF4444] to-[#DC2626]' },
 ]
 
-const TESTIMONIALS = [
-  { name: 'Sarah K.', role: 'Product Manager → Google', quote: 'Got 3 callbacks in 5 days. The ATS optimizer flagged exactly what was wrong with my old resume.', rating: 5 },
-  { name: 'Marcus T.', role: 'Engineer → Stripe', quote: 'The interview prep feature alone is worth it. Had the exact questions in my actual interview.', rating: 5 },
-  { name: 'Priya M.', role: 'Designer → Figma', quote: 'AURI rewrote my resume and LinkedIn the same morning. Had a recruiter reach out that afternoon.', rating: 5 },
-]
+// TODO: Replace with real testimonials after beta
 
 const TEMPLATES = [
   { id: 'classic-pro', label: 'Classic Pro', desc: 'Timeless. Maximum ATS safety.' },
@@ -258,7 +254,7 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-sm text-[#60607A]">
-                <span className="text-white font-medium">12,000+</span> job seekers hired this month
+                🧪 Currently in <span className="text-white font-medium">private beta</span>
               </p>
             </motion.div>
           </div>
@@ -316,39 +312,43 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── 2. Social Proof ── */}
+      {/* ── 2. Beta Banner (replaces social proof — TODO: Replace with real testimonials after beta) ── */}
       <section className="py-24 px-6">
-        <div className="max-w-6xl mx-auto">
-          <FadeInSection className="text-center mb-12">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Users className="w-5 h-5 text-[#6366F1]" />
-              <span className="text-[#A0A0B8] font-medium">Trusted by job seekers worldwide</span>
+        <div className="max-w-3xl mx-auto text-center">
+          <FadeInSection>
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
+              border border-[#6366F1]/30 bg-[#6366F1]/10 text-[#818CF8] text-xs font-semibold
+              tracking-wide mb-6">
+              🧪 Private Beta
             </div>
-            <h2 className="font-heading text-3xl font-bold text-white">
-              Real results from real people
-            </h2>
-          </FadeInSection>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t, i) => (
-              <FadeInSection key={t.name} delay={i * 0.1}>
-                <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
-                    <div className="flex gap-0.5 mb-4">
-                      {Array.from({ length: t.rating }).map((_, j) => (
-                        <Star key={j} className="w-4 h-4 fill-[#F59E0B] text-[#F59E0B]" />
-                      ))}
-                    </div>
-                    <p className="text-[#A0A0B8] text-sm leading-relaxed mb-4">&ldquo;{t.quote}&rdquo;</p>
-                    <div>
-                      <p className="font-semibold text-white text-sm">{t.name}</p>
-                      <p className="text-xs text-[#6366F1]">{t.role}</p>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-white mb-4">
+              Built for real job seekers
+            </h2>
+            <p className="text-[#A0A0B8] text-lg max-w-xl mx-auto mb-12 leading-relaxed">
+              AURI is currently in private beta. Every feature was designed to solve real hiring
+              challenges. Your feedback shapes what we build next.
+            </p>
+
+            {/* Stat cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { stat: '9 AI-powered tools', desc: 'Resume, cover letter, interview prep, and more' },
+                { stat: 'ATS-optimized output', desc: 'Structured for Workday, Greenhouse, Lever & iCIMS' },
+                { stat: 'Built with Claude AI', desc: 'Powered by Anthropic\'s most capable model' },
+              ].map((item, i) => (
+                <FadeInSection key={item.stat} delay={i * 0.1}>
+                  <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-full">
+                    <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 h-full flex flex-col items-center text-center gap-2">
+                      <p className="font-heading font-bold text-white text-lg">{item.stat}</p>
+                      <p className="text-xs text-[#60607A] leading-snug">{item.desc}</p>
                     </div>
                   </div>
-                </div>
-              </FadeInSection>
-            ))}
-          </div>
+                </FadeInSection>
+              ))}
+            </div>
+          </FadeInSection>
         </div>
       </section>
 
@@ -625,7 +625,7 @@ export default function LandingPage() {
                 Your next job is waiting.
               </h2>
               <p className="text-lg text-[#A0A0B8] mb-8 max-w-xl mx-auto">
-                Join 12,000+ job seekers who used AURI to land their dream role.
+                Join the private beta and get early access to every feature.
                 Start free — no credit card required.
               </p>
 
