@@ -240,12 +240,14 @@ export function buildCoverLetterPrompt(
 ${cityState ? `The applicant is based in ${cityState}.` : ''}
 ${hiringManagerName ? `Address it to ${hiringManagerName}.` : ''}
 
+WORD COUNT REQUIREMENT — THIS IS MANDATORY:
+The paragraphs array MUST contain a MINIMUM of 320 words and a MAXIMUM of 380 words. Count every word before outputting. If your draft is under 320 words, expand it — add more specific detail, a concrete example, or a stronger argument. Do NOT output a response under 320 words under any circumstances.
+
 STRUCTURE REQUIREMENTS:
-- Write 3 to 6 paragraphs total. The exact number should match the depth of the candidate's experience — use more paragraphs when there is enough substance to warrant them, fewer when concision is stronger.
-- Paragraph 1 (opening): Begin with a powerful, memorable hook. NOT "I am applying for..." and NOT "I am writing to express my interest...". Hook the reader immediately with insight, a bold claim, or a specific result.
-- Middle paragraphs (body): Connect specific experience to the company's exact needs. Be concrete — name technologies, metrics, or outcomes. Can span 1–4 paragraphs depending on how many distinct points deserve their own paragraph.
-- Final paragraph (closing): A confident call to action. Express genuine enthusiasm. Keep it brief.
-- Total body text: 300-380 words across all paragraphs. Aim to fill a single page.
+- Write 3 to 6 paragraphs total. The exact number should match the depth of the content needed to reach 320+ words.
+- Paragraph 1 (opening): Begin with a powerful, memorable hook. NOT "I am applying for..." and NOT "I am writing to express my interest...". Hook the reader immediately with insight, a bold claim, or a specific result. This paragraph alone should be 60-80 words.
+- Middle paragraphs (body): Connect specific experience to the company's exact needs. Be concrete — name technologies, metrics, or outcomes. Expand on each point fully. These paragraphs together should be 180-220 words.
+- Final paragraph (closing): A confident call to action. Express genuine enthusiasm. 50-70 words.
 - Tone: human, direct, compelling. Not corporate. Not generic.
 
 My experience:
