@@ -280,7 +280,7 @@ export default function CoverLetterPage() {
     await navigator.clipboard.writeText(body)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }, [isEditing, editedFields, result])
+  }, [isEditing, editedParagraphs, result])
 
   const handleDownloadPDF = useCallback(async () => {
     if (!letterCardRef.current) return
