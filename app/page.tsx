@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, useInView } from 'framer-motion'
 import {
   FileText, Edit3, Layout, RefreshCw, Linkedin,
   Map, Mail, MessageSquare, CheckCircle, ArrowRight,
   Sparkles, Target, ChevronRight,
 } from 'lucide-react'
+import { APP_CONFIG } from '@/lib/config'
+import { getStartedRedirect } from '@/lib/getStartedRedirect'
 
 // Spring config per CLAUDE.md §9
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -125,16 +128,10 @@ const TEMPLATES = [
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
-  const [email, setEmail] = useState('')
-  const [emailSubmitted, setEmailSubmitted] = useState(false)
+  const router = useRouter()
   const atsRef = useRef(null)
   const atsInView = useInView(atsRef, { once: true })
   const atsScore = useCounter(87, 2500, atsInView)
-
-  const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (email) setEmailSubmitted(true)
-  }
 
   return (
     <main className="min-h-screen bg-[#0A0A0F] overflow-x-hidden">
@@ -162,13 +159,14 @@ export default function LandingPage() {
             className="text-sm text-[#A0A0B8] hover:text-white transition-colors duration-200 hidden md:block">
             Sign In
           </Link>
-          <Link href="/dashboard"
+          <button
+            onClick={() => router.push(getStartedRedirect('free'))}
             className="px-4 py-2 rounded-xl text-sm font-semibold text-white
               bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
               shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
               hover:scale-[1.02] transition-all duration-200">
             Get Started Free
-          </Link>
+          </button>
         </div>
       </nav>
 
@@ -566,11 +564,12 @@ export default function LandingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/dashboard"
-                    className="block text-center py-3 rounded-xl border border-white/15
+                  <button
+                    onClick={() => router.push(getStartedRedirect('free'))}
+                    className="w-full py-3 rounded-xl border border-white/15
                       text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all duration-200 font-medium">
                     Get Started
-                  </Link>
+                  </button>
                 </div>
               </div>
             </FadeInSection>
@@ -580,14 +579,24 @@ export default function LandingPage() {
               <div className="rounded-2xl border border-[#6366F1]/40 bg-[#13131A] p-1 relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full
                   bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-xs font-semibold">
-                  Most Popular
+                  {APP_CONFIG.BETA_MODE ? '🧪 Beta' : 'Most Popular'}
                 </div>
                 <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] p-8">
                   <p className="font-heading font-semibold text-[#818CF8] mb-1">Pro</p>
-                  <div className="flex items-end gap-1 mb-6">
-                    <span className="font-heading font-bold text-4xl text-white">$19</span>
-                    <span className="text-[#60607A] mb-1">/month</span>
-                  </div>
+                  {APP_CONFIG.BETA_MODE ? (
+                    <div className="mb-6">
+                      <div className="flex items-end gap-2">
+                        <span className="font-heading font-bold text-4xl text-white">Free</span>
+                        <span className="text-[#60607A] mb-1">during beta</span>
+                      </div>
+                      <p className="text-sm text-[#60607A] mt-1 line-through">$19/month after beta</p>
+                    </div>
+                  ) : (
+                    <div className="flex items-end gap-1 mb-6">
+                      <span className="font-heading font-bold text-4xl text-white">$19</span>
+                      <span className="text-[#60607A] mb-1">/month</span>
+                    </div>
+                  )}
                   <ul className="space-y-3 mb-8">
                     {[
                       'Unlimited generations',
@@ -602,13 +611,19 @@ export default function LandingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/dashboard"
-                    className="block text-center py-3 rounded-xl font-semibold text-white
+                  <button
+                    onClick={() => router.push(getStartedRedirect('pro'))}
+                    className="w-full py-3 rounded-xl font-semibold text-white
                       bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
                       shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
                       hover:scale-[1.02] transition-all duration-200">
-                    Start Pro Free
-                  </Link>
+                    {APP_CONFIG.BETA_MODE ? 'Join Beta' : 'Start Pro Free'}
+                  </button>
+                  {APP_CONFIG.BETA_MODE && (
+                    <p className="text-center text-xs text-[#22C55E] mt-3">
+                      Full Pro access while we&apos;re in beta 🎉
+                    </p>
+                  )}
                 </div>
               </div>
             </FadeInSection>
@@ -628,46 +643,21 @@ export default function LandingPage() {
               </h2>
               <p className="text-lg text-[#A0A0B8] mb-8 max-w-xl mx-auto">
                 Join the private beta and get early access to every feature.
-                Start free — no credit card required.
+                Invite code required.
               </p>
 
-              {!emailSubmitted ? (
-                <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    aria-label="Email address"
-                    className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20
-                      text-white placeholder-[#60607A] focus:outline-none focus:border-[#6366F1]
-                      transition-colors duration-200"
-                    required
-                  />
-                  <button
-                    type="submit"
-                    className="px-6 py-3 rounded-xl font-semibold text-white
-                      bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-                      shadow-lg shadow-[#6366F1]/30 hover:shadow-[#6366F1]/60
-                      hover:scale-[1.02] transition-all duration-200 whitespace-nowrap"
-                  >
-                    Get Started Free
-                  </button>
-                </form>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={SPRING}
-                  className="flex items-center justify-center gap-2 text-[#22C55E] font-medium"
-                >
-                  <CheckCircle className="w-5 h-5" />
-                  You&apos;re on the list! Check your email.
-                </motion.div>
-              )}
+              <button
+                onClick={() => router.push(getStartedRedirect('free'))}
+                className="px-8 py-3 rounded-xl font-semibold text-white
+                  bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
+                  shadow-lg shadow-[#6366F1]/30 hover:shadow-[#6366F1]/60
+                  hover:scale-[1.02] transition-all duration-200"
+              >
+                Get Started Free
+              </button>
 
               <p className="text-xs text-[#60607A] mt-4">
-                No credit card required · Cancel anytime
+                Private beta · Invite code required
               </p>
             </div>
           </div>

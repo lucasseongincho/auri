@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Sparkles, Mail, Lock, Chrome, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { APP_CONFIG } from '@/lib/config'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -17,13 +18,23 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const getPostAuthRedirect = (): string => {
+    const intent = sessionStorage.getItem('postAuthIntent')
+    sessionStorage.removeItem('postAuthIntent')
+    // Pro intent only triggers Stripe when beta is off; during beta everyone gets full access
+    if (intent === 'pro' && !APP_CONFIG.BETA_MODE) {
+      return '/api/stripe/checkout'
+    }
+    return '/dashboard'
+  }
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
       await signInWithEmail(email, password)
-      router.push('/dashboard')
+      router.push(getPostAuthRedirect())
     } catch {
       setError('Invalid email or password.')
     } finally {
@@ -36,7 +47,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await signInWithGoogle()
-      router.push('/dashboard')
+      router.push(getPostAuthRedirect())
     } catch {
       setError('Google sign-in failed. Please try again.')
     } finally {
