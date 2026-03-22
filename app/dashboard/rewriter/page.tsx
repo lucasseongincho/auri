@@ -251,7 +251,7 @@ function RewriteResult({
 export default function RewriterPage() {
   const router = useRouter()
   const { user } = useAuth()
-  const { profile, updateProfile } = useCareerStore()
+  const { profile, updateProfile, setResume } = useCareerStore()
 
   const [inputMethod, setInputMethod] = useState<InputMethod>('auri')
   const [pastedText, setPastedText] = useState('')
@@ -383,13 +383,39 @@ export default function RewriterPage() {
 
   const applyToResumeBuilder = () => {
     if (!rewrittenData) return
-    const updates: Parameters<typeof updateProfile>[0] = {}
-    if (accepted.experience) updates.experience = rewrittenData.experience
-    if (accepted.education) updates.education = rewrittenData.education
-    if (accepted.skills) updates.skills = rewrittenData.skills
-    if (accepted.certifications) updates.certifications = rewrittenData.certifications
-    if (accepted.projects) updates.projects = rewrittenData.projects
-    if (Object.keys(updates).length > 0) updateProfile(updates)
+
+    // Update the career profile with accepted sections
+    const profileUpdates: Parameters<typeof updateProfile>[0] = {}
+    if (accepted.experience) profileUpdates.experience = rewrittenData.experience
+    if (accepted.education) profileUpdates.education = rewrittenData.education
+    if (accepted.skills) profileUpdates.skills = rewrittenData.skills
+    if (accepted.certifications) profileUpdates.certifications = rewrittenData.certifications
+    if (accepted.projects) profileUpdates.projects = rewrittenData.projects
+
+    // Sync target job info from the rewriter fields into the profile
+    profileUpdates.target = {
+      ...(profile?.target ?? {}),
+      position: targetPosition,
+      company: targetCompany,
+      company_type: companyType,
+      job_description: jobDescription,
+    }
+
+    updateProfile(profileUpdates)
+
+    // Set currentResume so the Resume Builder preview shows the rewritten resume immediately.
+    // Use rewritten sections where accepted, fall back to existing profile data otherwise.
+    const mergedResume = {
+      ...rewrittenData,
+      summary: accepted.summary ? (rewrittenData.summary ?? '') : '',
+      experience: accepted.experience ? rewrittenData.experience : (profile?.experience ?? []),
+      education: accepted.education ? rewrittenData.education : (profile?.education ?? []),
+      skills: accepted.skills ? rewrittenData.skills : (profile?.skills ?? []),
+      certifications: accepted.certifications ? rewrittenData.certifications : (profile?.certifications ?? []),
+      projects: accepted.projects ? rewrittenData.projects : (profile?.projects ?? []),
+    }
+    setResume(mergedResume)
+
     router.push('/dashboard/resume')
   }
 
