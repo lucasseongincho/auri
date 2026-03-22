@@ -3,6 +3,8 @@ import { streamClaude, callClaude, buildErrorResponse, parseClaudeJSON } from '@
 import { buildInterviewPrepPrompt, buildPracticeFeedbackPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
+import { checkBetaLimits, incrementBetaCall } from '@/lib/betaGuard'
+import { APP_CONFIG } from '@/lib/config'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -62,6 +64,12 @@ export async function POST(req: NextRequest) {
     const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)
 
+    // Beta gate (applies to all modes)
+    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) {
+      const beta = await checkBetaLimits(verifiedUser.uid)
+      if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
+    }
+
     // Practice mode — short non-streaming response
     if (body.mode === 'practice') {
       if (!body.question || !body.userAnswer || !body.targetPosition) {
@@ -70,6 +78,7 @@ export async function POST(req: NextRequest) {
       const prompt = buildPracticeFeedbackPrompt(body.question, body.userAnswer, body.targetPosition)
       const { text, inputTokens, outputTokens } = await callClaude(prompt, 1024)
       const data = parseClaudeJSON(text)
+      if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
       return Response.json({
         success: true,
         data,
@@ -88,6 +97,7 @@ export async function POST(req: NextRequest) {
       body.experienceSummary ?? ''
     )
 
+    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
     const stream = await attemptStream(prompt)
 
     return new Response(stream, {

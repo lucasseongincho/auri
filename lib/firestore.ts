@@ -9,8 +9,10 @@ import {
   query,
   orderBy,
   serverTimestamp,
+  Timestamp,
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+import { APP_CONFIG } from '@/lib/config'
 import type { CareerProfile, SavedResume, SavedInterviewPrep, InterviewPrep } from '@/types'
 
 // ── Career Profile ─────────────────────────────────────────────────────────────
@@ -105,6 +107,78 @@ export async function getSavedInterviewPrep(uid: string, prepId: string): Promis
   const snap = await getDoc(ref)
   if (!snap.exists()) return null
   return { id: snap.id, ...snap.data() } as SavedInterviewPrep
+}
+
+// ── Beta usage (client-side) ──────────────────────────────────────────────────
+
+export interface BetaUsage {
+  callsThisWeek: number
+  weekStart: Date | null
+  remainingCalls: number
+  resetsOn: string
+  betaApproved: boolean
+}
+
+function getNextMondayString(): string {
+  const now = new Date()
+  const day = now.getUTCDay()
+  const daysUntilMonday = day === 0 ? 1 : 8 - day
+  const nextMonday = new Date(now)
+  nextMonday.setUTCDate(now.getUTCDate() + daysUntilMonday)
+  nextMonday.setUTCHours(0, 0, 0, 0)
+  return nextMonday.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+}
+
+function getThisMondayUTC(): Date {
+  const now = new Date()
+  const day = now.getUTCDay()
+  const daysBack = day === 0 ? 6 : day - 1
+  const monday = new Date(now)
+  monday.setUTCDate(now.getUTCDate() - daysBack)
+  monday.setUTCHours(0, 0, 0, 0)
+  return monday
+}
+
+export async function getBetaUsage(uid: string): Promise<BetaUsage> {
+  const profileSnap = await getDoc(doc(db, 'users', uid, 'profile', 'data'))
+  const betaApproved = profileSnap.exists() ? profileSnap.data()?.betaApproved === true : false
+
+  const usageSnap = await getDoc(doc(db, 'users', uid, 'betaUsage', 'data'))
+  const usageData = usageSnap.exists() ? usageSnap.data() : {}
+
+  const thisMonday = getThisMondayUTC()
+  const storedWeekStart: Date | null =
+    usageData?.betaWeekStart instanceof Timestamp
+      ? usageData.betaWeekStart.toDate()
+      : null
+
+  const needsReset = !storedWeekStart || storedWeekStart < thisMonday
+  const callsThisWeek = needsReset ? 0 : (usageData?.betaCallsThisWeek ?? 0)
+
+  return {
+    callsThisWeek,
+    weekStart: needsReset ? thisMonday : storedWeekStart,
+    remainingCalls: Math.max(0, APP_CONFIG.BETA_WEEKLY_CALL_LIMIT - callsThisWeek),
+    resetsOn: getNextMondayString(),
+    betaApproved,
+  }
+}
+
+export async function setBetaApproved(uid: string): Promise<void> {
+  const ref = doc(db, 'users', uid, 'profile', 'data')
+  await setDoc(ref, { betaApproved: true }, { merge: true })
+}
+
+export async function initBetaUsage(uid: string): Promise<void> {
+  const ref = doc(db, 'users', uid, 'betaUsage', 'data')
+  await setDoc(
+    ref,
+    {
+      betaCallsThisWeek: 0,
+      betaWeekStart: Timestamp.fromDate(getThisMondayUTC()),
+    },
+    { merge: true }
+  )
 }
 
 // ── localStorage helpers for guest users ─────────────────────────────────────

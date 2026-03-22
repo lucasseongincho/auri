@@ -29,7 +29,7 @@ interface StreamState {
  * work out of the box on Vercel Edge/Serverless.
  */
 export function useAIStream() {
-  const { setIsGenerating } = useCareerStore()
+  const { setIsGenerating, setBetaLimitData } = useCareerStore()
   const [state, setState] = useState<StreamState>({
     isStreaming: false,
     streamedText: '',
@@ -74,6 +74,13 @@ export function useAIStream() {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+          if (errorData.error === 'BETA_LIMIT_REACHED') {
+            setBetaLimitData({
+              resetsOn: errorData.resetsOn ?? 'next Monday',
+              callsUsed: errorData.callsUsed ?? 0,
+              callsTotal: errorData.callsTotal ?? 20,
+            })
+          }
           throw new Error(errorData.error ?? `Request failed: ${response.status}`)
         }
 

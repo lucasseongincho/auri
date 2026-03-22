@@ -38,6 +38,11 @@ interface CareerStore {
   editHistory: EditHistoryEntry[]
   historyIndex: number
 
+  // Beta limit modal
+  betaLimitData: { resetsOn: string; callsUsed: number; callsTotal: number } | null
+  setBetaLimitData: (data: { resetsOn: string; callsUsed: number; callsTotal: number }) => void
+  clearBetaLimitData: () => void
+
   // Actions
   updateProfile: (partial: Partial<CareerProfile>) => void
   setProfile: (profile: CareerProfile) => void
@@ -76,6 +81,7 @@ export const useCareerStore = create<CareerStore>()(
       syncError: null,
       editHistory: [],
       historyIndex: -1,
+      betaLimitData: null,
 
       updateProfile: (partial) => {
         set((state) => ({
@@ -110,6 +116,9 @@ export const useCareerStore = create<CareerStore>()(
         editHistory: [],
         historyIndex: -1,
       }),
+      setBetaLimitData: (data) => set({ betaLimitData: data }),
+      clearBetaLimitData: () => set({ betaLimitData: null }),
+
       clearStore: () => set({
         profile: null,
         currentResume: null,

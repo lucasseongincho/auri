@@ -3,6 +3,8 @@ import { streamClaude, buildErrorResponse } from '@/lib/claude'
 import { buildRewriterPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
+import { checkBetaLimits, incrementBetaCall } from '@/lib/betaGuard'
+import { APP_CONFIG } from '@/lib/config'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -62,6 +64,12 @@ export async function POST(req: NextRequest) {
     if (!originalText?.trim() || !targetPosition?.trim()) {
       return buildErrorResponse('originalText and targetPosition are required', 400)
     }
+
+    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) {
+      const beta = await checkBetaLimits(verifiedUser.uid)
+      if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
+    }
+    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
 
     const prompt = buildRewriterPrompt(
       originalText,

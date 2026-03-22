@@ -3,6 +3,8 @@ import { streamClaude, callClaude, buildErrorResponse, parseClaudeJSON, MAX_TOKE
 import { buildResumePrompt, buildEasyTunePrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
+import { checkBetaLimits, incrementBetaCall } from '@/lib/betaGuard'
+import { APP_CONFIG } from '@/lib/config'
 import type { CareerProfile, TargetJob, APIMode } from '@/types'
 
 export const runtime = 'nodejs'
@@ -65,6 +67,12 @@ export async function POST(req: NextRequest) {
     const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)
 
+    // Beta gate
+    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) {
+      const beta = await checkBetaLimits(verifiedUser.uid)
+      if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
+    }
+
     // Easy Tune (assist mode) — short non-streaming response
     if (mode === 'assist') {
       if (!selectedText || !target.position) {
@@ -73,6 +81,7 @@ export async function POST(req: NextRequest) {
       const prompt = buildEasyTunePrompt(selectedText, target.position)
       const { text, inputTokens, outputTokens } = await callClaude(prompt, MAX_TOKENS_ASSIST)
       const data = parseClaudeJSON<{ rewritten: string }>(text)
+      if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
       return Response.json({
         success: true,
         data,
@@ -95,6 +104,7 @@ export async function POST(req: NextRequest) {
     }
 
     const prompt = buildResumePrompt(careerProfile, targetJob)
+    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
     const stream = await attemptStream(prompt)
 
     return new Response(stream, {

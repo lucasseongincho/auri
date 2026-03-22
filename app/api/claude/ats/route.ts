@@ -3,6 +3,8 @@ import { callClaude, buildErrorResponse, parseClaudeJSON, MAX_TOKENS_ANALYSIS } 
 import { buildATSScorePrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
+import { checkBetaLimits, incrementBetaCall } from '@/lib/betaGuard'
+import { APP_CONFIG } from '@/lib/config'
 import type { ATSScore } from '@/types'
 
 export const runtime = 'nodejs'
@@ -26,9 +28,15 @@ export async function POST(req: NextRequest) {
       return buildErrorResponse('resumePlainText and jobDescription are required', 400)
     }
 
+    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) {
+      const beta = await checkBetaLimits(verifiedUser.uid)
+      if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
+    }
+
     const prompt = buildATSScorePrompt(body.resumePlainText, body.jobDescription)
     const { text, inputTokens, outputTokens } = await callClaude(prompt, MAX_TOKENS_ANALYSIS)
     const data = parseClaudeJSON<ATSScore>(text)
+    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
 
     return Response.json({
       success: true,
