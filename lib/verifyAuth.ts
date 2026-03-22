@@ -3,6 +3,7 @@ import { adminAuth, adminDb } from '@/lib/firebaseAdmin'
 export interface VerifiedUser {
   uid: string
   isPro: boolean
+  email?: string
 }
 
 /**
@@ -31,7 +32,7 @@ export async function getAuthenticatedUser(req: Request): Promise<VerifiedUser |
     const snap = await adminDb.doc(`users/${uid}/profile/data`).get()
     const isPro = snap.exists ? (snap.data()?.isPro === true) : false
 
-    return { uid, isPro }
+    return { uid, isPro, email: decoded.email }
   } catch {
     return null
   }

@@ -50,8 +50,14 @@ function getNextMondayString(): string {
  * Auto-resets the weekly counter when a new Monday has started.
  * Returns { allowed: true } when the request can proceed.
  */
-export async function checkBetaLimits(uid: string): Promise<BetaGuardResult> {
+export async function checkBetaLimits(uid: string, email?: string): Promise<BetaGuardResult> {
   if (!adminDb) return { allowed: true } // Admin SDK not configured (local dev)
+
+  // Owner is always exempt from all beta limits
+  const ownerEmail = process.env.NEXT_PUBLIC_OWNER_EMAIL
+  if (ownerEmail && email && email === ownerEmail) {
+    return { allowed: true }
+  }
 
   // 1. Check betaApproved
   const profileSnap = await adminDb.doc(`users/${uid}/profile/data`).get()

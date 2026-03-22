@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) {
-      const beta = await checkBetaLimits(verifiedUser.uid)
+      const beta = await checkBetaLimits(verifiedUser.uid, verifiedUser.email)
       if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
     }
 
