@@ -8,19 +8,20 @@ import {
   FileText,
   CheckCircle,
   X,
-  ChevronRight,
   Loader2,
   AlertCircle,
   Sparkles,
   Copy,
   Check,
+  Save,
+  FolderOpen,
 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
-import { getSavedResumes } from '@/lib/firestore'
-import type { ResumeData, TemplateId, SavedResume } from '@/types'
+import { getSavedResumes, saveResume } from '@/lib/firestore'
+import ResumePreview from '@/components/resume/ResumePreview'
+import type { ResumeData, TemplateId, SavedResume, PersonalInfo } from '@/types'
 
 // Convert ResumeData → plain text for the rewriter API
 function resumeToPlainText(r: ResumeData, personal?: { name?: string; email?: string; phone?: string; location?: string }): string {
@@ -63,195 +64,11 @@ const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
 type InputMethod = 'paste' | 'upload' | 'auri'
 
-interface SectionAcceptance {
-  summary: boolean
-  experience: boolean
-  education: boolean
-  skills: boolean
-  certifications: boolean
-  projects: boolean
-}
-
-function RewriteSkeleton({ streamText }: { streamText: string }) {
-  return (
-    <div className="space-y-4 p-6">
-      <div className="flex items-center gap-2 mb-2 p-3 rounded-lg bg-[#6366F1]/10 border border-[#6366F1]/20">
-        <Loader2 className="w-4 h-4 text-[#6366F1] animate-spin flex-shrink-0" />
-        <span className="text-sm text-[#6366F1] font-medium">Claude is rewriting your resume…</span>
-      </div>
-      <div className="space-y-3">
-        <div className="h-5 w-32 rounded bg-gray-100 animate-pulse" />
-        {[95, 80, 88].map((w, i) => (
-          <div key={i} className="h-3 rounded bg-gray-50 animate-pulse" style={{ width: `${w}%` }} />
-        ))}
-        <div className="h-4 w-28 rounded bg-gray-100 animate-pulse mt-4" />
-        {[85, 75, 90, 70].map((w, i) => (
-          <div key={i} className="h-3 rounded bg-gray-50 animate-pulse" style={{ width: `${w}%` }} />
-        ))}
-      </div>
-      {streamText && (
-        <div className="mt-4 p-3 rounded-lg bg-gray-50 border border-gray-200 font-mono text-xs text-gray-400 overflow-hidden max-h-24">
-          {streamText.slice(-200)}
-          <span className="animate-pulse">▌</span>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function RewriteResult({
-  data,
-  accepted,
-  onToggle,
-  onAcceptAll,
-  onApply,
-}: {
-  data: ResumeData
-  accepted: SectionAcceptance
-  onToggle: (key: keyof SectionAcceptance) => void
-  onAcceptAll: () => void
-  onApply: () => void
-}) {
-  const allAccepted = Object.values(accepted).every(Boolean)
-
-  const Section = ({
-    label,
-    sectionKey,
-    children,
-  }: {
-    label: string
-    sectionKey: keyof SectionAcceptance
-    children: React.ReactNode
-  }) => (
-    <div className={`rounded-xl border p-4 transition-all duration-200 ${
-      accepted[sectionKey] ? 'border-[#22C55E]/30 bg-[#22C55E]/5' : 'border-white/[0.06] bg-[#0A0A0F]/50'
-    }`}>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold text-[#6366F1] uppercase tracking-wider">{label}</span>
-        <button
-          onClick={() => onToggle(sectionKey)}
-          aria-label={accepted[sectionKey] ? `Unaccept ${label}` : `Accept ${label}`}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all ${
-            accepted[sectionKey]
-              ? 'bg-[#22C55E]/20 text-[#22C55E] border border-[#22C55E]/30'
-              : 'bg-white/5 text-[#A0A0B8] border border-white/[0.08] hover:border-[#6366F1]/40 hover:text-[#6366F1]'
-          }`}
-        >
-          <Check className="w-3.5 h-3.5" />
-          {accepted[sectionKey] ? 'Accepted' : 'Accept'}
-        </button>
-      </div>
-      {children}
-    </div>
-  )
-
-  return (
-    <div className="space-y-3">
-      {data.summary && (
-        <Section label="Summary" sectionKey="summary">
-          <p className="text-sm text-[#A0A0B8] leading-relaxed">{data.summary}</p>
-        </Section>
-      )}
-
-      {data.experience.length > 0 && (
-        <Section label="Experience" sectionKey="experience">
-          <div className="space-y-3">
-            {data.experience.map((exp, i) => (
-              <div key={i}>
-                <div className="flex items-baseline justify-between mb-1">
-                  <span className="text-sm font-semibold text-white">{exp.title}</span>
-                  <span className="text-xs text-[#60607A]">{exp.start} – {exp.end}</span>
-                </div>
-                <span className="text-xs text-[#A0A0B8] italic">{exp.company}</span>
-                <ul className="mt-1.5 space-y-1">
-                  {exp.bullets.map((b, bi) => (
-                    <li key={bi} className="text-xs text-[#A0A0B8] pl-3 relative before:content-['•'] before:absolute before:left-0 before:text-[#6366F1]">{b}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {data.education.length > 0 && (
-        <Section label="Education" sectionKey="education">
-          {data.education.map((edu, i) => (
-            <div key={i} className="flex items-baseline justify-between">
-              <div>
-                <span className="text-sm font-semibold text-white">{edu.degree} in {edu.field}</span>
-                <span className="text-xs text-[#A0A0B8] block">{edu.institution}</span>
-              </div>
-              <span className="text-xs text-[#60607A]">{edu.year}</span>
-            </div>
-          ))}
-        </Section>
-      )}
-
-      {data.skills.length > 0 && (
-        <Section label="Skills" sectionKey="skills">
-          <div className="flex flex-wrap gap-1.5">
-            {data.skills.map((s, i) => (
-              <span key={i} className="px-2 py-0.5 rounded-md bg-[#6366F1]/10 text-xs text-[#818CF8] border border-[#6366F1]/20">{s}</span>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {data.certifications.length > 0 && (
-        <Section label="Certifications" sectionKey="certifications">
-          <ul className="space-y-1">
-            {data.certifications.map((c, i) => (
-              <li key={i} className="text-sm text-[#A0A0B8]">{c}</li>
-            ))}
-          </ul>
-        </Section>
-      )}
-
-      {data.projects.length > 0 && (
-        <Section label="Projects" sectionKey="projects">
-          <div className="space-y-2">
-            {data.projects.map((p, i) => (
-              <div key={i}>
-                <span className="text-sm font-semibold text-white">{p.name}</span>
-                <p className="text-xs text-[#A0A0B8] mt-0.5">{p.description}</p>
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      <div className="pt-2 flex gap-3">
-        <button
-          onClick={onAcceptAll}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-            allAccepted
-              ? 'bg-[#22C55E]/20 text-[#22C55E] border border-[#22C55E]/30 cursor-default'
-              : 'bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50 hover:scale-[1.02]'
-          }`}
-        >
-          {allAccepted ? '✓ All sections accepted' : 'Accept All Sections'}
-        </button>
-        <button
-          onClick={onApply}
-          disabled={!Object.values(accepted).some(Boolean)}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
-            bg-[#1C1C26] border border-white/[0.08] text-[#A0A0B8]
-            hover:text-white hover:border-[#6366F1]/40 transition-all
-            disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          Apply to Resume Builder
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
-  )
-}
+const EMPTY_PERSONAL: PersonalInfo = { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }
 
 export default function RewriterPage() {
-  const router = useRouter()
   const { user } = useAuth()
-  const { profile, updateProfile, setResume } = useCareerStore()
+  const { profile, selectedTemplate } = useCareerStore()
 
   const [inputMethod, setInputMethod] = useState<InputMethod>('auri')
   const [pastedText, setPastedText] = useState('')
@@ -273,11 +90,12 @@ export default function RewriterPage() {
 
   const [rewrittenData, setRewrittenData] = useState<ResumeData | null>(null)
   const [generateError, setGenerateError] = useState('')
-  const [accepted, setAccepted] = useState<SectionAcceptance>({
-    summary: false, experience: false, education: false,
-    skills: false, certifications: false, projects: false,
-  })
   const [copiedOriginal, setCopiedOriginal] = useState(false)
+
+  // Save state
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { isStreaming, streamedText, stream } = useAIStream()
@@ -290,7 +108,6 @@ export default function RewriterPage() {
     getSavedResumes(user.uid)
       .then((list) => {
         setSavedResumes(list)
-        // Auto-select most recent if nothing selected yet
         if (list.length > 0 && !selectedResumeId) {
           const first = list[0]
           setSelectedResumeId(first.id)
@@ -301,13 +118,11 @@ export default function RewriterPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputMethod, user?.uid])
 
-  // Also auto-populate from current profile if guest or no saved resumes
+  // Guest: auto-populate from current profile if no saved resumes
   useEffect(() => {
     if (inputMethod !== 'auri') return
-    if (user?.uid) return // handled above via Firestore
+    if (user?.uid) return
     if (!profile) return
-    // Guest: use current in-memory resume data
-    const r = profile.generated?.resume_html ? null : null // no saved resume data for guests
     if (!auriText && profile.experience.length > 0) {
       const fakeResume: ResumeData = {
         summary: (profile.generated as { resume_plain?: string })?.resume_plain ?? '',
@@ -318,7 +133,6 @@ export default function RewriterPage() {
         projects: profile.projects,
         templateId: 'classic-pro' as TemplateId,
       }
-      void r
       setAuriText(resumeToPlainText(fakeResume, profile.personal))
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -348,7 +162,8 @@ export default function RewriterPage() {
 
     setRewrittenData(null)
     setGenerateError('')
-    setAccepted({ summary: false, experience: false, education: false, skills: false, certifications: false, projects: false })
+    setSaveSuccess(false)
+    setSaveError('')
 
     const fullText = await stream('/api/claude/rewriter', {
       originalText: text,
@@ -366,58 +181,37 @@ export default function RewriterPage() {
       try {
         const cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
         const parsed = JSON.parse(cleaned) as ResumeData
-        setRewrittenData({ ...parsed, templateId: 'classic-pro' as TemplateId })
+        setRewrittenData({ ...parsed, templateId: selectedTemplate })
       } catch {
         setGenerateError('Could not parse the rewritten resume. Please try again.')
       }
     }
-  }, [inputMethod, pastedText, uploadedText, auriText, targetPosition, targetCompany, companyType, jobDescription, user?.uid, stream])
+  }, [inputMethod, pastedText, uploadedText, auriText, targetPosition, targetCompany, companyType, jobDescription, user?.uid, selectedTemplate, stream])
 
-  const toggleSection = (key: keyof SectionAcceptance) => {
-    setAccepted((prev) => ({ ...prev, [key]: !prev[key] }))
-  }
-
-  const acceptAll = () => {
-    setAccepted({ summary: true, experience: true, education: true, skills: true, certifications: true, projects: true })
-  }
-
-  const applyToResumeBuilder = () => {
-    if (!rewrittenData) return
-
-    // Update the career profile with accepted sections
-    const profileUpdates: Parameters<typeof updateProfile>[0] = {}
-    if (accepted.experience) profileUpdates.experience = rewrittenData.experience
-    if (accepted.education) profileUpdates.education = rewrittenData.education
-    if (accepted.skills) profileUpdates.skills = rewrittenData.skills
-    if (accepted.certifications) profileUpdates.certifications = rewrittenData.certifications
-    if (accepted.projects) profileUpdates.projects = rewrittenData.projects
-
-    // Sync target job info from the rewriter fields into the profile
-    profileUpdates.target = {
-      ...(profile?.target ?? {}),
-      position: targetPosition,
-      company: targetCompany,
-      company_type: companyType,
-      job_description: jobDescription,
+  const handleSave = useCallback(async () => {
+    if (!rewrittenData || !user?.uid) return
+    setIsSaving(true)
+    setSaveError('')
+    try {
+      const name = [targetPosition, targetCompany].filter(Boolean).join(' @ ') || 'Rewritten Resume'
+      await saveResume(user.uid, {
+        name: `${name} (Rewritten)`,
+        targetPosition,
+        targetCompany,
+        templateId: selectedTemplate,
+        resumeData: { ...rewrittenData, templateId: selectedTemplate },
+        personalInfo: profile?.personal ?? EMPTY_PERSONAL,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 4000)
+    } catch {
+      setSaveError('Failed to save. Please try again.')
+    } finally {
+      setIsSaving(false)
     }
-
-    updateProfile(profileUpdates)
-
-    // Set currentResume so the Resume Builder preview shows the rewritten resume immediately.
-    // Use rewritten sections where accepted, fall back to existing profile data otherwise.
-    const mergedResume = {
-      ...rewrittenData,
-      summary: accepted.summary ? (rewrittenData.summary ?? '') : '',
-      experience: accepted.experience ? rewrittenData.experience : (profile?.experience ?? []),
-      education: accepted.education ? rewrittenData.education : (profile?.education ?? []),
-      skills: accepted.skills ? rewrittenData.skills : (profile?.skills ?? []),
-      certifications: accepted.certifications ? rewrittenData.certifications : (profile?.certifications ?? []),
-      projects: accepted.projects ? rewrittenData.projects : (profile?.projects ?? []),
-    }
-    setResume(mergedResume)
-
-    router.push('/dashboard/resume')
-  }
+  }, [rewrittenData, user?.uid, targetPosition, targetCompany, selectedTemplate, profile?.personal])
 
   const originalText = inputMethod === 'paste' ? pastedText : inputMethod === 'auri' ? auriText : uploadedText
   const isGenerateDisabled = !originalText.trim() || !targetPosition.trim() || isStreaming || isUploadLoading || savedResumesLoading
@@ -648,35 +442,75 @@ export default function RewriterPage() {
           </div>
         </motion.div>
 
-        {/* ── Right: Output ────────────────────────────────────────────────────── */}
+        {/* ── Right: Preview ────────────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...SPRING, delay: 0.1 }}
-          className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+          className="flex flex-col gap-4"
         >
-          <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 min-h-[400px]">
-            <h3 className="text-sm font-semibold text-white mb-4">Rewritten Resume</h3>
-            <AnimatePresence mode="wait">
-              {isStreaming ? (
-                <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <RewriteSkeleton streamText={streamedText} />
-                </motion.div>
-              ) : rewrittenData ? (
-                <motion.div key="result" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
-                  <RewriteResult data={rewrittenData} accepted={accepted} onToggle={toggleSection} onAcceptAll={acceptAll} onApply={applyToResumeBuilder} />
-                </motion.div>
-              ) : (
-                <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  className="flex flex-col items-center justify-center py-16 text-center">
-                  <div className="w-14 h-14 rounded-2xl bg-[#6366F1]/10 border border-[#6366F1]/20 flex items-center justify-center mb-4">
-                    <RefreshCw className="w-6 h-6 text-[#6366F1]" />
-                  </div>
-                  <p className="text-sm font-medium text-[#A0A0B8]">Rewritten resume will appear here</p>
-                  <p className="text-xs text-[#60607A] mt-1">Select a resume on the left and click Rewrite Resume</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          {/* Save to My Resumes — shown only when result is ready */}
+          <AnimatePresence>
+            {rewrittenData && !isStreaming && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={SPRING}
+                className="flex items-center justify-between gap-3"
+              >
+                <p className="text-sm font-medium text-white">Your rewritten resume</p>
+                <div className="flex items-center gap-2">
+                  {saveSuccess && (
+                    <span className="flex items-center gap-1.5 text-xs text-[#22C55E]">
+                      <CheckCircle className="w-3.5 h-3.5" /> Saved to My Resumes
+                    </span>
+                  )}
+                  {saveError && (
+                    <span className="flex items-center gap-1.5 text-xs text-[#EF4444]">
+                      <AlertCircle className="w-3.5 h-3.5" /> {saveError}
+                    </span>
+                  )}
+                  <button
+                    onClick={handleSave}
+                    disabled={isSaving || saveSuccess || !user?.uid}
+                    aria-label="Save rewritten resume to My Resumes"
+                    title={!user?.uid ? 'Sign in to save resumes' : undefined}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                      border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+                      transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {isSaving ? (
+                      <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving…</>
+                    ) : saveSuccess ? (
+                      <><Check className="w-3.5 h-3.5 text-[#22C55E]" /> Saved!</>
+                    ) : (
+                      <><Save className="w-3.5 h-3.5" /> Save to My Resumes</>
+                    )}
+                  </button>
+                  {saveSuccess && (
+                    <a
+                      href="/dashboard/resume/saved"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                        bg-[#6366F1]/20 text-[#818CF8] border border-[#6366F1]/30
+                        hover:bg-[#6366F1]/30 transition-all duration-200"
+                    >
+                      <FolderOpen className="w-3.5 h-3.5" /> View My Resumes
+                    </a>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Resume preview — handles streaming state, template switcher, and PDF download internally */}
+          <div className="flex-1">
+            <ResumePreview
+              data={rewrittenData}
+              personal={profile?.personal ?? EMPTY_PERSONAL}
+              isStreaming={isStreaming}
+              streamText={streamedText}
+            />
           </div>
         </motion.div>
       </div>
