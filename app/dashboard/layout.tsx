@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  LayoutDashboard, FileText, RefreshCw, Target, Linkedin,
+  LayoutDashboard, FileText, FolderOpen, RefreshCw, Target, Linkedin,
   Map, Mail, MessageSquare, Settings, ChevronRight,
   Sparkles, User, Cloud, CloudOff,
 } from 'lucide-react'
@@ -18,6 +18,7 @@ const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
   { id: 'resume', label: 'Resume Builder', icon: FileText, href: '/dashboard/resume' },
+  { id: 'my-resumes', label: 'My Resumes', icon: FolderOpen, href: '/dashboard/resume/saved' },
   { id: 'rewriter', label: 'Resume Rewriter', icon: RefreshCw, href: '/dashboard/rewriter' },
   { id: 'ats', label: 'ATS Optimizer', icon: Target, href: '/dashboard/ats' },
   { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin' },

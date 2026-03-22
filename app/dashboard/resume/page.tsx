@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   User,
@@ -1538,6 +1539,17 @@ export default function ResumePage() {
             </p>
           </div>
         </div>
+
+        {/* My Resumes link — desktop */}
+        <Link
+          href="/dashboard/resume/saved"
+          className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
+            border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+            transition-all duration-200"
+        >
+          <FolderOpen className="w-3.5 h-3.5" />
+          My Resumes
+        </Link>
 
         {/* Mobile: Toggle form / preview */}
         <div className="flex md:hidden items-center gap-1 p-1 rounded-xl
