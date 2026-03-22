@@ -1393,10 +1393,10 @@ export default function ResumePage() {
           skills: parsed.skills ?? profile.skills,
           certifications: parsed.certifications ?? profile.certifications,
           projects: parsed.projects ?? profile.projects,
-          // User-controlled sections — always pull from profile, not AI
-          leadership: profile.leadership ?? [],
-          volunteer: profile.volunteer ?? [],
-          languages: profile.languages ?? [],
+          // User-controlled sections — capped to prevent single-page overflow
+          leadership: (profile.leadership ?? []).slice(0, 2),
+          volunteer: (profile.volunteer ?? []).slice(0, 1),
+          languages: (profile.languages ?? []).slice(0, 4),
           html: parsed.html,
           plain: parsed.plain,
           templateId: selectedTemplate,
@@ -1516,7 +1516,7 @@ export default function ResumePage() {
   const isLastStep = currentStep === STEPS.length
 
   return (
-    <div className="h-full flex flex-col pb-20 md:pb-0" style={{ minHeight: 'calc(100vh - 64px)' }}>
+    <div className="h-full flex flex-col pb-20 md:pb-0">
       {/* ── Page Header ── */}
       <motion.div
         initial={{ opacity: 0, y: -12 }}
@@ -1570,7 +1570,7 @@ export default function ResumePage() {
       </motion.div>
 
       {/* ── Main Split Layout ── */}
-      <div className="flex-1 flex gap-4 min-h-0">
+      <div className="flex-1 flex gap-4 min-h-0 overflow-hidden">
 
         {/* ── LEFT: Wizard Form Panel ── */}
         <motion.div
@@ -1578,7 +1578,7 @@ export default function ResumePage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ ...SPRING, delay: 0.05 }}
           className={`
-            flex flex-col
+            flex flex-col min-h-0 overflow-hidden
             w-full md:w-[45%] lg:w-[40%] flex-shrink-0
             ${mobileView === 'preview' ? 'hidden md:flex' : 'flex'}
           `}

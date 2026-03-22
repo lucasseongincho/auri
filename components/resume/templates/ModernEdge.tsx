@@ -61,7 +61,7 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
           {data.skills.length > 0 && (
             <div className="sidebar-section" data-ats-field="skills">
               <div className="sidebar-header">Skills</div>
-              {data.skills.map((skill, i) => (
+              {data.skills.slice(0, 12).map((skill, i) => (
                 <div key={i} className="skill-chip">{skill}</div>
               ))}
             </div>
@@ -70,7 +70,7 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
           {data.certifications.length > 0 && (
             <div className="sidebar-section" data-ats-field="certifications">
               <div className="sidebar-header">Certifications</div>
-              {data.certifications.map((cert, i) => (
+              {data.certifications.slice(0, 3).map((cert, i) => (
                 <div key={i} className="contact-item">{cert}</div>
               ))}
             </div>
@@ -79,7 +79,7 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
           {data.languages && data.languages.length > 0 && (
             <div className="sidebar-section" data-ats-field="languages">
               <div className="sidebar-header">Languages</div>
-              {data.languages.map((lang) => (
+              {data.languages.slice(0, 4).map((lang) => (
                 <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#e0e7ff', marginBottom: '3px' }}>
                   <span>{lang.name}</span>
                   <span style={{ color: '#a5b4fc', fontStyle: 'italic' }}>{lang.proficiency}</span>
@@ -101,7 +101,7 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
           {data.experience.length > 0 && (
             <section data-ats-field="experience">
               <div className="main-section-header">Experience</div>
-              {data.experience.map((exp) => (
+              {data.experience.slice(0, 3).map((exp) => (
                 <article key={exp.id} style={{ marginBottom: '10px' }}>
                   <div className="job-title-row">
                     <span className="job-title">{exp.title}</span>
@@ -109,7 +109,7 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
                   </div>
                   <div className="job-company">{exp.company}</div>
                   <ul>
-                    {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                    {exp.bullets.slice(0, 4).map((b, i) => <li key={i}>{b}</li>)}
                   </ul>
                 </article>
               ))}
@@ -131,7 +131,7 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
           {data.leadership && data.leadership.length > 0 && (
             <section data-ats-field="leadership">
               <div className="main-section-header">Leadership</div>
-              {data.leadership.map((item) => (
+              {data.leadership.slice(0, 2).map((item) => (
                 <article key={item.id} style={{ marginBottom: '10px' }}>
                   <div className="job-title-row">
                     <span className="job-title">{item.role}</span>
@@ -149,7 +149,7 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
           {data.volunteer && data.volunteer.length > 0 && (
             <section data-ats-field="volunteer">
               <div className="main-section-header">Volunteer</div>
-              {data.volunteer.map((item) => (
+              {data.volunteer.slice(0, 1).map((item) => (
                 <article key={item.id} style={{ marginBottom: '8px' }}>
                   <div className="job-title-row">
                     <div>
@@ -167,7 +167,7 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
           {data.projects.length > 0 && (
             <section data-ats-field="projects">
               <div className="main-section-header">Projects</div>
-              {data.projects.map((proj) => (
+              {data.projects.slice(0, 2).map((proj) => (
                 <article key={proj.id} style={{ marginBottom: '8px' }}>
                   <div className="job-title-row">
                     <span className="job-title">{proj.name}</span>
@@ -175,7 +175,7 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing }: Mo
                   </div>
                   {proj.description && <p style={{ fontSize: '11px', margin: '2px 0 3px 0' }}>{proj.description}</p>}
                   {proj.bullets.length > 0 && (
-                    <ul>{proj.bullets.map((b, i) => <li key={i}>{b}</li>)}</ul>
+                    <ul>{proj.bullets.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}</ul>
                   )}
                 </article>
               ))}

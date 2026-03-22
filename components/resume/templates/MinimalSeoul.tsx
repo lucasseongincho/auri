@@ -62,7 +62,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
         {data.experience.length > 0 && (
           <section data-ats-field="experience">
             <div className="section-header">Experience</div>
-            {data.experience.map((exp, idx) => (
+            {data.experience.slice(0, 3).map((exp, idx) => (
               <article key={exp.id}>
                 {idx > 0 && <div className="divider" />}
                 <div className="job-row">
@@ -73,7 +73,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
                   <div className="job-dates">{exp.start} – {exp.end}</div>
                 </div>
                 <ul>
-                  {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                  {exp.bullets.slice(0, 4).map((b, i) => <li key={i}>{b}</li>)}
                 </ul>
               </article>
             ))}
@@ -98,7 +98,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
         {data.leadership && data.leadership.length > 0 && (
           <section data-ats-field="leadership">
             <div className="section-header">Leadership</div>
-            {data.leadership.map((item, idx) => (
+            {data.leadership.slice(0, 2).map((item, idx) => (
               <article key={item.id}>
                 {idx > 0 && <div className="divider" />}
                 <div className="job-row">
@@ -119,7 +119,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
         {data.volunteer && data.volunteer.length > 0 && (
           <section data-ats-field="volunteer">
             <div className="section-header">Volunteer</div>
-            {data.volunteer.map((item, idx) => (
+            {data.volunteer.slice(0, 1).map((item, idx) => (
               <article key={item.id}>
                 {idx > 0 && <div className="divider" />}
                 <div className="job-row">
@@ -138,14 +138,14 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
         {data.skills.length > 0 && (
           <section data-ats-field="skills">
             <div className="section-header">Skills</div>
-            <p className="skills-text">{data.skills.join('   ·   ')}</p>
+            <p className="skills-text">{data.skills.slice(0, 12).join('   ·   ')}</p>
           </section>
         )}
 
         {data.certifications.length > 0 && (
           <section data-ats-field="certifications">
             <div className="section-header">Certifications</div>
-            <p className="skills-text">{data.certifications.join('   ·   ')}</p>
+            <p className="skills-text">{data.certifications.slice(0, 3).join('   ·   ')}</p>
           </section>
         )}
 
@@ -153,7 +153,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
           <section data-ats-field="languages">
             <div className="section-header">Languages</div>
             <p className="skills-text">
-              {data.languages.map((l) => `${l.name} — ${l.proficiency}`).join('   ·   ')}
+              {data.languages.slice(0, 4).map((l) => `${l.name} — ${l.proficiency}`).join('   ·   ')}
             </p>
           </section>
         )}
@@ -161,7 +161,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
         {data.projects.length > 0 && (
           <section data-ats-field="projects">
             <div className="section-header">Projects</div>
-            {data.projects.map((proj, idx) => (
+            {data.projects.slice(0, 2).map((proj, idx) => (
               <article key={proj.id}>
                 {idx > 0 && <div className="divider" />}
                 <div className="job-row">
@@ -170,7 +170,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
                 </div>
                 {proj.description && <p style={{ fontSize: '11px', color: '#555', margin: '2px 0 4px 0', fontWeight: 300 }}>{proj.description}</p>}
                 {proj.bullets.length > 0 && (
-                  <ul>{proj.bullets.map((b, i) => <li key={i}>{b}</li>)}</ul>
+                  <ul>{proj.bullets.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}</ul>
                 )}
               </article>
             ))}

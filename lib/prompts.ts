@@ -62,6 +62,15 @@ ATS RULES YOU MUST ENFORCE:
 - No tables, no columns in the output
 - Keywords from the JD injected naturally, never stuffed
 
+ONE-PAGE CONSTRAINT (CRITICAL — do NOT exceed these limits):
+- summary: exactly 2 sentences, max 45 words total
+- experience bullets: MAXIMUM 4 bullets per job entry, no exceptions
+- experience entries: include at most 3 most recent jobs
+- skills: MAXIMUM 12 items as a flat list
+- certifications: max 3 items
+- projects: max 2 projects, max 2 bullets each
+- Every bullet must be one line (under 120 characters). The entire resume MUST fit on one A4 page.
+
 ${originalResumeText ? `ORIGINAL RESUME TEXT:\n${originalResumeText}\n` : ''}
 CAREER PROFILE (structured):
 ${profileJson}
@@ -349,6 +358,15 @@ ATS RULES YOU MUST ENFORCE:
 - Use standard section headers only (Experience, Education, Skills)
 - No tables, no columns in the output
 - Keywords from the JD injected naturally, never stuffed
+
+ONE-PAGE CONSTRAINT (CRITICAL — do NOT exceed these limits):
+- summary: exactly 2 sentences, max 45 words total
+- experience bullets: MAXIMUM 4 bullets per job entry, no exceptions
+- experience entries: include at most 3 most recent jobs
+- skills: MAXIMUM 12 items as a flat list
+- certifications: max 3 items
+- projects: max 2 projects, max 2 bullets each
+- Every bullet must be one line (under 120 characters). The entire resume MUST fit on one A4 page.
 
 ORIGINAL RESUME TEXT:
 ${originalText}

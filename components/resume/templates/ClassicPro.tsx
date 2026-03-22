@@ -145,7 +145,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
         {data.experience.length > 0 && (
           <section data-ats-field="experience">
             <div className="section-header">Experience</div>
-            {data.experience.map((exp) => (
+            {data.experience.slice(0, 3).map((exp) => (
               <article key={exp.id} style={{ marginBottom: '8px' }}>
                 <div className="job-header">
                   <div>
@@ -155,7 +155,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
                   <span className="job-dates">{exp.start} – {exp.end}</span>
                 </div>
                 <ul>
-                  {exp.bullets.map((bullet, i) => (
+                  {exp.bullets.slice(0, 4).map((bullet, i) => (
                     <li key={i}>{bullet}</li>
                   ))}
                 </ul>
@@ -185,7 +185,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
         {data.skills.length > 0 && (
           <section data-ats-field="skills">
             <div className="section-header">Skills</div>
-            <p className="skills-list">{data.skills.join(' · ')}</p>
+            <p className="skills-list">{data.skills.slice(0, 12).join(' · ')}</p>
           </section>
         )}
 
@@ -201,7 +201,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
         {data.projects.length > 0 && (
           <section data-ats-field="projects">
             <div className="section-header">Projects</div>
-            {data.projects.map((proj) => (
+            {data.projects.slice(0, 2).map((proj) => (
               <article key={proj.id} style={{ marginBottom: '6px' }}>
                 <div className="job-header">
                   <span className="job-title">{proj.name}</span>
@@ -212,7 +212,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
                 )}
                 {proj.bullets.length > 0 && (
                   <ul>
-                    {proj.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                    {proj.bullets.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}
                   </ul>
                 )}
               </article>
@@ -224,7 +224,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
         {data.leadership && data.leadership.length > 0 && (
           <section data-ats-field="leadership">
             <div className="section-header">Leadership</div>
-            {data.leadership.map((item) => (
+            {data.leadership.slice(0, 2).map((item) => (
               <article key={item.id} style={{ marginBottom: '7px' }}>
                 <div className="job-header">
                   <div>
@@ -247,7 +247,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
         {data.volunteer && data.volunteer.length > 0 && (
           <section data-ats-field="volunteer">
             <div className="section-header">Volunteer</div>
-            {data.volunteer.map((item) => (
+            {data.volunteer.slice(0, 1).map((item) => (
               <article key={item.id} style={{ marginBottom: '6px' }}>
                 <div className="job-header">
                   <div>

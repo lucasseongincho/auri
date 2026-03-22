@@ -186,9 +186,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </motion.aside>
 
       {/* ── Main content ── */}
-      <div className="flex-1 md:ml-[72px] flex flex-col min-h-screen">
+      <div className="flex-1 md:ml-[72px] flex flex-col h-screen">
         {/* Top header */}
-        <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-[#0A0A0F]/80 backdrop-blur-xl px-6 py-4
+        <header className="flex-shrink-0 border-b border-white/[0.06] bg-[#0A0A0F]/80 backdrop-blur-xl px-6 py-4
           flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Mobile menu - handled by bottom nav, this is a breadcrumb area */}
@@ -230,8 +230,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
+        {/* Page content — flex-1 overflow-y-auto so child pages that use h-full get a real height */}
+        <main className="flex-1 overflow-y-auto p-6 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>

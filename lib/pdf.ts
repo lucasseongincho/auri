@@ -22,6 +22,19 @@ export async function generatePDFFromElement(
 ): Promise<void> {
   const html2pdf = (await import('html2pdf.js')).default
 
+  // Measure actual rendered content height.
+  // If it exceeds A4 (297mm = ~1122px at 96dpi), use a custom page height
+  // that matches the content exactly — this guarantees exactly 1 PDF page
+  // regardless of how much content the template contains.
+  const PX_PER_MM = 3.7795
+  const A4_HEIGHT_MM = 297
+  const contentHeightMm = element.scrollHeight / PX_PER_MM
+  // html2pdf.js supports [width, height] arrays at runtime but @types/html2pdf.js
+  // incorrectly declares format as string only — cast to bypass the type error.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pageFormat: any =
+    contentHeightMm <= A4_HEIGHT_MM ? 'a4' : [210, Math.ceil(contentHeightMm)]
+
   const config = {
     margin: options.margin ?? 0,
     filename: options.filename ?? 'resume.pdf',
@@ -33,7 +46,7 @@ export async function generatePDFFromElement(
     },
     jsPDF: {
       unit: 'mm',
-      format: 'a4',
+      format: pageFormat,
       orientation: 'portrait',
     },
   }
