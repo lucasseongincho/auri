@@ -9,14 +9,13 @@ import {
   Copy,
   CheckCircle,
   AlertCircle,
-  ChevronRight,
   User,
   Briefcase,
 } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
-import type { LinkedInRewrite, Experience } from '@/types'
+import type { LinkedInRewrite } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 const INPUT_CLASS =
@@ -106,7 +105,6 @@ export default function LinkedInPage() {
 
   const [result, setResult] = useState<LinkedInRewrite | null>(null)
   const [generateError, setGenerateError] = useState('')
-  const [appliedToResume, setAppliedToResume] = useState(false)
 
   const { isStreaming, stream } = useAIStream()
 
@@ -120,7 +118,6 @@ export default function LinkedInPage() {
 
     setResult(null)
     setGenerateError('')
-    setAppliedToResume(false)
 
     const fullText = await stream('/api/claude/linkedin', {
       pastedProfile: profileText,
@@ -146,20 +143,6 @@ export default function LinkedInPage() {
       }
     }
   }, [headline, aboutSection, experiences, targetPosition, sectorOrIndustry, user?.uid, stream, profile, updateProfile])
-
-  const handleApplyToResume = () => {
-    if (!result) return
-    const updatedExperiences: Experience[] = result.experiences.map((exp, i) => ({
-      id: profile?.experience[i]?.id ?? `li-${i}`,
-      company: exp.company,
-      title: exp.title,
-      start: profile?.experience[i]?.start ?? '',
-      end: profile?.experience[i]?.end ?? 'Present',
-      bullets: exp.description.split('\n').map((b) => b.trim()).filter(Boolean),
-    }))
-    updateProfile({ experience: updatedExperiences })
-    setAppliedToResume(true)
-  }
 
   const hasProfileInput = headline.trim() || aboutSection.trim() || experiences.trim()
 
@@ -255,21 +238,8 @@ export default function LinkedInPage() {
                 </div>
               </motion.div>
             ) : result ? (
-              <motion.div key="result" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={SPRING} className="space-y-4">
+              <motion.div key="result" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
                 <LinkedInCard data={result} />
-                <button
-                  onClick={handleApplyToResume}
-                  disabled={appliedToResume}
-                  className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                    appliedToResume
-                      ? 'bg-[#22C55E]/20 text-[#22C55E] border border-[#22C55E]/30 cursor-default'
-                      : 'bg-[#1C1C26] border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:border-[#6366F1]/40'
-                  }`}
-                >
-                  {appliedToResume
-                    ? <><CheckCircle className="w-4 h-4" /> Applied to Resume Builder</>
-                    : <><ChevronRight className="w-4 h-4" /> Apply Experiences to Resume Builder</>}
-                </button>
               </motion.div>
             ) : (
               <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
