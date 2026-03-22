@@ -47,6 +47,7 @@ interface CareerStore {
   setIsGenerating: (val: boolean) => void
   setActiveFeature: (id: FeatureId) => void
   resetProfile: () => void
+  clearStore: () => void
 
   // Easy Tune history
   pushToHistory: (resume: ResumeData) => void
@@ -104,6 +105,13 @@ export const useCareerStore = create<CareerStore>()(
       setActiveFeature: (id) => set({ activeFeature: id }),
       resetProfile: () => set({
         profile: DEFAULT_PROFILE,
+        currentResume: null,
+        atsScore: null,
+        editHistory: [],
+        historyIndex: -1,
+      }),
+      clearStore: () => set({
+        profile: null,
         currentResume: null,
         atsScore: null,
         editHistory: [],

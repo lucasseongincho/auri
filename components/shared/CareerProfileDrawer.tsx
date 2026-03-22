@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerProfile } from '@/hooks/useCareerProfile'
+import { useSignOut } from '@/hooks/useSignOut'
 
 interface CareerProfileDrawerProps {
   open: boolean
@@ -15,13 +16,9 @@ interface CareerProfileDrawerProps {
 }
 
 export default function CareerProfileDrawer({ open, onClose }: CareerProfileDrawerProps) {
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const { profile } = useCareerProfile()
-
-  const handleLogout = async () => {
-    await logout()
-    onClose()
-  }
+  const { handleSignOut } = useSignOut()
 
   return (
     <AnimatePresence>
@@ -202,7 +199,8 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                 </Link>
               ) : (
                 <button
-                  onClick={handleLogout}
+                  type="button"
+                  onClick={handleSignOut}
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
                     border border-white/10 text-[#60607A] hover:text-[#EF4444] hover:border-[#EF4444]/30
                     transition-all duration-200 text-sm font-medium"

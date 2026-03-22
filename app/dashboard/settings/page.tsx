@@ -2,12 +2,11 @@
 import { motion } from 'framer-motion'
 import { Settings } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { useRouter } from 'next/navigation'
+import { useSignOut } from '@/hooks/useSignOut'
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 export default function SettingsPage() {
-  const { user, logout } = useAuth()
-  const router = useRouter()
-  const handleLogout = async () => { await logout(); router.push('/') }
+  const { user } = useAuth()
+  const { handleSignOut } = useSignOut()
   return (
     <div className="space-y-6 pb-20 md:pb-0 max-w-2xl">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
@@ -28,7 +27,7 @@ export default function SettingsPage() {
               <p className="text-xs text-[#60607A]">{user?.email ?? 'No email — guest mode'}</p>
             </div>
           </div>
-          <button onClick={handleLogout}
+          <button type="button" onClick={handleSignOut}
             className="px-4 py-2 rounded-xl border border-[#EF4444]/30 text-[#EF4444]
               hover:bg-[#EF4444]/10 transition-all duration-200 text-sm font-medium">
             Sign Out
