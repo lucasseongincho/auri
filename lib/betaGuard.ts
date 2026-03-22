@@ -36,6 +36,7 @@ function getNextMondayString(): string {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
+    timeZone: 'UTC',
   })
 }
 

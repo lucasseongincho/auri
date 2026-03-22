@@ -126,7 +126,7 @@ function getNextMondayString(): string {
   const nextMonday = new Date(now)
   nextMonday.setUTCDate(now.getUTCDate() + daysUntilMonday)
   nextMonday.setUTCHours(0, 0, 0, 0)
-  return nextMonday.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+  return nextMonday.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' })
 }
 
 function getThisMondayUTC(): Date {

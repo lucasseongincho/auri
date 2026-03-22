@@ -133,7 +133,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* Beta usage indicator */}
-        {APP_CONFIG.BETA_MODE && betaUsage && sidebarExpanded && (
+        {APP_CONFIG.BETA_MODE && sidebarExpanded && isOwner && (
+          <div className="px-2 pb-2">
+            <div className="rounded-xl bg-[#0A0A0F] border border-white/[0.06] p-3 space-y-1">
+              <div className="flex items-center gap-1.5">
+                <FlaskConical className="w-3 h-3 text-[#6366F1] flex-shrink-0" />
+                <span className="text-xs font-semibold text-[#A0A0B8]">Beta Access</span>
+              </div>
+              <p className="text-[10px] text-[#22C55E]">Unlimited calls (owner)</p>
+            </div>
+          </div>
+        )}
+        {APP_CONFIG.BETA_MODE && betaUsage && sidebarExpanded && !isOwner && (
           <div className="px-2 pb-2">
             <div className="rounded-xl bg-[#0A0A0F] border border-white/[0.06] p-3 space-y-2">
               <div className="flex items-center gap-1.5">
