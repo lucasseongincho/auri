@@ -33,13 +33,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import { saveResume } from '@/lib/firestore'
 import ResumePreview from '@/components/resume/ResumePreview'
-import ResumeEditor from '@/components/resume/ResumeEditor'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
-import ClassicPro from '@/components/resume/templates/ClassicPro'
-import ModernEdge from '@/components/resume/templates/ModernEdge'
-import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
-import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
-import CreativePulse from '@/components/resume/templates/CreativePulse'
 import type {
   Experience,
   Education,
@@ -1227,7 +1221,6 @@ export default function ResumePage() {
   // ── Local UI state ──────────────────────────────────────────────────────────
   const [currentStep, setCurrentStep] = useState(1)
   const [mobileView, setMobileView] = useState<'form' | 'preview'>('form')
-  const [isEditing, setIsEditing] = useState(false)
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({
     step1: {},
     step2: {},
@@ -1239,10 +1232,6 @@ export default function ResumePage() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [isATSLoading, setIsATSLoading] = useState(false)
   const [isFixingATS, setIsFixingATS] = useState(false)
-  const [editedResume, setEditedResume] = useState<ResumeData | null>(null)
-
-  // The active resume data — prefer locally edited version
-  const activeResume = editedResume ?? currentResume
 
   // Sync Firestore when profile changes and user is authenticated
   useEffect(() => {
@@ -1346,7 +1335,7 @@ export default function ResumePage() {
   // ── Fix All ATS Issues ───────────────────────────────────────────────────────
 
   const handleFixAll = useCallback(async () => {
-    if (!profile || !activeResume) return
+    if (!profile || !currentResume) return
     setIsFixingATS(true)
     try {
       const fullText = await stream('/api/claude/resume', {
@@ -1363,13 +1352,12 @@ export default function ResumePage() {
         const cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
         const parsed = JSON.parse(cleaned) as ResumeData
         const updated: ResumeData = {
-          ...activeResume,
+          ...currentResume,
           ...parsed,
           templateId: selectedTemplate,
           updatedAt: new Date().toISOString(),
         }
         setResume(updated)
-        setEditedResume(updated)
         if (updated.plain && profile.target.job_description) {
           await runATSScore(updated.plain, profile.target.job_description)
         }
@@ -1379,7 +1367,7 @@ export default function ResumePage() {
     } finally {
       setIsFixingATS(false)
     }
-  }, [profile, activeResume, selectedTemplate, stream, setResume, runATSScore])
+  }, [profile, currentResume, selectedTemplate, stream, setResume, runATSScore])
 
   // ── Generate Resume ──────────────────────────────────────────────────────────
 
@@ -1389,8 +1377,6 @@ export default function ResumePage() {
 
     setGenerateError(null)
     resetStream()
-    setIsEditing(false)
-    setEditedResume(null)
 
     // Switch mobile view to preview immediately
     setMobileView('preview')
@@ -1441,8 +1427,6 @@ export default function ResumePage() {
           updatedAt: new Date().toISOString(),
         }
         setResume(resume)
-        setEditedResume(resume)
-        setIsEditing(false) // start in preview mode; user clicks Edit to enter inline editing
       } catch {
         setGenerateError('Failed to parse AI response. Please try again.')
       }
@@ -1452,7 +1436,7 @@ export default function ResumePage() {
   // ── Save Resume ──────────────────────────────────────────────────────────────
 
   const handleSave = useCallback(async () => {
-    if (!activeResume) return
+    if (!currentResume) return
 
     if (!isAuthenticated) {
       setShowSignUpModal(true)
@@ -1474,7 +1458,7 @@ export default function ResumePage() {
         targetCompany: profile?.target.company ?? '',
         templateId: selectedTemplate,
         atsScore: atsScore?.score,
-        resumeData: activeResume,
+        resumeData: currentResume,
         personalInfo: profile?.personal ?? {
           name: '',
           email: '',
@@ -1492,7 +1476,7 @@ export default function ResumePage() {
     } finally {
       setIsSaving(false)
     }
-  }, [activeResume, isAuthenticated, user?.uid, profile, selectedTemplate, atsScore])
+  }, [currentResume, isAuthenticated, user?.uid, profile, selectedTemplate, atsScore])
 
   // ── Render step content ──────────────────────────────────────────────────────
 
@@ -1516,26 +1500,6 @@ export default function ResumePage() {
         return <StepTargetJob errors={validationErrors.step8} />
       default:
         return null
-    }
-  }
-
-  // ── Template renderer for ResumeEditor children ──────────────────────────────
-
-  const renderTemplate = (data: ResumeData) => {
-    const personal = profile?.personal ?? {
-      name: '',
-      email: '',
-      phone: '',
-      location: '',
-      linkedin_url: '',
-      website: '',
-    }
-    switch (selectedTemplate) {
-      case 'modern-edge':    return <ModernEdge data={data} personal={personal} isEditing />
-      case 'minimal-seoul':  return <MinimalSeoul data={data} personal={personal} isEditing />
-      case 'executive-dark': return <ExecutiveDark data={data} personal={personal} isEditing />
-      case 'creative-pulse': return <CreativePulse data={data} personal={personal} isEditing />
-      default:               return <ClassicPro data={data} personal={personal} isEditing />
     }
   }
 
@@ -1786,7 +1750,7 @@ export default function ResumePage() {
                 </div>
 
                 {/* Generate shortcut hint on last step */}
-                {isLastStep && activeResume && (
+                {isLastStep && currentResume && (
                   <p className="text-xs text-[#60607A] text-center mt-2">
                     Resume generated — edit inline in the preview or regenerate
                   </p>
@@ -1808,7 +1772,7 @@ export default function ResumePage() {
         >
           {/* Save button row — shown when resume exists */}
           <AnimatePresence>
-            {activeResume && (
+            {currentResume && (
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1845,77 +1809,25 @@ export default function ResumePage() {
             )}
           </AnimatePresence>
 
-          {/* Resume Preview / Editor */}
+          {/* Resume Preview */}
           <div className="flex-shrink-0">
-            {isEditing && activeResume ? (
-              <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                <div className="rounded-xl border border-white/[0.05] bg-white overflow-auto"
-                  style={{ minHeight: '600px' }}>
-                  <ResumeEditor
-                    resumeData={activeResume}
-                    personal={personal}
-                    onDataChange={(updated) => setEditedResume(updated)}
-                  >
-                    {renderTemplate(activeResume)}
-                  </ResumeEditor>
-                </div>
-              </div>
-            ) : (
-              <ResumePreview
-                data={activeResume}
-                personal={personal}
-                isStreaming={isStreaming}
-                streamText={streamedText}
-                onTemplateChange={(id: TemplateId) => {
-                  setSelectedTemplate(id)
-                  if (activeResume) {
-                    const updated = { ...activeResume, templateId: id }
-                    setResume(updated)
-                    setEditedResume(updated)
-                  }
-                }}
-              />
-            )}
+            <ResumePreview
+              data={currentResume}
+              personal={personal}
+              isStreaming={isStreaming}
+              streamText={streamedText}
+              onTemplateChange={(id: TemplateId) => {
+                setSelectedTemplate(id)
+                if (currentResume) {
+                  setResume({ ...currentResume, templateId: id })
+                }
+              }}
+            />
           </div>
-
-          {/* Toggle edit mode button — shown after generation */}
-          <AnimatePresence>
-            {activeResume && !isStreaming && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex-shrink-0 flex justify-center"
-              >
-                <button
-                  onClick={() => setIsEditing((v) => !v)}
-                  aria-label={isEditing ? 'Exit editing mode' : 'Enter Easy Tune editing mode'}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium
-                    border transition-all duration-200
-                    ${isEditing
-                      ? 'border-[#22C55E]/30 text-[#22C55E] bg-[#22C55E]/5 hover:bg-[#22C55E]/10'
-                      : 'border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5'
-                    }`}
-                >
-                  {isEditing ? (
-                    <>
-                      <CheckCircle className="w-3.5 h-3.5" />
-                      Done Editing
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-3.5 h-3.5" />
-                      Easy Tune — Edit Inline
-                    </>
-                  )}
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* Run ATS Score button — shown when resume exists but no score yet */}
           <AnimatePresence>
-            {activeResume && !isStreaming && !atsScore && !isATSLoading && (
+            {currentResume && !isStreaming && !atsScore && !isATSLoading && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1927,7 +1839,7 @@ export default function ResumePage() {
                   onClick={() => {
                     const jd = profile?.target.job_description
                     if (!jd) return
-                    const plainText = activeResume.plain ?? buildPlainText(activeResume, profile?.personal ?? {})
+                    const plainText = currentResume.plain ?? buildPlainText(currentResume, profile?.personal ?? {})
                     runATSScore(plainText, jd)
                   }}
                   disabled={!profile?.target.job_description}
@@ -1967,7 +1879,7 @@ export default function ResumePage() {
           </AnimatePresence>
 
           {/* Empty state — no resume yet */}
-          {!activeResume && !isStreaming && (
+          {!currentResume && !isStreaming && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
