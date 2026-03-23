@@ -6,7 +6,7 @@
   RIGHT NOW (Beta):
   - BETA_MODE = true
   - Only users with a valid invite code can access the dashboard
-  - Each user gets 20 AI calls per week
+  - Each user gets 12 AI calls per week
   - Max 100 users total
   - Everyone is treated as Pro — no payment required
   - Resets every Monday automatically
@@ -58,13 +58,13 @@
 export const APP_CONFIG = {
   // BETA MODE
   // When true: all signed-in users with invite code get
-  // 20 calls/week regardless of payment
+  // 12 calls/week regardless of payment
   // When false: enforce free vs Pro paid tiers
   BETA_MODE: true,
   BETA_ENDS: '2026-07-01',
 
   // BETA LIMITS
-  BETA_WEEKLY_CALL_LIMIT: 20,   // AI calls per person per week
+  BETA_WEEKLY_CALL_LIMIT: 12,   // AI calls per person per week
   BETA_MAX_USERS: 100,          // max total beta users allowed
 
   // PAID TIER LIMITS (used when BETA_MODE = false)

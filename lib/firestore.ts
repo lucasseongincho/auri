@@ -146,6 +146,8 @@ export async function getBetaUsage(uid: string): Promise<BetaUsage> {
   const usageSnap = await getDoc(doc(db, 'users', uid, 'betaUsage', 'data'))
   const usageData = usageSnap.exists() ? usageSnap.data() : {}
 
+  // Weekly resets use UTC time.
+  // TODO post-beta: consider per-user timezone for daily limits.
   const thisMonday = getThisMondayUTC()
   const storedWeekStart: Date | null =
     usageData?.betaWeekStart instanceof Timestamp
