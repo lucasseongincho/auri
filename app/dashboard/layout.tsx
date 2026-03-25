@@ -39,21 +39,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter()
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false)
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const { isSyncing, syncError } = useCareerStore()
-  const betaUsage = useBetaUsage(APP_CONFIG.BETA_MODE && !user?.isGuest ? user?.uid : undefined)
+  const betaUsage = useBetaUsage(APP_CONFIG.BETA_MODE ? user?.uid : undefined)
   const isOwner = user?.email === process.env.NEXT_PUBLIC_OWNER_EMAIL && !!process.env.NEXT_PUBLIC_OWNER_EMAIL
 
-  // Beta gate: redirect unapproved users to /beta-access (owner is always exempt)
+  // Auth + beta gate
   useEffect(() => {
+    if (loading) return
+    if (!user) {
+      router.replace('/login')
+      return
+    }
     if (!APP_CONFIG.BETA_MODE) return
-    if (!user || user.isGuest) return
     if (isOwner) return
     // Only redirect once we have usage data confirming they're not approved
     if (betaUsage && !betaUsage.betaApproved) {
       router.replace('/beta-access')
     }
-  }, [betaUsage, user, router, isOwner])
+  }, [betaUsage, user, loading, router, isOwner])
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard'
@@ -246,7 +250,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <p className="text-xs font-medium text-[#A0A0B8] truncate">
                     {user?.displayName ?? user?.email ?? 'Guest'}
                   </p>
-                  <p className="text-[10px] text-[#60607A]">{user?.isGuest ? 'Guest mode' : 'Pro'}</p>
+                  <p className="text-[10px] text-[#60607A]">Pro</p>
                 </motion.div>
               )}
             </AnimatePresence>

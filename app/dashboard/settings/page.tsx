@@ -23,8 +23,8 @@ export default function SettingsPage() {
           <h2 className="font-heading font-semibold text-white">Account</h2>
           <div className="flex items-center justify-between py-3 border-b border-white/[0.06]">
             <div>
-              <p className="text-sm text-white">{user?.displayName ?? 'Guest User'}</p>
-              <p className="text-xs text-[#60607A]">{user?.email ?? 'No email — guest mode'}</p>
+              <p className="text-sm text-white">{user?.displayName ?? ''}</p>
+              <p className="text-xs text-[#60607A]">{user?.email ?? ''}</p>
             </div>
           </div>
           <button type="button" onClick={handleSignOut}

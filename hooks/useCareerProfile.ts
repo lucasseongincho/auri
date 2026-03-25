@@ -34,10 +34,9 @@ export function useCareerProfile() {
   const updateProfile = (partial: Partial<CareerProfile>) => {
     storeUpdateProfile(partial)
     // Auto-sync to Firestore for authenticated users (debounced inside store)
-    if (user && !user.isGuest) {
+    if (user) {
       syncToFirestore(user.uid)
     }
-    // Guest users: Zustand persist middleware handles localStorage automatically
   }
 
   return {

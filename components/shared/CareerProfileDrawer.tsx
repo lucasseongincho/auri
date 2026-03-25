@@ -55,7 +55,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                     {user?.displayName ?? user?.email ?? 'Guest User'}
                   </p>
                   <p className="text-xs text-[#60607A]">
-                    {user?.isGuest ? 'Guest mode — data saved locally' : user?.email ?? ''}
+                    {user?.email ?? ''}
                   </p>
                 </div>
               </div>
@@ -189,26 +189,16 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
 
             {/* Footer */}
             <div className="p-6 border-t border-white/[0.06]">
-              {user?.isGuest ? (
-                <Link href="/signup" onClick={onClose}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-                    font-semibold text-white bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-                    shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                    hover:scale-[1.02] transition-all duration-200">
-                  Save Your Progress
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-                    border border-white/10 text-[#60607A] hover:text-[#EF4444] hover:border-[#EF4444]/30
-                    transition-all duration-200 text-sm font-medium"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
+                  border border-white/10 text-[#60607A] hover:text-[#EF4444] hover:border-[#EF4444]/30
+                  transition-all duration-200 text-sm font-medium"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
             </div>
           </motion.aside>
         </>

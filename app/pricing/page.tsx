@@ -12,7 +12,6 @@ const FREE_FEATURES = [
   'All 5 resume templates',
   'ATS scoring & optimizer',
   'Cover letter generator',
-  'Guest mode — no sign-up required',
 ]
 
 const PRO_FEATURES = [
@@ -29,7 +28,7 @@ export default function PricingPage() {
   const { user } = useAuth()
 
   const handleUpgrade = async () => {
-    if (!user || user.isGuest) {
+    if (!user) {
       window.location.href = '/login'
       return
     }
@@ -150,7 +149,7 @@ export default function PricingPage() {
                     shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
                     hover:scale-[1.02] transition-all duration-200"
                 >
-                  {user && !user.isGuest ? 'Upgrade to Pro' : 'Sign in to Upgrade'}
+                  {user ? 'Upgrade to Pro' : 'Sign in to Upgrade'}
                 </button>
               </div>
             </div>

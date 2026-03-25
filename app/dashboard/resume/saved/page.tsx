@@ -4,12 +4,12 @@ import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  FileText, Plus, Search, Trash2, Edit3, Calendar,
+  FileText, Plus, Search, Trash2, Calendar,
   Target, Building2, Loader2, AlertCircle, SortAsc,
-  X, Star, Layout,
+  X, Star, Layout, Pencil, Check,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { getSavedResumes, deleteSavedResume } from '@/lib/firestore'
+import { getSavedResumes, deleteSavedResume, updateSavedResume } from '@/lib/firestore'
 import type { SavedResume } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -60,6 +60,12 @@ export default function SavedResumesPage() {
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Rename state
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
+  const [renameSaving, setRenameSaving] = useState(false)
+  const [renameSuccessId, setRenameSuccessId] = useState<string | null>(null)
+
   useEffect(() => {
     if (authLoading) return
     async function load() {
@@ -68,7 +74,7 @@ export default function SavedResumesPage() {
           const data = await getSavedResumes(user.uid)
           setResumes(data)
         } else {
-          setResumes([]) // guests have no persistent saved resumes
+          setResumes([])
         }
       } catch {
         setError('Failed to load saved resumes.')
@@ -110,6 +116,32 @@ export default function SavedResumesPage() {
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
+    }
+  }
+
+  function handleStartRename(resume: SavedResume) {
+    setRenamingId(resume.id)
+    setRenameValue(resume.name || resume.targetPosition || 'Untitled')
+  }
+
+  function handleCancelRename() {
+    setRenamingId(null)
+    setRenameValue('')
+  }
+
+  async function handleSaveRename(id: string) {
+    if (!user?.uid || !renameValue.trim()) return
+    setRenameSaving(true)
+    try {
+      await updateSavedResume(user.uid, id, { name: renameValue.trim() })
+      setResumes((prev) => prev.map((r) => r.id === id ? { ...r, name: renameValue.trim() } : r))
+      setRenamingId(null)
+      setRenameSuccessId(id)
+      setTimeout(() => setRenameSuccessId(null), 2000)
+    } catch {
+      setError('Failed to rename resume.')
+    } finally {
+      setRenameSaving(false)
     }
   }
 
@@ -209,32 +241,6 @@ export default function SavedResumesPage() {
           </div>
         )}
 
-        {/* Guest notice */}
-        {!loading && !user?.uid && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center py-20 text-center px-6"
-          >
-            <div className="w-16 h-16 rounded-2xl bg-[#6366F1]/10 border border-[#6366F1]/20
-              flex items-center justify-center mb-4">
-              <FileText className="w-8 h-8 text-[#6366F1]" />
-            </div>
-            <h3 className="font-heading text-base font-semibold text-white mb-2">Sign in to save resumes</h3>
-            <p className="text-sm text-[#60607A] mb-5 max-w-sm">
-              Create a free account to save and manage your resumes across devices.
-            </p>
-            <Link
-              href="/login"
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold
-                bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50 hover:scale-[1.02] transition-all"
-            >
-              Sign in
-            </Link>
-          </motion.div>
-        )}
-
         {/* Empty state */}
         {!loading && user?.uid && resumes.length === 0 && (
           <motion.div
@@ -296,14 +302,61 @@ export default function SavedResumesPage() {
 
                   {/* Top: name + ATS badge */}
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
                       <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366F1]/20 to-[#8B5CF6]/20
                         border border-[#6366F1]/30 flex items-center justify-center flex-shrink-0">
                         <FileText className="w-3.5 h-3.5 text-[#6366F1]" />
                       </div>
-                      <p className="text-sm font-semibold text-white truncate">
-                        {resume.name || resume.targetPosition || 'Untitled'}
-                      </p>
+                      {renamingId === resume.id ? (
+                        <div className="flex items-center gap-1 flex-1 min-w-0">
+                          <input
+                            autoFocus
+                            value={renameValue}
+                            onChange={(e) => setRenameValue(e.target.value)}
+                            onFocus={(e) => e.target.select()}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleSaveRename(resume.id)
+                              if (e.key === 'Escape') handleCancelRename()
+                            }}
+                            className="flex-1 min-w-0 bg-transparent border border-[#6366F1]/50 rounded-lg
+                              px-2 py-0.5 text-sm font-semibold text-white outline-none
+                              focus:border-[#6366F1] transition-colors"
+                          />
+                          <button
+                            onClick={() => handleSaveRename(resume.id)}
+                            disabled={renameSaving}
+                            aria-label="Save rename"
+                            className="p-1 rounded-lg text-[#22C55E] hover:bg-[#22C55E]/10 transition-colors flex-shrink-0"
+                          >
+                            {renameSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                          </button>
+                          <button
+                            onClick={handleCancelRename}
+                            aria-label="Cancel rename"
+                            className="p-1 rounded-lg text-[#60607A] hover:bg-white/5 transition-colors flex-shrink-0"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1 min-w-0">
+                          <p className="text-sm font-semibold text-white truncate">
+                            {renameSuccessId === resume.id ? (
+                              <span className="text-[#22C55E]">Renamed ✓</span>
+                            ) : (
+                              resume.name || resume.targetPosition || 'Untitled'
+                            )}
+                          </p>
+                          <button
+                            onClick={() => handleStartRename(resume)}
+                            aria-label="Rename resume"
+                            className="p-1 rounded-lg text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/5
+                              transition-all duration-200 flex-shrink-0 opacity-0 group-hover:opacity-100"
+                          >
+                            <Pencil className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <ATSBadge score={resume.atsScore} />
                   </div>
@@ -336,12 +389,11 @@ export default function SavedResumesPage() {
                   <div className="mt-auto flex items-center gap-2 pt-2 border-t border-white/[0.05]">
                     <Link
                       href={`/dashboard/resume/${resume.id}`}
-                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2
+                      className="flex-1 flex items-center justify-center px-3 py-2
                         rounded-lg text-xs font-semibold bg-[#6366F1] text-white
                         hover:bg-[#4F46E5] transition-colors"
                     >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      Open &amp; Edit
+                      Open
                     </Link>
                     <button
                       onClick={() => setDeleteTarget(resume.id)}

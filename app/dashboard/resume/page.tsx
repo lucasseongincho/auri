@@ -1221,7 +1221,7 @@ export default function ResumePage() {
     syncToFirestore,
   } = useCareerStore()
 
-  const { user, isAuthenticated, isGuest } = useAuth()
+  const { user, isAuthenticated } = useAuth()
   const { isStreaming, streamedText, stream, reset: resetStream } = useAIStream()
 
   // ── Local UI state ──────────────────────────────────────────────────────────
@@ -1456,9 +1456,9 @@ export default function ResumePage() {
 
     try {
       const resumeName =
-        profile?.target.position && profile?.target.company
-          ? `${profile.target.position} at ${profile.target.company}`
-          : `Resume ${new Date().toLocaleDateString()}`
+        profile?.target.company && profile?.target.position
+          ? `${profile.target.company} — ${profile.target.position}`
+          : `My Resume — ${new Date().toLocaleDateString()}`
 
       await saveResume(user.uid, {
         name: resumeName,
@@ -1808,14 +1808,7 @@ export default function ResumePage() {
                 transition={SPRING}
                 className="flex-shrink-0 flex items-center justify-between gap-3"
               >
-                <div className="flex items-center gap-2">
-                  {isGuest && (
-                    <span className="text-xs text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/20
-                      px-2.5 py-1 rounded-full">
-                      Guest mode — sign up to save
-                    </span>
-                  )}
-                </div>
+                <div className="flex items-center gap-2" />
                 <button
                   onClick={handleSave}
                   disabled={isSaving}

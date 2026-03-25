@@ -11,7 +11,6 @@ import {
   User,
 } from 'firebase/auth'
 import { auth, hasConfig } from '@/lib/firebase'
-import { migrateGuestToFirestore } from '@/lib/firestore'
 import { useCareerStore } from '@/store/careerStore'
 import type { AuthUser } from '@/types'
 
@@ -24,7 +23,6 @@ interface AuthContextValue {
   signInWithEmail: (email: string, password: string) => Promise<User>
   signUpWithEmail: (email: string, password: string) => Promise<User>
   logout: () => Promise<void>
-  continueAsGuest: () => void
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -53,8 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // This prevents double-reads on sign-in (listener fires after signInWithPopup resolves).
         await useCareerStore.getState().loadFromFirestore(firebaseUser.uid)
       } else {
-        // Don't clobber guest state — only clear if user was a real Firebase user
-        setUser((prev) => (prev?.isGuest ? prev : null))
+        setUser(null)
       }
       setLoading(false)
     })
@@ -64,21 +61,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = useCallback(async () => {
     if (!hasConfig) throw new Error('Firebase is not configured.')
     const result = await signInWithPopup(auth, googleProvider)
-    await migrateGuestToFirestore(result.user.uid)
     return result.user
   }, [])
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
     if (!hasConfig) throw new Error('Firebase is not configured.')
     const result = await signInWithEmailAndPassword(auth, email, password)
-    await migrateGuestToFirestore(result.user.uid)
     return result.user
   }, [])
 
   const signUpWithEmail = useCallback(async (email: string, password: string) => {
     if (!hasConfig) throw new Error('Firebase is not configured.')
     const result = await createUserWithEmailAndPassword(auth, email, password)
-    await migrateGuestToFirestore(result.user.uid)
     return result.user
   }, [])
 
@@ -91,28 +85,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const continueAsGuest = useCallback(() => {
-    setUser({
-      uid: 'guest',
-      email: null,
-      displayName: 'Guest',
-      photoURL: null,
-      isGuest: true,
-    })
-  }, [])
-
   return (
     <AuthContext.Provider
       value={{
         user,
         loading,
-        isGuest: user?.isGuest ?? false,
-        isAuthenticated: !!user && !user.isGuest,
+        isGuest: false,
+        isAuthenticated: !!user,
         signInWithGoogle,
         signInWithEmail,
         signUpWithEmail,
         logout,
-        continueAsGuest,
       }}
     >
       {children}

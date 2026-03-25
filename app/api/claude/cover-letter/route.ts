@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
 
     // Server-side auth + rate limiting
     const verifiedUser = await getAuthenticatedUser(req)
+    if (!verifiedUser) return Response.json({ error: 'Unauthorized' }, { status: 401 })
     const identifier = getIdentifier(req, verifiedUser?.uid)
     const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)

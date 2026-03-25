@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Sparkles, Mail, Lock, Chrome, ArrowRight } from 'lucide-react'
+import { Sparkles, Mail, Lock, Chrome } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { APP_CONFIG } from '@/lib/config'
 
@@ -12,7 +12,7 @@ const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
 export default function LoginPage() {
   const router = useRouter()
-  const { signInWithGoogle, signInWithEmail, continueAsGuest } = useAuth()
+  const { signInWithGoogle, signInWithEmail } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -53,11 +53,6 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleGuest = () => {
-    continueAsGuest()
-    router.push('/dashboard')
   }
 
   return (
@@ -158,19 +153,13 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-white/[0.06] space-y-3 text-center">
+            <div className="mt-6 pt-6 border-t border-white/[0.06] text-center">
               <p className="text-sm text-[#60607A]">
                 Don&apos;t have an account?{' '}
                 <Link href="/signup" className="text-[#6366F1] hover:text-[#818CF8] transition-colors">
                   Sign up
                 </Link>
               </p>
-              <button
-                onClick={handleGuest}
-                className="text-sm text-[#60607A] hover:text-[#A0A0B8] transition-colors flex items-center gap-1 mx-auto"
-              >
-                Continue as guest <ArrowRight className="w-3 h-3" />
-              </button>
             </div>
           </div>
         </div>

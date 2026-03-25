@@ -104,7 +104,7 @@ export default function BetaAccessPage() {
               <p className="text-sm text-[#A0A0B8]">
                 Enter your invite code to unlock access
               </p>
-              {user && !user.isGuest && (
+              {user && (
                 <p className="text-xs text-[#60607A] mt-1">
                   Signed in as {user.email}
                 </p>
