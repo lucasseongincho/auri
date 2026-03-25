@@ -17,7 +17,6 @@ import type { AuthUser } from '@/types'
 interface AuthContextValue {
   user: AuthUser | null
   loading: boolean
-  isGuest: boolean
   isAuthenticated: boolean
   signInWithGoogle: () => Promise<User>
   signInWithEmail: (email: string, password: string) => Promise<User>
@@ -45,7 +44,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: firebaseUser.email,
           displayName: firebaseUser.displayName,
           photoURL: firebaseUser.photoURL,
-          isGuest: false,
         })
         // Single source of truth: loadFromFirestore only here, not in sign-in methods.
         // This prevents double-reads on sign-in (listener fires after signInWithPopup resolves).
@@ -90,7 +88,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
-        isGuest: false,
         isAuthenticated: !!user,
         signInWithGoogle,
         signInWithEmail,
