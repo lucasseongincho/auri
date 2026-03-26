@@ -8,9 +8,7 @@ import {
   ArrowLeft,
   Calendar,
   ChevronRight,
-  Download,
   FileText,
-  Loader2,
   LogIn,
   Plus,
   Target,
@@ -308,9 +306,6 @@ export default function SavedResumePage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Download
-  const [isDownloading, setIsDownloading] = useState(false)
-
   // Sidebar collapsed on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -380,24 +375,6 @@ export default function SavedResumePage() {
     },
     [resume, user, setSelectedTemplate]
   )
-
-  const handleDownload = useCallback(async () => {
-    if (!resume) return
-    // Target #resume-content (the template-only div inside ResumePreview) so the
-    // PDF contains only resume content — not the template switcher or action toolbar.
-    const element = document.getElementById('resume-content')
-    if (!element) return
-    setIsDownloading(true)
-    try {
-      const { generatePDFFromElement } = await import('@/lib/pdf')
-      const filename =
-        `${(resume.personalInfo?.name ?? '').replace(/\s+/g, '-').toLowerCase() || 'resume'}-` +
-        `${resume.targetPosition.replace(/\s+/g, '-').toLowerCase() || 'resume'}.pdf`
-      await generatePDFFromElement(element as HTMLElement, { filename, imageQuality: 0.98 })
-    } finally {
-      setIsDownloading(false)
-    }
-  }, [resume])
 
   const handleDelete = useCallback(async () => {
     if (!user || !resume) return
@@ -669,24 +646,6 @@ export default function SavedResumePage() {
                   <ArrowLeft className="w-3.5 h-3.5" />
                   Back
                 </Link>
-
-                {/* Download PDF */}
-                <button
-                  onClick={handleDownload}
-                  disabled={isDownloading}
-                  aria-label="Download resume as PDF"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                    bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                    shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                    hover:scale-[1.02] transition-all duration-200
-                    disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                >
-                  {isDownloading
-                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    : <Download className="w-3.5 h-3.5" />
-                  }
-                  {isDownloading ? 'Generating...' : 'Download PDF'}
-                </button>
 
                 {/* Delete */}
                 <button
