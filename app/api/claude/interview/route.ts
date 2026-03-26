@@ -58,9 +58,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as InterviewRequestBody
 
-    // Server-side auth + rate limiting
+    // Server-side auth + rate limiting (guests allowed — fall back to IP rate limit)
     const verifiedUser = await getAuthenticatedUser(req)
-    if (!verifiedUser) return Response.json({ error: 'Unauthorized' }, { status: 401 })
     const identifier = getIdentifier(req, verifiedUser?.uid)
     const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)
