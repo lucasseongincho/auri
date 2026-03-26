@@ -382,7 +382,7 @@ export default function SavedResumePage() {
     setIsDeleting(true)
     try {
       await deleteSavedResume(user.uid, resume.id)
-      router.push('/dashboard/resume')
+      router.push('/dashboard/resume/saved')
     } catch {
       setIsDeleting(false)
       setShowDeleteModal(false)
