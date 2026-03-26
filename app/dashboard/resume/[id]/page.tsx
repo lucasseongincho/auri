@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -310,7 +310,6 @@ export default function SavedResumePage() {
 
   // Download
   const [isDownloading, setIsDownloading] = useState(false)
-  const previewRef = useRef<HTMLDivElement>(null)
 
   // Sidebar collapsed on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -383,14 +382,18 @@ export default function SavedResumePage() {
   )
 
   const handleDownload = useCallback(async () => {
-    if (!previewRef.current || !resume) return
+    if (!resume) return
+    // Target #resume-content (the template-only div inside ResumePreview) so the
+    // PDF contains only resume content — not the template switcher or action toolbar.
+    const element = document.getElementById('resume-content')
+    if (!element) return
     setIsDownloading(true)
     try {
       const { generatePDFFromElement } = await import('@/lib/pdf')
       const filename =
         `${(resume.personalInfo?.name ?? '').replace(/\s+/g, '-').toLowerCase() || 'resume'}-` +
         `${resume.targetPosition.replace(/\s+/g, '-').toLowerCase() || 'resume'}.pdf`
-      await generatePDFFromElement(previewRef.current, { filename, imageQuality: 0.98 })
+      await generatePDFFromElement(element as HTMLElement, { filename, imageQuality: 0.98 })
     } finally {
       setIsDownloading(false)
     }
@@ -752,15 +755,13 @@ export default function SavedResumePage() {
               </div>
             </div>
 
-            {/* Resume Preview */}
-            <div ref={previewRef}>
-              <ResumePreview
-                data={resume.resumeData}
-                personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
-                isStreaming={false}
-                onTemplateChange={handleTemplateChange}
-              />
-            </div>
+            {/* Resume Preview — PDF targets #resume-content inside ResumePreview, not this wrapper */}
+            <ResumePreview
+              data={resume.resumeData}
+              personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
+              isStreaming={false}
+              onTemplateChange={handleTemplateChange}
+            />
 
           </motion.div>
         )}

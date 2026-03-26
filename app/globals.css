@@ -68,6 +68,22 @@
   }
 }
 
+/* Print / PDF export: hide all UI chrome, show only resume content */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  #resume-content {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border: none;
+  }
+}
+
 @layer components {
   /* Double-Bezel Card Architecture per CLAUDE.md §9 */
   .card-outer {

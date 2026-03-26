@@ -60,7 +60,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [betaUsage, user, loading, router, isOwner])
 
   const isActive = (href: string) => {
+    // Dashboard: exact match only
     if (href === '/dashboard') return pathname === '/dashboard'
+    // Resume Builder: exact match only — prevents /resume/saved and /resume/[id] from also lighting it up
+    if (href === '/dashboard/resume') return pathname === '/dashboard/resume'
+    // My Resumes: active on /dashboard/resume/saved AND any individual saved resume (/dashboard/resume/[id])
+    if (href === '/dashboard/resume/saved') {
+      return (
+        pathname === '/dashboard/resume/saved' ||
+        (pathname.startsWith('/dashboard/resume/') && pathname !== '/dashboard/resume')
+      )
+    }
     return pathname.startsWith(href)
   }
 

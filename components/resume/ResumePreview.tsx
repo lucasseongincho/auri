@@ -116,8 +116,8 @@ export default function ResumePreview({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
+      {/* Toolbar — no-print ensures it never appears in PDF export */}
+      <div className="no-print flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
         {/* Template switcher — scrollable on mobile for all 5 templates */}
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#13131A] border border-white/[0.08] overflow-x-auto max-w-full">
           <Layout className="w-3.5 h-3.5 text-[#60607A] ml-2 flex-shrink-0" />
@@ -224,6 +224,7 @@ export default function ResumePreview({
                 animate={{ opacity: 1, y: 0 }}
                 transition={SPRING}
                 ref={previewRef}
+                id="resume-content"
                 className="w-full"
               >
                 {selectedTemplate === 'classic-pro' && (
