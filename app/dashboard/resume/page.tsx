@@ -53,6 +53,7 @@ import type {
 } from '@/types'
 import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
+import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -202,14 +203,7 @@ function StepPersonal({
           />
         </Field>
         <Field label="Location">
-          <input
-            type="text"
-            className={INPUT_CLASS}
-            placeholder="New York, NY"
-            value={personal.location}
-            onChange={(e) => update('location', e.target.value)}
-            aria-label="Location"
-          />
+          <LocationAutocomplete value={personal.location} onChange={(v) => update('location', v)} placeholder="New York, NY" className={INPUT_CLASS} aria-label="Location" />
         </Field>
         <Field label="LinkedIn URL">
           <input
@@ -1040,14 +1034,7 @@ function StepTargetJob({ errors }: { errors: Step8Errors }) {
           <JobTitleAutocomplete value={target.position} onChange={(v) => update('position', v)} placeholder="Senior Software Engineer" className={INPUT_CLASS} aria-label="Target position" />
         </Field>
         <Field label="Target Company" required error={errors.company}>
-          <input
-            type="text"
-            className={INPUT_CLASS}
-            placeholder="Google"
-            value={target.company}
-            onChange={(e) => update('company', e.target.value)}
-            aria-label="Target company"
-          />
+          <CompanyAutocomplete value={target.company} onChange={(v) => update('company', v)} placeholder="Google" className={INPUT_CLASS} aria-label="Target company" />
         </Field>
         <Field label="Company Type">
           <input

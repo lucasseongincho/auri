@@ -26,6 +26,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
 import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
+import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 import { saveInterviewPrep, saveGuestInterviewPrep } from '@/lib/firestore'
 import type { InterviewPrep, InterviewQuestion } from '@/types'
 
@@ -345,17 +346,46 @@ export default function InterviewPage() {
     })
 
     if (fullText) {
-      try {
-        let cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
-        const fb = cleaned.indexOf('{'), lb = cleaned.lastIndexOf('}')
-        if (fb !== -1 && lb > fb) cleaned = cleaned.slice(fb, lb + 1)
-        const parsed = JSON.parse(cleaned) as InterviewPrep
+      console.log('[interview] raw response length:', fullText.length)
+      const parseInterviewJSON = (raw: string): InterviewPrep | null => {
+        try {
+          let cleaned = raw.trim()
+          if (cleaned.startsWith('```')) {
+            cleaned = cleaned.replace(/^```json\n?/i, '').replace(/^```\n?/, '').replace(/```\s*$/, '').trim()
+          }
+          const fb = cleaned.indexOf('{'), lb = cleaned.lastIndexOf('}')
+          if (fb !== -1 && lb > fb) cleaned = cleaned.slice(fb, lb + 1)
+          let parsed: InterviewPrep
+          try {
+            parsed = JSON.parse(cleaned) as InterviewPrep
+          } catch {
+            parsed = JSON.parse(cleaned.replace(/,(\s*[}\]])/g, '$1')) as InterviewPrep
+          }
+          if (!parsed?.questions?.length || !Array.isArray(parsed.questions_to_ask)) return null
+          return parsed
+        } catch {
+          return null
+        }
+      }
+
+      const parsed = parseInterviewJSON(fullText)
+      if (parsed) {
         setPrep(parsed)
         if (profile) {
           updateProfile({ generated: { ...profile.generated, interview_prep: parsed } })
         }
-      } catch {
-        setGenerateError('Could not parse the interview prep. Please try again.')
+      } else {
+        // Auto-retry once
+        const retryText = await stream('/api/claude/interview', {
+          mode: 'generate', position, company, experienceSummary, uid: user?.uid, isPro: false,
+        }, { onError: (err) => setGenerateError(err) })
+        const retryParsed = retryText ? parseInterviewJSON(retryText) : null
+        if (retryParsed) {
+          setPrep(retryParsed)
+          if (profile) updateProfile({ generated: { ...profile.generated, interview_prep: retryParsed } })
+        } else {
+          setGenerateError('Could not parse the interview prep. Please try again.')
+        }
       }
     }
   }, [position, company, experienceSummary, user?.uid, stream, profile, updateProfile])
@@ -455,7 +485,7 @@ export default function InterviewPage() {
               </div>
               <div>
                 <label className={LABEL_CLASS}>Company Name <span className="text-[#EF4444]">*</span></label>
-                <input type="text" className={INPUT_CLASS} placeholder="Stripe" value={company} onChange={(e) => setCompany(e.target.value)} aria-label="Company" />
+                <CompanyAutocomplete value={company} onChange={setCompany} placeholder="Stripe" className={INPUT_CLASS} aria-label="Company" />
               </div>
 
               {generateError && (

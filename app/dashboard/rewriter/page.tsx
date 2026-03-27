@@ -23,6 +23,7 @@ import { getSavedResumes, saveResume } from '@/lib/firestore'
 import ResumePreview from '@/components/resume/ResumePreview'
 import type { ResumeData, TemplateId, SavedResume, PersonalInfo } from '@/types'
 import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
+import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 
 // Convert ResumeData → plain text for the rewriter API
 function resumeToPlainText(r: ResumeData, personal?: { name?: string; email?: string; phone?: string; location?: string }): string {
@@ -141,17 +142,35 @@ export default function RewriterPage() {
 
   const handleFileUpload = useCallback(async (file: File) => {
     setUploadError('')
+
+    // Client-side validation before hitting the API
+    const validExtensions = /\.(pdf|doc|docx|txt)$/i
+    const validTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/plain',
+    ]
+    if (!validExtensions.test(file.name) && !validTypes.includes(file.type)) {
+      setUploadError('Invalid file type. Please upload a PDF, Word (.doc, .docx), or text file.')
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError('File too large. Maximum size is 10MB.')
+      return
+    }
+
     setIsUploadLoading(true)
     try {
       const formData = new FormData()
       formData.append('file', file)
       const res = await fetch('/api/parse-pdf', { method: 'POST', body: formData })
       const json = await res.json()
-      if (!json.success) throw new Error(json.error ?? 'Failed to parse PDF')
+      if (!json.success) throw new Error(json.error ?? 'Failed to parse file')
       setUploadedText(json.text)
       setUploadedFileName(file.name)
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : 'PDF upload failed')
+      setUploadError(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setIsUploadLoading(false)
     }
@@ -180,8 +199,20 @@ export default function RewriterPage() {
 
     if (fullText) {
       try {
-        const cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
-        const parsed = JSON.parse(cleaned) as ResumeData
+        console.log('[rewriter] raw response length:', fullText.length)
+        // Robust JSON extraction: strip fences, find outer braces, fix trailing commas
+        let cleaned = fullText.trim()
+        if (cleaned.startsWith('```')) {
+          cleaned = cleaned.replace(/^```json\n?/i, '').replace(/^```\n?/, '').replace(/```\s*$/, '').trim()
+        }
+        const fb = cleaned.indexOf('{'), lb = cleaned.lastIndexOf('}')
+        if (fb !== -1 && lb > fb) cleaned = cleaned.slice(fb, lb + 1)
+        let parsed: ResumeData
+        try {
+          parsed = JSON.parse(cleaned) as ResumeData
+        } catch {
+          parsed = JSON.parse(cleaned.replace(/,(\s*[}\]])/g, '$1')) as ResumeData
+        }
         setRewrittenData({ ...parsed, templateId: selectedTemplate })
       } catch {
         setGenerateError('Could not parse the rewritten resume. Please try again.')
@@ -432,7 +463,7 @@ export default function RewriterPage() {
                 </div>
                 <div>
                   <label className={LABEL_CLASS}>Company Name</label>
-                  <input type="text" className={INPUT_CLASS} placeholder="Acme Corp" value={targetCompany} onChange={(e) => setTargetCompany(e.target.value)} aria-label="Company name" />
+                  <CompanyAutocomplete value={targetCompany} onChange={setTargetCompany} placeholder="Acme Corp" className={INPUT_CLASS} aria-label="Company name" />
                 </div>
                 <div className="sm:col-span-2">
                   <label className={LABEL_CLASS}>Company Type / Industry</label>

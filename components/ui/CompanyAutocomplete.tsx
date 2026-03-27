@@ -3,49 +3,40 @@
 import { useEffect, useRef } from 'react'
 import { useAutocomplete } from '@/hooks/useAutocomplete'
 
-const JOB_TITLES = [
-  // Tech
-  'Software Engineer', 'Senior Software Engineer', 'Full Stack Engineer',
-  'Frontend Engineer', 'Backend Engineer', 'DevOps Engineer',
-  'Data Scientist', 'Data Analyst', 'Data Engineer',
-  'Machine Learning Engineer', 'AI Engineer',
-  'Product Manager', 'Senior Product Manager',
-  'UX Designer', 'UI Designer', 'Product Designer',
-  'Engineering Manager', 'CTO', 'VP of Engineering',
-  'QA Engineer', 'Security Engineer',
-  'Cloud Architect', 'Solutions Architect',
-  // Marketing
-  'Marketing Manager', 'Growth Marketing Manager',
-  'Digital Marketing Manager', 'Content Marketing Manager',
-  'SEO Manager', 'Social Media Manager',
-  'Brand Manager', 'Product Marketing Manager',
-  'CMO', 'VP of Marketing', 'Marketing Director',
-  'Performance Marketing Manager',
-  'Email Marketing Manager', 'Growth Hacker',
+const COMPANIES = [
+  // Big Tech
+  'Google', 'Meta', 'Apple', 'Amazon', 'Microsoft',
+  'Netflix', 'Salesforce', 'Adobe', 'Oracle', 'IBM',
+  'Intel', 'Nvidia', 'Uber', 'Airbnb', 'Lyft',
+  'Twitter / X', 'LinkedIn', 'Spotify', 'Stripe',
+  'Square', 'PayPal', 'Shopify', 'Zoom', 'Slack',
+  'Dropbox', 'Atlassian', 'HubSpot', 'Twilio',
+  'Snowflake', 'Databricks', 'OpenAI', 'Anthropic',
   // Finance
-  'Financial Analyst', 'Investment Analyst',
-  'Portfolio Manager', 'Risk Analyst',
-  'Quantitative Analyst', 'CFO', 'Controller',
-  'Accountant', 'CPA', 'Financial Advisor',
-  // Business
-  'Business Analyst', 'Strategy Analyst',
-  'Management Consultant', 'Operations Manager',
-  'Project Manager', 'Program Manager',
-  'Chief of Staff', 'CEO', 'COO',
-  'Business Development Manager',
-  'Account Manager', 'Sales Manager',
-  'Customer Success Manager',
-  // HR
-  'HR Manager', 'Recruiter', 'Talent Acquisition',
-  'People Operations Manager', 'CHRO',
-  // Other
-  'Graphic Designer', 'Creative Director',
-  'Copywriter', 'Content Writer',
-  'Research Analyst', 'Policy Analyst',
-  'Supply Chain Manager', 'Logistics Manager',
+  'Goldman Sachs', 'JP Morgan', 'Morgan Stanley',
+  'BlackRock', 'Citadel', 'Two Sigma', 'AQR Capital',
+  'Bridgewater', 'Point72', 'Renaissance Technologies',
+  'Bank of America', 'Wells Fargo', 'Citi', 'HSBC',
+  'Deutsche Bank', 'Barclays',
+  // Consulting
+  'McKinsey', 'Boston Consulting Group', 'Bain',
+  'Deloitte', 'PwC', 'EY', 'KPMG', 'Accenture',
+  'Oliver Wyman', 'Booz Allen Hamilton',
+  // Healthcare
+  'Johnson & Johnson', 'Pfizer', 'UnitedHealth',
+  'CVS Health', 'Anthem', 'Cigna', 'Abbott',
+  // Retail & Consumer
+  'Walmart', 'Target', 'Costco', 'Nike', 'Adidas',
+  'Starbucks', "McDonald's", 'Coca-Cola', 'PepsiCo',
+  // Media & Entertainment
+  'Disney', 'Warner Bros', 'NBCUniversal', 'HBO',
+  // Other Major
+  'Tesla', 'SpaceX', 'Boeing', 'Lockheed Martin',
+  'ExxonMobil', 'Chevron', 'General Electric',
+  '3M', 'Procter & Gamble', 'Unilever',
 ]
 
-interface JobTitleAutocompleteProps {
+interface CompanyAutocompleteProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
@@ -53,15 +44,15 @@ interface JobTitleAutocompleteProps {
   'aria-label'?: string
 }
 
-export default function JobTitleAutocomplete({
+export default function CompanyAutocomplete({
   value,
   onChange,
-  placeholder = 'Senior Software Engineer',
+  placeholder = 'Acme Corp',
   className = '',
   'aria-label': ariaLabel,
-}: JobTitleAutocompleteProps) {
+}: CompanyAutocompleteProps) {
   const { query, setQuery, filtered, isOpen, setIsOpen, selectedIndex, handleKeyDown } =
-    useAutocomplete(JOB_TITLES)
+    useAutocomplete(COMPANIES)
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Sync external value → internal query
@@ -81,14 +72,14 @@ export default function JobTitleAutocomplete({
     return () => document.removeEventListener('mousedown', handle)
   }, [setIsOpen])
 
-  function highlightMatch(title: string) {
-    const idx = title.toLowerCase().indexOf(query.toLowerCase())
-    if (idx === -1 || query.length < 2) return <span>{title}</span>
+  function highlightMatch(text: string) {
+    const idx = text.toLowerCase().indexOf(query.toLowerCase())
+    if (idx === -1 || query.length < 2) return <span>{text}</span>
     return (
       <>
-        {title.slice(0, idx)}
-        <span className="text-[#818CF8] font-semibold">{title.slice(idx, idx + query.length)}</span>
-        {title.slice(idx + query.length)}
+        {text.slice(0, idx)}
+        <span className="text-[#818CF8] font-semibold">{text.slice(idx, idx + query.length)}</span>
+        {text.slice(idx + query.length)}
       </>
     )
   }
@@ -115,23 +106,24 @@ export default function JobTitleAutocomplete({
           style={{ maxHeight: 240, overflowY: 'auto' }}
           role="listbox"
         >
-          {filtered.map((title, i) => (
+          {filtered.map((company, i) => (
             <button
-              key={title}
+              key={company}
               role="option"
               aria-selected={i === selectedIndex}
               onMouseDown={(e) => {
                 e.preventDefault()
-                setQuery(title)
-                onChange(title)
+                setQuery(company)
+                onChange(company)
                 setIsOpen(false)
               }}
+              onMouseEnter={() => {}}
               className={`w-full text-left px-4 text-sm text-[#E8E8F0] transition-colors ${
                 i === selectedIndex ? 'bg-white/[0.08]' : 'hover:bg-white/[0.05]'
               }`}
               style={{ minHeight: 44, display: 'flex', alignItems: 'center' }}
             >
-              {highlightMatch(title)}
+              {highlightMatch(company)}
             </button>
           ))}
         </div>

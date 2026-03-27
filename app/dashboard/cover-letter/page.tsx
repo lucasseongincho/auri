@@ -19,6 +19,7 @@ import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
 import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
+import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 import type { CoverLetter } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -354,14 +355,7 @@ export default function CoverLetterPage() {
               </div>
               <div>
                 <label className={LABEL_CLASS}>Company Name <span className="text-[#EF4444]">*</span></label>
-                <input
-                  type="text"
-                  className={INPUT_CLASS}
-                  placeholder="Acme Corp"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  aria-label="Company name"
-                />
+                <CompanyAutocomplete value={company} onChange={setCompany} placeholder="Acme Corp" className={INPUT_CLASS} aria-label="Company name" />
               </div>
             </div>
 

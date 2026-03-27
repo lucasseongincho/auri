@@ -43,9 +43,10 @@ export async function POST(req: NextRequest) {
     let extractedText = ''
 
     if (isPdf) {
-      // pdf-parse v1.1.1 — stable, exports a plain function
+      // Use lib path directly — avoids the ENOENT test-runner bug in Next.js
+      // (require('pdf-parse') triggers its test suite; the lib path does not)
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string; numpages: number }>
+      const pdfParse = require('pdf-parse/lib/pdf-parse.js') as (buf: Buffer) => Promise<{ text: string; numpages: number }>
       const parsed = await pdfParse(buffer)
       extractedText = parsed.text
 

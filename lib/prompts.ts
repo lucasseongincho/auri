@@ -316,13 +316,19 @@ Give me:
 My experience:
 ${experienceSummary}
 
-Return ONLY valid JSON:
+YOU MUST RESPOND WITH VALID JSON ONLY.
+NO preamble. NO explanation. NO markdown. NO code blocks. NO backticks.
+START your response with { and END with }
+
+Return this exact structure:
 {
-  "questions": [{
-    "question": "string",
-    "answer_framework": "string",
-    "star_example": "string"
-  }],
+  "questions": [
+    {
+      "question": "string",
+      "answer_framework": "string",
+      "star_example": "Situation: ... Task: ... Action: ... Result: ..."
+    }
+  ],
   "questions_to_ask": ["string"]
 }`
 }
@@ -398,7 +404,11 @@ ${originalText}
 TARGET JOB DESCRIPTION:
 ${jobDescription || '(not provided — optimize for the role and company type)'}
 
-Return ONLY valid JSON with this exact shape:
+YOU MUST RESPOND WITH VALID JSON ONLY.
+NO preamble. NO explanation. NO markdown. NO code blocks. NO backticks.
+START your response with { and END with }
+
+Return this exact JSON structure:
 {
   "summary": "string",
   "experience": [{ "id": "string", "company": "string", "title": "string", "start": "string", "end": "string", "bullets": ["string"] }],

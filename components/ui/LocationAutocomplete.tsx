@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { useAutocomplete } from '@/hooks/useAutocomplete'
 
 const LOCATIONS = [
   // US Cities
@@ -36,58 +37,35 @@ export default function LocationAutocomplete({
   className = '',
   'aria-label': ariaLabel,
 }: LocationAutocompleteProps) {
-  const [open, setOpen] = useState(false)
-  const [highlighted, setHighlighted] = useState(-1)
+  const { query, setQuery, filtered, isOpen, setIsOpen, selectedIndex, handleKeyDown } =
+    useAutocomplete(LOCATIONS)
   const containerRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
-  const filtered =
-    value.length >= 2
-      ? LOCATIONS.filter((l) =>
-          l.toLowerCase().includes(value.toLowerCase())
-        ).slice(0, 6)
-      : []
+  // Sync external value → internal query
+  useEffect(() => {
+    setQuery(value)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
 
-  const showDropdown = open && filtered.length > 0
-
+  // Close on outside click
   useEffect(() => {
     function handle(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false)
-        setHighlighted(-1)
+        setIsOpen(false)
       }
     }
     document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
-  }, [])
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!showDropdown) return
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setHighlighted((h) => Math.min(h + 1, filtered.length - 1))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setHighlighted((h) => Math.max(h - 1, 0))
-    } else if (e.key === 'Enter' && highlighted >= 0) {
-      e.preventDefault()
-      onChange(filtered[highlighted])
-      setOpen(false)
-      setHighlighted(-1)
-    } else if (e.key === 'Escape') {
-      setOpen(false)
-      setHighlighted(-1)
-    }
-  }
+  }, [setIsOpen])
 
   function highlightMatch(loc: string) {
-    const idx = loc.toLowerCase().indexOf(value.toLowerCase())
-    if (idx === -1) return <span>{loc}</span>
+    const idx = loc.toLowerCase().indexOf(query.toLowerCase())
+    if (idx === -1 || query.length < 2) return <span>{loc}</span>
     return (
       <>
         {loc.slice(0, idx)}
-        <span className="text-[#818CF8] font-semibold">{loc.slice(idx, idx + value.length)}</span>
-        {loc.slice(idx + value.length)}
+        <span className="text-[#818CF8] font-semibold">{loc.slice(idx, idx + query.length)}</span>
+        {loc.slice(idx + query.length)}
       </>
     )
   }
@@ -95,21 +73,20 @@ export default function LocationAutocomplete({
   return (
     <div ref={containerRef} className="relative">
       <input
-        ref={inputRef}
         type="text"
-        value={value}
-        onChange={(e) => { onChange(e.target.value); setOpen(true); setHighlighted(-1) }}
-        onFocus={() => setOpen(true)}
+        value={query}
+        onChange={(e) => { setQuery(e.target.value); onChange(e.target.value); setIsOpen(true) }}
+        onFocus={() => { if (filtered.length > 0) setIsOpen(true) }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className={className}
         aria-label={ariaLabel}
         aria-autocomplete="list"
-        aria-expanded={showDropdown}
+        aria-expanded={isOpen}
         style={{ fontSize: '16px' }}
         autoComplete="off"
       />
-      {showDropdown && (
+      {isOpen && filtered.length > 0 && (
         <div
           className="absolute z-50 w-full mt-1 rounded-xl border border-white/[0.12] bg-[#1C1C26] shadow-xl overflow-hidden"
           style={{ maxHeight: 240, overflowY: 'auto' }}
@@ -119,16 +96,15 @@ export default function LocationAutocomplete({
             <button
               key={loc}
               role="option"
-              aria-selected={i === highlighted}
+              aria-selected={i === selectedIndex}
               onMouseDown={(e) => {
                 e.preventDefault()
+                setQuery(loc)
                 onChange(loc)
-                setOpen(false)
-                setHighlighted(-1)
+                setIsOpen(false)
               }}
-              onMouseEnter={() => setHighlighted(i)}
               className={`w-full text-left px-4 text-sm text-[#E8E8F0] transition-colors ${
-                i === highlighted ? 'bg-white/[0.08]' : 'hover:bg-white/[0.05]'
+                i === selectedIndex ? 'bg-white/[0.08]' : 'hover:bg-white/[0.05]'
               }`}
               style={{ minHeight: 44, display: 'flex', alignItems: 'center' }}
             >
