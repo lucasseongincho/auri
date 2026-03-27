@@ -17,6 +17,8 @@ import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
+import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
+import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import type { CoverLetter } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -348,14 +350,7 @@ export default function CoverLetterPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL_CLASS}>Position <span className="text-[#EF4444]">*</span></label>
-                <input
-                  type="text"
-                  className={INPUT_CLASS}
-                  placeholder="Senior Software Engineer"
-                  value={position}
-                  onChange={(e) => setPosition(e.target.value)}
-                  aria-label="Target position"
-                />
+                <JobTitleAutocomplete value={position} onChange={setPosition} placeholder="Senior Software Engineer" className={INPUT_CLASS} aria-label="Target position" />
               </div>
               <div>
                 <label className={LABEL_CLASS}>Company Name <span className="text-[#EF4444]">*</span></label>
@@ -384,14 +379,7 @@ export default function CoverLetterPage() {
               </div>
               <div>
                 <label className={LABEL_CLASS}>Your City, State</label>
-                <input
-                  type="text"
-                  className={INPUT_CLASS}
-                  placeholder="New York, NY"
-                  value={cityState}
-                  onChange={(e) => setCityState(e.target.value)}
-                  aria-label="City and state"
-                />
+                <LocationAutocomplete value={cityState} onChange={setCityState} placeholder="New York, NY" className={INPUT_CLASS} aria-label="City and state" />
               </div>
             </div>
 
@@ -456,7 +444,7 @@ export default function CoverLetterPage() {
                 <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 space-y-3 min-h-[300px]">
                   <div className="flex items-center gap-2 p-3 rounded-lg bg-[#F59E0B]/10 border border-[#F59E0B]/20">
                     <Loader2 className="w-4 h-4 text-[#F59E0B] animate-spin" />
-                    <span className="text-sm text-[#F59E0B] font-medium">Claude is crafting your cover letter…</span>
+                    <span className="text-sm text-[#F59E0B] font-medium">AURI is crafting your cover letter…</span>
                   </div>
                   {[95, 80, 88, 72, 90, 78, 85, 60, 70, 82].map((w, i) => (
                     <div key={i} className="h-3 rounded-full bg-white/[0.04] animate-pulse" style={{ width: `${w}%` }} />

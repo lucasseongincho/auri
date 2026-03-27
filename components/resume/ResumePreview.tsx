@@ -183,7 +183,7 @@ export default function ResumePreview({
                 {/* Streaming indicator */}
                 <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-[#6366F1]/10 border border-[#6366F1]/20">
                   <Loader2 className="w-4 h-4 text-[#6366F1] animate-spin" />
-                  <span className="text-sm text-[#6366F1] font-medium">Claude is generating your resume...</span>
+                  <span className="text-sm text-[#6366F1] font-medium">AURI is generating your resume...</span>
                 </div>
                 {/* Skeleton */}
                 <div className="space-y-3">

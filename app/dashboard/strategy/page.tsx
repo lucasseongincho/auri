@@ -15,6 +15,8 @@ import {
   Clock,
 } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
+import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
+import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import type { JobStrategy, JobStrategyAction, JobStrategyDay } from '@/types'
@@ -235,7 +237,7 @@ export default function StrategyPage() {
           <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-4">
             <div>
               <label className={LABEL_CLASS}>Target Position <span className="text-[#EF4444]">*</span></label>
-              <input type="text" className={INPUT_CLASS} placeholder="Growth Marketing Manager" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} aria-label="Target position" />
+              <JobTitleAutocomplete value={targetPosition} onChange={setTargetPosition} placeholder="Growth Marketing Manager" className={INPUT_CLASS} aria-label="Target position" />
             </div>
             <div>
               <label className={LABEL_CLASS}>Sector / Industry</label>
@@ -247,7 +249,7 @@ export default function StrategyPage() {
                 <button onClick={() => setIsRemote(false)} className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-all ${!isRemote ? 'border-[#22C55E]/40 bg-[#22C55E]/10 text-[#22C55E]' : 'border-white/[0.08] text-[#60607A] hover:text-[#A0A0B8]'}`}>City</button>
                 <button onClick={() => setIsRemote(true)} className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-all ${isRemote ? 'border-[#22C55E]/40 bg-[#22C55E]/10 text-[#22C55E]' : 'border-white/[0.08] text-[#60607A] hover:text-[#A0A0B8]'}`}>Remote</button>
               </div>
-              {!isRemote && <input type="text" className={INPUT_CLASS} placeholder="New York, NY" value={city} onChange={(e) => setCity(e.target.value)} aria-label="City" />}
+              {!isRemote && <LocationAutocomplete value={city} onChange={setCity} placeholder="New York, NY" className={INPUT_CLASS} aria-label="City" />}
             </div>
             <div>
               <label className={LABEL_CLASS}>Company Size / Type</label>
@@ -286,7 +288,7 @@ export default function StrategyPage() {
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
                 <div className="rounded-2xl border border-[#22C55E]/20 bg-[#22C55E]/5 p-4 flex items-center gap-3">
                   <Loader2 className="w-4 h-4 text-[#22C55E] animate-spin" />
-                  <span className="text-sm text-[#22C55E] font-medium">Claude is building your 7-day plan…</span>
+                  <span className="text-sm text-[#22C55E] font-medium">AURI is building your 7-day plan…</span>
                 </div>
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">

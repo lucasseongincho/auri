@@ -25,10 +25,43 @@ import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
+import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
 import { saveInterviewPrep, saveGuestInterviewPrep } from '@/lib/firestore'
 import type { InterviewPrep, InterviewQuestion } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
+
+// ── STARAnswer ───────────────────────────────────────────────────────────────
+
+function STARAnswer({ text }: { text: string }) {
+  const sections = text.split(/(?=Situation:|Task:|Action:|Result:)/i)
+  const parsed = sections
+    .map((section) => {
+      const match = section.match(/^(Situation|Task|Action|Result):([\s\S]*)/i)
+      if (!match) return null
+      return { label: match[1], content: match[2].trim() }
+    })
+    .filter(Boolean) as { label: string; content: string }[]
+
+  if (parsed.length < 2) {
+    return <p className="text-[0.95rem] text-[#A0A0B8] leading-[1.7]">{text}</p>
+  }
+
+  return (
+    <div>
+      {parsed.map((s, i) => (
+        <div key={i} className="mb-5">
+          <span className="block text-[0.75rem] font-bold uppercase tracking-[0.1em] text-[#6366F1] mb-1">
+            {s.label}
+          </span>
+          <p className="text-[0.95rem] leading-[1.6] pl-3 border-l-2 border-[#6366F1] text-[#F8F8FF] mb-4">
+            {s.content}
+          </p>
+        </div>
+      ))}
+    </div>
+  )
+}
 const CARD_SPRING = { type: 'spring' as const, stiffness: 200, damping: 25 }
 const INPUT_CLASS =
   'w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-[#60607A] focus:outline-none focus:border-[#EF4444]/50 focus:ring-1 focus:ring-[#EF4444]/30 transition-all'
@@ -124,7 +157,7 @@ function FlipCard({
                 </span>
               )}
             </div>
-            <p className="text-white font-medium text-base leading-relaxed">{question.question}</p>
+            <p className="text-white font-semibold text-lg leading-relaxed">{question.question}</p>
             {isPracticeMode && (
               <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                 <textarea
@@ -202,11 +235,11 @@ function FlipCard({
                 <RotateCcw className="w-3 h-3" /> Tap to flip back
               </span>
             </div>
-            <p className="text-sm text-[#A0A0B8] leading-relaxed">{question.answer_framework}</p>
+            <p className="text-[0.95rem] text-[#A0A0B8] leading-[1.7] mb-3">{question.answer_framework}</p>
             {question.star_example && (
               <div className="p-3 rounded-xl bg-[#6366F1]/5 border border-[#6366F1]/15">
-                <p className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide mb-1.5">Example</p>
-                <p className="text-xs text-[#A0A0B8] leading-relaxed">{question.star_example}</p>
+                <p className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide mb-3">Example</p>
+                <STARAnswer text={question.star_example} />
               </div>
             )}
           </div>
@@ -239,7 +272,7 @@ function QuestionsToAsk({ questions }: { questions: string[] }) {
               <div className="w-6 h-6 rounded-full bg-[#6366F1]/20 border border-[#6366F1]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-xs font-bold text-[#818CF8]">{i + 1}</span>
               </div>
-              <p className="flex-1 text-sm text-[#E8E8F0] leading-relaxed italic">&ldquo;{q}&rdquo;</p>
+              <p className="flex-1 text-[0.95rem] text-[#E8E8F0] leading-[1.6] italic">&ldquo;{q}&rdquo;</p>
               <button
                 onClick={async () => { await navigator.clipboard.writeText(q); setCopied(i); setTimeout(() => setCopied(null), 1500) }}
                 aria-label={`Copy question ${i + 1}`}
@@ -418,7 +451,7 @@ export default function InterviewPage() {
               )}
               <div>
                 <label className={LABEL_CLASS}>Position <span className="text-[#EF4444]">*</span></label>
-                <input type="text" className={INPUT_CLASS} placeholder="Senior Backend Engineer" value={position} onChange={(e) => setPosition(e.target.value)} aria-label="Position" />
+                <JobTitleAutocomplete value={position} onChange={setPosition} placeholder="Senior Backend Engineer" className={INPUT_CLASS} aria-label="Position" />
               </div>
               <div>
                 <label className={LABEL_CLASS}>Company Name <span className="text-[#EF4444]">*</span></label>
@@ -535,7 +568,7 @@ export default function InterviewPage() {
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <div className="rounded-2xl border border-[#EF4444]/20 bg-[#EF4444]/5 p-4 flex items-center gap-3">
                   <Loader2 className="w-4 h-4 text-[#EF4444] animate-spin" />
-                  <span className="text-sm text-[#EF4444] font-medium">Claude is preparing your interview questions…</span>
+                  <span className="text-sm text-[#EF4444] font-medium">AURI is preparing your interview questions…</span>
                 </div>
                 {Array.from({ length: 2 }).map((_, i) => (
                   <div key={i} className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">

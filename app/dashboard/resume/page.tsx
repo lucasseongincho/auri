@@ -51,6 +51,8 @@ import type {
   TemplateId,
   ATSScore,
 } from '@/types'
+import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
+import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -1028,21 +1030,14 @@ function StepTargetJob({ errors }: { errors: Step8Errors }) {
     <div className="space-y-4">
       <div className="p-3 rounded-xl bg-[#6366F1]/10 border border-[#6366F1]/20">
         <p className="text-xs text-[#818CF8]">
-          Claude will tailor your entire resume to this specific role and job description.
+          AURI will tailor your entire resume to this specific role and job description.
           The more detail you provide, the stronger the keyword match.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Target Position" required error={errors.position}>
-          <input
-            type="text"
-            className={INPUT_CLASS}
-            placeholder="Senior Software Engineer"
-            value={target.position}
-            onChange={(e) => update('position', e.target.value)}
-            aria-label="Target position"
-          />
+          <JobTitleAutocomplete value={target.position} onChange={(v) => update('position', v)} placeholder="Senior Software Engineer" className={INPUT_CLASS} aria-label="Target position" />
         </Field>
         <Field label="Target Company" required error={errors.company}>
           <input
@@ -1075,14 +1070,7 @@ function StepTargetJob({ errors }: { errors: Step8Errors }) {
           />
         </Field>
         <Field label="City / Remote">
-          <input
-            type="text"
-            className={INPUT_CLASS}
-            placeholder="San Francisco, CA or Remote"
-            value={target.city}
-            onChange={(e) => update('city', e.target.value)}
-            aria-label="City or remote"
-          />
+          <LocationAutocomplete value={target.city} onChange={(v) => update('city', v)} placeholder="San Francisco, CA or Remote" className={INPUT_CLASS} aria-label="City or remote" />
         </Field>
       </div>
 

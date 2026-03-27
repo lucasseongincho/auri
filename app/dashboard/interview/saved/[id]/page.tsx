@@ -9,6 +9,38 @@ import type { SavedInterviewPrep, InterviewQuestion } from '@/types'
 
 const CARD_SPRING = { type: 'spring', stiffness: 280, damping: 28 } as const
 
+// ── STARAnswer ────────────────────────────────────────────────────────────────
+
+function STARAnswer({ text }: { text: string }) {
+  const sections = text.split(/(?=Situation:|Task:|Action:|Result:)/i)
+  const parsed = sections
+    .map((section) => {
+      const match = section.match(/^(Situation|Task|Action|Result):([\s\S]*)/i)
+      if (!match) return null
+      return { label: match[1], content: match[2].trim() }
+    })
+    .filter(Boolean) as { label: string; content: string }[]
+
+  if (parsed.length < 2) {
+    return <p className="text-[0.95rem] text-[#A0A0B8] leading-[1.7]">{text}</p>
+  }
+
+  return (
+    <div>
+      {parsed.map((s, i) => (
+        <div key={i} className="mb-5">
+          <span className="block text-[0.75rem] font-bold uppercase tracking-[0.1em] text-[#6366F1] mb-1">
+            {s.label}
+          </span>
+          <p className="text-[0.95rem] leading-[1.6] pl-3 border-l-2 border-[#6366F1] text-[#F8F8FF] mb-4">
+            {s.content}
+          </p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── Practice score helper ────────────────────────────────────────────────────
 
 function scoreAnswer(question: string, framework: string, userAnswer: string): {
@@ -407,12 +439,12 @@ export default function StudyViewPage() {
                     Answer Framework
                   </span>
                 </div>
-                <p className="text-sm font-semibold text-[#F8F8FF] mb-3">{questions[currentCard].question}</p>
-                <p className="text-sm text-[#A0A0B8] leading-relaxed">{questions[currentCard].answer_framework}</p>
+                <p className="text-[1.05rem] font-semibold text-[#F8F8FF] mb-3 leading-snug">{questions[currentCard].question}</p>
+                <p className="text-[0.95rem] text-[#A0A0B8] leading-[1.7] mb-3">{questions[currentCard].answer_framework}</p>
                 {questions[currentCard].star_example && (
                   <div className="mt-4 p-3 rounded-xl bg-[#6366F1]/8 border border-[#6366F1]/15">
-                    <p className="text-xs font-semibold text-[#6366F1] mb-1">STAR Example</p>
-                    <p className="text-xs text-[#A0A0B8] leading-relaxed">{questions[currentCard].star_example}</p>
+                    <p className="text-xs font-semibold text-[#6366F1] mb-3">STAR Example</p>
+                    <STARAnswer text={questions[currentCard].star_example} />
                   </div>
                 )}
               </div>
@@ -468,12 +500,12 @@ export default function StudyViewPage() {
           </span>
           {practiceEntry && <ScoreMeter score={practiceEntry.score} />}
         </div>
-        <p className="text-base font-semibold text-[#F8F8FF] leading-snug mb-4">
+        <p className="text-[1.1rem] font-semibold text-[#F8F8FF] leading-snug mb-4">
           {practiceQuestion.question}
         </p>
         <div className="p-3 rounded-xl bg-[#6366F1]/8 border border-[#6366F1]/15 mb-4">
           <p className="text-xs font-semibold text-[#6366F1] mb-1">Framework hint</p>
-          <p className="text-xs text-[#A0A0B8] leading-relaxed">{practiceQuestion.answer_framework}</p>
+          <p className="text-[0.95rem] text-[#A0A0B8] leading-relaxed">{practiceQuestion.answer_framework}</p>
         </div>
 
         <textarea
@@ -490,7 +522,7 @@ export default function StudyViewPage() {
             <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`mt-3 p-3 rounded-xl border text-sm ${
+              className={`mt-3 p-3 rounded-xl border text-[0.95rem] ${
                 practiceEntry.score >= 80
                   ? 'bg-[#22C55E]/8 border-[#22C55E]/20 text-[#22C55E]'
                   : practiceEntry.score >= 60

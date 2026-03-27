@@ -13,6 +13,7 @@ import {
   Briefcase,
 } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
+import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import type { LinkedInRewrite } from '@/types'
@@ -174,7 +175,7 @@ export default function LinkedInPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL_CLASS}>Target Position <span className="text-[#EF4444]">*</span></label>
-                <input type="text" className={INPUT_CLASS} placeholder="Product Manager" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} aria-label="Target position" />
+                <JobTitleAutocomplete value={targetPosition} onChange={setTargetPosition} placeholder="Product Manager" className={INPUT_CLASS} aria-label="Target position" />
               </div>
               <div>
                 <label className={LABEL_CLASS}>Sector / Industry</label>
@@ -232,7 +233,7 @@ export default function LinkedInPage() {
                 <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 space-y-3 min-h-[300px]">
                   <div className="flex items-center gap-2 p-3 rounded-lg bg-[#0EA5E9]/10 border border-[#0EA5E9]/20">
                     <Loader2 className="w-4 h-4 text-[#0EA5E9] animate-spin" />
-                    <span className="text-sm text-[#0EA5E9] font-medium">Claude is rewriting your LinkedIn profile…</span>
+                    <span className="text-sm text-[#0EA5E9] font-medium">AURI is rewriting your LinkedIn profile…</span>
                   </div>
                   {[85, 70, 90, 75, 88, 60].map((w, i) => (
                     <div key={i} className="h-3 rounded-full bg-white/[0.04] animate-pulse" style={{ width: `${w}%` }} />

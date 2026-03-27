@@ -10,7 +10,7 @@ interface AILoadingStateProps {
 }
 
 export default function AILoadingState({
-  message = 'Claude is thinking...',
+  message = 'AURI is thinking...',
   variant = 'inline',
   lines = 4,
 }: AILoadingStateProps) {

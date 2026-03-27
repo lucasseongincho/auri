@@ -191,7 +191,7 @@ export default function LandingPage() {
                 border border-[#6366F1]/30 bg-[#6366F1]/10 mb-6"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#818CF8]" />
-              <span className="text-xs font-medium text-[#818CF8]">Powered by Claude AI</span>
+              <span className="text-xs font-medium text-[#818CF8]">Powered by AURI</span>
             </motion.div>
 
             <motion.h1
@@ -334,7 +334,7 @@ export default function LandingPage() {
               {[
                 { stat: '9 AI-powered tools', desc: 'Resume, cover letter, interview prep, and more' },
                 { stat: 'ATS-optimized output', desc: 'Structured for Workday, Greenhouse, Lever & iCIMS' },
-                { stat: 'Built with Claude AI', desc: 'Powered by Anthropic\'s most capable model' },
+                { stat: 'Built with AURI AI', desc: 'Powered by Anthropic\'s most capable model' },
               ].map((item, i) => (
                 <FadeInSection key={item.stat} delay={i * 0.1}>
                   <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-full">
@@ -673,7 +673,7 @@ export default function LandingPage() {
             </div>
             <span className="font-heading font-semibold text-white">AURI</span>
           </div>
-          <p className="text-sm text-[#60607A]">© 2026 AURI. Powered by Claude AI.</p>
+          <p className="text-sm text-[#60607A]">© 2026 AURI. Powered by AI.</p>
           <div className="flex gap-6">
             {['Privacy', 'Terms', 'Contact'].map((link) => (
               <a key={link} href="#" className="text-sm text-[#60607A] hover:text-white transition-colors duration-200">

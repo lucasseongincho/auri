@@ -22,6 +22,7 @@ import { useAIStream } from '@/hooks/useAIStream'
 import { getSavedResumes, saveResume } from '@/lib/firestore'
 import ResumePreview from '@/components/resume/ResumePreview'
 import type { ResumeData, TemplateId, SavedResume, PersonalInfo } from '@/types'
+import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
 
 // Convert ResumeData → plain text for the rewriter API
 function resumeToPlainText(r: ResumeData, personal?: { name?: string; email?: string; phone?: string; location?: string }): string {
@@ -226,7 +227,7 @@ export default function RewriterPage() {
           <h1 className="font-heading text-2xl font-bold text-white">Resume Rewriter</h1>
         </div>
         <p className="text-[#A0A0B8] text-sm ml-12">
-          Load a saved AURI resume or paste your own — Claude will rewrite it for your target role.
+          Load a saved AURI resume or paste your own — AURI will rewrite it for your target role.
         </p>
       </motion.div>
 
@@ -346,31 +347,47 @@ export default function RewriterPage() {
                     </div>
                   </motion.div>
                 ) : (
-                  <motion.div key="upload" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <motion.div key="upload" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept=".pdf"
+                      accept=".pdf,.doc,.docx,.txt"
                       className="hidden"
-                      aria-label="Upload PDF resume"
+                      aria-label="Upload resume file"
                       onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f) }}
                     />
                     {!uploadedText ? (
-                      <button
+                      <div
+                        onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('border-[#6366F1]', 'bg-[#6366F1]/5') }}
+                        onDragLeave={(e) => { e.currentTarget.classList.remove('border-[#6366F1]', 'bg-[#6366F1]/5') }}
+                        onDrop={(e) => {
+                          e.preventDefault()
+                          e.currentTarget.classList.remove('border-[#6366F1]', 'bg-[#6366F1]/5')
+                          const f = e.dataTransfer.files[0]
+                          if (f) handleFileUpload(f)
+                        }}
                         onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploadLoading}
-                        className="w-full flex flex-col items-center justify-center gap-3 py-10 rounded-xl border-2 border-dashed border-white/[0.10] hover:border-[#6366F1]/50 hover:bg-[#6366F1]/5 transition-all"
-                        aria-label="Click to upload PDF"
+                        className="w-full flex flex-col items-center justify-center gap-3 py-10 rounded-xl border-2 border-dashed border-white/[0.10] hover:border-[#6366F1]/50 hover:bg-[#6366F1]/5 transition-all cursor-pointer"
                       >
-                        {isUploadLoading ? <Loader2 className="w-8 h-8 text-[#6366F1] animate-spin" /> : <Upload className="w-8 h-8 text-[#60607A]" />}
-                        <div className="text-center">
-                          <p className="text-sm font-medium text-[#A0A0B8]">{isUploadLoading ? 'Extracting text…' : 'Click to upload PDF'}</p>
-                          <p className="text-xs text-[#60607A] mt-0.5">External PDFs only (Word exports, Google Docs, etc.)</p>
-                        </div>
-                      </button>
+                        {isUploadLoading ? (
+                          <>
+                            <Loader2 className="w-8 h-8 text-[#6366F1] animate-spin" />
+                            <p className="text-sm font-medium text-[#A0A0B8]">Parsing your resume…</p>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-8 h-8 text-[#60607A]" />
+                            <div className="text-center">
+                              <p className="text-sm font-medium text-[#A0A0B8]">Drag your resume here or click to browse</p>
+                              <p className="text-xs text-[#60607A] mt-0.5">Supports PDF, Word (.doc, .docx), and text files</p>
+                              <p className="text-xs text-[#6366F1] mt-1">✨ Works with AURI-generated resumes</p>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     ) : (
-                      <div className="rounded-xl border border-[#22C55E]/20 bg-[#22C55E]/5 p-4">
-                        <div className="flex items-center justify-between mb-2">
+                      <div className="rounded-xl border border-[#22C55E]/20 bg-[#22C55E]/5 p-4 space-y-2">
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <CheckCircle className="w-4 h-4 text-[#22C55E]" />
                             <span className="text-sm font-medium text-white">{uploadedFileName}</span>
@@ -380,14 +397,24 @@ export default function RewriterPage() {
                           </button>
                         </div>
                         <p className="text-xs text-[#60607A]">{uploadedText.length.toLocaleString()} characters extracted</p>
+                        <p className="text-xs text-[#A0A0B8] bg-white/[0.04] rounded-lg p-2 line-clamp-2 font-mono">
+                          {uploadedText.substring(0, 160)}…
+                        </p>
                       </div>
                     )}
                     {uploadError && (
-                      <div className="mt-2 flex items-center gap-2 text-xs text-[#EF4444]">
-                        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                        {uploadError}
+                      <div className="mt-2 p-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20">
+                        <div className="flex items-center gap-2 text-xs text-[#EF4444] mb-1">
+                          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                          {uploadError}
+                        </div>
+                        <p className="text-xs text-[#60607A]">Try the Paste Text tab instead.</p>
                       </div>
                     )}
+                    <p className="text-xs text-[#60607A] flex items-start gap-1.5 pt-1">
+                      <span>💡</span>
+                      <span>For best results, upload a PDF with selectable text. Scanned or image-based PDFs cannot be parsed — use the Paste Text tab instead.</span>
+                    </p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -401,7 +428,7 @@ export default function RewriterPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className={LABEL_CLASS}>Target Position <span className="text-[#EF4444]">*</span></label>
-                  <input type="text" className={INPUT_CLASS} placeholder="Senior Product Manager" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} aria-label="Target position" />
+                  <JobTitleAutocomplete value={targetPosition} onChange={setTargetPosition} placeholder="Senior Product Manager" className={INPUT_CLASS} aria-label="Target position" />
                 </div>
                 <div>
                   <label className={LABEL_CLASS}>Company Name</label>
