@@ -251,18 +251,12 @@ export default function RewriterPage() {
   }, [inputMethod, auriText, pastedText, targetPosition, targetCompany, companyType, jobDescription, extraToggles, user?.uid, selectedTemplate, stream])
 
   // ── Accept All ─────────────────────────────────────────────────────────────
-  const handleAcceptAll = useCallback(async () => {
+  const handleAcceptAll = useCallback(() => {
     if (!rewrittenData) return
-    const accepted = { ...rewrittenData, templateId: selectedTemplate }
-    setEditedResume(accepted)
+    setEditedResume({ ...rewrittenData, templateId: selectedTemplate })
     setPagePhase('tune')
     setIsEditing(false)
-    // Auto-run ATS score if job description is provided
-    if (jobDescription) {
-      const plain = resumeToPlainText(accepted, personal)
-      await runATSScore(plain, jobDescription)
-    }
-  }, [rewrittenData, selectedTemplate, jobDescription, personal, runATSScore])
+  }, [rewrittenData, selectedTemplate])
 
   // ── Fix All ATS Issues ─────────────────────────────────────────────────────
   const handleFixAll = useCallback(async () => {
@@ -926,18 +920,42 @@ export default function RewriterPage() {
 
               {/* Right: ATS Score */}
               <div>
-                <ATSScorePanel
-                  score={atsScore}
-                  isLoading={isATSLoading}
-                  onFixAll={handleFixAll}
-                  isFixing={isFixingATS || isStreaming}
-                />
-                {!atsScore && !isATSLoading && !jobDescription && (
-                  <div className="mt-3 rounded-xl border border-white/[0.06] bg-[#0A0A0F]/50 px-4 py-3">
-                    <p className="text-xs text-[#60607A]">
-                      💡 Add a job description in Step 1 to enable ATS scoring
-                    </p>
-                  </div>
+                {!atsScore && !isATSLoading ? (
+                  jobDescription ? (
+                    <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
+                      <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 text-center space-y-3">
+                        <p className="text-sm font-semibold text-white">Check ATS Score</p>
+                        <p className="text-xs text-[#60607A]">
+                          Analyze your rewritten resume against the job description for keyword match and formatting.
+                        </p>
+                        <button
+                          onClick={() => {
+                            const plain = resumeToPlainText(activeResume, personal)
+                            runATSScore(plain, jobDescription)
+                          }}
+                          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold
+                            bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
+                            shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
+                            hover:scale-[1.02] transition-all duration-200"
+                        >
+                          <Sparkles className="w-3.5 h-3.5" /> Run ATS Score
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-white/[0.06] bg-[#0A0A0F]/50 px-4 py-3">
+                      <p className="text-xs text-[#60607A]">
+                        💡 Add a job description in Step 1 to enable ATS scoring
+                      </p>
+                    </div>
+                  )
+                ) : (
+                  <ATSScorePanel
+                    score={atsScore}
+                    isLoading={isATSLoading}
+                    onFixAll={handleFixAll}
+                    isFixing={isFixingATS || isStreaming}
+                  />
                 )}
               </div>
             </div>
