@@ -9,12 +9,21 @@ import { APP_CONFIG } from '@/lib/config'
 export const runtime = 'nodejs'
 export const maxDuration = 60
 
+interface ExtraSectionsPayload {
+  certifications?: unknown[] | null
+  languages?: unknown[] | null
+  leadership?: unknown[] | null
+  volunteer?: unknown[] | null
+  extras?: unknown[] | null
+}
+
 interface RewriterRequestBody {
   originalText: string
   targetPosition: string
   targetCompany: string
   companyType: string
   jobDescription: string
+  extraSections?: ExtraSectionsPayload
   uid?: string
   isPro?: boolean
 }
@@ -59,7 +68,7 @@ export async function POST(req: NextRequest) {
     const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)
 
-    const { originalText, targetPosition, targetCompany, companyType, jobDescription } = body
+    const { originalText, targetPosition, targetCompany, companyType, jobDescription, extraSections } = body
 
     if (!originalText?.trim() || !targetPosition?.trim()) {
       return buildErrorResponse('originalText and targetPosition are required', 400)
@@ -76,7 +85,8 @@ export async function POST(req: NextRequest) {
       targetPosition,
       targetCompany ?? '',
       companyType ?? '',
-      jobDescription ?? ''
+      jobDescription ?? '',
+      extraSections
     )
 
     const stream = await attemptStream(prompt)

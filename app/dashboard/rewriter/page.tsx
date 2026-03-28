@@ -1,10 +1,11 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   RefreshCw,
   CheckCircle,
+  ChevronDown,
   Loader2,
   AlertCircle,
   Sparkles,
@@ -37,6 +38,30 @@ export default function RewriterPage() {
   const [pastedText, setPastedText] = useState('')
   const [copiedOriginal, setCopiedOriginal] = useState(false)
 
+  // Extra sections panel — populated from careerStore profile
+  const [extraToggles, setExtraToggles] = useState<Record<string, boolean>>({})
+  const [extraPanelOpen, setExtraPanelOpen] = useState(false)
+
+  const extraSections = {
+    certifications: profile?.certifications?.length ? profile.certifications : null,
+    languages: profile?.languages?.length ? profile.languages : null,
+    leadership: profile?.leadership?.length ? profile.leadership : null,
+    volunteer: profile?.volunteer?.length ? profile.volunteer : null,
+  }
+  const hasAnyExtra = Object.values(extraSections).some((v) => v !== null)
+
+  // Set defaults (ON) for any section that has data — only when that section first appears
+  useEffect(() => {
+    setExtraToggles((prev) => {
+      const next = { ...prev }
+      if (profile?.certifications?.length && prev.certifications === undefined) next.certifications = true
+      if (profile?.languages?.length && prev.languages === undefined) next.languages = true
+      if (profile?.leadership?.length && prev.leadership === undefined) next.leadership = true
+      if (profile?.volunteer?.length && prev.volunteer === undefined) next.volunteer = true
+      return next
+    })
+  }, [profile])
+
   const [targetPosition, setTargetPosition] = useState(profile?.target?.position ?? '')
   const [targetCompany, setTargetCompany] = useState(profile?.target?.company ?? '')
   const [companyType, setCompanyType] = useState(profile?.target?.company_type ?? '')
@@ -60,12 +85,22 @@ export default function RewriterPage() {
     setSaveSuccess(false)
     setSaveError('')
 
+    // Build extra sections payload — only include toggled-on sections
+    const extraSectionsPayload = {
+      certifications: extraToggles.certifications ? extraSections.certifications : null,
+      languages: extraToggles.languages ? extraSections.languages : null,
+      leadership: extraToggles.leadership ? extraSections.leadership : null,
+      volunteer: extraToggles.volunteer ? extraSections.volunteer : null,
+      extras: null,
+    }
+
     const fullText = await stream('/api/claude/rewriter', {
       originalText: pastedText,
       targetPosition,
       targetCompany,
       companyType,
       jobDescription,
+      extraSections: extraSectionsPayload,
       uid: user?.uid,
       isPro: false,
     }, {
@@ -93,7 +128,8 @@ export default function RewriterPage() {
         setGenerateError('Could not parse the rewritten resume. Please try again.')
       }
     }
-  }, [pastedText, targetPosition, targetCompany, companyType, jobDescription, user?.uid, selectedTemplate, stream])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pastedText, targetPosition, targetCompany, companyType, jobDescription, extraToggles, user?.uid, selectedTemplate, stream])
 
   const handleSave = useCallback(async () => {
     if (!rewrittenData || !user?.uid) return
@@ -174,6 +210,84 @@ export default function RewriterPage() {
               </div>
             </div>
           </div>
+
+          {/* Extra Sections from careerStore */}
+          {hasAnyExtra ? (
+            <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
+              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4">
+                <button
+                  onClick={() => setExtraPanelOpen((o) => !o)}
+                  className="w-full flex items-center justify-between gap-3"
+                  aria-expanded={extraPanelOpen}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles className="w-4 h-4 text-[#818CF8] flex-shrink-0" />
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-white">Extra Sections</p>
+                      <p className="text-xs text-[#60607A]">Found in your profile — these will be used to fill your resume</p>
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-[#60607A] flex-shrink-0 transition-transform duration-200 ${extraPanelOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {extraPanelOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pt-4 mt-3 border-t border-white/[0.06] space-y-3">
+                        {(Object.entries(extraSections) as [string, unknown[] | null][]).map(([key, data]) => {
+                          if (!data) return null
+                          const LABELS: Record<string, string> = {
+                            certifications: 'Certifications',
+                            languages: 'Languages',
+                            leadership: 'Leadership',
+                            volunteer: 'Volunteer',
+                          }
+                          return (
+                            <div key={key} className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle className="w-3.5 h-3.5 text-[#22C55E]" />
+                                <span className="text-sm text-[#E8E8F0]">
+                                  {LABELS[key]} <span className="text-[#60607A]">({data.length} found)</span>
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => setExtraToggles((prev) => ({ ...prev, [key]: !prev[key] }))}
+                                aria-label={`Toggle ${LABELS[key]}`}
+                                className={`relative w-9 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${
+                                  extraToggles[key] ? 'bg-[#6366F1]' : 'bg-white/10'
+                                }`}
+                              >
+                                <span
+                                  className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${
+                                    extraToggles[key] ? 'translate-x-4' : 'translate-x-0'
+                                  }`}
+                                />
+                              </button>
+                            </div>
+                          )
+                        })}
+                        <p className="text-xs text-[#60607A] pt-1">Toggle sections on/off to include or exclude from the rewritten resume</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-white/[0.06] bg-[#0A0A0F]/50 px-4 py-3">
+              <p className="text-xs text-[#60607A]">
+                💡 Add certifications, languages, or extra sections to your{' '}
+                <a href="/dashboard" className="text-[#818CF8] hover:underline">profile</a>{' '}
+                to help fill your resume
+              </p>
+            </div>
+          )}
 
           {/* Target fields */}
           <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">

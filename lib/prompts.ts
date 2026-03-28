@@ -360,21 +360,59 @@ Return ONLY valid JSON:
 }`
 }
 
-// ── Feature 5 — Resume Rewriter (paste/upload mode) ──────────────────────────
+// ── Feature 5 — Resume Rewriter (paste mode) ─────────────────────────────────
 
 /**
  * Why separate from buildResumePrompt: The rewriter has NO structured
  * CareerProfile — it only has raw text + target. Mixing empty-profile JSON
  * into the prompt adds noise that can confuse Claude's rewrite logic.
  * Keeping it text-only keeps the prompt tight and the output predictable.
+ *
+ * Why extraSections + page-filling rules: Users store certifications,
+ * languages, leadership, and volunteer data in their profile. The rewriter
+ * should use these to fill whitespace on the page rather than padding bullets,
+ * but only when those sections are toggled on by the user.
  */
+
+interface ExtraSections {
+  certifications?: unknown[] | null
+  languages?: unknown[] | null
+  leadership?: unknown[] | null
+  volunteer?: unknown[] | null
+  extras?: unknown[] | null
+}
+
+function serializeExtraSections(extra: ExtraSections): string {
+  const parts: string[] = []
+  if (extra.certifications?.length) {
+    parts.push(`CERTIFICATIONS PROVIDED (include if page has space):\n${(extra.certifications as string[]).join('\n')}`)
+  }
+  if (extra.languages?.length) {
+    const langs = extra.languages as Array<{ name: string; proficiency: string }>
+    parts.push(`LANGUAGES PROVIDED (include if page has space):\n${langs.map((l) => `${l.name} (${l.proficiency})`).join('\n')}`)
+  }
+  if (extra.leadership?.length) {
+    const items = extra.leadership as Array<{ role: string; organization: string; start: string; end: string; bullets?: string[] }>
+    parts.push(`LEADERSHIP PROVIDED (include if page has space):\n${items.map((l) => `${l.role} at ${l.organization} (${l.start}–${l.end})`).join('\n')}`)
+  }
+  if (extra.volunteer?.length) {
+    const items = extra.volunteer as Array<{ role: string; organization: string; description: string }>
+    parts.push(`VOLUNTEER PROVIDED (include if page has space):\n${items.map((v) => `${v.role} at ${v.organization}: ${v.description}`).join('\n')}`)
+  }
+  return parts.join('\n\n')
+}
+
 export function buildRewriterPrompt(
   originalText: string,
   targetPosition: string,
   targetCompany: string,
   companyType: string,
-  jobDescription: string
+  jobDescription: string,
+  extraSections?: ExtraSections
 ): string {
+  const hasExtras = extraSections && Object.values(extraSections).some((v) => v?.length)
+  const extrasBlock = hasExtras ? `\n${serializeExtraSections(extraSections!)}\n` : ''
+
   return `Act as a senior recruiter who reviews 200 resumes a day.
 Rewrite this resume for the position of ${targetPosition} at ${targetCompany}, a ${companyType}.
 Replace every responsibility with a measurable achievement.
@@ -389,14 +427,24 @@ ATS RULES YOU MUST ENFORCE:
 - No tables, no columns in the output
 - Keywords from the JD injected naturally, never stuffed
 
-ONE-PAGE CONSTRAINT (CRITICAL — do NOT exceed these limits):
-- summary: exactly 2 sentences, max 45 words total
-- experience bullets: MAXIMUM 4 bullets per job entry, no exceptions
-- experience entries: include at most 3 most recent jobs
-- skills: MAXIMUM 12 items as a flat list
-- certifications: max 3 items
-- projects: max 2 projects, max 2 bullets each
-- Every bullet must be one line (under 120 characters). The entire resume MUST fit on one A4 page.
+CRITICAL — THE REWRITTEN RESUME MUST FIT ON EXACTLY ONE A4 PAGE:
+
+Core sections (always include):
+- Header, Summary (2 sentences max, 45 words total max)
+- Experience (max 3 most recent jobs, max 3 bullets each, each bullet under 120 characters)
+- Education, Skills (max 12 items as a flat list)
+
+Page filling rules — after core sections, if the page looks sparse:
+${hasExtras ? extrasBlock : '- No extra sections provided — if still sparse, expand skill descriptions or add a brief projects section (max 2, max 2 bullets each)'}
+- Only include extra sections if they help fill the page — never force them in if the page is already full
+- If still sparse after extras → expand skill descriptions or add a brief projects section
+
+One-page trimming rules — if content is too long:
+- Trim bullets to 2 per job
+- Shorten summary to 1 sentence
+- Remove least relevant experience entry
+- NEVER allow content to flow to a second page
+- The final resume must look like a COMPLETE, full one-page professional resume
 
 ORIGINAL RESUME TEXT:
 ${originalText}
@@ -408,14 +456,17 @@ YOU MUST RESPOND WITH VALID JSON ONLY.
 NO preamble. NO explanation. NO markdown. NO code blocks. NO backticks.
 START your response with { and END with }
 
-Return this exact JSON structure:
+Return this exact JSON structure (include leadership/languages/volunteer only if you added them):
 {
   "summary": "string",
   "experience": [{ "id": "string", "company": "string", "title": "string", "start": "string", "end": "string", "bullets": ["string"] }],
   "education": [{ "id": "string", "institution": "string", "degree": "string", "field": "string", "year": "string" }],
   "skills": ["string"],
   "certifications": ["string"],
-  "projects": [{ "id": "string", "name": "string", "description": "string", "bullets": ["string"] }]
+  "projects": [{ "id": "string", "name": "string", "description": "string", "bullets": ["string"] }],
+  "leadership": [{ "id": "string", "role": "string", "organization": "string", "start": "string", "end": "string", "bullets": ["string"] }],
+  "languages": [{ "id": "string", "name": "string", "proficiency": "string" }],
+  "volunteer": [{ "id": "string", "role": "string", "organization": "string", "date": "string", "description": "string" }]
 }`
 }
 
