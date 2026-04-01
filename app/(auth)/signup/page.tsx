@@ -42,8 +42,20 @@ export default function SignupPage() {
     try {
       await signInWithGoogle()
       router.push('/dashboard')
-    } catch {
-      setError('Google sign-in failed. Please try again.')
+    } catch (err: unknown) {
+      const code = (err as { code?: string })?.code ?? ''
+      console.error('[Google Sign-In Error]', err)
+      if (code === 'auth/popup-blocked') {
+        setError('Popup was blocked by your browser. Please allow popups for this site and try again.')
+      } else if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        setError('Sign-in was cancelled. Please try again.')
+      } else if (code === 'auth/unauthorized-domain') {
+        setError('This domain is not authorized. Please contact support.')
+      } else if (code) {
+        setError(`Sign-in failed: ${code}`)
+      } else {
+        setError('Google sign-in failed. Please try again.')
+      }
     } finally {
       setLoading(false)
     }
