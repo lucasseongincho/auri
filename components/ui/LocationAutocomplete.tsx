@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader'
 
 const ALWAYS_SHOW = [
@@ -85,7 +86,22 @@ export default function LocationAutocomplete({
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
   const containerRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Position dropdown using input's bounding rect so it escapes overflow:hidden parents
+  function updateDropdownPosition() {
+    if (!inputRef.current) return
+    const rect = inputRef.current.getBoundingClientRect()
+    setDropdownStyle({
+      position: 'fixed',
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: rect.width,
+      zIndex: 9999,
+    })
+  }
 
   // Close on outside click
   useEffect(() => {
@@ -97,6 +113,18 @@ export default function LocationAutocomplete({
     document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
   }, [])
+
+  // Reposition on scroll/resize while open
+  useEffect(() => {
+    if (!isOpen) return
+    const handle = () => updateDropdownPosition()
+    window.addEventListener('scroll', handle, true)
+    window.addEventListener('resize', handle)
+    return () => {
+      window.removeEventListener('scroll', handle, true)
+      window.removeEventListener('resize', handle)
+    }
+  }, [isOpen])
 
   async function getSuggestions(input: string) {
     if (input.length < 2) {
@@ -123,7 +151,12 @@ export default function LocationAutocomplete({
 
           const combined = [...remoteMatches, ...cityResults].slice(0, 7)
           setSuggestions(combined)
-          setIsOpen(combined.length > 0)
+          if (combined.length > 0) {
+            updateDropdownPosition()
+            setIsOpen(true)
+          } else {
+            setIsOpen(false)
+          }
         }
       )
     } else {
@@ -133,7 +166,12 @@ export default function LocationAutocomplete({
 
       const combined = [...remoteMatches, ...cityMatches].slice(0, 7)
       setSuggestions(combined)
-      setIsOpen(combined.length > 0)
+      if (combined.length > 0) {
+        updateDropdownPosition()
+        setIsOpen(true)
+      } else {
+        setIsOpen(false)
+      }
     }
   }
 
@@ -168,34 +206,11 @@ export default function LocationAutocomplete({
     }
   }
 
-  return (
-    <div ref={containerRef} className="relative w-full">
-      {label && (
-        <label className="block text-sm font-medium text-gray-300 mb-1.5">
-          {label}
-          {required && <span className="text-red-400 ml-1">*</span>}
-        </label>
-      )}
-
-      <input
-        type="text"
-        value={value}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        onFocus={() => value.length >= 2 && getSuggestions(value)}
-        placeholder={placeholder}
-        aria-label={ariaLabel}
-        aria-autocomplete="list"
-        aria-expanded={isOpen}
-        className={className}
-        style={{ fontSize: '16px' }}
-        autoComplete="off"
-      />
-
-      {isOpen && suggestions.length > 0 && (
+  const dropdown = isOpen && suggestions.length > 0 && typeof document !== 'undefined'
+    ? createPortal(
         <div
-          className="absolute top-full left-0 right-0 mt-1 z-50 rounded-xl border border-white/[0.12] bg-[#1C1C26] shadow-xl shadow-black/30 overflow-hidden"
-          style={{ maxHeight: 280, overflowY: 'auto' }}
+          style={{ ...dropdownStyle, maxHeight: 280, overflowY: 'auto' }}
+          className="rounded-xl border border-white/[0.12] bg-[#1C1C26] shadow-xl shadow-black/30 overflow-hidden"
           role="listbox"
         >
           {suggestions.map((suggestion, index) => (
@@ -219,8 +234,37 @@ export default function LocationAutocomplete({
               {suggestion}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body
+      )
+    : null
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      {label && (
+        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+          {label}
+          {required && <span className="text-red-400 ml-1">*</span>}
+        </label>
       )}
+
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        onFocus={() => value.length >= 2 && getSuggestions(value)}
+        placeholder={placeholder}
+        aria-label={ariaLabel}
+        aria-autocomplete="list"
+        aria-expanded={isOpen}
+        className={className}
+        style={{ fontSize: '16px' }}
+        autoComplete="off"
+      />
+
+      {dropdown}
     </div>
   )
 }
