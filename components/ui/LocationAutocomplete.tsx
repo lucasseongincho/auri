@@ -38,12 +38,11 @@ function getPlacesLib(): Promise<google.maps.PlacesLibrary | null> {
 
   if (!placesLibPromise) {
     setOptions({ key: apiKey, v: 'weekly' })
-    placesLibPromise = importLibrary('places')
-      .then((lib) => lib as google.maps.PlacesLibrary)
-      .catch(() => {
-        placesLibPromise = null
-        return null
-      })
+    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000))
+    placesLibPromise = Promise.race([
+      importLibrary('places').then((lib) => lib as google.maps.PlacesLibrary),
+      timeout,
+    ]).catch(() => null)
   }
 
   return placesLibPromise
@@ -137,42 +136,38 @@ export default function LocationAutocomplete({
       opt.toLowerCase().includes(input.toLowerCase())
     )
 
+    const cityMatches = FALLBACK_CITIES.filter((city) =>
+      city.toLowerCase().includes(input.toLowerCase())
+    ).slice(0, 5)
+
+    // Show fallback immediately — don't wait for Places API
+    const fallback = [...remoteMatches, ...cityMatches].slice(0, 7)
+    setSuggestions(fallback)
+    if (fallback.length > 0) {
+      updateDropdownPosition()
+      setIsOpen(true)
+    }
+
+    // Upgrade with Google Places results if available
     const lib = await getPlacesLib().catch(() => null)
     const service = lib ? new lib.AutocompleteService() : null
+    if (!service) return
 
-    if (service) {
-      service.getPlacePredictions(
-        { input, types: ['(cities)'] },
-        (predictions, status) => {
-          const cityResults =
-            status === google.maps.places.PlacesServiceStatus.OK && predictions
-              ? predictions.slice(0, 5).map(formatPrediction)
-              : []
+    service.getPlacePredictions(
+      { input, types: ['(cities)'] },
+      (predictions, status) => {
+        const cityResults =
+          status === google.maps.places.PlacesServiceStatus.OK && predictions
+            ? predictions.slice(0, 5).map(formatPrediction)
+            : []
 
-          const combined = [...remoteMatches, ...cityResults].slice(0, 7)
-          setSuggestions(combined)
-          if (combined.length > 0) {
-            updateDropdownPosition()
-            setIsOpen(true)
-          } else {
-            setIsOpen(false)
-          }
-        }
-      )
-    } else {
-      const cityMatches = FALLBACK_CITIES.filter((city) =>
-        city.toLowerCase().includes(input.toLowerCase())
-      ).slice(0, 5)
-
-      const combined = [...remoteMatches, ...cityMatches].slice(0, 7)
-      setSuggestions(combined)
-      if (combined.length > 0) {
+        if (cityResults.length === 0) return
+        const combined = [...remoteMatches, ...cityResults].slice(0, 7)
+        setSuggestions(combined)
         updateDropdownPosition()
         setIsOpen(true)
-      } else {
-        setIsOpen(false)
       }
-    }
+    )
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
