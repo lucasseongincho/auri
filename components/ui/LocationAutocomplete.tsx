@@ -1,51 +1,91 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { useAutocomplete } from '@/hooks/useAutocomplete'
+import { useEffect, useRef, useState } from 'react'
+import { setOptions, importLibrary } from '@googlemaps/js-api-loader'
 
-const LOCATIONS = [
-  // US Cities
-  'New York, NY', 'Los Angeles, CA', 'Chicago, IL',
-  'San Francisco, CA', 'Seattle, WA', 'Austin, TX',
-  'Boston, MA', 'Denver, CO', 'Atlanta, GA',
-  'Miami, FL', 'Dallas, TX', 'Washington, DC',
-  'Portland, OR', 'Nashville, TN', 'Phoenix, AZ',
-  'San Diego, CA', 'Minneapolis, MN', 'Detroit, MI',
-  // Remote options
-  'Remote', 'Remote (US Only)', 'Remote (Worldwide)',
-  'Hybrid - New York, NY', 'Hybrid - San Francisco, CA',
-  'Hybrid - Chicago, IL', 'Hybrid - Austin, TX',
-  // International
-  'London, UK', 'Toronto, Canada', 'Vancouver, Canada',
-  'Sydney, Australia', 'Singapore', 'Tokyo, Japan',
-  'Berlin, Germany', 'Amsterdam, Netherlands',
-  'Paris, France', 'Dubai, UAE', 'Seoul, South Korea',
+const ALWAYS_SHOW = [
+  'Remote',
+  'Remote (US Only)',
+  'Remote (Worldwide)',
+  'Hybrid',
 ]
+
+const FALLBACK_CITIES = [
+  'New York, NY', 'Los Angeles, CA',
+  'Chicago, IL', 'San Francisco, CA',
+  'Seattle, WA', 'Austin, TX',
+  'Boston, MA', 'Denver, CO',
+  'Atlanta, GA', 'Miami, FL',
+  'Dallas, TX', 'Washington, DC',
+  'Portland, OR', 'Nashville, TN',
+  'Phoenix, AZ', 'San Diego, CA',
+  'Minneapolis, MN', 'Detroit, MI',
+  'London, UK', 'Toronto, Canada',
+  'Vancouver, Canada', 'Sydney, Australia',
+  'Singapore', 'Tokyo, Japan',
+  'Seoul, South Korea', 'Berlin, Germany',
+  'Amsterdam, Netherlands', 'Paris, France',
+  'Dubai, UAE',
+]
+
+// Singleton: Places library is loaded at most once
+let placesLibPromise: Promise<google.maps.PlacesLibrary | null> | null = null
+
+function getPlacesLib(): Promise<google.maps.PlacesLibrary | null> {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY?.trim()
+  if (!apiKey) return Promise.resolve(null)
+
+  if (!placesLibPromise) {
+    setOptions({ key: apiKey, v: 'weekly' })
+    placesLibPromise = importLibrary('places')
+      .then((lib) => lib as google.maps.PlacesLibrary)
+      .catch(() => {
+        placesLibPromise = null
+        return null
+      })
+  }
+
+  return placesLibPromise
+}
+
+function formatPrediction(prediction: google.maps.places.AutocompletePrediction): string {
+  const terms = prediction.terms
+  if (terms.length >= 3) {
+    const country = terms[terms.length - 1].value
+    if (country === 'USA' || country === 'United States') {
+      return `${terms[0].value}, ${terms[1].value}`
+    }
+    return `${terms[0].value}, ${country}`
+  }
+  if (terms.length === 2) {
+    return `${terms[0].value}, ${terms[1].value}`
+  }
+  return prediction.description
+}
 
 interface LocationAutocompleteProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
   className?: string
+  label?: string
+  required?: boolean
   'aria-label'?: string
 }
 
 export default function LocationAutocomplete({
   value,
   onChange,
-  placeholder = 'San Francisco, CA or Remote',
+  placeholder = 'City or Remote',
   className = '',
+  label,
+  required = false,
   'aria-label': ariaLabel,
 }: LocationAutocompleteProps) {
-  const { query, setQuery, filtered, isOpen, setIsOpen, selectedIndex, handleKeyDown } =
-    useAutocomplete(LOCATIONS)
+  const [suggestions, setSuggestions] = useState<string[]>([])
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(-1)
   const containerRef = useRef<HTMLDivElement>(null)
-
-  // Sync external value → internal query
-  useEffect(() => {
-    setQuery(value)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value])
 
   // Close on outside click
   useEffect(() => {
@@ -56,59 +96,127 @@ export default function LocationAutocomplete({
     }
     document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
-  }, [setIsOpen])
+  }, [])
 
-  function highlightMatch(loc: string) {
-    const idx = loc.toLowerCase().indexOf(query.toLowerCase())
-    if (idx === -1 || query.length < 2) return <span>{loc}</span>
-    return (
-      <>
-        {loc.slice(0, idx)}
-        <span className="text-[#818CF8] font-semibold">{loc.slice(idx, idx + query.length)}</span>
-        {loc.slice(idx + query.length)}
-      </>
+  async function getSuggestions(input: string) {
+    if (input.length < 2) {
+      setSuggestions([])
+      setIsOpen(false)
+      return
+    }
+
+    const remoteMatches = ALWAYS_SHOW.filter((opt) =>
+      opt.toLowerCase().includes(input.toLowerCase())
     )
+
+    const lib = await getPlacesLib().catch(() => null)
+    const service = lib ? new lib.AutocompleteService() : null
+
+    if (service) {
+      service.getPlacePredictions(
+        { input, types: ['(cities)'] },
+        (predictions, status) => {
+          const cityResults =
+            status === google.maps.places.PlacesServiceStatus.OK && predictions
+              ? predictions.slice(0, 5).map(formatPrediction)
+              : []
+
+          const combined = [...remoteMatches, ...cityResults].slice(0, 7)
+          setSuggestions(combined)
+          setIsOpen(combined.length > 0)
+        }
+      )
+    } else {
+      const cityMatches = FALLBACK_CITIES.filter((city) =>
+        city.toLowerCase().includes(input.toLowerCase())
+      ).slice(0, 5)
+
+      const combined = [...remoteMatches, ...cityMatches].slice(0, 7)
+      setSuggestions(combined)
+      setIsOpen(combined.length > 0)
+    }
+  }
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const newValue = e.target.value
+    onChange(newValue)
+    getSuggestions(newValue)
+    setSelectedIndex(-1)
+  }
+
+  function handleSelect(suggestion: string) {
+    onChange(suggestion)
+    setSuggestions([])
+    setIsOpen(false)
+    setSelectedIndex(-1)
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!isOpen || suggestions.length === 0) return
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setSelectedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : prev))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0))
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault()
+      handleSelect(suggestions[selectedIndex])
+    } else if (e.key === 'Escape') {
+      setIsOpen(false)
+    }
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative w-full">
+      {label && (
+        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+          {label}
+          {required && <span className="text-red-400 ml-1">*</span>}
+        </label>
+      )}
+
       <input
         type="text"
-        value={query}
-        onChange={(e) => { setQuery(e.target.value); onChange(e.target.value); setIsOpen(true) }}
-        onFocus={() => { if (filtered.length > 0) setIsOpen(true) }}
+        value={value}
+        onChange={handleInputChange}
         onKeyDown={handleKeyDown}
+        onFocus={() => value.length >= 2 && getSuggestions(value)}
         placeholder={placeholder}
-        className={className}
         aria-label={ariaLabel}
         aria-autocomplete="list"
         aria-expanded={isOpen}
+        className={className}
         style={{ fontSize: '16px' }}
         autoComplete="off"
       />
-      {isOpen && filtered.length > 0 && (
+
+      {isOpen && suggestions.length > 0 && (
         <div
-          className="absolute z-50 w-full mt-1 rounded-xl border border-white/[0.12] bg-[#1C1C26] shadow-xl overflow-hidden"
-          style={{ maxHeight: 240, overflowY: 'auto' }}
+          className="absolute top-full left-0 right-0 mt-1 z-50 rounded-xl border border-white/[0.12] bg-[#1C1C26] shadow-xl shadow-black/30 overflow-hidden"
+          style={{ maxHeight: 280, overflowY: 'auto' }}
           role="listbox"
         >
-          {filtered.map((loc, i) => (
+          {suggestions.map((suggestion, index) => (
             <button
-              key={loc}
+              key={suggestion}
+              type="button"
               role="option"
-              aria-selected={i === selectedIndex}
+              aria-selected={index === selectedIndex}
               onMouseDown={(e) => {
                 e.preventDefault()
-                setQuery(loc)
-                onChange(loc)
-                setIsOpen(false)
+                handleSelect(suggestion)
               }}
-              className={`w-full text-left px-4 text-sm text-[#E8E8F0] transition-colors ${
-                i === selectedIndex ? 'bg-white/[0.08]' : 'hover:bg-white/[0.05]'
-              }`}
-              style={{ minHeight: 44, display: 'flex', alignItems: 'center' }}
+              className={`w-full text-left px-4 text-sm transition-colors flex items-center gap-2 ${
+                index === selectedIndex
+                  ? 'bg-indigo-500/20 text-white'
+                  : 'text-[#E8E8F0] hover:bg-white/[0.05]'
+              } ${ALWAYS_SHOW.includes(suggestion) ? 'text-indigo-300' : ''}`}
+              style={{ minHeight: '44px' }}
             >
-              {highlightMatch(loc)}
+              <span>{ALWAYS_SHOW.includes(suggestion) ? '🌐' : '📍'}</span>
+              {suggestion}
             </button>
           ))}
         </div>
