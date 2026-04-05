@@ -67,7 +67,10 @@ function buildPlainTextFromData(data: ResumeData, personal: PersonalInfo): strin
   if (personal.name) lines.push(personal.name)
   const contact = [personal.email, personal.phone, personal.location].filter(Boolean).join(' | ')
   if (contact) lines.push(contact)
-  if (personal.linkedin_url) lines.push(personal.linkedin_url)
+  // Show links as labeled plain text so ATS systems can parse URLs without confusion
+  if (personal.linkedin_url) lines.push(`LinkedIn: ${personal.linkedin_url}`)
+  if (personal.website) lines.push(`${personal.portfolioLabel || 'Portfolio'}: ${personal.website}`)
+  if (personal.github) lines.push(`GitHub: ${personal.github}`)
 
   // Summary
   if (data.summary) {

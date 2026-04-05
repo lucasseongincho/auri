@@ -10,12 +10,22 @@ interface MinimalSeoulProps {
     location: string
     linkedin_url: string
     website: string
+    github?: string
+    portfolioLabel?: string
   }
   isEditing?: boolean
   renderText?: (text: string) => ReactNode
 }
 
 export default function MinimalSeoul({ data, personal, isEditing: _isEditing, renderText = (t) => t }: MinimalSeoulProps) {
+  const contactParts: ReactNode[] = []
+  if (personal.email) contactParts.push(personal.email)
+  if (personal.phone) contactParts.push(personal.phone)
+  if (personal.location) contactParts.push(personal.location)
+  if (personal.linkedin_url) contactParts.push(<a href={personal.linkedin_url} className="resume-link" target="_blank" rel="noopener noreferrer">LinkedIn</a>)
+  if (personal.website) contactParts.push(<a href={personal.website} className="resume-link" target="_blank" rel="noopener noreferrer">{personal.portfolioLabel || 'Portfolio'}</a>)
+  if (personal.github) contactParts.push(<a href={personal.github} className="resume-link" target="_blank" rel="noopener noreferrer">GitHub</a>)
+
   return (
     <>
       <style>{`
@@ -36,8 +46,10 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing, re
         .minimal-seoul .edu-degree { font-size: 11px; font-weight: 500; }
         .minimal-seoul .edu-info { font-size: 9.5px; color: #777; }
         .minimal-seoul .divider { height: 1px; background: #f0f0f0; margin: 5px 0; }
+        .minimal-seoul .resume-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
         @media print {
           .minimal-seoul * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .minimal-seoul .resume-link { color: inherit !important; text-decoration: underline !important; }
         }
       `}</style>
       <div
@@ -48,9 +60,9 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing, re
         <header data-ats-field="header">
           <h1 data-ats-field="name">{personal.name || 'Your Name'}</h1>
           <div className="contact-line" data-ats-field="contact">
-            {[personal.email, personal.phone, personal.location, personal.linkedin_url, personal.website]
-              .filter(Boolean)
-              .join('   ·   ')}
+            {contactParts.map((part, i) => (
+              <span key={i}>{i > 0 && '   ·   '}{part}</span>
+            ))}
           </div>
         </header>
 

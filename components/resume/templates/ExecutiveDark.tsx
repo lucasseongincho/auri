@@ -10,6 +10,8 @@ interface ExecutiveDarkProps {
     location: string
     linkedin_url: string
     website: string
+    github?: string
+    portfolioLabel?: string
   }
   isEditing?: boolean
   renderText?: (text: string) => ReactNode
@@ -19,6 +21,14 @@ interface ExecutiveDarkProps {
 // Designed for senior/executive candidates who want gravitas without sacrificing ATS safety.
 // ATS rule: dark header is decorative only; all text is in standard HTML, no images.
 export default function ExecutiveDark({ data, personal, isEditing: _isEditing, renderText = (t) => t }: ExecutiveDarkProps) {
+  const contactParts: ReactNode[] = []
+  if (personal.email) contactParts.push(personal.email)
+  if (personal.phone) contactParts.push(personal.phone)
+  if (personal.location) contactParts.push(personal.location)
+  if (personal.linkedin_url) contactParts.push(<a href={personal.linkedin_url} className="resume-link" target="_blank" rel="noopener noreferrer">LinkedIn</a>)
+  if (personal.website) contactParts.push(<a href={personal.website} className="resume-link" target="_blank" rel="noopener noreferrer">{personal.portfolioLabel || 'Portfolio'}</a>)
+  if (personal.github) contactParts.push(<a href={personal.github} className="resume-link" target="_blank" rel="noopener noreferrer">GitHub</a>)
+
   return (
     <>
       <style>{`
@@ -49,10 +59,12 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing, r
         .exec-dark .edu-school { font-size: 10px; color: #374151; font-style: italic; }
         .exec-dark .edu-year { font-size: 9.5px; color: #C9A84C; font-weight: 600; white-space: nowrap; margin-left: 8px; flex-shrink: 0; }
 
+        .exec-dark .resume-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
         @media print {
           .exec-dark { }
           .exec-dark * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .exec-dark .header-wrap { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .exec-dark .resume-link { color: inherit !important; text-decoration: underline !important; }
         }
       `}</style>
       <div className="exec-dark" data-ats-field="resume-root">
@@ -61,13 +73,11 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing, r
         <div className="header-wrap" data-ats-field="header">
           <h1 data-ats-field="name">{personal.name || 'Your Name'}</h1>
           <div className="contact-line" data-ats-field="contact">
-            {[personal.email, personal.phone, personal.location, personal.linkedin_url, personal.website]
-              .filter(Boolean)
-              .map((v, i, arr) => (
-                <span key={i}>
-                  {v}{i < arr.length - 1 && <span className="contact-sep">·</span>}
-                </span>
-              ))}
+            {contactParts.map((part, i) => (
+              <span key={i}>
+                {part}{i < contactParts.length - 1 && <span className="contact-sep">·</span>}
+              </span>
+            ))}
           </div>
         </div>
 

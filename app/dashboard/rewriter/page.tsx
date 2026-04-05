@@ -90,7 +90,7 @@ const INPUT_CLASS =
   'w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-[#60607A] focus:outline-none focus:border-[#6366F1]/50 focus:ring-1 focus:ring-[#6366F1]/30 transition-all'
 const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
 const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
-const EMPTY_PERSONAL: PersonalInfo = { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }
+const EMPTY_PERSONAL: PersonalInfo = { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '', github: '', portfolioLabel: '' }
 
 type InputMethod = 'auri' | 'paste'
 type PagePhase = 'input' | 'review' | 'tune'

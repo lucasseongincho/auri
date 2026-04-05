@@ -9,6 +9,8 @@ export interface PersonalInfo {
   location: string
   linkedin_url: string
   website: string
+  github?: string
+  portfolioLabel?: string
 }
 
 export interface Experience {

@@ -165,6 +165,8 @@ function StepPersonal({
     location: '',
     linkedin_url: '',
     website: '',
+    github: '',
+    portfolioLabel: '',
   }
 
   const update = (key: keyof typeof personal, value: string) => {
@@ -217,7 +219,17 @@ function StepPersonal({
             aria-label="LinkedIn URL"
           />
         </Field>
-        <Field label="Website / Portfolio">
+        <Field label="GitHub URL">
+          <input
+            type="url"
+            className={INPUT_CLASS}
+            placeholder="https://github.com/username"
+            value={personal.github ?? ''}
+            onChange={(e) => update('github', e.target.value)}
+            aria-label="GitHub URL"
+          />
+        </Field>
+        <Field label="Website / Portfolio URL">
           <input
             type="url"
             className={INPUT_CLASS}
@@ -226,6 +238,19 @@ function StepPersonal({
             onChange={(e) => update('website', e.target.value)}
             aria-label="Website or portfolio URL"
           />
+        </Field>
+        <Field label="Portfolio Link Label">
+          <input
+            type="text"
+            className={INPUT_CLASS}
+            placeholder="Portfolio"
+            value={personal.portfolioLabel ?? ''}
+            onChange={(e) => update('portfolioLabel', e.target.value)}
+            aria-label="Portfolio link label"
+          />
+          <p className="mt-1.5 text-[11px] text-[#60607A]">
+            This is what people will see as the link text (default: &quot;Portfolio&quot;)
+          </p>
         </Field>
       </div>
     </div>

@@ -10,6 +10,8 @@ interface CreativePulseProps {
     location: string
     linkedin_url: string
     website: string
+    github?: string
+    portfolioLabel?: string
   }
   isEditing?: boolean
   renderText?: (text: string) => ReactNode
@@ -20,6 +22,14 @@ interface CreativePulseProps {
 // ATS-safe: grid texture is a CSS background pattern on a wrapper div, not an image.
 // All text is in standard semantic HTML with data-ats-field attributes.
 export default function CreativePulse({ data, personal, isEditing: _isEditing, renderText = (t) => t }: CreativePulseProps) {
+  const contactParts: ReactNode[] = []
+  if (personal.email) contactParts.push(personal.email)
+  if (personal.phone) contactParts.push(personal.phone)
+  if (personal.location) contactParts.push(personal.location)
+  if (personal.linkedin_url) contactParts.push(<a href={personal.linkedin_url} className="resume-link" target="_blank" rel="noopener noreferrer">LinkedIn</a>)
+  if (personal.website) contactParts.push(<a href={personal.website} className="resume-link" target="_blank" rel="noopener noreferrer">{personal.portfolioLabel || 'Portfolio'}</a>)
+  if (personal.github) contactParts.push(<a href={personal.github} className="resume-link" target="_blank" rel="noopener noreferrer">GitHub</a>)
+
   return (
     <>
       <style>{`
@@ -100,11 +110,13 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing, r
         .creative-pulse .edu-school { font-size: 10px; color: #6366F1; }
         .creative-pulse .edu-year { font-size: 9.5px; color: #888; white-space: nowrap; margin-left: 6px; flex-shrink: 0; }
 
+        .creative-pulse .resume-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
         @media print {
           .creative-pulse { background-image: none !important; }
           .creative-pulse * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .creative-pulse .skills-plain { display: block; }
           .creative-pulse .skills-wrap { display: none; }
+          .creative-pulse .resume-link { color: inherit !important; text-decoration: underline !important; }
         }
       `}</style>
       <div className="creative-pulse" style={{ width: '210mm', minHeight: '297mm', boxSizing: 'border-box' }} data-ats-field="resume-root">
@@ -114,13 +126,11 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing, r
           <h1 data-ats-field="name">{personal.name || 'Your Name'}</h1>
           <p className="tagline">Creative Professional</p>
           <div className="contact-line" data-ats-field="contact">
-            {[personal.email, personal.phone, personal.location, personal.linkedin_url, personal.website]
-              .filter(Boolean)
-              .map((v, i, arr) => (
-                <span key={i}>
-                  {v}{i < arr.length - 1 && <span className="contact-sep">✦</span>}
-                </span>
-              ))}
+            {contactParts.map((part, i) => (
+              <span key={i}>
+                {part}{i < contactParts.length - 1 && <span className="contact-sep">✦</span>}
+              </span>
+            ))}
           </div>
         </div>
         <div className="header-rule" />

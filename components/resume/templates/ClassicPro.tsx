@@ -10,6 +10,8 @@ interface ClassicProProps {
     location: string
     linkedin_url: string
     website: string
+    github?: string
+    portfolioLabel?: string
   }
   isEditing?: boolean
   /** Optional renderer for text fields — used to inject amber AI-estimate highlights. Defaults to identity. */
@@ -17,6 +19,14 @@ interface ClassicProProps {
 }
 
 export default function ClassicPro({ data, personal, isEditing: _isEditing, renderText = (t) => t }: ClassicProProps) {
+  const contactParts: ReactNode[] = []
+  if (personal.email) contactParts.push(personal.email)
+  if (personal.phone) contactParts.push(personal.phone)
+  if (personal.location) contactParts.push(personal.location)
+  if (personal.linkedin_url) contactParts.push(<a href={personal.linkedin_url} className="resume-link" target="_blank" rel="noopener noreferrer">LinkedIn</a>)
+  if (personal.website) contactParts.push(<a href={personal.website} className="resume-link" target="_blank" rel="noopener noreferrer">{personal.portfolioLabel || 'Portfolio'}</a>)
+  if (personal.github) contactParts.push(<a href={personal.github} className="resume-link" target="_blank" rel="noopener noreferrer">GitHub</a>)
+
   return (
     <>
       <style>{`
@@ -119,9 +129,11 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
           flex-shrink: 0;
           margin-left: 8px;
         }
+        .classic-pro .resume-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
         @media print {
           .classic-pro { padding: 18mm 20mm 16mm !important; }
           .classic-pro * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .classic-pro .resume-link { color: inherit !important; text-decoration: underline !important; }
         }
       `}</style>
       <div className="classic-pro" data-ats-field="resume-root">
@@ -130,9 +142,9 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
         <header data-ats-field="header">
           <h1 data-ats-field="name">{personal.name || 'Your Name'}</h1>
           <div className="contact-line" data-ats-field="contact">
-            {[personal.email, personal.phone, personal.location, personal.linkedin_url, personal.website]
-              .filter(Boolean)
-              .join(' · ')}
+            {contactParts.map((part, i) => (
+              <span key={i}>{i > 0 && ' · '}{part}</span>
+            ))}
           </div>
         </header>
 

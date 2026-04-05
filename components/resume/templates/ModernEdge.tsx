@@ -10,6 +10,8 @@ interface ModernEdgeProps {
     location: string
     linkedin_url: string
     website: string
+    github?: string
+    portfolioLabel?: string
   }
   isEditing?: boolean
   renderText?: (text: string) => ReactNode
@@ -39,8 +41,10 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing, rend
         .modern-edge .edu-row { margin-bottom: 6px; }
         .modern-edge .edu-degree { font-size: 11px; font-weight: 700; }
         .modern-edge .edu-info { font-size: 10px; color: #555; }
+        .modern-edge .resume-link { color: #c7d2fe; text-decoration: underline; text-underline-offset: 2px; }
         @media print {
           .modern-edge * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .modern-edge .resume-link { color: #c7d2fe !important; text-decoration: underline !important; }
         }
       `}</style>
       <div className="modern-edge" data-ats-field="resume-root" style={{ width: '100%', boxSizing: 'border-box' }}>
@@ -56,8 +60,15 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing, rend
             {personal.email && <div className="contact-item">✉ {personal.email}</div>}
             {personal.phone && <div className="contact-item">📱 {personal.phone}</div>}
             {personal.location && <div className="contact-item">📍 {personal.location}</div>}
-            {personal.linkedin_url && <div className="contact-item">in {personal.linkedin_url}</div>}
-            {personal.website && <div className="contact-item">🌐 {personal.website}</div>}
+            {personal.linkedin_url && (
+              <div className="contact-item">in <a href={personal.linkedin_url} className="resume-link" target="_blank" rel="noopener noreferrer">LinkedIn</a></div>
+            )}
+            {personal.website && (
+              <div className="contact-item">🌐 <a href={personal.website} className="resume-link" target="_blank" rel="noopener noreferrer">{personal.portfolioLabel || 'Portfolio'}</a></div>
+            )}
+            {personal.github && (
+              <div className="contact-item">⌥ <a href={personal.github} className="resume-link" target="_blank" rel="noopener noreferrer">GitHub</a></div>
+            )}
           </div>
 
           {data.skills.length > 0 && (
