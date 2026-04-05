@@ -93,6 +93,8 @@ export interface CareerProfile {
   target: TargetJob
   generated: GeneratedData
   updatedAt?: string
+  /** Set to true after the user dismisses the AI-estimate disclaimer modal for the first time. */
+  hasSeenEstimateDisclaimer?: boolean
 }
 
 // ============================================================

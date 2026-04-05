@@ -35,6 +35,7 @@ import { saveResume } from '@/lib/firestore'
 import ResumePreview from '@/components/resume/ResumePreview'
 import ResumeEditor from '@/components/resume/ResumeEditor'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
+import EstimateDisclaimerModal from '@/components/resume/EstimateDisclaimerModal'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
 import ModernEdge from '@/components/resume/templates/ModernEdge'
 import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
@@ -1194,6 +1195,7 @@ export default function ResumePage() {
     setATSScore,
     setSelectedTemplate,
     syncToFirestore,
+    updateProfile,
   } = useCareerStore()
 
   const { user, isAuthenticated } = useAuth()
@@ -1211,6 +1213,7 @@ export default function ResumePage() {
   const [generateError, setGenerateError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [showSignUpModal, setShowSignUpModal] = useState(false)
+  const [showEstimateDisclaimer, setShowEstimateDisclaimer] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [isATSLoading, setIsATSLoading] = useState(false)
   const [isFixingATS, setIsFixingATS] = useState(false)
@@ -1410,6 +1413,10 @@ export default function ResumePage() {
         setResume(resume)
         setEditedResume(resume)
         setIsEditing(false) // start in preview mode; user clicks Edit to enter inline editing
+        // Show estimate disclaimer on first generation
+        if (!profile.hasSeenEstimateDisclaimer) {
+          setShowEstimateDisclaimer(true)
+        }
       } catch {
         setGenerateError('Failed to parse AI response. Please try again.')
       }
@@ -1967,6 +1974,18 @@ export default function ResumePage() {
           />
         )}
       </AnimatePresence>
+
+      {/* First-use AI estimate disclaimer */}
+      <EstimateDisclaimerModal
+        open={showEstimateDisclaimer}
+        onClose={() => {
+          setShowEstimateDisclaimer(false)
+          // Persist that the user has seen the disclaimer
+          if (profile && !profile.hasSeenEstimateDisclaimer) {
+            updateProfile({ hasSeenEstimateDisclaimer: true })
+          }
+        }}
+      />
     </div>
   )
 }

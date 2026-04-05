@@ -1,4 +1,5 @@
 import type { ResumeData } from '@/types'
+import type { ReactNode } from 'react'
 
 interface ExecutiveDarkProps {
   data: ResumeData
@@ -11,12 +12,13 @@ interface ExecutiveDarkProps {
     website: string
   }
   isEditing?: boolean
+  renderText?: (text: string) => ReactNode
 }
 
 // ExecutiveDark — Dark header with gold accent strip, premium serif typography.
 // Designed for senior/executive candidates who want gravitas without sacrificing ATS safety.
 // ATS rule: dark header is decorative only; all text is in standard HTML, no images.
-export default function ExecutiveDark({ data, personal, isEditing: _isEditing }: ExecutiveDarkProps) {
+export default function ExecutiveDark({ data, personal, isEditing: _isEditing, renderText = (t) => t }: ExecutiveDarkProps) {
   return (
     <>
       <style>{`
@@ -79,7 +81,7 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing }:
                 <span className="section-label">Executive Summary</span>
                 <div className="section-rule" />
               </div>
-              <p className="summary-text">{data.summary}</p>
+              <p className="summary-text">{renderText(data.summary)}</p>
             </section>
           )}
 
@@ -101,7 +103,7 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing }:
                   </div>
                   <ul>
                     {exp.bullets.map((bullet, i) => (
-                      <li key={i}>{bullet}</li>
+                      <li key={i}>{renderText(bullet)}</li>
                     ))}
                   </ul>
                 </article>
@@ -146,7 +148,7 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing }:
                     <span className="job-dates">{item.start} – {item.end}</span>
                   </div>
                   <ul>
-                    {item.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                    {item.bullets.map((b, i) => <li key={i}>{renderText(b)}</li>)}
                   </ul>
                 </article>
               ))}
@@ -223,10 +225,10 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing }:
                     <span className="job-title">{proj.name}</span>
                     {proj.url && <span className="job-dates">{proj.url}</span>}
                   </div>
-                  {proj.description && <p style={{ fontSize: '11px', color: '#374151', margin: '2px 0 4px 0' }}>{proj.description}</p>}
+                  {proj.description && <p style={{ fontSize: '11px', color: '#374151', margin: '2px 0 4px 0' }}>{renderText(proj.description)}</p>}
                   {proj.bullets.length > 0 && (
                     <ul>
-                      {proj.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                      {proj.bullets.map((b, i) => <li key={i}>{renderText(b)}</li>)}
                     </ul>
                   )}
                 </article>

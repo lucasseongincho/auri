@@ -1,4 +1,5 @@
 import type { ResumeData } from '@/types'
+import type { ReactNode } from 'react'
 
 interface ClassicProProps {
   data: ResumeData
@@ -11,9 +12,11 @@ interface ClassicProProps {
     website: string
   }
   isEditing?: boolean
+  /** Optional renderer for text fields — used to inject amber AI-estimate highlights. Defaults to identity. */
+  renderText?: (text: string) => ReactNode
 }
 
-export default function ClassicPro({ data, personal, isEditing: _isEditing }: ClassicProProps) {
+export default function ClassicPro({ data, personal, isEditing: _isEditing, renderText = (t) => t }: ClassicProProps) {
   return (
     <>
       <style>{`
@@ -137,7 +140,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
         {data.summary && (
           <section data-ats-field="summary">
             <div className="section-header">Summary</div>
-            <p className="summary-text">{data.summary}</p>
+            <p className="summary-text">{renderText(data.summary)}</p>
           </section>
         )}
 
@@ -156,7 +159,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
                 </div>
                 <ul>
                   {exp.bullets.slice(0, 4).map((bullet, i) => (
-                    <li key={i}>{bullet}</li>
+                    <li key={i}>{renderText(bullet)}</li>
                   ))}
                 </ul>
               </article>
@@ -208,11 +211,11 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
                   {proj.url && <span className="job-dates">{proj.url}</span>}
                 </div>
                 {proj.description && (
-                  <p style={{ fontSize: '10.5px', margin: '1px 0 3px 0', lineHeight: 1.4 }}>{proj.description}</p>
+                  <p style={{ fontSize: '10.5px', margin: '1px 0 3px 0', lineHeight: 1.4 }}>{renderText(proj.description)}</p>
                 )}
                 {proj.bullets.length > 0 && (
                   <ul>
-                    {proj.bullets.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}
+                    {proj.bullets.slice(0, 2).map((b, i) => <li key={i}>{renderText(b)}</li>)}
                   </ul>
                 )}
               </article>
@@ -235,7 +238,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing }: Cl
                 </div>
                 {item.bullets.length > 0 && (
                   <ul>
-                    {item.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                    {item.bullets.map((b, i) => <li key={i}>{renderText(b)}</li>)}
                   </ul>
                 )}
               </article>

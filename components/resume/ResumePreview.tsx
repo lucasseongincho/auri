@@ -2,13 +2,16 @@
 
 import { useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, Copy, CheckCircle, Loader2, Layout } from 'lucide-react'
+import { Download, Copy, CheckCircle, Loader2, Layout, AlertTriangle, X } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
 import ModernEdge from '@/components/resume/templates/ModernEdge'
 import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
 import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
 import CreativePulse from '@/components/resume/templates/CreativePulse'
+import VerificationBanner from '@/components/resume/VerificationBanner'
+import ResumeHighlightedText from '@/components/resume/ResumeHighlightedText'
+import { countAllEstimates, stripAllAITags } from '@/lib/resumeHighlight'
 import type { ResumeData, TemplateId, PersonalInfo } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -65,7 +68,6 @@ function extractPlainTextFromElement(el: HTMLElement): string {
       lines.push(text)
     }
   })
-  // Fallback: use innerText of the whole element
   return lines.length ? lines.join('\n\n') : el.innerText
 }
 
@@ -80,36 +82,80 @@ export default function ResumePreview({
   const previewRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [showPDFWarning, setShowPDFWarning] = useState(false)
+  const [verifiedCount, setVerifiedCount] = useState(0)
 
   // Sanitise data once so all 5 templates receive guaranteed non-null arrays.
   const safeData = data ? sanitizeResumeData(data) : null
+
+  // Count total AI estimates in the current resume data
+  const totalEstimates = safeData ? countAllEstimates(safeData) : 0
+
+  // renderText: passed to templates to convert <ai-estimate> tags into
+  // interactive amber highlights. When the user verifies an estimate,
+  // we increment the verified counter for the banner.
+  const renderText = useCallback(
+    (text: string) => (
+      <ResumeHighlightedText
+        text={text}
+        onVerify={() => setVerifiedCount((c) => c + 1)}
+      />
+    ),
+    []
+  )
 
   const handleTemplateChange = (id: TemplateId) => {
     setSelectedTemplate(id)
     onTemplateChange?.(id)
   }
 
-  const handleDownloadPDF = useCallback(async () => {
+  // Scroll to first unverified amber highlight
+  const handleReviewClick = useCallback(() => {
+    const firstHighlight = previewRef.current?.querySelector('[data-estimate="true"]')
+    firstHighlight?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [])
+
+  const executePDFDownload = useCallback(async () => {
     if (!previewRef.current || !safeData) return
     setDownloading(true)
+    setShowPDFWarning(false)
     try {
       const { generatePDFFromElement } = await import('@/lib/pdf')
+      const el = previewRef.current
+
+      // Add .printing class so amber highlights render as plain text in html2canvas
+      el.classList.add('printing')
+
       const name = personal.name?.replace(/\s+/g, '-').toLowerCase() || 'resume'
-      // We need to access target from the store - get from window or pass as prop
-      // Use data to generate filename
-      await generatePDFFromElement(previewRef.current, {
+      await generatePDFFromElement(el, {
         filename: `${name}-resume.pdf`,
         imageQuality: 0.98,
       })
+
+      el.classList.remove('printing')
     } finally {
       setDownloading(false)
     }
   }, [safeData, personal])
 
+  const handleDownloadPDF = useCallback(async () => {
+    if (!safeData) return
+    const remaining = totalEstimates - verifiedCount
+    if (remaining > 0) {
+      setShowPDFWarning(true)
+    } else {
+      await executePDFDownload()
+    }
+  }, [safeData, totalEstimates, verifiedCount, executePDFDownload])
+
   const handleCopyATS = useCallback(async () => {
     if (!previewRef.current || !safeData) return
-    const text = extractPlainTextFromElement(previewRef.current)
-    await navigator.clipboard.writeText(text)
+    // Strip ai-estimate tags from plain text before copying
+    const rawText = extractPlainTextFromElement(previewRef.current)
+    // rawText already reflects verified edits from the DOM; strip any remaining tags
+    const { stripAITags } = await import('@/lib/resumeHighlight')
+    const cleanText = stripAITags(rawText)
+    await navigator.clipboard.writeText(cleanText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }, [safeData])
@@ -118,7 +164,7 @@ export default function ResumePreview({
     <div className="flex flex-col h-full">
       {/* Toolbar — no-print ensures it never appears in PDF export */}
       <div className="no-print flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
-        {/* Template switcher — scrollable on mobile for all 5 templates */}
+        {/* Template switcher */}
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#13131A] border border-white/[0.08] overflow-x-auto max-w-full">
           <Layout className="w-3.5 h-3.5 text-[#60607A] ml-2 flex-shrink-0" />
           {TEMPLATES.map((t) => (
@@ -166,10 +212,37 @@ export default function ResumePreview({
         </div>
       </div>
 
+      {/* Verification Banner — shown after generation when estimates exist */}
+      {safeData && !isStreaming && (
+        <VerificationBanner
+          estimateCount={totalEstimates}
+          verifiedCount={verifiedCount}
+          onReviewClick={handleReviewClick}
+        />
+      )}
+
       {/* Preview area */}
       <div className="flex-1 rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden">
-        <div className="rounded-xl border border-white/[0.05] bg-white overflow-auto h-full relative"
-          style={{ minHeight: '600px' }}>
+        <div
+          className="rounded-xl border border-white/[0.05] bg-white overflow-auto h-full relative"
+          style={{ minHeight: '600px' }}
+        >
+          {/* Global CSS: hide amber highlight styling when .printing class is active (html2pdf capture) */}
+          <style>{`
+            .printing .ai-estimate-highlight-btn {
+              background: none !important;
+              border-bottom: none !important;
+              color: inherit !important;
+              padding: 0 !important;
+            }
+            .printing .ai-estimate-verified {
+              color: inherit !important;
+            }
+            .printing [data-estimate],
+            .printing .print-plain {
+              display: inline !important;
+            }
+          `}</style>
 
           <AnimatePresence mode="wait">
             {isStreaming ? (
@@ -180,12 +253,10 @@ export default function ResumePreview({
                 exit={{ opacity: 0 }}
                 className="p-6"
               >
-                {/* Streaming indicator */}
                 <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-[#6366F1]/10 border border-[#6366F1]/20">
                   <Loader2 className="w-4 h-4 text-[#6366F1] animate-spin" />
                   <span className="text-sm text-[#6366F1] font-medium">AURI is generating your resume...</span>
                 </div>
-                {/* Skeleton */}
                 <div className="space-y-3">
                   <div className="h-8 w-48 rounded bg-gray-100 animate-pulse mx-auto" />
                   <div className="h-3 w-64 rounded bg-gray-100 animate-pulse mx-auto" />
@@ -208,7 +279,6 @@ export default function ResumePreview({
                       <div key={i} className="h-2.5 rounded bg-gray-50 animate-pulse" style={{ width: `${w}%` }} />
                     ))}
                   </div>
-                  {/* Live stream text */}
                   {streamText && (
                     <div className="mt-4 p-3 rounded-lg bg-gray-50 border border-gray-200 font-mono text-xs text-gray-400 overflow-hidden max-h-32">
                       {streamText.slice(-300)}
@@ -228,19 +298,19 @@ export default function ResumePreview({
                 className="w-full"
               >
                 {selectedTemplate === 'classic-pro' && (
-                  <ClassicPro data={safeData} personal={personal} />
+                  <ClassicPro data={safeData} personal={personal} renderText={renderText} />
                 )}
                 {selectedTemplate === 'modern-edge' && (
-                  <ModernEdge data={safeData} personal={personal} />
+                  <ModernEdge data={safeData} personal={personal} renderText={renderText} />
                 )}
                 {selectedTemplate === 'minimal-seoul' && (
-                  <MinimalSeoul data={safeData} personal={personal} />
+                  <MinimalSeoul data={safeData} personal={personal} renderText={renderText} />
                 )}
                 {selectedTemplate === 'executive-dark' && (
-                  <ExecutiveDark data={safeData} personal={personal} />
+                  <ExecutiveDark data={safeData} personal={personal} renderText={renderText} />
                 )}
                 {selectedTemplate === 'creative-pulse' && (
-                  <CreativePulse data={safeData} personal={personal} />
+                  <CreativePulse data={safeData} personal={personal} renderText={renderText} />
                 )}
               </motion.div>
             ) : (
@@ -261,6 +331,71 @@ export default function ResumePreview({
           </AnimatePresence>
         </div>
       </div>
+
+      {/* PDF Download Warning Modal */}
+      <AnimatePresence>
+        {showPDFWarning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={(e) => { if (e.target === e.currentTarget) setShowPDFWarning(false) }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={SPRING}
+              className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 w-full max-w-md"
+            >
+              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                    <h3 className="text-white font-semibold text-base">Your resume has unverified numbers</h3>
+                  </div>
+                  <button
+                    onClick={() => setShowPDFWarning(false)}
+                    className="text-[#60607A] hover:text-white transition-colors"
+                    aria-label="Close warning"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <p className="text-[#A0A0B8] text-sm mb-2">
+                  AURI estimated <span className="text-amber-300 font-medium">{totalEstimates - verifiedCount} numbers</span> that
+                  you haven&apos;t verified yet. Submitting a resume with unverified numbers could hurt you in interviews.
+                </p>
+                <p className="text-[#60607A] text-xs mb-6">
+                  Amber highlights in the preview show exactly which numbers to check.
+                </p>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => { setShowPDFWarning(false); handleReviewClick() }}
+                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold
+                      bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
+                      shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
+                      hover:scale-[1.02] transition-all duration-200"
+                  >
+                    Review &amp; Fix
+                  </button>
+                  <button
+                    onClick={executePDFDownload}
+                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium
+                      border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+                      transition-all duration-200"
+                  >
+                    Download Anyway
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

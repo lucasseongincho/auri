@@ -55,6 +55,32 @@ Eliminate everything generic.
 Make the candidate's value impossible to ignore.
 Optimize every bullet point for ATS keyword matching based on this job description: ${target.job_description ?? '(not provided)'}.
 
+CRITICAL — AI ESTIMATE TAGGING RULES:
+You must clearly distinguish between information the user actually provided and numbers/claims you are estimating.
+For ANY number, percentage, metric, timeframe, or specific claim that the user DID NOT explicitly provide in their input — wrap it in an XML tag:
+  <ai-estimate>47%</ai-estimate>
+  <ai-estimate>8 engineers</ai-estimate>
+  <ai-estimate>3 major product launches</ai-estimate>
+
+Examples:
+  User provided: "Managed social media accounts"
+  You write: "Grew engagement by <ai-estimate>35%</ai-estimate> through strategic content planning"
+
+  User provided: "Led a team"
+  You write: "Led a team of <ai-estimate>8 engineers</ai-estimate> delivering <ai-estimate>3 major product launches</ai-estimate>"
+
+  User provided: "Increased sales by 40%"
+  You write: "Increased sales by 40%"  (no tag — user provided this number)
+
+Rules for estimates:
+→ Use conservative realistic industry averages
+→ Never exaggerate or use unrealistic numbers
+→ Base estimates on the role and industry context
+→ It is better to underestimate than overestimate
+→ If you truly cannot estimate realistically, use a range: <ai-estimate>15-20%</ai-estimate>
+→ This tagging is NON-NEGOTIABLE. Every number you add must be tagged.
+→ User-provided information must NEVER be tagged.
+
 ATS RULES YOU MUST ENFORCE:
 - Action verbs at the start of every bullet point
 - Quantify achievements with numbers/percentages wherever possible
@@ -419,6 +445,32 @@ Replace every responsibility with a measurable achievement.
 Eliminate everything generic.
 Make the candidate's value impossible to ignore.
 Optimize every bullet point for ATS keyword matching based on the job description provided.
+
+CRITICAL — AI ESTIMATE TAGGING RULES:
+You must clearly distinguish between information the user actually provided and numbers/claims you are estimating.
+For ANY number, percentage, metric, timeframe, or specific claim that the user DID NOT explicitly provide in their input — wrap it in an XML tag:
+  <ai-estimate>47%</ai-estimate>
+  <ai-estimate>8 engineers</ai-estimate>
+  <ai-estimate>3 major product launches</ai-estimate>
+
+Examples:
+  User provided: "Managed social media accounts"
+  You write: "Grew engagement by <ai-estimate>35%</ai-estimate> through strategic content planning"
+
+  User provided: "Led a team"
+  You write: "Led a team of <ai-estimate>8 engineers</ai-estimate> delivering <ai-estimate>3 major product launches</ai-estimate>"
+
+  User provided: "Increased sales by 40%"
+  You write: "Increased sales by 40%"  (no tag — user provided this number)
+
+Rules for estimates:
+→ Use conservative realistic industry averages
+→ Never exaggerate or use unrealistic numbers
+→ Base estimates on the role and industry context
+→ It is better to underestimate than overestimate
+→ If you truly cannot estimate realistically, use a range: <ai-estimate>15-20%</ai-estimate>
+→ This tagging is NON-NEGOTIABLE. Every number you add must be tagged.
+→ User-provided information must NEVER be tagged.
 
 ATS RULES YOU MUST ENFORCE:
 - Action verbs at the start of every bullet point

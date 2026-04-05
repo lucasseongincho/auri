@@ -23,6 +23,7 @@ import { getSavedResumes, saveResume } from '@/lib/firestore'
 import ResumePreview from '@/components/resume/ResumePreview'
 import ResumeEditor from '@/components/resume/ResumeEditor'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
+import EstimateDisclaimerModal from '@/components/resume/EstimateDisclaimerModal'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
 import ModernEdge from '@/components/resume/templates/ModernEdge'
 import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
@@ -97,7 +98,7 @@ type PagePhase = 'input' | 'review' | 'tune'
 
 export default function RewriterPage() {
   const { user } = useAuth()
-  const { profile, selectedTemplate, setSelectedTemplate } = useCareerStore()
+  const { profile, selectedTemplate, setSelectedTemplate, updateProfile } = useCareerStore()
 
   // ── Phase ──────────────────────────────────────────────────────────────────
   const [pagePhase, setPagePhase] = useState<PagePhase>('input')
@@ -159,6 +160,7 @@ export default function RewriterPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [showEstimateDisclaimer, setShowEstimateDisclaimer] = useState(false)
 
   const { isStreaming, streamedText, stream } = useAIStream()
 
@@ -243,6 +245,9 @@ export default function RewriterPage() {
         const parsed = parseResumeJSON(fullText)
         setRewrittenData({ ...parsed, templateId: selectedTemplate })
         setPagePhase('review')
+        if (!profile?.hasSeenEstimateDisclaimer) {
+          setShowEstimateDisclaimer(true)
+        }
       } catch {
         setGenerateError('Could not parse the rewritten resume. Please try again.')
       }
@@ -962,6 +967,17 @@ export default function RewriterPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* First-use AI estimate disclaimer */}
+      <EstimateDisclaimerModal
+        open={showEstimateDisclaimer}
+        onClose={() => {
+          setShowEstimateDisclaimer(false)
+          if (profile && !profile.hasSeenEstimateDisclaimer) {
+            updateProfile({ hasSeenEstimateDisclaimer: true })
+          }
+        }}
+      />
     </div>
   )
 }

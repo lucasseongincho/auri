@@ -1,4 +1,5 @@
 import type { ResumeData } from '@/types'
+import type { ReactNode } from 'react'
 
 interface CreativePulseProps {
   data: ResumeData
@@ -11,13 +12,14 @@ interface CreativePulseProps {
     website: string
   }
   isEditing?: boolean
+  renderText?: (text: string) => ReactNode
 }
 
 // CreativePulse — Subtle grid texture, bold name treatment, left accent bar on sections.
 // For design, marketing, product, and creative professionals.
 // ATS-safe: grid texture is a CSS background pattern on a wrapper div, not an image.
 // All text is in standard semantic HTML with data-ats-field attributes.
-export default function CreativePulse({ data, personal, isEditing: _isEditing }: CreativePulseProps) {
+export default function CreativePulse({ data, personal, isEditing: _isEditing, renderText = (t) => t }: CreativePulseProps) {
   return (
     <>
       <style>{`
@@ -133,7 +135,7 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
                 <div className="section-accent" />
                 <span className="section-label">About</span>
               </div>
-              <p className="summary-text">{data.summary}</p>
+              <p className="summary-text">{renderText(data.summary)}</p>
             </section>
           )}
 
@@ -155,7 +157,7 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
                   </div>
                   <ul>
                     {exp.bullets.map((bullet, i) => (
-                      <li key={i}>{bullet}</li>
+                      <li key={i}>{renderText(bullet)}</li>
                     ))}
                   </ul>
                 </article>
@@ -200,7 +202,7 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
                     <span className="job-dates">{item.start} – {item.end}</span>
                   </div>
                   <ul>
-                    {item.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                    {item.bullets.map((b, i) => <li key={i}>{renderText(b)}</li>)}
                   </ul>
                 </article>
               ))}
@@ -287,10 +289,10 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing }:
                     <span className="job-title">{proj.name}</span>
                     {proj.url && <span className="job-dates">{proj.url}</span>}
                   </div>
-                  {proj.description && <p style={{ fontSize: '11px', color: '#374151', margin: '2px 0 4px 0' }}>{proj.description}</p>}
+                  {proj.description && <p style={{ fontSize: '11px', color: '#374151', margin: '2px 0 4px 0' }}>{renderText(proj.description)}</p>}
                   {proj.bullets.length > 0 && (
                     <ul>
-                      {proj.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                      {proj.bullets.map((b, i) => <li key={i}>{renderText(b)}</li>)}
                     </ul>
                   )}
                 </article>

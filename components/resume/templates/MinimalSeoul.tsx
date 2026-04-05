@@ -1,4 +1,5 @@
 import type { ResumeData } from '@/types'
+import type { ReactNode } from 'react'
 
 interface MinimalSeoulProps {
   data: ResumeData
@@ -11,9 +12,10 @@ interface MinimalSeoulProps {
     website: string
   }
   isEditing?: boolean
+  renderText?: (text: string) => ReactNode
 }
 
-export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: MinimalSeoulProps) {
+export default function MinimalSeoul({ data, personal, isEditing: _isEditing, renderText = (t) => t }: MinimalSeoulProps) {
   return (
     <>
       <style>{`
@@ -55,7 +57,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
         {data.summary && (
           <section data-ats-field="summary">
             <div className="section-header">About</div>
-            <p className="summary-text">{data.summary}</p>
+            <p className="summary-text">{renderText(data.summary)}</p>
           </section>
         )}
 
@@ -73,7 +75,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
                   <div className="job-dates">{exp.start} – {exp.end}</div>
                 </div>
                 <ul>
-                  {exp.bullets.slice(0, 4).map((b, i) => <li key={i}>{b}</li>)}
+                  {exp.bullets.slice(0, 4).map((b, i) => <li key={i}>{renderText(b)}</li>)}
                 </ul>
               </article>
             ))}
@@ -109,7 +111,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
                   <div className="job-dates">{item.start} – {item.end}</div>
                 </div>
                 <ul>
-                  {item.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                  {item.bullets.map((b, i) => <li key={i}>{renderText(b)}</li>)}
                 </ul>
               </article>
             ))}
@@ -168,9 +170,9 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing }: 
                   <span className="job-title">{proj.name}</span>
                   {proj.url && <span className="job-dates">{proj.url}</span>}
                 </div>
-                {proj.description && <p style={{ fontSize: '11px', color: '#555', margin: '2px 0 4px 0', fontWeight: 300 }}>{proj.description}</p>}
+                {proj.description && <p style={{ fontSize: '11px', color: '#555', margin: '2px 0 4px 0', fontWeight: 300 }}>{renderText(proj.description)}</p>}
                 {proj.bullets.length > 0 && (
-                  <ul>{proj.bullets.slice(0, 2).map((b, i) => <li key={i}>{b}</li>)}</ul>
+                  <ul>{proj.bullets.slice(0, 2).map((b, i) => <li key={i}>{renderText(b)}</li>)}</ul>
                 )}
               </article>
             ))}
