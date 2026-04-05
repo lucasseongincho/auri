@@ -1443,7 +1443,7 @@ export default function ResumePage() {
           ? `${profile.target.company} — ${profile.target.position}`
           : `My Resume — ${new Date().toLocaleDateString()}`
 
-      await saveResume(user.uid, {
+      const savePayload = {
         name: resumeName,
         targetPosition: profile?.target.position ?? '',
         targetCompany: profile?.target.company ?? '',
@@ -1460,11 +1460,20 @@ export default function ResumePage() {
         },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-      })
+      }
+
+      // Explicitly verify serializability before hitting Firestore.
+      // Non-serializable values (circular refs, React elements) would cause setDoc
+      // to silently hang or throw a cryptic error — this surfaces it immediately.
+      JSON.stringify(savePayload)
+
+      await saveResume(user.uid, savePayload)
       setToast({ message: 'Resume saved successfully!', type: 'success' })
-    } catch {
+    } catch (error) {
+      console.error('Save resume error:', error)
       setToast({ message: 'Failed to save resume. Please try again.', type: 'error' })
     } finally {
+      // Always reset — whether save succeeded, failed, or threw synchronously.
       setIsSaving(false)
     }
   }, [activeResume, isAuthenticated, user?.uid, profile, selectedTemplate, atsScore])

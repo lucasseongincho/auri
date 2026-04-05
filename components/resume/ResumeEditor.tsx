@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Undo2, Redo2, Loader2, CheckCircle } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
+import { stripAITags } from '@/lib/resumeHighlight'
 import type { ResumeData, PersonalInfo } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -140,33 +141,59 @@ export default function ResumeEditor({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aiAssist.selectedText, profile])
 
-  // Sync contenteditable DOM changes back to ResumeData state
+  // Sync contenteditable DOM changes back to ResumeData state.
+  // IMPORTANT: Easy Tune renders with renderText={stripAITags}, so the DOM only
+  // contains plain text — no <ai-estimate> tags. We must compare each DOM value
+  // against the stripped original to detect whether the user actually changed it.
+  // If unchanged, we keep the original string (which may still have tags) so that
+  // amber highlights survive for fields the user never touched.
   const syncDOMToData = useCallback(() => {
     if (!editorRef.current) return
 
     const updated: ResumeData = { ...resumeData }
 
-    // Sync summary
+    // Sync summary — only overwrite if user changed it
     const summaryEl = editorRef.current.querySelector('[data-ats-field="summary"] p')
-    if (summaryEl) updated.summary = (summaryEl as HTMLElement).innerText.trim()
+    if (summaryEl) {
+      const domText = (summaryEl as HTMLElement).innerText.trim()
+      const origStripped = stripAITags(resumeData.summary ?? '').trim()
+      if (domText !== origStripped) {
+        // User edited this field — save plain text (tags intentionally removed)
+        updated.summary = domText
+      }
+      // else: keep resumeData.summary with ai-estimate tags intact
+    }
 
-    // Sync experience bullets
+    // Sync experience bullets — compare by bullet index to preserve tags on unedited bullets
     const expEls = editorRef.current.querySelectorAll('[data-ats-field="experience"] article')
     expEls.forEach((articleEl, i) => {
       if (!updated.experience[i]) return
+      const origBullets = resumeData.experience[i]?.bullets ?? []
       const bullets: string[] = []
-      articleEl.querySelectorAll('li').forEach((li) => {
-        const text = (li as HTMLElement).innerText.trim()
-        if (text) bullets.push(text)
+      articleEl.querySelectorAll('li').forEach((li, bulletIndex) => {
+        const domText = (li as HTMLElement).innerText.trim()
+        if (!domText) return
+        const origBullet = origBullets[bulletIndex]
+        if (origBullet !== undefined && stripAITags(origBullet).trim() === domText) {
+          // Unchanged — keep original bullet with ai-estimate tags
+          bullets.push(origBullet)
+        } else {
+          // User edited this bullet — use plain DOM text
+          bullets.push(domText)
+        }
       })
       updated.experience[i] = { ...updated.experience[i], bullets }
     })
 
-    // Sync skills (comma-separated or middle-dot separated)
+    // Sync skills — only update if changed (skills rarely have ai-estimate tags)
     const skillsEl = editorRef.current.querySelector('[data-ats-field="skills"] p')
     if (skillsEl) {
-      const text = (skillsEl as HTMLElement).innerText.trim()
-      updated.skills = text.split(/[,·]/).map((s) => s.trim()).filter(Boolean)
+      const domText = (skillsEl as HTMLElement).innerText.trim()
+      const origSkillsText = stripAITags((resumeData.skills ?? []).join(', ')).trim()
+      if (domText !== origSkillsText) {
+        updated.skills = domText.split(/[,·]/).map((s) => s.trim()).filter(Boolean)
+      }
+      // else: keep original skills unchanged
     }
 
     // Push to undo history before updating
