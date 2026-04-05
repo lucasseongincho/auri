@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Download, Copy, CheckCircle, Loader2, Layout, AlertTriangle, X } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
@@ -58,17 +58,88 @@ function sanitizeResumeData(data: ResumeData): ResumeData {
   }
 }
 
-// Extract plain text from the resume element for ATS copy
-function extractPlainTextFromElement(el: HTMLElement): string {
-  const fields = el.querySelectorAll('[data-ats-field]')
+// Build ATS-safe plain text directly from resume data — avoids DOM button artifacts.
+// Uses the exact field names from the ResumeData TypeScript interface.
+function buildPlainTextFromData(data: ResumeData, personal: PersonalInfo): string {
   const lines: string[] = []
-  fields.forEach((f) => {
-    const text = (f as HTMLElement).innerText?.trim()
-    if (text && !['resume-root', 'sidebar', 'header', 'contact'].includes(f.getAttribute('data-ats-field') ?? '')) {
-      lines.push(text)
+
+  // Header
+  if (personal.name) lines.push(personal.name)
+  const contact = [personal.email, personal.phone, personal.location].filter(Boolean).join(' | ')
+  if (contact) lines.push(contact)
+  if (personal.linkedin_url) lines.push(personal.linkedin_url)
+
+  // Summary
+  if (data.summary) {
+    lines.push('', 'SUMMARY')
+    lines.push(data.summary)
+  }
+
+  // Experience
+  if (data.experience?.length) {
+    lines.push('', 'EXPERIENCE')
+    for (const exp of data.experience) {
+      lines.push(`${exp.title} | ${exp.company} | ${exp.start} – ${exp.end}`)
+      for (const bullet of (exp.bullets ?? [])) lines.push(`• ${bullet}`)
     }
-  })
-  return lines.length ? lines.join('\n\n') : el.innerText
+  }
+
+  // Education
+  if (data.education?.length) {
+    lines.push('', 'EDUCATION')
+    for (const edu of data.education) {
+      const gpaStr = edu.gpa ? ` | GPA ${edu.gpa}` : ''
+      lines.push(`${edu.degree} in ${edu.field} | ${edu.institution} | ${edu.year}${gpaStr}`)
+    }
+  }
+
+  // Skills
+  if (data.skills?.length) {
+    lines.push('', 'SKILLS')
+    lines.push(data.skills.join(', '))
+  }
+
+  // Certifications
+  if (data.certifications?.length) {
+    lines.push('', 'CERTIFICATIONS')
+    for (const cert of data.certifications) lines.push(cert)
+  }
+
+  // Projects
+  if (data.projects?.length) {
+    lines.push('', 'PROJECTS')
+    for (const proj of data.projects) {
+      lines.push(proj.name)
+      if (proj.description) lines.push(proj.description)
+      for (const b of (proj.bullets ?? [])) lines.push(`• ${b}`)
+    }
+  }
+
+  // Leadership
+  if (data.leadership?.length) {
+    lines.push('', 'LEADERSHIP')
+    for (const lead of data.leadership) {
+      lines.push(`${lead.role} | ${lead.organization} | ${lead.start} – ${lead.end}`)
+      for (const b of (lead.bullets ?? [])) lines.push(`• ${b}`)
+    }
+  }
+
+  // Volunteer
+  if (data.volunteer?.length) {
+    lines.push('', 'VOLUNTEER')
+    for (const v of data.volunteer) {
+      lines.push(`${v.role} | ${v.organization} | ${v.date}`)
+      if (v.description) lines.push(v.description)
+    }
+  }
+
+  // Languages
+  if (data.languages?.length) {
+    lines.push('', 'LANGUAGES')
+    for (const lang of data.languages) lines.push(`${lang.name}: ${lang.proficiency}`)
+  }
+
+  return lines.join('\n').trim()
 }
 
 export default function ResumePreview({
@@ -90,6 +161,11 @@ export default function ResumePreview({
 
   // Count total AI estimates in the current resume data
   const totalEstimates = safeData ? countAllEstimates(safeData) : 0
+
+  // Reset verified count whenever data changes (e.g. after Easy Tune saves cleaned text)
+  useEffect(() => {
+    setVerifiedCount(0)
+  }, [data])
 
   // renderText: passed to templates to convert <ai-estimate> tags into
   // interactive amber highlights. When the user verifies an estimate,
@@ -149,16 +225,15 @@ export default function ResumePreview({
   }, [safeData, totalEstimates, verifiedCount, executePDFDownload])
 
   const handleCopyATS = useCallback(async () => {
-    if (!previewRef.current || !safeData) return
-    // Strip ai-estimate tags from plain text before copying
-    const rawText = extractPlainTextFromElement(previewRef.current)
-    // rawText already reflects verified edits from the DOM; strip any remaining tags
-    const { stripAITags } = await import('@/lib/resumeHighlight')
-    const cleanText = stripAITags(rawText)
+    if (!safeData) return
+    // Build plain text from data (not DOM) to avoid capturing button text artifacts
+    // from amber highlight components (✓ ✕ tooltips etc.)
+    const rawText = buildPlainTextFromData(safeData, personal)
+    const cleanText = stripAllAITags(rawText)
     await navigator.clipboard.writeText(cleanText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }, [safeData])
+  }, [safeData, personal])
 
   return (
     <div className="flex flex-col h-full">

@@ -24,6 +24,7 @@ import ResumePreview from '@/components/resume/ResumePreview'
 import ResumeEditor from '@/components/resume/ResumeEditor'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import EstimateDisclaimerModal from '@/components/resume/EstimateDisclaimerModal'
+import { stripAITags } from '@/lib/resumeHighlight'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
 import ModernEdge from '@/components/resume/templates/ModernEdge'
 import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
@@ -325,11 +326,11 @@ export default function RewriterPage() {
   // ── Template renderer for ResumeEditor ────────────────────────────────────
   const renderTemplate = (data: ResumeData) => {
     switch (selectedTemplate) {
-      case 'modern-edge':    return <ModernEdge data={data} personal={personal} isEditing />
-      case 'minimal-seoul':  return <MinimalSeoul data={data} personal={personal} isEditing />
-      case 'executive-dark': return <ExecutiveDark data={data} personal={personal} isEditing />
-      case 'creative-pulse': return <CreativePulse data={data} personal={personal} isEditing />
-      default:               return <ClassicPro data={data} personal={personal} isEditing />
+      case 'modern-edge':    return <ModernEdge data={data} personal={personal} isEditing renderText={stripAITags} />
+      case 'minimal-seoul':  return <MinimalSeoul data={data} personal={personal} isEditing renderText={stripAITags} />
+      case 'executive-dark': return <ExecutiveDark data={data} personal={personal} isEditing renderText={stripAITags} />
+      case 'creative-pulse': return <CreativePulse data={data} personal={personal} isEditing renderText={stripAITags} />
+      default:               return <ClassicPro data={data} personal={personal} isEditing renderText={stripAITags} />
     }
   }
 
