@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
         },
       ],
       // Exact URLs per deployment spec
-      success_url: 'https://auri-beta.vercel.app/dashboard?upgraded=true',
-      cancel_url: 'https://auri-beta.vercel.app/pricing',
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?upgraded=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
       metadata: { uid: user.uid },
       // Propagate uid to subscription metadata so subscription.updated/deleted
       // webhooks can look up the user without a separate Firestore query.

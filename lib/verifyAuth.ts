@@ -14,11 +14,15 @@ export interface VerifiedUser {
  * to bypass Pro-only rate limits. Firebase ID tokens are cryptographically signed
  * and cannot be forged without the private key.
  *
- * Returns null for: missing token, invalid token, unconfigured Firebase Admin.
- * Callers should fall back to guest/free-tier behavior on null.
+ * Returns null for: missing token, invalid token.
+ * Throws if Firebase Admin is not initialized (misconfigured env) — this surfaces
+ * as a 500 rather than silently treating the request as a guest.
  */
 export async function getAuthenticatedUser(req: Request): Promise<VerifiedUser | null> {
-  if (!adminAuth || !adminDb) return null
+  if (!adminAuth || !adminDb) {
+    console.error('Firebase Admin not initialized — check FIREBASE_ADMIN_* env vars')
+    throw new Error('Firebase Admin not initialized')
+  }
 
   const authHeader = req.headers.get('authorization')
   if (!authHeader?.startsWith('Bearer ')) return null

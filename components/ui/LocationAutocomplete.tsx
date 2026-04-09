@@ -32,6 +32,11 @@ const FALLBACK_CITIES = [
 // Singleton: Places library is loaded at most once
 let placesLibPromise: Promise<google.maps.PlacesLibrary | null> | null = null
 
+// TODO SECURITY: Ensure NEXT_PUBLIC_GOOGLE_PLACES_API_KEY has HTTP referrer
+// restrictions set in GCP Console → APIs & Services → Credentials:
+//   https://console.cloud.google.com
+//   Allowed referrers: https://auri-beta.vercel.app/*
+//                      http://localhost:*
 function getPlacesLib(): Promise<google.maps.PlacesLibrary | null> {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY?.trim()
   if (!apiKey) return Promise.resolve(null)
