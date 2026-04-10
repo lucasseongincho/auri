@@ -38,7 +38,7 @@ export async function generatePDFFromElement(
   const config = {
     margin: options.margin ?? 0,
     filename: options.filename ?? 'resume.pdf',
-    image: { type: 'jpeg', quality: options.imageQuality ?? 0.98 },
+    image: { type: 'jpeg' as const, quality: options.imageQuality ?? 0.98 },
     html2canvas: {
       scale: 2,
       useCORS: true,
