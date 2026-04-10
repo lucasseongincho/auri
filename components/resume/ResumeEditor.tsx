@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Undo2, Redo2, Loader2, CheckCircle } from 'lucide-react'
+import { getIdToken } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { stripAITags } from '@/lib/resumeHighlight'
@@ -101,9 +103,16 @@ export default function ResumeEditor({
     setAIAssist((s) => ({ ...s, isLoading: true }))
 
     try {
+      let idToken: string | undefined
+      if (auth.currentUser) {
+        try { idToken = await getIdToken(auth.currentUser) } catch { /* guest */ }
+      }
       const res = await fetch('/api/claude/resume', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+        },
         body: JSON.stringify({
           careerProfile: profile,
           target: {

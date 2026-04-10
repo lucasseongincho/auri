@@ -16,6 +16,8 @@ import {
   FileText,
   ArrowLeft,
 } from 'lucide-react'
+import { getIdToken } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
@@ -192,9 +194,16 @@ export default function RewriterPage() {
     if (!plainText || !jd) return
     setIsATSLoading(true)
     try {
+      let idToken: string | undefined
+      if (auth.currentUser) {
+        try { idToken = await getIdToken(auth.currentUser) } catch { /* guest */ }
+      }
       const res = await fetch('/api/claude/ats', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+        },
         body: JSON.stringify({ resumePlainText: plainText, jobDescription: jd }),
       })
       const json = await res.json() as { success: boolean; data: ATSScore }
