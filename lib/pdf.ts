@@ -47,7 +47,7 @@ export async function generatePDFFromElement(
     jsPDF: {
       unit: 'mm',
       format: pageFormat,
-      orientation: 'portrait',
+      orientation: 'portrait' as const,
     },
   }
 
