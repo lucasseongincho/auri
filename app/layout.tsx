@@ -53,6 +53,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: APP_URL,
   },
+  verification: {
+    google: 'P2tadCAsvByF8yjAeb7ZVg2TH5OlXFajDfEAAoXjDlE',
+  },
   icons: {
     icon: '/favicon.svg',
   },
