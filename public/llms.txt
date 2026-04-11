@@ -1,0 +1,93 @@
+# AURI — AI-Powered Career Toolkit
+> https://auri-beta.vercel.app
+
+AURI is an AI-powered career toolkit that helps
+job seekers build ATS-optimized resumes, rewrite
+LinkedIn profiles, generate cover letters, prepare
+for interviews, and create personalized job search
+strategies — all in one connected system.
+
+## What Makes AURI Different
+- Every tool is connected — enter your experience
+  once, every feature uses it automatically
+- ATS-first approach — resumes are optimized for
+  Applicant Tracking Systems before human review
+- Tailored per application — generates a different
+  optimized resume for every job posting
+- Complete career system — not just a resume builder
+
+## Features
+
+### Smart Resume Builder
+Builds fully tailored, ATS-optimized resumes for
+each specific job. Replaces generic responsibilities
+with measurable achievements. Every bullet point
+optimized for the job description's exact keywords.
+
+### ATS Score & Optimizer
+Scores your resume 0-100 against any job description
+in real time. Shows matched keywords, missing keywords,
+formatting issues, and specific improvement suggestions.
+One-click Fix All automatically improves the score.
+
+### Easy Tune Editor
+Inline editing on every resume section after AI
+generation. Per-bullet AI rewriting assistance.
+Undo/redo history. Changes sync automatically.
+
+### Resume Templates
+5 premium resume templates that pass ATS systems:
+Classic Pro, Modern Edge, Minimal Seoul,
+Executive Dark, Creative Pulse.
+All templates switchable without losing content.
+
+### Resume Rewriter
+Transforms an existing resume for a new target role.
+Side-by-side before/after comparison.
+Uses the same senior recruiter rewriting methodology.
+
+### LinkedIn Profile Rewriter
+Rewrites headline, About section, and top 3 experiences
+to appear in recruiter searches for a target role.
+Outputs copy-ready sections for each LinkedIn field.
+
+### Cover Letter Generator
+Generates cover letters under 200 words that open
+with a powerful hook — never "I am applying for..."
+Connects specific experience to the company's exact needs.
+
+### Interview Preparation System
+Generates the 8 most likely interview questions for
+a specific role and company. Provides STAR-method
+answer frameworks built from the user's own experience.
+Includes 3 strategic questions to ask the interviewer.
+Practice mode with AI scoring and feedback.
+
+### 7-Day Job Search Strategy
+Creates a personalized day-by-day action plan with
+specific job sites, search terms, and immediately
+executable daily tasks for a target role and location.
+
+## Target Users
+- Active job seekers at any career stage
+- Recent graduates entering the job market
+- Professionals changing careers or industries
+- Anyone who has applied to jobs and heard nothing back
+
+## Technology
+- Built with Next.js, TypeScript, Firebase
+- Powered by Anthropic Claude AI
+- ATS optimization based on real recruiter methodology
+- PDF export with clean ATS-parseable structure
+
+## Pricing
+- Free tier: 3 AI generations per month
+- Pro tier: Unlimited generations, all features
+- Currently in private beta
+
+## Keywords
+ATS resume builder, AI resume optimizer, ATS score checker,
+resume rewriter, LinkedIn profile optimizer, cover letter
+generator, interview preparation AI, job search strategy,
+ATS-friendly resume, resume keyword optimizer,
+career toolkit, job application AI

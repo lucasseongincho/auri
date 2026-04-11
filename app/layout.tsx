@@ -7,20 +7,24 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://auri-beta.vercel.app
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: 'AURI — AI-Powered Career Toolkit',
+    default: 'AURI — AI Resume Builder That Gets Past ATS Filters',
     template: '%s | AURI',
   },
   description:
-    'Build ATS-optimized resumes, rewrite your LinkedIn profile, generate cover letters, and ace interviews — all powered by Claude AI. Free to start.',
+    'Build ATS-optimized resumes tailored to every job. AURI rewrites your resume, LinkedIn profile, cover letter, and preps you for interviews — all powered by AI.',
   keywords: [
-    'AI resume builder',
-    'ATS optimizer',
-    'cover letter generator',
-    'LinkedIn profile rewriter',
-    'interview prep',
+    'ATS resume builder',
+    'AI resume optimizer',
+    'ATS score checker',
+    'resume keyword optimizer',
+    'ATS-friendly resume',
+    'AI cover letter generator',
+    'LinkedIn profile optimizer',
+    'interview preparation AI',
     'job search strategy',
-    'resume templates',
+    'resume rewriter AI',
     'career toolkit',
+    'applicant tracking system resume',
   ],
   authors: [{ name: 'AURI' }],
   creator: 'AURI',
@@ -31,9 +35,9 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true },
   },
   openGraph: {
-    title: 'AURI — AI-Powered Career Toolkit',
+    title: 'AURI — AI Resume Builder & Career Toolkit',
     description:
-      'Build ATS-optimized resumes, rewrite your LinkedIn, craft cover letters, and prepare for interviews — all powered by Claude AI.',
+      'Build ATS-optimized resumes tailored to every job. Rewrite your LinkedIn, generate cover letters, and prep for interviews — all in one AI-powered system.',
     type: 'website',
     siteName: 'AURI',
     url: APP_URL,
@@ -41,10 +45,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AURI — AI-Powered Career Toolkit',
+    title: 'AURI — AI Resume Builder & Career Toolkit',
     description:
-      'Build ATS-optimized resumes, rewrite your LinkedIn, craft cover letters, and prepare for interviews — powered by AI.',
+      'Build ATS-optimized resumes tailored to every job. AI-powered career toolkit.',
     // twitter:image is auto-injected by app/twitter-image.tsx (falls back to opengraph-image)
+  },
+  alternates: {
+    canonical: APP_URL,
   },
   icons: {
     icon: '/favicon.svg',
