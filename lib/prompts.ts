@@ -152,6 +152,53 @@ Return ONLY valid JSON:
 }`
 }
 
+// ── ATS Fix (rewrite resume to improve score) ────────────────────────────────
+
+/**
+ * Why plain-text output: The improved resume is shown in an editable textarea
+ * and copied as-is to clipboard — no JSON parsing needed, no formatting lost.
+ *
+ * Why strict "no false information" rule: Users will submit this text to employers.
+ * Any invented facts are a liability. Constraint stated up front bounds generation.
+ */
+export function buildATSFixPrompt(
+  resumeText: string,
+  jobDescription: string,
+  missingKeywords: string[],
+  formattingIssues: string[],
+  suggestions: string[]
+): string {
+  return `You are an ATS optimization expert and senior resume writer.
+
+Rewrite this resume to score higher against the job description by naturally incorporating the missing keywords and fixing the issues found.
+
+Original resume:
+${resumeText}
+
+Job description:
+${jobDescription}
+
+Missing keywords to add naturally:
+${missingKeywords.length ? missingKeywords.join(', ') : 'None'}
+
+Formatting issues to fix:
+${formattingIssues.length ? formattingIssues.map((s) => `- ${s}`).join('\n') : 'None'}
+
+Suggestions to implement:
+${suggestions.length ? suggestions.map((s) => `- ${s}`).join('\n') : 'None'}
+
+STRICT RULES:
+- Add missing keywords naturally into existing bullet points — never force them awkwardly
+- NEVER add false information, fake numbers, or achievements the person did not have
+- Keep all facts, dates, companies, and titles exactly the same
+- Only improve phrasing and keyword density
+- Fix any formatting issues listed above
+- Maintain the same resume structure and sections
+- Return ONLY the improved resume text
+- No explanations, no preamble, no commentary
+- Just the clean improved resume text`
+}
+
 // ── Feature 3 — Easy Tune (per-bullet AI Assist) ─────────────────────────────
 
 /**

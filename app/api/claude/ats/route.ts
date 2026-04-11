@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { callClaude, buildErrorResponse, parseClaudeJSON, MAX_TOKENS_ANALYSIS } from '@/lib/claude'
-import { buildATSScorePrompt } from '@/lib/prompts'
+import { buildATSScorePrompt, buildATSFixPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
 import { checkBetaLimits, incrementBetaCall } from '@/lib/betaGuard'
@@ -16,10 +16,15 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Request too large', code: 'PAYLOAD_TOO_LARGE' }, { status: 413 })
     }
     const body = await req.json() as {
-      resumePlainText: string
+      mode?: 'score' | 'fix'
+      resumePlainText?: string
+      resumeText?: string
       jobDescription: string
       uid?: string
       isPro?: boolean
+      missingKeywords?: string[]
+      formattingIssues?: string[]
+      suggestions?: string[]
     }
 
     // Server-side auth + rate limiting (guests allowed — fall back to IP rate limit)
@@ -27,10 +32,6 @@ export async function POST(req: NextRequest) {
     const identifier = getIdentifier(req, verifiedUser?.uid)
     const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)
-
-    if (!body.resumePlainText || !body.jobDescription) {
-      return buildErrorResponse('resumePlainText and jobDescription are required', 400)
-    }
 
     // Beta gate — requires sign-in; guests are blocked in beta mode
     if (APP_CONFIG.BETA_MODE) {
@@ -41,7 +42,40 @@ export async function POST(req: NextRequest) {
       if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
     }
 
-    const prompt = buildATSScorePrompt(body.resumePlainText, body.jobDescription)
+    const mode = body.mode ?? 'score'
+
+    // ── Fix mode: rewrite resume to incorporate missing keywords / fix issues ──
+    if (mode === 'fix') {
+      const resumeText = body.resumeText ?? body.resumePlainText ?? ''
+      if (!resumeText || !body.jobDescription) {
+        return buildErrorResponse('resumeText and jobDescription are required', 400)
+      }
+
+      const prompt = buildATSFixPrompt(
+        resumeText,
+        body.jobDescription,
+        body.missingKeywords ?? [],
+        body.formattingIssues ?? [],
+        body.suggestions ?? []
+      )
+      // Plain text output — higher token limit to allow full resume
+      const { text, inputTokens, outputTokens } = await callClaude(prompt, MAX_TOKENS_ANALYSIS)
+      if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
+
+      return Response.json({
+        success: true,
+        improvedResume: text.trim(),
+        usage: { input_tokens: inputTokens, output_tokens: outputTokens },
+      })
+    }
+
+    // ── Score mode (default) ──────────────────────────────────────────────────
+    const resumePlainText = body.resumePlainText ?? body.resumeText ?? ''
+    if (!resumePlainText || !body.jobDescription) {
+      return buildErrorResponse('resumePlainText and jobDescription are required', 400)
+    }
+
+    const prompt = buildATSScorePrompt(resumePlainText, body.jobDescription)
     const { text, inputTokens, outputTokens } = await callClaude(prompt, MAX_TOKENS_ANALYSIS)
     const data = parseClaudeJSON<ATSScore>(text)
     if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)

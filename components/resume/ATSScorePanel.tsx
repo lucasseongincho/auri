@@ -12,6 +12,7 @@ interface ATSScorePanelProps {
   isLoading: boolean
   onFixAll: () => void
   isFixing: boolean
+  fixingLabel?: string
 }
 
 function ScoreMeter({ score, prevScore }: { score: number; prevScore?: number }) {
@@ -61,7 +62,7 @@ function ScoreMeter({ score, prevScore }: { score: number; prevScore?: number })
   )
 }
 
-export default function ATSScorePanel({ score, isLoading, onFixAll, isFixing }: ATSScorePanelProps) {
+export default function ATSScorePanel({ score, isLoading, onFixAll, isFixing, fixingLabel = 'Fixing...' }: ATSScorePanelProps) {
   const [prevScore, setPrevScore] = useState<number | undefined>()
 
   useEffect(() => {
@@ -123,7 +124,7 @@ export default function ATSScorePanel({ score, isLoading, onFixAll, isFixing }: 
                 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isFixing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
-              {isFixing ? 'Fixing...' : 'Fix All Issues'}
+              {isFixing ? fixingLabel : 'Fix All Issues'}
             </button>
           </div>
         </div>

@@ -1246,9 +1246,14 @@ export default function ResumePage() {
   const [isATSLoading, setIsATSLoading] = useState(false)
   const [isFixingATS, setIsFixingATS] = useState(false)
   const [editedResume, setEditedResume] = useState<ResumeData | null>(null)
+  // Gate right-side display — false until a resume is generated in this session.
+  // Prevents the previous session's persisted resume and ATS score from appearing on load.
+  const [hasSessionResume, setHasSessionResume] = useState(false)
 
   // The active resume data — prefer locally edited version
   const activeResume = editedResume ?? currentResume
+  // Display resume — null until this session produces one
+  const displayResume = hasSessionResume ? activeResume : null
 
   // Sync Firestore when profile changes and user is authenticated
   useEffect(() => {
@@ -1447,6 +1452,7 @@ export default function ResumePage() {
         }
         setResume(resume)
         setEditedResume(resume)
+        setHasSessionResume(true)
         setIsEditing(false) // start in preview mode; user clicks Edit to enter inline editing
         // Show estimate disclaimer on first generation
         if (!profile.hasSeenEstimateDisclaimer) {
@@ -1804,7 +1810,7 @@ export default function ResumePage() {
                 </div>
 
                 {/* Generate shortcut hint on last step */}
-                {isLastStep && activeResume && (
+                {isLastStep && displayResume && (
                   <p className="text-xs text-[#60607A] text-center mt-2">
                     Resume generated — edit inline in the preview or regenerate
                   </p>
@@ -1826,7 +1832,7 @@ export default function ResumePage() {
         >
           {/* Save button row — shown when resume exists */}
           <AnimatePresence>
-            {activeResume && (
+            {displayResume && (
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1858,29 +1864,29 @@ export default function ResumePage() {
 
           {/* Resume Preview / Editor */}
           <div className="flex-shrink-0">
-            {isEditing && activeResume ? (
+            {isEditing && displayResume ? (
               <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
                 <div className="rounded-xl border border-white/[0.05] bg-white overflow-auto"
                   style={{ minHeight: '600px' }}>
                   <ResumeEditor
-                    resumeData={activeResume}
+                    resumeData={displayResume}
                     personal={personal}
                     onDataChange={(updated) => setEditedResume(updated)}
                   >
-                    {renderTemplate(activeResume)}
+                    {renderTemplate(displayResume)}
                   </ResumeEditor>
                 </div>
               </div>
             ) : (
               <ResumePreview
-                data={activeResume}
+                data={displayResume}
                 personal={personal}
                 isStreaming={isStreaming}
                 streamText={streamedText}
                 onTemplateChange={(id: TemplateId) => {
                   setSelectedTemplate(id)
-                  if (activeResume) {
-                    const updated = { ...activeResume, templateId: id }
+                  if (displayResume) {
+                    const updated = { ...displayResume, templateId: id }
                     setResume(updated)
                     setEditedResume(updated)
                   }
@@ -1891,7 +1897,7 @@ export default function ResumePage() {
 
           {/* Toggle edit mode button — shown after generation */}
           <AnimatePresence>
-            {activeResume && !isStreaming && (
+            {displayResume && !isStreaming && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -1926,7 +1932,7 @@ export default function ResumePage() {
 
           {/* Run ATS Score button — shown when resume exists but no score yet */}
           <AnimatePresence>
-            {activeResume && !isStreaming && !atsScore && !isATSLoading && (
+            {displayResume && !isStreaming && !atsScore && !isATSLoading && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1938,7 +1944,7 @@ export default function ResumePage() {
                   onClick={() => {
                     const jd = profile?.target.job_description
                     if (!jd) return
-                    const plainText = activeResume.plain ?? buildPlainText(activeResume, profile?.personal ?? {})
+                    const plainText = displayResume.plain ?? buildPlainText(displayResume, profile?.personal ?? {})
                     runATSScore(plainText, jd)
                   }}
                   disabled={!profile?.target.job_description}
@@ -1959,7 +1965,7 @@ export default function ResumePage() {
 
           {/* ATS Score Panel */}
           <AnimatePresence>
-            {(atsScore || isATSLoading) && (
+            {hasSessionResume && (atsScore || isATSLoading) && (
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1977,8 +1983,8 @@ export default function ResumePage() {
             )}
           </AnimatePresence>
 
-          {/* Empty state — no resume yet */}
-          {!activeResume && !isStreaming && (
+          {/* Empty state — no resume yet in this session */}
+          {!displayResume && !isStreaming && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
