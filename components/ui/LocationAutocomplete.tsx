@@ -55,17 +55,22 @@ function getPlacesLib(): Promise<google.maps.PlacesLibrary | null> {
 
 function formatPrediction(prediction: google.maps.places.AutocompletePrediction): string {
   const terms = prediction.terms
-  if (terms.length >= 3) {
-    const country = terms[terms.length - 1].value
-    if (country === 'USA' || country === 'United States') {
-      return `${terms[0].value}, ${terms[1].value}`
+  if (terms.length >= 2) {
+    const lastTerm = terms[terms.length - 1].value
+    if (lastTerm === 'USA' || lastTerm === 'United States') {
+      // US locations: "City, State" (use first two terms)
+      if (terms.length >= 3) {
+        return `${terms[0].value}, ${terms[1].value}`
+      }
+      return terms[0].value
     }
-    return `${terms[0].value}, ${country}`
+    // International: "City, Country"
+    return `${terms[0].value}, ${lastTerm}`
   }
-  if (terms.length === 2) {
-    return `${terms[0].value}, ${terms[1].value}`
-  }
+  // Fallback: strip USA suffix from description
   return prediction.description
+    .replace(', USA', '')
+    .replace(', United States', '')
 }
 
 interface LocationAutocompleteProps {
@@ -159,11 +164,11 @@ export default function LocationAutocomplete({
     if (!service) return
 
     service.getPlacePredictions(
-      { input, types: ['(cities)'] },
+      { input, types: ['(regions)'] },
       (predictions, status) => {
         const cityResults =
           status === google.maps.places.PlacesServiceStatus.OK && predictions
-            ? predictions.slice(0, 5).map(formatPrediction)
+            ? predictions.slice(0, 6).map(formatPrediction)
             : []
 
         if (cityResults.length === 0) return
