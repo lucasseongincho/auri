@@ -12,6 +12,7 @@ const ALWAYS_SHOW = [
 ]
 
 const FALLBACK_CITIES = [
+  // Major US cities
   'New York, NY', 'Los Angeles, CA',
   'Chicago, IL', 'San Francisco, CA',
   'Seattle, WA', 'Austin, TX',
@@ -21,33 +22,61 @@ const FALLBACK_CITIES = [
   'Portland, OR', 'Nashville, TN',
   'Phoenix, AZ', 'San Diego, CA',
   'Minneapolis, MN', 'Detroit, MI',
+  'Philadelphia, PA', 'Houston, TX',
+  // Tech hubs & suburbs
+  'Palo Alto, CA', 'Menlo Park, CA',
+  'Mountain View, CA', 'Sunnyvale, CA',
+  'San Jose, CA', 'Bellevue, WA',
+  'Redmond, WA', 'Kirkland, WA',
+  'Melville, NY', 'Hoboken, NJ',
+  'Jersey City, NJ', 'Stamford, CT',
+  'Cambridge, MA', 'Somerville, MA',
+  'Brooklyn, NY', 'Queens, NY',
+  'Reston, VA', 'McLean, VA',
+  'Bethesda, MD',
+  // International
   'London, UK', 'Toronto, Canada',
-  'Vancouver, Canada', 'Sydney, Australia',
+  'Vancouver, Canada', 'Montreal, Canada',
+  'Sydney, Australia', 'Melbourne, Australia',
   'Singapore', 'Tokyo, Japan',
   'Seoul, South Korea', 'Berlin, Germany',
   'Amsterdam, Netherlands', 'Paris, France',
-  'Dubai, UAE',
+  'Dublin, Ireland', 'Zurich, Switzerland',
+  'Dubai, UAE', 'Tel Aviv, Israel',
 ]
 
-// Singleton: Places library is loaded at most once
+// Singleton: Places library is loaded at most once per session.
+// No artificial timeout — we let the Google Maps API handle errors itself.
 let placesLibPromise: Promise<google.maps.PlacesLibrary | null> | null = null
 
 // TODO SECURITY: Ensure NEXT_PUBLIC_GOOGLE_PLACES_API_KEY has HTTP referrer
 // restrictions set in GCP Console → APIs & Services → Credentials:
-//   https://console.cloud.google.com
-//   Allowed referrers: https://auri-beta.vercel.app/*
-//                      http://localhost:*
+//   Allowed referrers: https://auri-beta.vercel.app/*  http://localhost:*
 function getPlacesLib(): Promise<google.maps.PlacesLibrary | null> {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY?.trim()
-  if (!apiKey) return Promise.resolve(null)
+
+  console.log('[LocationAutocomplete] API key present:', !!apiKey)
+  if (apiKey) {
+    console.log('[LocationAutocomplete] API key prefix:', apiKey.substring(0, 10))
+  } else {
+    console.error('[LocationAutocomplete] MISSING: NEXT_PUBLIC_GOOGLE_PLACES_API_KEY')
+    return Promise.resolve(null)
+  }
 
   if (!placesLibPromise) {
+    console.log('[LocationAutocomplete] Initialising Google Places…')
     setOptions({ key: apiKey, v: 'weekly' })
-    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000))
-    placesLibPromise = Promise.race([
-      importLibrary('places').then((lib) => lib as google.maps.PlacesLibrary),
-      timeout,
-    ]).catch(() => null)
+    placesLibPromise = importLibrary('places')
+      .then((lib) => {
+        console.log('[LocationAutocomplete] Google Places loaded ✓')
+        return lib as google.maps.PlacesLibrary
+      })
+      .catch((err) => {
+        console.error('[LocationAutocomplete] Google Places load failed:', err)
+        // Reset so the next call retries (e.g. after a transient network error)
+        placesLibPromise = null
+        return null
+      })
   }
 
   return placesLibPromise
@@ -58,16 +87,13 @@ function formatPrediction(prediction: google.maps.places.AutocompletePrediction)
   if (terms.length >= 2) {
     const lastTerm = terms[terms.length - 1].value
     if (lastTerm === 'USA' || lastTerm === 'United States') {
-      // US locations: "City, State" (use first two terms)
       if (terms.length >= 3) {
         return `${terms[0].value}, ${terms[1].value}`
       }
       return terms[0].value
     }
-    // International: "City, Country"
     return `${terms[0].value}, ${lastTerm}`
   }
-  // Fallback: strip USA suffix from description
   return prediction.description
     .replace(', USA', '')
     .replace(', United States', '')
@@ -161,11 +187,16 @@ export default function LocationAutocomplete({
     // Upgrade with Google Places results if available
     const lib = await getPlacesLib().catch(() => null)
     const service = lib ? new lib.AutocompleteService() : null
+
+    console.log('[LocationAutocomplete] Places service available:', !!service)
+
     if (!service) return
 
     service.getPlacePredictions(
       { input, types: ['geocode'] },
       (predictions, status) => {
+        console.log('[LocationAutocomplete] Places status:', status, '| count:', predictions?.length ?? 0)
+
         const cityResults =
           status === google.maps.places.PlacesServiceStatus.OK && predictions
             ? predictions.slice(0, 6).map(formatPrediction)
