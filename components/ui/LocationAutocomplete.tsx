@@ -45,58 +45,48 @@ const FALLBACK_CITIES = [
   'Dubai, UAE', 'Tel Aviv, Israel',
 ]
 
-// Singleton: Places library is loaded at most once per session.
-// No artificial timeout — we let the Google Maps API handle errors itself.
-let placesLibPromise: Promise<google.maps.PlacesLibrary | null> | null = null
-
-// TODO SECURITY: Ensure NEXT_PUBLIC_GOOGLE_PLACES_API_KEY has HTTP referrer
-// restrictions set in GCP Console → APIs & Services → Credentials:
-//   Allowed referrers: https://auri-beta.vercel.app/*  http://localhost:*
-function getPlacesLib(): Promise<google.maps.PlacesLibrary | null> {
+// Bootstrap the Google Maps loader once per session.
+// setOptions() from @googlemaps/js-api-loader installs google.maps.importLibrary
+// globally; repeated calls after the first are silently ignored by the library.
+let mapsBootstrapped = false
+function ensureMapsBootstrapped() {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY?.trim()
-
   console.log('[LocationAutocomplete] API key present:', !!apiKey)
-  if (apiKey) {
-    console.log('[LocationAutocomplete] API key prefix:', apiKey.substring(0, 10))
-  } else {
+  if (!apiKey) {
     console.error('[LocationAutocomplete] MISSING: NEXT_PUBLIC_GOOGLE_PLACES_API_KEY')
-    return Promise.resolve(null)
+    return false
   }
-
-  if (!placesLibPromise) {
-    console.log('[LocationAutocomplete] Initialising Google Places…')
+  console.log('[LocationAutocomplete] API key prefix:', apiKey.substring(0, 10))
+  if (!mapsBootstrapped) {
     setOptions({ key: apiKey, v: 'weekly' })
-    placesLibPromise = importLibrary('places')
-      .then((lib) => {
-        console.log('[LocationAutocomplete] Google Places loaded ✓')
-        return lib as google.maps.PlacesLibrary
-      })
-      .catch((err) => {
-        console.error('[LocationAutocomplete] Google Places load failed:', err)
-        // Reset so the next call retries (e.g. after a transient network error)
-        placesLibPromise = null
-        return null
-      })
+    mapsBootstrapped = true
+    console.log('[LocationAutocomplete] Maps bootstrapped via setOptions')
   }
-
-  return placesLibPromise
+  return true
 }
 
-function formatPrediction(prediction: google.maps.places.AutocompletePrediction): string {
-  const terms = prediction.terms
-  if (terms.length >= 2) {
-    const lastTerm = terms[terms.length - 1].value
-    if (lastTerm === 'USA' || lastTerm === 'United States') {
-      if (terms.length >= 3) {
-        return `${terms[0].value}, ${terms[1].value}`
-      }
-      return terms[0].value
-    }
-    return `${terms[0].value}, ${lastTerm}`
+// Format a suggestion's main + secondary text into "City, State" or "City, Country"
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function formatSuggestion(suggestion: any): string {
+  const place = suggestion.placePrediction
+  const mainText: string = place?.mainText?.text ?? ''
+  const secondaryText: string = place?.secondaryText?.text ?? ''
+
+  if (!mainText) return ''
+
+  if (secondaryText.includes('USA') || secondaryText.includes('United States')) {
+    // secondaryText is e.g. "Suffolk County, NY, USA" or "New York, NY, USA"
+    // We want the state abbreviation — typically the second-to-last comma-part
+    const parts = secondaryText.split(', ')
+    // Find the 2-letter state abbreviation (part before "USA" / "United States")
+    const stateIndex = parts.findIndex((p) => p === 'USA' || p === 'United States')
+    const state = stateIndex > 0 ? parts[stateIndex - 1] : parts[0]
+    return `${mainText}, ${state}`
   }
-  return prediction.description
-    .replace(', USA', '')
-    .replace(', United States', '')
+
+  // International: last comma-segment is the country
+  const country = secondaryText.split(', ').pop() ?? secondaryText
+  return country ? `${mainText}, ${country}` : mainText
 }
 
 interface LocationAutocompleteProps {
@@ -125,7 +115,7 @@ export default function LocationAutocomplete({
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Position dropdown using input's bounding rect so it escapes overflow:hidden parents
+  // Position dropdown using input's bounding rect so it escapes overflow parents
   function updateDropdownPosition() {
     if (!inputRef.current) return
     const rect = inputRef.current.getBoundingClientRect()
@@ -171,12 +161,11 @@ export default function LocationAutocomplete({
     const remoteMatches = ALWAYS_SHOW.filter((opt) =>
       opt.toLowerCase().includes(input.toLowerCase())
     )
-
     const cityMatches = FALLBACK_CITIES.filter((city) =>
       city.toLowerCase().includes(input.toLowerCase())
     ).slice(0, 5)
 
-    // Show fallback immediately — don't wait for Places API
+    // Show fallback list immediately — don't wait for Places API
     const fallback = [...remoteMatches, ...cityMatches].slice(0, 7)
     setSuggestions(fallback)
     if (fallback.length > 0) {
@@ -184,31 +173,53 @@ export default function LocationAutocomplete({
       setIsOpen(true)
     }
 
-    // Upgrade with Google Places results if available
-    const lib = await getPlacesLib().catch(() => null)
-    const service = lib ? new lib.AutocompleteService() : null
+    // Attempt to upgrade with live Places results
+    if (!ensureMapsBootstrapped()) return
 
-    console.log('[LocationAutocomplete] Places service available:', !!service)
+    try {
+      // importLibrary from @googlemaps/js-api-loader delegates to
+      // google.maps.importLibrary which was installed by setOptions above.
+      // This loads the new Places (New) library which includes AutocompleteSuggestion.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const placesLib = await importLibrary('places') as any
+      const { AutocompleteSuggestion } = placesLib
 
-    if (!service) return
+      console.log('[LocationAutocomplete] AutocompleteSuggestion available:', !!AutocompleteSuggestion)
 
-    service.getPlacePredictions(
-      { input, types: ['geocode'] },
-      (predictions, status) => {
-        console.log('[LocationAutocomplete] Places status:', status, '| count:', predictions?.length ?? 0)
+      if (!AutocompleteSuggestion) {
+        console.warn('[LocationAutocomplete] AutocompleteSuggestion not found in library')
+        return
+      }
 
-        const cityResults =
-          status === google.maps.places.PlacesServiceStatus.OK && predictions
-            ? predictions.slice(0, 6).map(formatPrediction)
-            : []
+      const { suggestions: apiSuggestions } =
+        await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+          input,
+          includedPrimaryTypes: [
+            'locality',
+            'sublocality',
+            'administrative_area_level_3',
+            'postal_town',
+          ],
+        })
 
-        if (cityResults.length === 0) return
-        const combined = [...remoteMatches, ...cityResults].slice(0, 7)
-        setSuggestions(combined)
+      console.log('[LocationAutocomplete] Places results:', apiSuggestions?.length ?? 0)
+
+      const cityResults: string[] = (apiSuggestions ?? [])
+        .slice(0, 6)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((s: any) => formatSuggestion(s))
+        .filter(Boolean)
+
+      const combined = [...remoteMatches, ...cityResults].slice(0, 7)
+      setSuggestions(combined)
+      if (combined.length > 0) {
         updateDropdownPosition()
         setIsOpen(true)
       }
-    )
+    } catch (error) {
+      console.error('[LocationAutocomplete] AutocompleteSuggestion error:', error)
+      // Fallback list is already displayed — nothing more to do
+    }
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
