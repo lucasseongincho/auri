@@ -15,7 +15,6 @@ import {
   Clock,
 } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
-import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
@@ -237,7 +236,7 @@ export default function StrategyPage() {
           <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-4">
             <div>
               <label className={LABEL_CLASS}>Target Position <span className="text-[#EF4444]">*</span></label>
-              <JobTitleAutocomplete value={targetPosition} onChange={setTargetPosition} placeholder="Growth Marketing Manager" className={INPUT_CLASS} aria-label="Target position" />
+              <input type="text" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} placeholder="Growth Marketing Manager" className={INPUT_CLASS} aria-label="Target position" style={{ fontSize: '16px' }} />
             </div>
             <div>
               <label className={LABEL_CLASS}>Sector / Industry</label>

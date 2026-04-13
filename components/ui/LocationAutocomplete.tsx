@@ -164,7 +164,7 @@ export default function LocationAutocomplete({
     if (!service) return
 
     service.getPlacePredictions(
-      { input, types: ['(regions)'] },
+      { input, types: ['geocode'] },
       (predictions, status) => {
         const cityResults =
           status === google.maps.places.PlacesServiceStatus.OK && predictions

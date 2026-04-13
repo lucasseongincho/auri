@@ -25,7 +25,6 @@ import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
-import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 import { saveInterviewPrep, saveGuestInterviewPrep } from '@/lib/firestore'
 import type { InterviewPrep, InterviewQuestion } from '@/types'
@@ -481,7 +480,7 @@ export default function InterviewPage() {
               )}
               <div>
                 <label className={LABEL_CLASS}>Position <span className="text-[#EF4444]">*</span></label>
-                <JobTitleAutocomplete value={position} onChange={setPosition} placeholder="Senior Backend Engineer" className={INPUT_CLASS} aria-label="Position" />
+                <input type="text" value={position} onChange={(e) => setPosition(e.target.value)} placeholder="Senior Backend Engineer" className={INPUT_CLASS} aria-label="Position" style={{ fontSize: '16px' }} />
               </div>
               <div>
                 <label className={LABEL_CLASS}>Company Name <span className="text-[#EF4444]">*</span></label>

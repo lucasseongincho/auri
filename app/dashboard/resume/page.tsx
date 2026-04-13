@@ -55,7 +55,6 @@ import type {
   TemplateId,
   ATSScore,
 } from '@/types'
-import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 
@@ -1060,7 +1059,7 @@ function StepTargetJob({ errors }: { errors: Step8Errors }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Target Position" required error={errors.position}>
-          <JobTitleAutocomplete value={target.position} onChange={(v) => update('position', v)} placeholder="Senior Software Engineer" className={INPUT_CLASS} aria-label="Target position" />
+          <input type="text" value={target.position} onChange={(e) => update('position', e.target.value)} placeholder="Senior Software Engineer" className={INPUT_CLASS} aria-label="Target position" style={{ fontSize: '16px' }} />
         </Field>
         <Field label="Target Company" required error={errors.company}>
           <CompanyAutocomplete value={target.company} onChange={(v) => update('company', v)} placeholder="Google" className={INPUT_CLASS} aria-label="Target company" />

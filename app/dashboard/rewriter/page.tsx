@@ -33,7 +33,6 @@ import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
 import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
 import CreativePulse from '@/components/resume/templates/CreativePulse'
 import type { ResumeData, PersonalInfo, SavedResume, ATSScore, TemplateId } from '@/types'
-import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -668,13 +667,7 @@ export default function RewriterPage() {
                       <label className={LABEL_CLASS}>
                         Target Position <span className="text-[#EF4444]">*</span>
                       </label>
-                      <JobTitleAutocomplete
-                        value={targetPosition}
-                        onChange={setTargetPosition}
-                        placeholder="Senior Product Manager"
-                        className={INPUT_CLASS}
-                        aria-label="Target position"
-                      />
+                      <input type="text" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} placeholder="Senior Product Manager" className={INPUT_CLASS} aria-label="Target position" style={{ fontSize: '16px' }} />
                     </div>
                     <div>
                       <label className={LABEL_CLASS}>Company Name</label>

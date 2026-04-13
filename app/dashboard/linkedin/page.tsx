@@ -13,7 +13,6 @@ import {
   Briefcase,
 } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
-import JobTitleAutocomplete from '@/components/ui/JobTitleAutocomplete'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import type { LinkedInRewrite } from '@/types'
@@ -175,7 +174,7 @@ export default function LinkedInPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL_CLASS}>Target Position <span className="text-[#EF4444]">*</span></label>
-                <JobTitleAutocomplete value={targetPosition} onChange={setTargetPosition} placeholder="Product Manager" className={INPUT_CLASS} aria-label="Target position" />
+                <input type="text" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} placeholder="Product Manager" className={INPUT_CLASS} aria-label="Target position" style={{ fontSize: '16px' }} />
               </div>
               <div>
                 <label className={LABEL_CLASS}>Sector / Industry</label>
