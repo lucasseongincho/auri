@@ -15,6 +15,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [marketingConsent, setMarketingConsent] = useState(true)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -27,7 +28,7 @@ export default function SignupPage() {
     }
     setLoading(true)
     try {
-      await signUpWithEmail(email, password)
+      await signUpWithEmail(email, password, { name, marketingConsent })
       router.push('/dashboard')
     } catch {
       setError('Account creation failed. This email may already be in use.')
@@ -163,6 +164,19 @@ export default function SignupPage() {
                   />
                 </div>
               </div>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={marketingConsent}
+                  onChange={(e) => setMarketingConsent(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border border-white/20 bg-white/5 accent-[#6366F1] flex-shrink-0"
+                  aria-label="Marketing consent"
+                />
+                <span className="text-xs text-[#A0A0B8] leading-relaxed">
+                  Send me tips on getting hired, product updates, and career advice. Unsubscribe anytime.
+                </span>
+              </label>
 
               {error && <p className="text-[#EF4444] text-xs">{error}</p>}
 

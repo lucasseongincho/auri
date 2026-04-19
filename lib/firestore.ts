@@ -15,6 +15,33 @@ import { db } from '@/lib/firebase'
 import { APP_CONFIG } from '@/lib/config'
 import type { CareerProfile, SavedResume, SavedInterviewPrep, InterviewPrep } from '@/types'
 
+// ── User Profile Bootstrap ────────────────────────────────────────────────────
+// Called on sign-up and Google sign-in to persist auth metadata to Firestore.
+// Uses merge: true + field-existence check so existing data is never overwritten.
+
+export async function ensureUserProfileFields(uid: string, fields: {
+  email?: string | null
+  displayName?: string | null
+  marketingConsent?: boolean
+}): Promise<void> {
+  const ref = doc(db, 'users', uid, 'profile', 'data')
+  const snap = await getDoc(ref)
+  const existing = snap.exists() ? snap.data() : {}
+
+  const updates: Record<string, unknown> = {}
+  if (fields.email && !existing['email']) updates['email'] = fields.email
+  if (fields.displayName && !existing['displayName']) updates['displayName'] = fields.displayName
+  if (fields.marketingConsent !== undefined && !('marketingConsent' in existing)) {
+    updates['marketingConsent'] = fields.marketingConsent
+    if (fields.marketingConsent) updates['marketingConsentAt'] = serverTimestamp()
+  }
+  if (!snap.exists()) updates['createdAt'] = serverTimestamp()
+
+  if (Object.keys(updates).length > 0) {
+    await setDoc(ref, updates, { merge: true })
+  }
+}
+
 // ── Career Profile ─────────────────────────────────────────────────────────────
 
 export async function getCareerProfile(uid: string): Promise<CareerProfile | null> {

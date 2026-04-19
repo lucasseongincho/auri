@@ -26,7 +26,7 @@ interface InterviewRequestBody {
 
 async function attemptStream(prompt: string, retryCount = 0): Promise<ReadableStream<Uint8Array>> {
   try {
-    const claudeStream = await streamClaude(prompt, 4096)
+    const claudeStream = await streamClaude(prompt, 8192)
     return new ReadableStream<Uint8Array>({
       async start(controller) {
         try {

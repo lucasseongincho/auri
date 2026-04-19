@@ -2000,7 +2000,7 @@ export default function ResumePage() {
               </p>
               <p className="text-xs text-[#60607A] max-w-xs">
                 Complete the form steps and click <strong className="text-[#6366F1]">Generate Resume</strong> on
-                step 7 to create your AI-tailored resume.
+                step 8 to create your AI-tailored resume.
               </p>
             </motion.div>
           )}

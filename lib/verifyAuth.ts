@@ -1,4 +1,5 @@
 import { adminAuth, adminDb } from '@/lib/firebaseAdmin'
+import admin from '@/lib/firebaseAdmin'
 
 export interface VerifiedUser {
   uid: string
@@ -35,6 +36,13 @@ export async function getAuthenticatedUser(req: Request): Promise<VerifiedUser |
 
     const snap = await adminDb.doc(`users/${uid}/profile/data`).get()
     const isPro = snap.exists ? (snap.data()?.isPro === true) : false
+
+    // Fire-and-forget: update lastActiveAt on every authenticated API call.
+    // Non-blocking — never delays the response if Firestore is slow.
+    adminDb.doc(`users/${uid}/profile/data`).set(
+      { lastActiveAt: admin.firestore.FieldValue.serverTimestamp() },
+      { merge: true }
+    ).catch(() => {/* silently ignore */})
 
     return { uid, isPro, email: decoded.email }
   } catch {

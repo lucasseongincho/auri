@@ -6,13 +6,20 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  updateProfile,
   signOut,
   GoogleAuthProvider,
   User,
 } from 'firebase/auth'
 import { auth, hasConfig } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
+import { ensureUserProfileFields } from '@/lib/firestore'
 import type { AuthUser } from '@/types'
+
+interface SignUpOptions {
+  name?: string
+  marketingConsent?: boolean
+}
 
 interface AuthContextValue {
   user: AuthUser | null
@@ -20,7 +27,7 @@ interface AuthContextValue {
   isAuthenticated: boolean
   signInWithGoogle: () => Promise<User>
   signInWithEmail: (email: string, password: string) => Promise<User>
-  signUpWithEmail: (email: string, password: string) => Promise<User>
+  signUpWithEmail: (email: string, password: string, options?: SignUpOptions) => Promise<User>
   logout: () => Promise<void>
 }
 
@@ -48,6 +55,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Single source of truth: loadFromFirestore only here, not in sign-in methods.
         // This prevents double-reads on sign-in (listener fires after signInWithPopup resolves).
         await useCareerStore.getState().loadFromFirestore(firebaseUser.uid)
+        // Persist auth metadata to Firestore for Google sign-ins and any gaps.
+        // ensureUserProfileFields only writes fields that are missing — no overwrites.
+        ensureUserProfileFields(firebaseUser.uid, {
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+        }).catch(() => {/* non-blocking */})
       } else {
         setUser(null)
       }
@@ -68,10 +81,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return result.user
   }, [])
 
-  const signUpWithEmail = useCallback(async (email: string, password: string) => {
+  const signUpWithEmail = useCallback(async (email: string, password: string, options?: SignUpOptions) => {
     if (!hasConfig) throw new Error('Firebase is not configured.')
     const result = await createUserWithEmailAndPassword(auth, email, password)
-    return result.user
+    const firebaseUser = result.user
+    // Set displayName on the Firebase Auth profile
+    if (options?.name?.trim()) {
+      await updateProfile(firebaseUser, { displayName: options.name.trim() })
+    }
+    // Write email, displayName, marketingConsent to Firestore (merge: true, no overwrites)
+    await ensureUserProfileFields(firebaseUser.uid, {
+      email: firebaseUser.email,
+      displayName: options?.name?.trim() || firebaseUser.displayName,
+      marketingConsent: options?.marketingConsent ?? false,
+    })
+    return firebaseUser
   }, [])
 
   const logout = useCallback(async () => {
