@@ -119,7 +119,7 @@ export default function CreativePulse({ data, personal, isEditing: _isEditing, r
           .creative-pulse .resume-link { color: inherit !important; text-decoration: underline !important; }
         }
       `}</style>
-      <div className="creative-pulse" style={{ width: '210mm', minHeight: '297mm', boxSizing: 'border-box' }} data-ats-field="resume-root">
+      <div className="creative-pulse" style={{ width: '8.5in', minHeight: '11in', boxSizing: 'border-box' }} data-ats-field="resume-root">
 
         {/* Name block */}
         <div className="name-block" data-ats-field="header">

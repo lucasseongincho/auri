@@ -29,7 +29,7 @@ export default function MinimalSeoul({ data, personal, isEditing: _isEditing, re
   return (
     <>
       <style>{`
-        .minimal-seoul { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #111; background: white; width: 210mm; min-height: 297mm; box-sizing: border-box; }
+        .minimal-seoul { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #111; background: white; width: 8.5in; min-height: 11in; box-sizing: border-box; }
         .minimal-seoul h1 { font-size: 26px; font-weight: 200; letter-spacing: 0.08em; margin: 0 0 5px 0; color: #0a0a0a; }
         .minimal-seoul .contact-line { font-size: 9.5px; color: #888; letter-spacing: 0.06em; margin-bottom: 20px; }
         .minimal-seoul .section-header { font-size: 8.5px; font-weight: 400; letter-spacing: 0.25em; text-transform: uppercase; color: #999; margin: 18px 0 8px 0; }

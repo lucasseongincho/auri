@@ -27,13 +27,14 @@ export async function generatePDFFromElement(
   // that matches the content exactly — this guarantees exactly 1 PDF page
   // regardless of how much content the template contains.
   const PX_PER_MM = 3.7795
-  const A4_HEIGHT_MM = 297
+  const LETTER_WIDTH_MM = 215.9   // 8.5in
+  const LETTER_HEIGHT_MM = 279.4  // 11in
   const contentHeightMm = element.scrollHeight / PX_PER_MM
   // html2pdf.js supports [width, height] arrays at runtime but @types/html2pdf.js
   // incorrectly declares format as string only — cast to bypass the type error.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pageFormat: any =
-    contentHeightMm <= A4_HEIGHT_MM ? 'a4' : [210, Math.ceil(contentHeightMm)]
+    contentHeightMm <= LETTER_HEIGHT_MM ? 'letter' : [LETTER_WIDTH_MM, Math.ceil(contentHeightMm)]
 
   const config = {
     margin: options.margin ?? 0,

@@ -21,7 +21,7 @@ export default function ModernEdge({ data, personal, isEditing: _isEditing, rend
   return (
     <>
       <style>{`
-        .modern-edge { font-family: Arial, Helvetica, sans-serif; color: #1a1a1a; background: white; display: flex; min-height: 297mm; width: 210mm; box-sizing: border-box; }
+        .modern-edge { font-family: Arial, Helvetica, sans-serif; color: #1a1a1a; background: white; display: flex; min-height: 11in; width: 8.5in; box-sizing: border-box; }
         .modern-edge .sidebar { width: 27%; background: #1e1b4b; color: white; padding: 22px 14px; flex-shrink: 0; }
         .modern-edge .main { flex: 1; padding: 22px 20px; }
         .modern-edge .name { font-size: 20px; font-weight: 900; color: white; margin: 0 0 2px 0; line-height: 1.1; }

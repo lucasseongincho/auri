@@ -34,8 +34,8 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
           font-family: 'Times New Roman', Times, serif;
           color: #1a1a1a;
           background: white;
-          width: 210mm;
-          min-height: 297mm;
+          width: 8.5in;
+          min-height: 11in;
           box-sizing: border-box;
           padding: 18mm 20mm 16mm;
         }

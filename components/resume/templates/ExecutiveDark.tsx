@@ -32,7 +32,7 @@ export default function ExecutiveDark({ data, personal, isEditing: _isEditing, r
   return (
     <>
       <style>{`
-        .exec-dark { font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #1a1a1a; background: white; width: 210mm; min-height: 297mm; box-sizing: border-box; }
+        .exec-dark { font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #1a1a1a; background: white; width: 8.5in; min-height: 11in; box-sizing: border-box; }
 
         /* Header — dark background with gold accent */
         .exec-dark .header-wrap { background: #111827; padding: 20px 32px 16px; border-bottom: 3px solid #C9A84C; }

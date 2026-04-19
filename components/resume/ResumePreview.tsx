@@ -16,6 +16,18 @@ import type { ResumeData, TemplateId, PersonalInfo } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
+const LOADING_MESSAGES = [
+  'Analyzing job description…',
+  'Matching keywords to your experience…',
+  'Rewriting achievements…',
+  'Optimizing for ATS…',
+  'Adding measurable impacts…',
+  'Polishing the final resume…',
+]
+
+const LETTER_W = 816  // 8.5in at 96 dpi
+const LETTER_H = 1056 // 11in at 96 dpi
+
 const TEMPLATES: { id: TemplateId; label: string }[] = [
   { id: 'classic-pro', label: 'Classic Pro' },
   { id: 'modern-edge', label: 'Modern Edge' },
@@ -154,10 +166,35 @@ export default function ResumePreview({
 }: ResumePreviewProps) {
   const { selectedTemplate, setSelectedTemplate } = useCareerStore()
   const previewRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [showPDFWarning, setShowPDFWarning] = useState(false)
   const [verifiedCount, setVerifiedCount] = useState(0)
+  const [msgIdx, setMsgIdx] = useState(0)
+  const [containerWidth, setContainerWidth] = useState(LETTER_W)
+
+  // Cycle loading messages every 2s while streaming
+  useEffect(() => {
+    if (!isStreaming) { setMsgIdx(0); return }
+    const id = setInterval(() => setMsgIdx((i) => (i + 1) % LOADING_MESSAGES.length), 2000)
+    return () => clearInterval(id)
+  }, [isStreaming])
+
+  // Track container width for scale transform
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    setContainerWidth(el.clientWidth || LETTER_W)
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width
+      if (w) setContainerWidth(w)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  const scale = Math.min(1, containerWidth / LETTER_W)
 
   // Sanitise data once so all 5 templates receive guaranteed non-null arrays.
   const safeData = data ? sanitizeResumeData(data) : null
@@ -302,7 +339,8 @@ export default function ResumePreview({
       {/* Preview area */}
       <div className="flex-1 rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden">
         <div
-          className="rounded-xl border border-white/[0.05] bg-white overflow-auto h-full relative"
+          ref={containerRef}
+          className="rounded-xl border border-white/[0.05] bg-white overflow-y-auto overflow-x-hidden h-full relative"
           style={{ minHeight: '600px' }}
         >
           {/* Global CSS: hide amber highlight styling when .printing class is active (html2pdf capture) */}
@@ -329,52 +367,73 @@ export default function ResumePreview({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="p-6"
+                className="p-8 flex flex-col items-center justify-center min-h-[480px]"
               >
-                <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-[#6366F1]/10 border border-[#6366F1]/20">
-                  <Loader2 className="w-4 h-4 text-[#6366F1] animate-spin" />
-                  <span className="text-sm text-[#6366F1] font-medium">AURI is generating your resume...</span>
+                {/* Spinner */}
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#6366F1]/15 to-[#8B5CF6]/15
+                  border border-[#6366F1]/25 flex items-center justify-center mb-5">
+                  <Loader2 className="w-7 h-7 text-[#6366F1] animate-spin" />
                 </div>
-                <div className="space-y-3">
-                  <div className="h-8 w-48 rounded bg-gray-100 animate-pulse mx-auto" />
-                  <div className="h-3 w-64 rounded bg-gray-100 animate-pulse mx-auto" />
-                  <div className="mt-4 space-y-2">
-                    <div className="h-2 w-24 rounded bg-gray-100 animate-pulse" />
-                    {[90, 80, 85, 75].map((w, i) => (
-                      <div key={i} className="h-2.5 rounded bg-gray-50 animate-pulse" style={{ width: `${w}%` }} />
-                    ))}
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    <div className="h-2 w-28 rounded bg-gray-100 animate-pulse" />
-                    <div className="h-3 w-48 rounded bg-gray-100 animate-pulse" />
-                    {[85, 70, 80].map((w, i) => (
-                      <div key={i} className="h-2.5 rounded bg-gray-50 animate-pulse" style={{ width: `${w}%` }} />
-                    ))}
-                  </div>
+
+                {/* Cycling message */}
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={msgIdx}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.3 }}
+                    className="text-sm font-medium text-[#6366F1] mb-2 text-center"
+                  >
+                    {LOADING_MESSAGES[msgIdx]}
+                  </motion.p>
+                </AnimatePresence>
+
+                <p className="text-xs text-gray-400 mb-6">
+                  Step {msgIdx + 1} of {LOADING_MESSAGES.length}
+                </p>
+
+                {/* Progress bar */}
+                <div className="w-48 h-1 rounded-full bg-gray-100 overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]"
+                    animate={{ width: `${((msgIdx + 1) / LOADING_MESSAGES.length) * 100}%` }}
+                    transition={{ duration: 0.4, ease: 'easeInOut' }}
+                  />
+                </div>
+
+                {/* Skeleton preview */}
+                <div className="w-full mt-8 space-y-3 opacity-40">
+                  <div className="h-6 w-40 rounded bg-gray-100 animate-pulse mx-auto" />
+                  <div className="h-2.5 w-56 rounded bg-gray-100 animate-pulse mx-auto" />
                   <div className="mt-4 space-y-2">
                     <div className="h-2 w-20 rounded bg-gray-100 animate-pulse" />
-                    {[90, 75, 88, 65, 80].map((w, i) => (
-                      <div key={i} className="h-2.5 rounded bg-gray-50 animate-pulse" style={{ width: `${w}%` }} />
+                    {[92, 78, 85, 70].map((w, i) => (
+                      <div key={i} className="h-2 rounded bg-gray-50 animate-pulse" style={{ width: `${w}%` }} />
                     ))}
                   </div>
-                  {streamText && (
-                    <div className="mt-4 p-3 rounded-lg bg-gray-50 border border-gray-200 font-mono text-xs text-gray-400 overflow-hidden max-h-32">
-                      {streamText.slice(-300)}
-                      <span className="animate-pulse">▌</span>
-                    </div>
-                  )}
+                  <div className="mt-4 space-y-2">
+                    <div className="h-2 w-24 rounded bg-gray-100 animate-pulse" />
+                    {[88, 72, 80].map((w, i) => (
+                      <div key={i} className="h-2 rounded bg-gray-50 animate-pulse" style={{ width: `${w}%` }} />
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             ) : safeData ? (
-              <motion.div
-                key="resume"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={SPRING}
-                ref={previewRef}
-                id="resume-content"
-                className="w-full"
-              >
+              /* Scale wrapper — sets the scroll area to the scaled dimensions */
+              <div style={{ width: `${LETTER_W * scale}px`, minHeight: `${LETTER_H * scale}px`, margin: '0 auto', overflow: 'hidden' }}>
+                {/* Transform wrapper — scales the 816px content visually without affecting html2canvas capture */}
+                <div style={{ width: LETTER_W, minHeight: LETTER_H, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
+                  <motion.div
+                    key="resume"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={SPRING}
+                    ref={previewRef}
+                    id="resume-content"
+                    className="w-full"
+                  >
                 {selectedTemplate === 'classic-pro' && (
                   <ClassicPro data={safeData} personal={personal} renderText={renderText} />
                 )}
@@ -390,7 +449,9 @@ export default function ResumePreview({
                 {selectedTemplate === 'creative-pulse' && (
                   <CreativePulse data={safeData} personal={personal} renderText={renderText} />
                 )}
-              </motion.div>
+                  </motion.div>
+                </div>
+              </div>
             ) : (
               <motion.div
                 key="empty"

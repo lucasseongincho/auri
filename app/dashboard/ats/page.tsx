@@ -97,47 +97,68 @@ export default function ATSPage() {
         return
       }
 
-      const res = await fetch('/api/claude/ats', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({
-          mode: 'fix',
-          resumeText,
-          jobDescription,
-          missingKeywords: score.missing_keywords ?? [],
-          formattingIssues: score.formatting_issues ?? [],
-          suggestions: score.suggestions ?? [],
-        }),
-      })
-
-      if (res.status === 429) {
-        const j = await res.json()
-        throw new Error(`Rate limit reached. Try again in ${j.retryAfter}s.`)
+      const callFix = async (text: string, atsData: ATSScore): Promise<string> => {
+        const res = await fetch('/api/claude/ats', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+          body: JSON.stringify({
+            mode: 'fix',
+            resumeText: text,
+            jobDescription,
+            missingKeywords: atsData.missing_keywords ?? [],
+            formattingIssues: atsData.formatting_issues ?? [],
+            suggestions: atsData.suggestions ?? [],
+          }),
+        })
+        if (res.status === 429) {
+          const j = await res.json()
+          throw new Error(`Rate limit reached. Try again in ${j.retryAfter}s.`)
+        }
+        if (!res.ok) {
+          const j = await res.json().catch(() => ({ error: 'Fix failed' }))
+          throw new Error(j.error ?? 'Fix failed')
+        }
+        const data = await res.json()
+        if (!data.success || !data.improvedResume) throw new Error('No improved resume returned')
+        return data.improvedResume as string
       }
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({ error: 'Fix failed' }))
-        throw new Error(j.error ?? 'Fix failed')
-      }
 
-      const data = await res.json()
-      if (data.success && data.improvedResume) {
-        setFixedResume(data.improvedResume)
-        setOriginalScore(score.score)
-        setTimeout(() => {
-          improvedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 300)
-      } else {
-        throw new Error('No improved resume returned')
+      const originalScoreVal = score.score
+
+      // First pass
+      const fixed1 = await callFix(resumeText, score)
+      setOriginalScore(originalScoreVal)
+      setFixedResume(fixed1)
+      setTimeout(() => improvedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300)
+
+      // Auto re-analyze after first pass
+      const result1 = await runAnalysis(fixed1, jobDescription)
+      if (result1) {
+        setScore(result1)
+        setATSScore(result1)
+
+        // Auto-retry if improvement is less than 5 points
+        if (result1.score - originalScoreVal < 5) {
+          const fixed2 = await callFix(fixed1, result1)
+          setFixedResume(fixed2)
+          const result2 = await runAnalysis(fixed2, jobDescription)
+          if (result2) {
+            setImprovedScore(result2.score)
+            setScore(result2)
+            setATSScore(result2)
+          } else {
+            setImprovedScore(result1.score)
+          }
+        } else {
+          setImprovedScore(result1.score)
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Fix All failed — please try again')
     } finally {
       setIsFixing(false)
     }
-  }, [resumeText, jobDescription, score, getIdTokenSafe])
+  }, [resumeText, jobDescription, score, getIdTokenSafe, runAnalysis, setATSScore])
 
   const handleReanalyze = useCallback(async () => {
     if (!fixedResume || !jobDescription.trim()) return
@@ -296,22 +317,38 @@ export default function ATSPage() {
 
                     {/* Score comparison */}
                     <AnimatePresence>
-                      {originalScore !== null && improvedScore !== null && (
+                      {originalScore !== null && (
                         <motion.div
                           initial={{ opacity: 0, scale: 0.97 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={SPRING}
-                          className="flex items-center gap-3 p-4 rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/20"
+                          className={`flex items-center gap-3 p-4 rounded-xl ${
+                            improvedScore !== null
+                              ? 'bg-[#22C55E]/10 border border-[#22C55E]/20'
+                              : 'bg-[#6366F1]/10 border border-[#6366F1]/20'
+                          }`}
                         >
-                          <CheckCircle className="w-5 h-5 text-[#22C55E] flex-shrink-0" />
+                          {improvedScore !== null ? (
+                            <CheckCircle className="w-5 h-5 text-[#22C55E] flex-shrink-0" />
+                          ) : (
+                            <Loader2 className="w-5 h-5 text-[#6366F1] animate-spin flex-shrink-0" />
+                          )}
                           <div>
-                            <p className="text-sm font-semibold text-[#22C55E]">
-                              Score improved: {originalScore} → {improvedScore}
-                              {' '}(+{improvedScore - originalScore} points)
-                            </p>
-                            <p className="text-xs text-[#22C55E]/70 mt-0.5">
-                              Missing keywords have been naturally incorporated
-                            </p>
+                            {improvedScore !== null ? (
+                              <>
+                                <p className="text-sm font-semibold text-[#22C55E]">
+                                  Score improved: {originalScore} → {improvedScore}
+                                  {' '}({improvedScore >= originalScore ? '+' : ''}{improvedScore - originalScore} points)
+                                </p>
+                                <p className="text-xs text-[#22C55E]/70 mt-0.5">
+                                  Keywords injected — copy the improved resume below
+                                </p>
+                              </>
+                            ) : (
+                              <p className="text-sm font-medium text-[#818CF8]">
+                                Re-analyzing score…
+                              </p>
+                            )}
                           </div>
                         </motion.div>
                       )}
@@ -361,13 +398,13 @@ export default function ATSPage() {
                           border border-white/[0.08] text-[#A0A0B8] text-sm font-medium
                           hover:text-white hover:bg-white/5 transition-all duration-200
                           disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Re-analyze the improved resume"
+                        aria-label="Re-run ATS analysis on the improved resume"
                       >
                         {isReanalyzing
                           ? <Loader2 className="w-4 h-4 animate-spin" />
                           : <RefreshCw className="w-4 h-4" />
                         }
-                        {isReanalyzing ? 'Analyzing…' : 'Re-analyze Score'}
+                        {isReanalyzing ? 'Analyzing…' : 'Re-run Analysis'}
                       </button>
                     </div>
                   </div>

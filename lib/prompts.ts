@@ -161,6 +161,16 @@ Return ONLY valid JSON:
  * Why strict "no false information" rule: Users will submit this text to employers.
  * Any invented facts are a liability. Constraint stated up front bounds generation.
  */
+/**
+ * Why aggressive injection with exact JD phrasing: ATS systems match exact
+ * strings from the job description. "Project management" and "managing projects"
+ * are different tokens — only exact matches count. Instructing Claude to use JD
+ * phrasing maximizes hit rate without inventing facts.
+ *
+ * Why auto-retry logic (in the caller): A single pass sometimes misses low-frequency
+ * keywords buried in the JD. Retrying with the updated missing-keyword list from the
+ * re-analysis pass catches stragglers.
+ */
 export function buildATSFixPrompt(
   resumeText: string,
   jobDescription: string,
@@ -168,35 +178,37 @@ export function buildATSFixPrompt(
   formattingIssues: string[],
   suggestions: string[]
 ): string {
-  return `You are an ATS optimization expert and senior resume writer.
-
-Rewrite this resume to score higher against the job description by naturally incorporating the missing keywords and fixing the issues found.
+  return `You are a ruthless ATS optimization specialist. Your sole mission is to maximize this resume's keyword match score against the target job description.
 
 Original resume:
 ${resumeText}
 
-Job description:
+Target job description:
 ${jobDescription}
 
-Missing keywords to add naturally:
-${missingKeywords.length ? missingKeywords.join(', ') : 'None'}
+Missing keywords — inject EVERY SINGLE ONE:
+${missingKeywords.length ? missingKeywords.map((k) => `- ${k}`).join('\n') : 'None'}
 
 Formatting issues to fix:
 ${formattingIssues.length ? formattingIssues.map((s) => `- ${s}`).join('\n') : 'None'}
 
-Suggestions to implement:
+Additional improvements:
 ${suggestions.length ? suggestions.map((s) => `- ${s}`).join('\n') : 'None'}
 
-STRICT RULES:
-- Add missing keywords naturally into existing bullet points — never force them awkwardly
-- NEVER add false information, fake numbers, or achievements the person did not have
-- Keep all facts, dates, companies, and titles exactly the same
-- Only improve phrasing and keyword density
-- Fix any formatting issues listed above
-- Maintain the same resume structure and sections
-- Return ONLY the improved resume text
-- No explanations, no preamble, no commentary
-- Just the clean improved resume text`
+INJECTION STRATEGY — follow this exactly:
+1. Rewrite bullet points to embed missing keywords naturally — restructure entire sentences if needed
+2. Expand the Skills section aggressively — list every relevant missing keyword as its own skill entry
+3. Mirror exact phrasing from the job description (ATS matches exact token strings, not synonyms)
+4. If a keyword describes something the candidate HAS done, use that exact word even if the original phrasing differed
+5. Critical keywords should appear 2-3 times across different sections for higher weight
+6. Inject keywords into the summary/profile section as well
+
+NON-NEGOTIABLE CONSTRAINTS:
+- NEVER invent companies, job titles, degrees, or date ranges the person did not have
+- NEVER fabricate specific numbers or achievements not present in the original
+- NEVER add certifications or technologies the person has zero experience with
+- Keep all factual details (names, titles, dates) exactly identical to the original
+- Return ONLY the improved resume text — no commentary, preamble, or explanation`
 }
 
 // ── Feature 3 — Easy Tune (per-bullet AI Assist) ─────────────────────────────
