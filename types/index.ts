@@ -77,9 +77,9 @@ export interface GeneratedData {
   resume_plain: string
   ats_score: ATSScore | null
   cover_letter: string
-  linkedin_rewrite: LinkedInRewrite | Record<string, never>
-  job_strategy: JobStrategy | Record<string, never>
-  interview_prep: InterviewPrep | Record<string, never>
+  linkedin_rewrite: LinkedInRewrite | Record<string, unknown>
+  job_strategy: (JobStrategy & { completed?: Record<string, boolean> }) | Record<string, unknown>
+  interview_prep: InterviewPrep | Record<string, unknown>
 }
 
 export interface CareerProfile {

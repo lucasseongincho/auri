@@ -170,7 +170,7 @@ export default function StrategyPage() {
       updateProfile({
         generated: {
           ...profile.generated,
-          job_strategy: { ...(profile.generated.job_strategy as object | undefined ?? {}), completed },
+          job_strategy: { ...(profile.generated.job_strategy ?? {}), completed },
         },
       })
     }
