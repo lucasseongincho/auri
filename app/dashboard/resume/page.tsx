@@ -1353,42 +1353,78 @@ export default function ResumePage() {
   )
 
   // ── Fix All ATS Issues ───────────────────────────────────────────────────────
+  // Bug fix: previously called stream('/api/claude/resume', mode:'rewrite') which:
+  // (a) hijacked isStreaming → showed loading overlay instead of button spinner,
+  // (b) never rebuilt `plain` from new data → runATSScore re-scored OLD text → score unchanged.
+  // Now calls /api/claude/ats mode:'fix' directly (aggressive keyword-injection prompt)
+  // and rebuilds plain text from the result so re-scoring reflects the improvements.
 
   const handleFixAll = useCallback(async () => {
-    if (!profile || !activeResume) return
+    if (!profile || !activeResume || !atsScore) return
     setIsFixingATS(true)
     try {
-      const fullText = await stream('/api/claude/resume', {
-        careerProfile: profile,
-        target: {
-          position: profile.target.position,
-          company: profile.target.company,
-          companyType: profile.target.company_type,
-          jobDescription: profile.target.job_description ?? '',
-        },
-        mode: 'rewrite',
-      })
-      if (fullText) {
-        const cleaned = fullText.replace(/```json\n?|```\n?/g, '').trim()
-        const parsed = JSON.parse(cleaned) as ResumeData
-        const updated: ResumeData = {
-          ...activeResume,
-          ...parsed,
-          templateId: selectedTemplate,
-          updatedAt: new Date().toISOString(),
-        }
-        setResume(updated)
-        setEditedResume(updated)
-        if (updated.plain && profile.target.job_description) {
-          await runATSScore(updated.plain, profile.target.job_description)
-        }
+      let idToken: string | undefined
+      if (auth.currentUser) {
+        try { idToken = await getIdToken(auth.currentUser) } catch { /* guest fallback */ }
       }
-    } catch {
-      setToast({ message: 'Failed to fix ATS issues. Please try again.', type: 'error' })
+
+      const jd = profile.target.job_description ?? ''
+      const currentPlain = activeResume.plain ?? buildPlainText(activeResume, profile.personal)
+
+      const res = await fetch('/api/claude/ats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+        },
+        body: JSON.stringify({
+          mode: 'fix',
+          resumeText: currentPlain,
+          jobDescription: jd,
+          missingKeywords: atsScore.missing_keywords ?? [],
+          formattingIssues: atsScore.formatting_issues ?? [],
+          suggestions: atsScore.suggestions ?? [],
+        }),
+      })
+
+      if (res.status === 429) {
+        const j = await res.json()
+        throw new Error(`Rate limit reached. Try again in ${j.retryAfter}s.`)
+      }
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({ error: 'Fix failed' }))
+        throw new Error(j.error ?? 'Fix All failed')
+      }
+
+      const data = await res.json()
+      if (!data.success || !data.improvedResume) throw new Error('No improved resume returned')
+
+      const improvedPlain = data.improvedResume as string
+
+      // Update resume with improved plain text so ATS copy-for-portal is improved
+      const updated: ResumeData = {
+        ...activeResume,
+        plain: improvedPlain,
+        updatedAt: new Date().toISOString(),
+      }
+      setResume(updated)
+      setEditedResume(updated)
+
+      // Re-score with the improved plain text → score updates
+      if (jd) {
+        await runATSScore(improvedPlain, jd)
+      }
+
+      setToast({ message: 'Keywords injected — ATS score updated!', type: 'success' })
+    } catch (err) {
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to fix ATS issues. Please try again.',
+        type: 'error',
+      })
     } finally {
       setIsFixingATS(false)
     }
-  }, [profile, activeResume, selectedTemplate, stream, setResume, runATSScore])
+  }, [profile, activeResume, atsScore, setResume, runATSScore])
 
   // ── Generate Resume ──────────────────────────────────────────────────────────
 
