@@ -106,7 +106,10 @@ export default async function Image() {
               boxShadow: `0 8px 32px rgba(99,102,241,0.4)`,
             }}
           >
-            <span style={{ color: 'white', fontSize: '26px', lineHeight: '1' }}>✦</span>
+            {/* SVG star avoids font lookup for ✦ (U+2726) which fails in Satori edge runtime */}
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+              <path d="M12 2 L13.5 10.5 L22 12 L13.5 13.5 L12 22 L10.5 13.5 L2 12 L10.5 10.5 Z" />
+            </svg>
           </div>
 
           {/* Wordmark */}
