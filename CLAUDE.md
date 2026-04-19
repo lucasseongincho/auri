@@ -216,13 +216,13 @@ Return as JSON: { days: [{ day: number, theme: string, actions: [{ time: string,
 
 ### Feature 8 — Cover Letter Generator
 
-**What it does:** Generates a compelling, under-200-word cover letter that starts with a powerful idea (not "I am applying for...") and connects the user's experience to the company's exact needs.
+**What it does:** Generates a compelling, 280-300-word cover letter that starts with a powerful idea (not "I am applying for...") and connects the user's experience to the company's exact needs.
 
 **User Flow:**
 1. Pulls data from Career Profile (experience auto-populated if resume exists)
 2. User enters: Position, Company Name, Job Description
 3. Claude generates cover letter
-4. Displayed with word count indicator (must stay ≤200 words — shown as a colored progress bar)
+4. Displayed with word count indicator (must be 280-300 words — shown as a colored progress bar)
 5. Easy Tune inline editing
 6. Download as PDF or copy as plain text
 
@@ -231,7 +231,7 @@ Return as JSON: { days: [{ day: number, theme: string, actions: [{ time: string,
 Write a cover letter for the position of [position] at [company].
 Begin with a powerful, memorable idea — NOT "I am applying for...".
 Connect my specific experience to the company's exact needs and build genuine trust.
-Keep the total text under 200 words. Be human, direct, and compelling.
+Keep the text between 280 and 300 words — never shorter than 280, never longer than 300. Be human, direct, and compelling.
 My experience: [experience_summary]
 Job description: [job_description]
 Return JSON: { cover_letter: string, word_count: number, opening_hook: string }

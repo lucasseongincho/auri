@@ -314,8 +314,8 @@ Be specific and immediately executable. Include real URLs. No vague advice.`
  * content the user's experience provides. Enables per-paragraph editing
  * in the UI and a professional letter layout.
  *
- * Why 300-380 words: Long enough to fill one page and give a complete
- * narrative, short enough for a hiring manager to read in < 90 seconds.
+ * Why 280-300 words: Long enough to give a complete narrative,
+ * short enough for a hiring manager to read in < 60 seconds.
  *
  * Why return opening_hook separately: Lets the UI highlight the
  * first sentence distinctively so users can quickly judge impact.
@@ -337,13 +337,13 @@ ${cityState ? `The applicant is based in ${cityState}.` : ''}
 ${hiringManagerName ? `Address it to ${hiringManagerName}.` : ''}
 
 WORD COUNT REQUIREMENT — THIS IS MANDATORY:
-The paragraphs array MUST contain a MINIMUM of 320 words and a MAXIMUM of 380 words. Count every word before outputting. If your draft is under 320 words, expand it — add more specific detail, a concrete example, or a stronger argument. Do NOT output a response under 320 words under any circumstances.
+The paragraphs array MUST contain a MINIMUM of 280 words and a MAXIMUM of 300 words. Count every word before outputting. If your draft is under 280 words, expand it — add more specific detail, a concrete example, or a stronger argument. If your draft exceeds 300 words, trim it. Do NOT output a response under 280 words or over 300 words under any circumstances.
 
 STRUCTURE REQUIREMENTS:
-- Write 3 to 6 paragraphs total. The exact number should match the depth of the content needed to reach 320+ words.
-- Paragraph 1 (opening): Begin with a powerful, memorable hook. NOT "I am applying for..." and NOT "I am writing to express my interest...". Hook the reader immediately with insight, a bold claim, or a specific result. This paragraph alone should be 60-80 words.
-- Middle paragraphs (body): Connect specific experience to the company's exact needs. Be concrete — name technologies, metrics, or outcomes. Expand on each point fully. These paragraphs together should be 180-220 words.
-- Final paragraph (closing): A confident call to action. Express genuine enthusiasm. 50-70 words.
+- Write 3 to 4 paragraphs total. The exact number should match the depth of the content needed to stay within 280-300 words.
+- Paragraph 1 (opening): Begin with a powerful, memorable hook. NOT "I am applying for..." and NOT "I am writing to express my interest...". Hook the reader immediately with insight, a bold claim, or a specific result. This paragraph alone should be 55-65 words.
+- Middle paragraphs (body): Connect specific experience to the company's exact needs. Be concrete — name technologies, metrics, or outcomes. These paragraphs together should be 155-175 words.
+- Final paragraph (closing): A confident call to action. Express genuine enthusiasm. 45-55 words.
 - Tone: human, direct, compelling. Not corporate. Not generic.
 
 My experience:

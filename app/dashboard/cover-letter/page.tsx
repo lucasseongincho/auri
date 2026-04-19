@@ -28,8 +28,8 @@ const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
 const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
 const MIN_WORDS = 280
-const MAX_WORDS = 380
-const WARN_WORDS = 355
+const MAX_WORDS = 300
+const WARN_WORDS = 270  // approaching minimum — show amber below this
 
 function countWords(text: string): number {
   return text.trim() ? text.trim().split(/\s+/).length : 0
@@ -39,19 +39,21 @@ function WordCountBar({ wordCount }: { wordCount: number }) {
   const pct = Math.min((wordCount / MAX_WORDS) * 100, 100)
   const color =
     wordCount > MAX_WORDS
-      ? '#EF4444'
-      : wordCount >= WARN_WORDS
-      ? '#F59E0B'
+      ? '#EF4444'           // red: over 300
       : wordCount >= MIN_WORDS
-      ? '#22C55E'
-      : '#60607A'
+      ? '#22C55E'           // green: 280-300 (good zone)
+      : wordCount >= WARN_WORDS
+      ? '#F59E0B'           // amber: 270-279 (approaching minimum)
+      : '#60607A'           // gray: below 270 (too short)
 
   const label =
     wordCount > MAX_WORDS
-      ? `${wordCount - MAX_WORDS} words over limit`
+      ? `${wordCount - MAX_WORDS} words over limit — trim to 280-300`
       : wordCount >= MIN_WORDS
       ? `${MAX_WORDS - wordCount} words remaining`
-      : `${MIN_WORDS - wordCount} more words to reach minimum`
+      : wordCount >= WARN_WORDS
+      ? `${MIN_WORDS - wordCount} more words to reach minimum (aim for 280-300)`
+      : 'Too short — aim for 280-300 words'
 
   return (
     <div className="space-y-1.5">
@@ -70,7 +72,7 @@ function WordCountBar({ wordCount }: { wordCount: number }) {
           transition={{ duration: 0.4, ease: 'easeOut' }}
         />
       </div>
-      <p className="text-xs" style={{ color: wordCount > MAX_WORDS ? '#EF4444' : '#60607A' }}>
+      <p className="text-xs" style={{ color: wordCount > MAX_WORDS ? '#EF4444' : wordCount < MIN_WORDS ? (wordCount >= WARN_WORDS ? '#F59E0B' : '#60607A') : '#60607A' }}>
         {label}
       </p>
     </div>
@@ -327,7 +329,7 @@ export default function CoverLetterPage() {
           <h1 className="font-heading text-2xl font-bold text-white">Cover Letter Generator</h1>
         </div>
         <p className="text-[#A0A0B8] text-sm ml-12">
-          Professional letter structure, 300–380 words, 3–6 paragraphs, opens with a powerful hook — never &quot;I am applying for...&quot;
+          Professional letter structure, 280–300 words, 3–4 paragraphs, opens with a powerful hook — never &quot;I am applying for...&quot;
         </p>
       </motion.div>
 

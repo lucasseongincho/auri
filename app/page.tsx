@@ -111,7 +111,7 @@ const FEATURES = [
   { icon: RefreshCw, label: 'Resume Rewriter', desc: 'Transform your existing resume for any new role', href: '/dashboard/rewriter', color: 'from-[#4F46E5] to-[#6366F1]' },
   { icon: Linkedin, label: 'LinkedIn Rewriter', desc: 'Attract recruiters with an optimized profile', href: '/dashboard/linkedin', color: 'from-[#0EA5E9] to-[#6366F1]' },
   { icon: Map, label: '7-Day Job Strategy', desc: 'A personalized, day-by-day job search action plan', href: '/dashboard/strategy', color: 'from-[#22C55E] to-[#16A34A]' },
-  { icon: Mail, label: 'Cover Letter Generator', desc: 'Under-200-word letters that open doors', href: '/dashboard/cover-letter', color: 'from-[#F59E0B] to-[#D97706]' },
+  { icon: Mail, label: 'Cover Letter Generator', desc: '280-300 word letters that open doors', href: '/dashboard/cover-letter', color: 'from-[#F59E0B] to-[#D97706]' },
   { icon: MessageSquare, label: 'Interview Prep', desc: '8 likely questions + STAR frameworks + flip cards', href: '/dashboard/interview', color: 'from-[#EF4444] to-[#DC2626]' },
 ]
 
