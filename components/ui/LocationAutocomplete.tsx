@@ -51,16 +51,13 @@ const FALLBACK_CITIES = [
 let mapsBootstrapped = false
 function ensureMapsBootstrapped() {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY?.trim()
-  console.log('[LocationAutocomplete] API key present:', !!apiKey)
   if (!apiKey) {
     console.error('[LocationAutocomplete] MISSING: NEXT_PUBLIC_GOOGLE_PLACES_API_KEY')
     return false
   }
-  console.log('[LocationAutocomplete] API key prefix:', apiKey.substring(0, 10))
   if (!mapsBootstrapped) {
     setOptions({ key: apiKey, v: 'weekly' })
     mapsBootstrapped = true
-    console.log('[LocationAutocomplete] Maps bootstrapped via setOptions')
   }
   return true
 }
@@ -184,8 +181,6 @@ export default function LocationAutocomplete({
       const placesLib = await importLibrary('places') as any
       const { AutocompleteSuggestion } = placesLib
 
-      console.log('[LocationAutocomplete] AutocompleteSuggestion available:', !!AutocompleteSuggestion)
-
       if (!AutocompleteSuggestion) {
         console.warn('[LocationAutocomplete] AutocompleteSuggestion not found in library')
         return
@@ -201,8 +196,6 @@ export default function LocationAutocomplete({
             'postal_town',
           ],
         })
-
-      console.log('[LocationAutocomplete] Places results:', apiSuggestions?.length ?? 0)
 
       const cityResults: string[] = (apiSuggestions ?? [])
         .slice(0, 6)

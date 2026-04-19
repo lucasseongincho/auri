@@ -153,15 +153,28 @@ export default function StrategyPage() {
   const [copied, setCopied] = useState(false)
 
   const [completed, setCompleted] = useState<CompletedMap>(() => {
+    // Prefer Firestore-synced data from the career profile (loaded on mount via store)
+    // Fall back to localStorage for guests or first load before Firestore arrives
+    const fromProfile = (profile?.generated?.job_strategy as { completed?: CompletedMap } | undefined)?.completed
+    if (fromProfile && typeof fromProfile === 'object') return fromProfile
     if (typeof window === 'undefined') return {}
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') } catch { return {} }
   })
 
-  // Persist completed to localStorage
+  // Persist completed to localStorage and Firestore
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(completed))
     }
+    if (profile) {
+      updateProfile({
+        generated: {
+          ...profile.generated,
+          job_strategy: { ...(profile.generated.job_strategy as object | undefined ?? {}), completed },
+        },
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completed])
 
   const { isStreaming, stream } = useAIStream()

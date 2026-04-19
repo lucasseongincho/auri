@@ -117,7 +117,7 @@ export function useAIStream() {
         setIsGenerating(false)
       }
     },
-    [setIsGenerating]
+    [setIsGenerating, setBetaLimitData]
   )
 
   const reset = useCallback(() => {

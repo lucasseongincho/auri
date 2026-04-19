@@ -345,7 +345,6 @@ export default function InterviewPage() {
     })
 
     if (fullText) {
-      console.log('[interview] raw response length:', fullText.length)
       const parseInterviewJSON = (raw: string): InterviewPrep | null => {
         try {
           let cleaned = raw.trim()

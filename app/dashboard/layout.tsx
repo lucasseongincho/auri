@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -40,8 +40,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false)
   const { user, loading } = useAuth()
-  const { isSyncing, syncError } = useCareerStore()
-  const betaUsage = useBetaUsage(APP_CONFIG.BETA_MODE ? user?.uid : undefined)
+  const { isSyncing, syncError, isGenerating } = useCareerStore()
+  const [betaRefreshKey, setBetaRefreshKey] = useState(0)
+  const prevGenerating = useRef(false)
+  const betaUsage = useBetaUsage(APP_CONFIG.BETA_MODE ? user?.uid : undefined, betaRefreshKey)
+
+  // Refresh beta usage counter after each AI generation completes
+  useEffect(() => {
+    if (prevGenerating.current && !isGenerating) {
+      setBetaRefreshKey((k) => k + 1)
+    }
+    prevGenerating.current = isGenerating
+  }, [isGenerating])
   const isOwner = user?.email === process.env.NEXT_PUBLIC_OWNER_EMAIL && !!process.env.NEXT_PUBLIC_OWNER_EMAIL
 
   // Auth + beta gate
