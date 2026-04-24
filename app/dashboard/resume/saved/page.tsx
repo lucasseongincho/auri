@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { getSavedResumes, deleteSavedResume, updateSavedResume } from '@/lib/firestore'
+import { toDate, formatResumeDate } from '@/lib/utils'
 import type { SavedResume } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -25,20 +26,11 @@ const TEMPLATE_LABELS: Record<string, string> = {
 }
 
 function toMs(val: unknown): number {
-  if (!val) return 0
-  if (typeof val === 'object' && 'seconds' in (val as object))
-    return (val as { seconds: number }).seconds * 1000
-  if (typeof val === 'object' && 'toDate' in (val as object))
-    return (val as { toDate: () => Date }).toDate().getTime()
-  return new Date(val as string).getTime()
+  return toDate(val)?.getTime() ?? 0
 }
 
-function formatDate(iso: unknown) {
-  try {
-    return new Date(toMs(iso)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-  } catch {
-    return ''
-  }
+function formatDate(val: unknown) {
+  return formatResumeDate(val, '')
 }
 
 function ATSBadge({ score }: { score?: number }) {

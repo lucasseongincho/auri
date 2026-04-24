@@ -34,6 +34,7 @@ import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
 import CreativePulse from '@/components/resume/templates/CreativePulse'
 import type { ResumeData, PersonalInfo, SavedResume, ATSScore, TemplateId } from '@/types'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
+import { toDate } from '@/lib/utils'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -504,10 +505,10 @@ export default function RewriterPage() {
                                       <CheckCircle className="w-4 h-4 text-[#6366F1]" />
                                     )}
                                     <span className="text-xs text-[#60607A]">
-                                      {new Date(r.updatedAt).toLocaleDateString('en-US', {
+                                      {toDate(r.updatedAt)?.toLocaleDateString('en-US', {
                                         month: 'short',
                                         day: 'numeric',
-                                      })}
+                                      }) ?? ''}
                                     </span>
                                   </div>
                                 </div>
