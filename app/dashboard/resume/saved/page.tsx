@@ -24,12 +24,18 @@ const TEMPLATE_LABELS: Record<string, string> = {
   'creative-pulse': 'Creative Pulse',
 }
 
+function toMs(val: unknown): number {
+  if (!val) return 0
+  if (typeof val === 'object' && 'seconds' in (val as object))
+    return (val as { seconds: number }).seconds * 1000
+  if (typeof val === 'object' && 'toDate' in (val as object))
+    return (val as { toDate: () => Date }).toDate().getTime()
+  return new Date(val as string).getTime()
+}
+
 function formatDate(iso: unknown) {
   try {
-    const d = iso && typeof iso === 'object' && 'seconds' in iso
-      ? new Date((iso as { seconds: number }).seconds * 1000)
-      : new Date(iso as string)
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    return new Date(toMs(iso)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   } catch {
     return ''
   }
@@ -97,8 +103,8 @@ export default function SavedResumesPage() {
       )
     }
     switch (sort) {
-      case 'newest': list.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()); break
-      case 'oldest': list.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()); break
+      case 'newest': list.sort((a, b) => toMs(b.updatedAt) - toMs(a.updatedAt)); break
+      case 'oldest': list.sort((a, b) => toMs(a.updatedAt) - toMs(b.updatedAt)); break
       case 'az': list.sort((a, b) => (a.targetPosition ?? '').localeCompare(b.targetPosition ?? '')); break
       case 'za': list.sort((a, b) => (b.targetPosition ?? '').localeCompare(a.targetPosition ?? '')); break
     }
