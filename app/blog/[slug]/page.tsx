@@ -2,10 +2,9 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { getAllPosts, getPostBySlug } from '@/lib/blog'
+import type { PostWithContent } from '@/lib/blog'
 
-interface Props {
-  params: { slug: string }
-}
+type Props = { params: Promise<{ slug: string }> }
 
 export async function generateStaticParams() {
   const posts = getAllPosts()
@@ -13,7 +12,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = getPostBySlug(params.slug)
+  const { slug } = await params
+  const post = getPostBySlug(slug)
   if (!post) return {}
   return {
     title: `${post.title} — AURI Blog`,
@@ -35,10 +35,7 @@ function formatDate(iso: string): string {
   })
 }
 
-export default function BlogPostPage({ params }: Props) {
-  const post = getPostBySlug(params.slug)
-  if (!post) notFound()
-
+function BlogPostContent({ post }: { post: PostWithContent }) {
   return (
     <main className="min-h-screen bg-[#0A0A0F] text-[#F8F8FF] px-6 py-16">
       <div className="max-w-3xl mx-auto">
@@ -121,4 +118,11 @@ export default function BlogPostPage({ params }: Props) {
       </div>
     </main>
   )
+}
+
+export default async function BlogPostPage({ params }: Props) {
+  const { slug } = await params
+  const post = getPostBySlug(slug)
+  if (!post) notFound()
+  return <BlogPostContent post={post} />
 }
