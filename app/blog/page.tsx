@@ -27,6 +27,14 @@ export default function BlogIndexPage() {
     <main className="min-h-screen bg-[#0A0A0F] text-[#F8F8FF] px-6 py-16">
       <div className="max-w-3xl mx-auto">
 
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm text-[#60607A]
+            hover:text-[#A0A0B8] transition-colors duration-200 mb-8"
+        >
+          ← Back to Home
+        </Link>
+
         {/* Header */}
         <div className="mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full
