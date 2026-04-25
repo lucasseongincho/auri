@@ -153,6 +153,10 @@ export default function LandingPage() {
               {item}
             </a>
           ))}
+          <Link href="/blog"
+            className="text-sm text-[#A0A0B8] hover:text-white transition-colors duration-200">
+            Blog
+          </Link>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/login"
