@@ -1,5 +1,11 @@
+const createMDX = require('@next/mdx')
+
+const withMDX = createMDX({})
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+
   // ANTHROPIC_API_KEY has no NEXT_PUBLIC_ prefix so Next.js never exposes it
   // to the client bundle. No extra config needed — server-only by convention.
 
@@ -12,8 +18,6 @@ const nextConfig = {
         source: '/(.*)',
         headers: [
           {
-            // Firebase signInWithPopup polls window.closed on the OAuth popup.
-            // 'same-origin-allow-popups' permits it while still isolating the page.
             key: 'Cross-Origin-Opener-Policy',
             value: 'same-origin-allow-popups',
           },
@@ -43,4 +47,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = withMDX(nextConfig)
