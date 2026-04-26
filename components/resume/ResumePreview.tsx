@@ -42,6 +42,8 @@ interface ResumePreviewProps {
   isStreaming: boolean
   streamText?: string
   onTemplateChange?: (id: TemplateId) => void
+  /** When provided, overrides the internal ResizeObserver scale. Use this to sync with an adjacent edit mode. */
+  forcedScale?: number
 }
 
 // Normalise resume data from Firestore: arrays may be null/undefined if the AI
@@ -163,6 +165,7 @@ export default function ResumePreview({
   isStreaming,
   streamText = '',
   onTemplateChange,
+  forcedScale,
 }: ResumePreviewProps) {
   const { selectedTemplate, setSelectedTemplate } = useCareerStore()
   const previewRef = useRef<HTMLDivElement>(null)
@@ -194,7 +197,7 @@ export default function ResumePreview({
     return () => ro.disconnect()
   }, [])
 
-  const scale = Math.min(1, containerWidth / LETTER_W)
+  const scale = forcedScale ?? Math.min(1, containerWidth / LETTER_W)
 
   // Sanitise data once so all 5 templates receive guaranteed non-null arrays.
   const safeData = data ? sanitizeResumeData(data) : null

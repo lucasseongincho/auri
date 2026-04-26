@@ -1229,8 +1229,8 @@ export default function ResumePage() {
   const { user, isAuthenticated } = useAuth()
   const { isStreaming, streamedText, stream, reset: resetStream } = useAIStream()
 
-  // ── Letter-size scale for edit mode ─────────────────────────────────────────
-  const { containerRef: editContainerRef, scale: editScale } = useLetterScale()
+  // ── Shared letter-size scale — drives both view and edit modes identically ───
+  const { containerRef: editContainerRef, scale: editScale } = useLetterScale(8)
 
   // ── Local UI state ──────────────────────────────────────────────────────────
   const [currentStep, setCurrentStep] = useState(1)
@@ -1901,12 +1901,11 @@ export default function ResumePage() {
             )}
           </AnimatePresence>
 
-          {/* Resume Preview / Editor */}
-          <div className="flex-shrink-0">
+          {/* Resume Preview / Editor — ref on shared wrapper so both modes use the same scale */}
+          <div ref={editContainerRef} className="flex-shrink-0 overflow-x-hidden">
             {isEditing && displayResume ? (
               <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
                 <div
-                  ref={editContainerRef}
                   className="rounded-xl border border-white/[0.05] bg-white overflow-x-hidden overflow-y-auto"
                   style={{ minHeight: '600px' }}>
                   <ResumeEditor
@@ -1926,6 +1925,7 @@ export default function ResumePage() {
                 personal={personal}
                 isStreaming={isStreaming}
                 streamText={streamedText}
+                forcedScale={editScale}
                 onTemplateChange={(id: TemplateId) => {
                   setSelectedTemplate(id)
                   if (displayResume) {
