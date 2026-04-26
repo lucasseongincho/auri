@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -17,9 +17,70 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useCareerStore } from '@/store/careerStore'
 import { getSavedCoverLetter, getSavedCoverLetters, deleteCoverLetter } from '@/lib/firestore'
 import { toDate, formatResumeDate } from '@/lib/utils'
 import type { SavedCoverLetter } from '@/types'
+
+const LETTER_W = 816
+const LETTER_H = 1056
+const PAGE_PADDING = 96
+
+function LetterDocReadOnly({
+  company,
+  name,
+  email,
+  phone,
+  location,
+  paragraphs,
+}: {
+  company: string
+  name: string
+  email: string
+  phone: string
+  location: string
+  paragraphs: string[]
+}) {
+  const today = new Date().toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric',
+  })
+  return (
+    <div style={{
+      fontFamily: 'Georgia, "Times New Roman", serif',
+      fontSize: '11pt',
+      lineHeight: '1.6',
+      color: '#1a1a1a',
+      background: 'white',
+      padding: `${PAGE_PADDING}px`,
+      minHeight: `${LETTER_H}px`,
+      width: `${LETTER_W}px`,
+      boxSizing: 'border-box',
+    }}>
+      <div style={{ marginBottom: '24px' }}>
+        <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700, fontSize: '13pt', margin: '0 0 4px 0' }}>
+          {name || 'Your Name'}
+        </p>
+        <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '9.5pt', color: '#555', margin: 0 }}>
+          {[location, email, phone].filter(Boolean).join('  ·  ')}
+        </p>
+      </div>
+      <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '10pt', color: '#444', marginBottom: '20px' }}>
+        {today}
+      </p>
+      <div style={{ marginBottom: '24px' }}>
+        <p style={{ margin: 0 }}>{company}</p>
+      </div>
+      <p style={{ marginBottom: '16px', fontWeight: 500 }}>Dear Hiring Manager,</p>
+      {paragraphs.map((text, i) => (
+        <p key={i} style={{ marginBottom: '14px', whiteSpace: 'pre-wrap' }}>{text}</p>
+      ))}
+      <p style={{ marginBottom: '40px' }}>Sincerely,</p>
+      <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700 }}>
+        {name || 'Your Name'}
+      </p>
+    </div>
+  )
+}
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -47,6 +108,7 @@ export default function CoverLetterDetailPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
+  const { profile } = useCareerStore()
 
   const [letter, setLetter] = useState<SavedCoverLetter | null>(null)
   const [allLetters, setAllLetters] = useState<SavedCoverLetter[]>([])
@@ -55,6 +117,19 @@ export default function CoverLetterDetailPage() {
   const [deleteTarget, setDeleteTarget] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [scale, setScale] = useState(1)
+  const previewContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = previewContainerRef.current
+    if (!el) return
+    const observer = new ResizeObserver(() => {
+      const w = el.clientWidth - 32
+      setScale(Math.min(1, w / LETTER_W))
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     if (authLoading) return
@@ -297,16 +372,28 @@ export default function CoverLetterDetailPage() {
               </div>
             )}
 
-            {/* Letter body */}
-            <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
-                <div className="prose prose-invert max-w-none">
-                  {(letter.paragraphs?.length ? letter.paragraphs : [letter.content]).map((para, i) => (
-                    <p key={i} className="text-sm text-[#D0D0E0] leading-relaxed mb-4 last:mb-0">
-                      {para}
-                    </p>
-                  ))}
-                </div>
+            {/* Letter document preview */}
+            <div
+              ref={previewContainerRef}
+              className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden"
+            >
+              <div
+                className="rounded-xl border border-white/[0.05] overflow-hidden"
+                style={{
+                  transformOrigin: 'top left',
+                  transform: `scale(${scale})`,
+                  width: `${LETTER_W}px`,
+                  marginBottom: scale < 1 ? `${(scale - 1) * LETTER_H}px` : undefined,
+                }}
+              >
+                <LetterDocReadOnly
+                  company={letter.company}
+                  name={profile?.personal?.name ?? ''}
+                  email={profile?.personal?.email ?? ''}
+                  phone={profile?.personal?.phone ?? ''}
+                  location={profile?.personal?.location ?? ''}
+                  paragraphs={letter.paragraphs?.length ? letter.paragraphs : [letter.content]}
+                />
               </div>
             </div>
           </motion.div>

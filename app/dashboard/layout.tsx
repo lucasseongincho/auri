@@ -18,6 +18,30 @@ import BetaLimitModal from '@/components/shared/BetaLimitModal'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
+const PATH_LABELS: Record<string, string> = {
+  '/dashboard': 'Dashboard',
+  '/dashboard/resume': 'Resume Builder',
+  '/dashboard/resume/saved': 'My Resumes',
+  '/dashboard/rewriter': 'Resume Rewriter',
+  '/dashboard/ats': 'ATS Optimizer',
+  '/dashboard/linkedin': 'LinkedIn',
+  '/dashboard/strategy': 'Job Strategy',
+  '/dashboard/cover-letter': 'Cover Letter',
+  '/dashboard/cover-letter/saved': 'My Cover Letters',
+  '/dashboard/interview': 'Interview Prep',
+  '/dashboard/settings': 'Settings',
+}
+
+function getBreadcrumbLabel(pathname: string): string {
+  if (PATH_LABELS[pathname]) return PATH_LABELS[pathname]
+  const segments = pathname.split('/').filter(Boolean)
+  const parent = segments[segments.length - 2]
+  if (parent === 'resume') return 'Saved Resume'
+  if (parent === 'cover-letter') return 'Cover Letter'
+  const last = segments[segments.length - 1]
+  return last ? last.replace(/-/g, ' ') : 'Dashboard'
+}
+
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
   { id: 'resume', label: 'Resume Builder', icon: FileText, href: '/dashboard/resume' },
@@ -300,7 +324,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="hidden md:flex items-center gap-2 text-sm">
               <ChevronRight className="w-4 h-4 text-[#60607A]" />
               <span className="text-[#A0A0B8] capitalize">
-                {pathname.split('/').filter(Boolean).pop()?.replace('-', ' ') ?? 'Dashboard'}
+                {getBreadcrumbLabel(pathname)}
               </span>
             </div>
             {/* Mobile: show logo */}
