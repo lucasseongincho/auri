@@ -291,7 +291,7 @@ export default function SavedCoverLettersPage() {
                   {/* Actions */}
                   <div className="mt-auto flex items-center gap-2 pt-2 border-t border-white/[0.05]">
                     <Link
-                      href={`/dashboard/cover-letter?id=${letter.id}`}
+                      href={`/dashboard/cover-letter/${letter.id}`}
                       className="flex-1 flex items-center justify-center px-3 py-2
                         rounded-lg text-xs font-semibold bg-[#F59E0B] text-white
                         hover:bg-[#D97706] transition-colors"

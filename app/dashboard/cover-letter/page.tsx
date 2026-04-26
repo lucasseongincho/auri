@@ -281,6 +281,7 @@ function LetterDocument({
               contentEditable={isActive}
               suppressContentEditableWarning
               onInput={(e) => onParagraphChange(i, (e.target as HTMLElement).innerText)}
+              onClick={(e) => { if (isActive) e.stopPropagation() }}
               style={{
                 outline: 'none',
                 borderRadius: '4px',
@@ -489,9 +490,9 @@ function CoverLetterContent() {
     }
   }, [position, company, jobDescription, experienceSummary, hiringManagerName, cityState, user?.uid, stream])
 
-  // Paragraph click — toggle active
+  // Paragraph click — set active (no toggle; deactivation happens via outer container click)
   const handleParagraphClick = useCallback((idx: number) => {
-    setActiveParagraphIdx((prev) => (prev === idx ? null : idx))
+    setActiveParagraphIdx(idx)
   }, [])
 
   // Paragraph text change

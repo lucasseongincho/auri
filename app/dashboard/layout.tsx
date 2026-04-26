@@ -82,13 +82,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         (pathname.startsWith('/dashboard/resume/') && pathname !== '/dashboard/resume')
       )
     }
-    // Cover Letter: exact match only — prevents /cover-letter/saved from also lighting it up
+    // Cover Letter: exact match only — prevents /cover-letter/saved and /cover-letter/[id] from lighting it up
     if (href === '/dashboard/cover-letter') return pathname === '/dashboard/cover-letter'
-    // My Cover Letters: active on /dashboard/cover-letter/saved
+    // My Cover Letters: active on /saved AND any individual letter (/dashboard/cover-letter/[id])
     if (href === '/dashboard/cover-letter/saved') {
       return (
         pathname === '/dashboard/cover-letter/saved' ||
-        (pathname.startsWith('/dashboard/cover-letter/') && pathname !== '/dashboard/cover-letter')
+        (pathname.startsWith('/dashboard/cover-letter/') &&
+          pathname !== '/dashboard/cover-letter' &&
+          pathname !== '/dashboard/cover-letter/saved')
       )
     }
     return pathname.startsWith(href)
