@@ -817,7 +817,7 @@ export default function SavedResumePage() {
                       personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
                       onDataChange={(updated) => setEditedResumeData(updated)}
                     >
-                      <div style={{ zoom: editScale }}>
+                      <div style={{ zoom: editScale, width: '8.5in', margin: '0 auto' }}>
                         {(() => {
                           const p = resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }
                           switch (resume.templateId) {

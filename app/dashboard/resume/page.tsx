@@ -1913,7 +1913,7 @@ export default function ResumePage() {
                     personal={personal}
                     onDataChange={(updated) => setEditedResume(updated)}
                   >
-                    <div style={{ zoom: editScale }}>
+                    <div style={{ zoom: editScale, width: '8.5in', margin: '0 auto' }}>
                       {renderTemplate(displayResume)}
                     </div>
                   </ResumeEditor>
