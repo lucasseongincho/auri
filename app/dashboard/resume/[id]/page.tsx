@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
+import { useLetterScale } from '@/hooks/useLetterScale'
 import ResumePreview from '@/components/resume/ResumePreview'
 import ResumeEditor from '@/components/resume/ResumeEditor'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
@@ -302,6 +303,7 @@ export default function SavedResumePage() {
   const router = useRouter()
   const { user, loading: authLoading, isAuthenticated } = useAuth()
   const { setResume, setSelectedTemplate } = useCareerStore()
+  const { containerRef: editContainerRef, scale: editScale } = useLetterScale()
 
   // ── State ────────────────────────────────────────────────────────────────────
 
@@ -803,23 +805,27 @@ export default function SavedResumePage() {
             {/* Resume Preview / Editor */}
             {isEditMode && editedResumeData ? (
               <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                <div className="rounded-xl border border-white/[0.05] bg-white overflow-auto"
+                <div
+                  ref={editContainerRef}
+                  className="rounded-xl border border-white/[0.05] bg-white overflow-x-hidden overflow-y-auto"
                   style={{ minHeight: '600px' }}>
                   <ResumeEditor
                     resumeData={editedResumeData}
                     personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
                     onDataChange={(updated) => setEditedResumeData(updated)}
                   >
-                    {(() => {
-                      const p = resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }
-                      switch (resume.templateId) {
-                        case 'modern-edge':    return <ModernEdge data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
-                        case 'minimal-seoul':  return <MinimalSeoul data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
-                        case 'executive-dark': return <ExecutiveDark data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
-                        case 'creative-pulse': return <CreativePulse data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
-                        default:               return <ClassicPro data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
-                      }
-                    })()}
+                    <div style={{ zoom: editScale }}>
+                      {(() => {
+                        const p = resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }
+                        switch (resume.templateId) {
+                          case 'modern-edge':    return <ModernEdge data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
+                          case 'minimal-seoul':  return <MinimalSeoul data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
+                          case 'executive-dark': return <ExecutiveDark data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
+                          case 'creative-pulse': return <CreativePulse data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
+                          default:               return <ClassicPro data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
+                        }
+                      })()}
+                    </div>
                   </ResumeEditor>
                 </div>
               </div>

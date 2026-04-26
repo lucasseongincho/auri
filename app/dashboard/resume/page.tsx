@@ -33,6 +33,7 @@ import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
+import { useLetterScale } from '@/hooks/useLetterScale'
 import { saveResume } from '@/lib/firestore'
 import ResumePreview from '@/components/resume/ResumePreview'
 import ResumeEditor from '@/components/resume/ResumeEditor'
@@ -1228,6 +1229,9 @@ export default function ResumePage() {
   const { user, isAuthenticated } = useAuth()
   const { isStreaming, streamedText, stream, reset: resetStream } = useAIStream()
 
+  // ── Letter-size scale for edit mode ─────────────────────────────────────────
+  const { containerRef: editContainerRef, scale: editScale } = useLetterScale()
+
   // ── Local UI state ──────────────────────────────────────────────────────────
   const [currentStep, setCurrentStep] = useState(1)
   const [mobileView, setMobileView] = useState<'form' | 'preview'>('form')
@@ -1901,14 +1905,18 @@ export default function ResumePage() {
           <div className="flex-shrink-0">
             {isEditing && displayResume ? (
               <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                <div className="rounded-xl border border-white/[0.05] bg-white overflow-auto"
+                <div
+                  ref={editContainerRef}
+                  className="rounded-xl border border-white/[0.05] bg-white overflow-x-hidden overflow-y-auto"
                   style={{ minHeight: '600px' }}>
                   <ResumeEditor
                     resumeData={displayResume}
                     personal={personal}
                     onDataChange={(updated) => setEditedResume(updated)}
                   >
-                    {renderTemplate(displayResume)}
+                    <div style={{ zoom: editScale }}>
+                      {renderTemplate(displayResume)}
+                    </div>
                   </ResumeEditor>
                 </div>
               </div>
