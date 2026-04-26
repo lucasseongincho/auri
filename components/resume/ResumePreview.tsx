@@ -275,6 +275,8 @@ export default function ResumePreview({
     setTimeout(() => setCopied(false), 2000)
   }, [safeData, personal])
 
+  if (!data && !isStreaming) return null
+
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar — no-print ensures it never appears in PDF export */}
