@@ -282,6 +282,10 @@ function EditableParagraph({
           whiteSpace: 'pre-wrap',
         }}
       >
+        {/* When inactive, React owns the DOM and renders text normally.
+            When active, the useEffect sets innerText imperatively and React
+            must not touch the children — so we render nothing here. */}
+        {!isActive && !isAssisting && text}
         {isAssisting && (
           <span style={{ opacity: 0.5, fontStyle: 'italic' }}>Rewriting…</span>
         )}
