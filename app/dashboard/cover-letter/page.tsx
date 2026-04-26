@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
   useState,
+  Suspense,
 } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -350,7 +351,7 @@ function Toast({ message, type, onDismiss }: { message: string; type: 'success' 
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
-export default function CoverLetterPage() {
+function CoverLetterContent() {
   const { user } = useAuth()
   const { profile } = useCareerStore()
   const searchParams = useSearchParams()
@@ -930,5 +931,13 @@ export default function CoverLetterPage() {
       </AnimatePresence>
 
     </div>
+  )
+}
+
+export default function CoverLetterPage() {
+  return (
+    <Suspense fallback={null}>
+      <CoverLetterContent />
+    </Suspense>
   )
 }
