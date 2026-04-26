@@ -772,7 +772,7 @@ export default function CoverLetterPage() {
                 className="space-y-4"
               >
                 {/* Toolbar */}
-                <div className="flex items-center gap-2 flex-wrap no-print">
+                <div className="flex items-center gap-2 flex-wrap print:hidden">
                   {/* Undo / Redo */}
                   <button onClick={handleUndo} disabled={!canUndo} aria-label="Undo"
                     className="p-2 rounded-lg border border-white/[0.08] text-[#A0A0B8]
@@ -822,7 +822,7 @@ export default function CoverLetterPage() {
                   <motion.div
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="no-print flex items-center gap-3 px-4 py-2.5 rounded-xl
+                    className="print:hidden flex items-center gap-3 px-4 py-2.5 rounded-xl
                       bg-[#F59E0B]/10 border border-[#F59E0B]/20"
                   >
                     <Wand2 className="w-4 h-4 text-[#F59E0B] flex-shrink-0" />
@@ -849,7 +849,7 @@ export default function CoverLetterPage() {
 
                 {/* Opening hook callout */}
                 {result.opening_hook && (
-                  <div className="no-print p-3 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/20">
+                  <div className="print:hidden p-3 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/20">
                     <p className="text-xs font-semibold text-[#F59E0B] uppercase tracking-wide mb-1">Opening Hook</p>
                     <p className="text-sm text-[#FDE68A] italic">{result.opening_hook}</p>
                   </div>
@@ -887,14 +887,14 @@ export default function CoverLetterPage() {
                 </div>
 
                 {/* Word count bar */}
-                <div className="no-print rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
+                <div className="print:hidden rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
                   <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4">
                     <WordCountBar wordCount={currentWordCount} />
                   </div>
                 </div>
 
                 {/* Easy Tune tip */}
-                <p className="no-print text-xs text-center text-[#60607A]">
+                <p className="print:hidden text-xs text-center text-[#60607A]">
                   Click any paragraph to edit inline · Use AI Assist to rewrite · Ctrl+Z to undo
                 </p>
               </motion.div>
@@ -929,10 +929,6 @@ export default function CoverLetterPage() {
         )}
       </AnimatePresence>
 
-      {/* no-print global style */}
-      <style jsx global>{`
-        @media print { .no-print { display: none !important; } }
-      `}</style>
     </div>
   )
 }
