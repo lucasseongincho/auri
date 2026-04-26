@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft,
   Calendar,
+  Check,
   ChevronRight,
   FileText,
   Loader2,
@@ -20,13 +21,20 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
 import ResumePreview from '@/components/resume/ResumePreview'
+import ResumeEditor from '@/components/resume/ResumeEditor'
+import ClassicPro from '@/components/resume/templates/ClassicPro'
+import ModernEdge from '@/components/resume/templates/ModernEdge'
+import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
+import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
+import CreativePulse from '@/components/resume/templates/CreativePulse'
+import { stripAITags } from '@/lib/resumeHighlight'
 import {
   deleteSavedResume,
   getSavedResume,
   getSavedResumes,
   updateSavedResume,
 } from '@/lib/firestore'
-import type { SavedResume, TemplateId } from '@/types'
+import type { ResumeData, SavedResume, TemplateId } from '@/types'
 import { TEMPLATE_LABELS } from '@/types'
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
@@ -304,6 +312,12 @@ export default function SavedResumePage() {
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Edit mode
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editedResumeData, setEditedResumeData] = useState<ResumeData | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+
   // Delete flow
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -334,6 +348,7 @@ export default function SavedResumePage() {
           setNotFound(true)
         } else {
           setResumeData(data)
+          setEditedResumeData(data.resumeData)
           // Sync to global store
           setResume(data.resumeData)
           setSelectedTemplate(data.templateId)
@@ -377,6 +392,25 @@ export default function SavedResumePage() {
     },
     [resume, user, setSelectedTemplate]
   )
+
+  const handleSaveEdits = useCallback(async () => {
+    if (!user || !resume || !editedResumeData) return
+    setSaving(true)
+    try {
+      await updateSavedResume(user.uid, resume.id, {
+        resumeData: editedResumeData,
+        updatedAt: new Date().toISOString(),
+      })
+      setResumeData((prev) => prev ? { ...prev, resumeData: editedResumeData } : prev)
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
+      setIsEditMode(false)
+    } catch {
+      setError('Failed to save changes.')
+    } finally {
+      setSaving(false)
+    }
+  }, [user, resume, editedResumeData])
 
   const handleDelete = useCallback(async () => {
     if (!user || !resume) return
@@ -638,40 +672,71 @@ export default function SavedResumePage() {
               {/* Actions */}
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Back */}
-                <Link
-                  href="/dashboard/resume"
-                  aria-label="Back to resume builder"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-                    border border-white/[0.08] text-[#A0A0B8]
-                    hover:bg-white/5 hover:text-white transition-all duration-200"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  Back
-                </Link>
+                {!isEditMode && (
+                  <Link
+                    href="/dashboard/resume/saved"
+                    aria-label="Back to saved resumes"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
+                      border border-white/[0.08] text-[#A0A0B8]
+                      hover:bg-white/5 hover:text-white transition-all duration-200"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    Back
+                  </Link>
+                )}
 
-                {/* Edit in Builder */}
-                <Link
-                  href="/dashboard/resume"
-                  aria-label="Edit this resume in the builder"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                    bg-[#6366F1] text-white hover:bg-[#4F46E5] transition-colors duration-200"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                  Edit in Builder
-                </Link>
+                {/* Edit / Save / Cancel */}
+                {!isEditMode ? (
+                  <button
+                    onClick={() => setIsEditMode(true)}
+                    aria-label="Edit this resume"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                      bg-[#6366F1] text-white hover:bg-[#4F46E5] transition-colors duration-200"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    Edit
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={handleSaveEdits}
+                      disabled={saving}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                        bg-[#22C55E] text-white hover:bg-[#16A34A] transition-colors duration-200
+                        disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                      {saving ? 'Saving…' : saveSuccess ? 'Saved!' : 'Save Changes'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsEditMode(false)
+                        setEditedResumeData(resume.resumeData)
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
+                        border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+                        transition-all duration-200"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                      Cancel
+                    </button>
+                  </>
+                )}
 
                 {/* Delete */}
-                <button
-                  onClick={() => setShowDeleteModal(true)}
-                  aria-label="Delete this resume"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-                    border border-[#EF4444]/20 text-[#EF4444]/70
-                    hover:bg-[#EF4444]/10 hover:text-[#EF4444] hover:border-[#EF4444]/40
-                    transition-all duration-200"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  Delete
-                </button>
+                {!isEditMode && (
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    aria-label="Delete this resume"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
+                      border border-[#EF4444]/20 text-[#EF4444]/70
+                      hover:bg-[#EF4444]/10 hover:text-[#EF4444] hover:border-[#EF4444]/40
+                      transition-all duration-200"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
 
@@ -681,9 +746,17 @@ export default function SavedResumePage() {
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   {/* Left: title block */}
                   <div>
-                    <h1 className="font-heading font-semibold text-white text-lg leading-tight">
-                      {resume.name}
-                    </h1>
+                    <div className="flex items-center gap-2">
+                      <h1 className="font-heading font-semibold text-white text-lg leading-tight">
+                        {resume.name}
+                      </h1>
+                      {isEditMode && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold
+                          bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B]">
+                          Editing
+                        </span>
+                      )}
+                    </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2">
                       {resume.targetPosition && (
                         <span className="flex items-center gap-1.5 text-sm text-[#A0A0B8]">
@@ -727,13 +800,37 @@ export default function SavedResumePage() {
               </div>
             </div>
 
-            {/* Resume Preview — PDF targets #resume-content inside ResumePreview, not this wrapper */}
-            <ResumePreview
-              data={resume.resumeData}
-              personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
-              isStreaming={false}
-              onTemplateChange={handleTemplateChange}
-            />
+            {/* Resume Preview / Editor */}
+            {isEditMode && editedResumeData ? (
+              <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
+                <div className="rounded-xl border border-white/[0.05] bg-white overflow-auto"
+                  style={{ minHeight: '600px' }}>
+                  <ResumeEditor
+                    resumeData={editedResumeData}
+                    personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
+                    onDataChange={(updated) => setEditedResumeData(updated)}
+                  >
+                    {(() => {
+                      const p = resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }
+                      switch (resume.templateId) {
+                        case 'modern-edge':    return <ModernEdge data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
+                        case 'minimal-seoul':  return <MinimalSeoul data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
+                        case 'executive-dark': return <ExecutiveDark data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
+                        case 'creative-pulse': return <CreativePulse data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
+                        default:               return <ClassicPro data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
+                      }
+                    })()}
+                  </ResumeEditor>
+                </div>
+              </div>
+            ) : (
+              <ResumePreview
+                data={resume.resumeData}
+                personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
+                isStreaming={false}
+                onTemplateChange={handleTemplateChange}
+              />
+            )}
 
           </motion.div>
         )}

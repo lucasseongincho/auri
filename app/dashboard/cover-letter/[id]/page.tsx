@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -16,10 +16,17 @@ import {
   Pencil,
   ArrowLeft,
   Download,
+  Check,
+  Sparkles,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
-import { getSavedCoverLetter, getSavedCoverLetters, deleteCoverLetter } from '@/lib/firestore'
+import {
+  getSavedCoverLetter,
+  getSavedCoverLetters,
+  deleteCoverLetter,
+  updateCoverLetter,
+} from '@/lib/firestore'
 import { toDate, formatResumeDate } from '@/lib/utils'
 import type { SavedCoverLetter } from '@/types'
 
@@ -27,21 +34,106 @@ const LETTER_W = 816
 const LETTER_H = 1056
 const PAGE_PADDING = 96
 
-function LetterDocReadOnly({
-  company,
-  name,
-  email,
-  phone,
-  location,
-  paragraphs,
-}: {
+// ── EditableParagraph ─────────────────────────────────────────────────────────
+// Verbatim copy from app/dashboard/cover-letter/page.tsx.
+// Owns its own DOM — React never re-writes content after first activation,
+// which prevents the browser from resetting the cursor on every keystroke.
+
+interface EditableParagraphProps {
+  text: string
+  isActive: boolean
+  isAssisting: boolean
+  idx: number
+  onClick: () => void
+  onChange: (val: string) => void
+}
+
+function EditableParagraph({
+  text,
+  isActive,
+  isAssisting,
+  onClick,
+  onChange,
+}: EditableParagraphProps) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    if (!isActive || !ref.current) return
+    ref.current.innerText = text
+    const sel = window.getSelection()
+    const range = document.createRange()
+    range.selectNodeContents(ref.current)
+    range.collapse(false)
+    sel?.removeAllRanges()
+    sel?.addRange(range)
+    ref.current.focus()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive])
+
+  useEffect(() => {
+    if (!isAssisting && ref.current) {
+      ref.current.innerText = text
+      try {
+        const sel = window.getSelection()
+        const range = document.createRange()
+        range.selectNodeContents(ref.current)
+        range.collapse(false)
+        sel?.removeAllRanges()
+        sel?.addRange(range)
+      } catch { /* ignore */ }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAssisting])
+
+  const base: React.CSSProperties = {
+    outline: 'none',
+    borderRadius: '4px',
+    transition: 'all 0.15s ease',
+    whiteSpace: 'pre-wrap',
+  }
+
+  return (
+    <div style={{ position: 'relative', marginBottom: '14px' }} onClick={onClick}>
+      {isActive ? (
+        <div
+          key="edit"
+          ref={ref}
+          contentEditable
+          suppressContentEditableWarning
+          onInput={(e) => onChange((e.target as HTMLDivElement).innerText)}
+          onClick={(e) => e.stopPropagation()}
+          style={{ ...base, padding: '6px 8px', cursor: 'text',
+            border: '1.5px solid rgba(245,158,11,0.4)',
+            background: 'rgba(245,158,11,0.04)' }}
+        />
+      ) : (
+        <div
+          key="view"
+          style={{ ...base, padding: '0', cursor: 'pointer',
+            border: '1.5px solid transparent',
+            background: isAssisting ? 'rgba(245,158,11,0.06)' : 'transparent' }}
+        >
+          {isAssisting
+            ? <span style={{ opacity: 0.5, fontStyle: 'italic' }}>Rewriting…</span>
+            : text}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Shared letter header/footer layout ────────────────────────────────────────
+
+interface LetterShellProps {
   company: string
   name: string
   email: string
   phone: string
   location: string
-  paragraphs: string[]
-}) {
+  children: React.ReactNode
+}
+
+function LetterShell({ company, name, email, phone, location, children }: LetterShellProps) {
   const today = new Date().toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
   })
@@ -72,9 +164,7 @@ function LetterDocReadOnly({
         <p style={{ margin: 0 }}>{company}</p>
       </div>
       <p style={{ marginBottom: '16px', fontWeight: 500 }}>Dear Hiring Manager,</p>
-      {paragraphs.map((text, i) => (
-        <p key={i} style={{ marginBottom: '14px', whiteSpace: 'pre-wrap' }}>{text}</p>
-      ))}
+      {children}
       <p style={{ marginBottom: '40px' }}>Sincerely,</p>
       <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700 }}>
         {name || 'Your Name'}
@@ -82,6 +172,56 @@ function LetterDocReadOnly({
     </div>
   )
 }
+
+// ── LetterDocReadOnly ─────────────────────────────────────────────────────────
+
+function LetterDocReadOnly(props: Omit<LetterShellProps, 'children'> & { paragraphs: string[] }) {
+  const { paragraphs, ...shellProps } = props
+  return (
+    <LetterShell {...shellProps}>
+      {paragraphs.map((text, i) => (
+        <p key={i} style={{ marginBottom: '14px', whiteSpace: 'pre-wrap' }}>{text}</p>
+      ))}
+    </LetterShell>
+  )
+}
+
+// ── LetterDocEditable ─────────────────────────────────────────────────────────
+
+interface LetterDocEditableProps extends Omit<LetterShellProps, 'children'> {
+  paragraphs: string[]
+  activeParagraphIdx: number | null
+  assistingIdx: number | null
+  onParagraphClick: (idx: number) => void
+  onParagraphChange: (idx: number, val: string) => void
+}
+
+function LetterDocEditable({
+  paragraphs,
+  activeParagraphIdx,
+  assistingIdx,
+  onParagraphClick,
+  onParagraphChange,
+  ...shellProps
+}: LetterDocEditableProps) {
+  return (
+    <LetterShell {...shellProps}>
+      {paragraphs.map((text, i) => (
+        <EditableParagraph
+          key={i}
+          idx={i}
+          text={text}
+          isActive={activeParagraphIdx === i}
+          isAssisting={assistingIdx === i}
+          onClick={() => onParagraphClick(i)}
+          onChange={(val) => onParagraphChange(i, val)}
+        />
+      ))}
+    </LetterShell>
+  )
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -105,6 +245,8 @@ function WordBadge({ count }: { count: number }) {
   )
 }
 
+// ── Main Page ─────────────────────────────────────────────────────────────────
+
 export default function CoverLetterDetailPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
@@ -120,6 +262,15 @@ export default function CoverLetterDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [scale, setScale] = useState(1)
   const [downloading, setDownloading] = useState(false)
+
+  // Edit mode
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editedParagraphs, setEditedParagraphs] = useState<string[]>([])
+  const [activeParagraphIdx, setActiveParagraphIdx] = useState<number | null>(null)
+  const [assistingIdx, setAssistingIdx] = useState<number | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+
   const previewContainerRef = useRef<HTMLDivElement>(null)
   const letterDocRef = useRef<HTMLDivElement>(null)
 
@@ -150,6 +301,7 @@ export default function CoverLetterDetailPage() {
           setNotFound(true)
         } else {
           setLetter(single)
+          setEditedParagraphs(single.paragraphs?.length ? single.paragraphs : [single.content])
         }
         setAllLetters(all.sort((a, b) => toMs(b.updatedAt) - toMs(a.updatedAt)))
       } catch {
@@ -160,6 +312,56 @@ export default function CoverLetterDetailPage() {
     }
     load()
   }, [authLoading, user, id])
+
+  const handleSaveEdits = useCallback(async () => {
+    if (!user || !letter) return
+    setSaving(true)
+    try {
+      const wordCount = editedParagraphs.join(' ').split(/\s+/).filter(Boolean).length
+      await updateCoverLetter(user.uid, id, {
+        paragraphs: editedParagraphs,
+        wordCount,
+        updatedAt: new Date().toISOString(),
+      })
+      setLetter((prev) => prev ? { ...prev, paragraphs: editedParagraphs, wordCount } : prev)
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
+      setIsEditMode(false)
+      setActiveParagraphIdx(null)
+    } catch {
+      setError('Failed to save changes.')
+    } finally {
+      setSaving(false)
+    }
+  }, [user, letter, id, editedParagraphs])
+
+  const handleAIAssist = useCallback(async (idx: number) => {
+    if (!letter || assistingIdx !== null) return
+    setAssistingIdx(idx)
+    try {
+      const res = await fetch('/api/claude/cover-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'assist',
+          position: letter.position,
+          company: letter.company,
+          selectedParagraph: editedParagraphs[idx],
+          allParagraphs: editedParagraphs,
+          uid: user?.uid,
+        }),
+      })
+      if (!res.ok) throw new Error('Assist failed')
+      const rewritten = (await res.text()).trim()
+      if (rewritten) {
+        setEditedParagraphs((prev) => prev.map((p, i) => (i === idx ? rewritten : p)))
+      }
+    } catch {
+      // silent — user can try again
+    } finally {
+      setAssistingIdx(null)
+    }
+  }, [letter, assistingIdx, editedParagraphs, user])
 
   async function handleDownloadPDF() {
     if (!letterDocRef.current || !letter) return
@@ -186,6 +388,13 @@ export default function CoverLetterDetailPage() {
       setDeleting(false)
       setDeleteTarget(false)
     }
+  }
+
+  const personal = {
+    name: profile?.personal?.name ?? '',
+    email: profile?.personal?.email ?? '',
+    phone: profile?.personal?.phone ?? '',
+    location: profile?.personal?.location ?? '',
   }
 
   // ── Auth gate ──────────────────────────────────────────────────────────────
@@ -215,7 +424,6 @@ export default function CoverLetterDetailPage() {
         <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 flex flex-col h-full">
           <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-3 flex flex-col h-full">
 
-            {/* Sidebar header */}
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold text-[#A0A0B8] uppercase tracking-wide">
                 Saved Letters
@@ -230,7 +438,6 @@ export default function CoverLetterDetailPage() {
               </Link>
             </div>
 
-            {/* Letter list */}
             <div className="flex-1 overflow-y-auto space-y-1 min-h-0">
               {loading && (
                 <div className="flex items-center justify-center py-8">
@@ -349,27 +556,66 @@ export default function CoverLetterDetailPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <WordBadge count={letter.wordCount} />
-                <button
-                  onClick={handleDownloadPDF}
-                  disabled={downloading}
-                  aria-label="Download cover letter as PDF"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                    bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
-                    shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.02]
-                    transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                >
-                  {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-                  {downloading ? 'Generating…' : 'Download PDF'}
-                </button>
-                <Link
-                  href={`/dashboard/cover-letter?id=${letter.id}`}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                    border border-[#F59E0B]/40 text-[#F59E0B] hover:bg-[#F59E0B]/10 transition-colors"
-                >
-                  <Pencil className="w-3 h-3" />
-                  Edit in Builder
-                </Link>
+                <WordBadge count={isEditMode
+                  ? editedParagraphs.join(' ').split(/\s+/).filter(Boolean).length
+                  : letter.wordCount}
+                />
+
+                {/* Download PDF — always available */}
+                {!isEditMode && (
+                  <button
+                    onClick={handleDownloadPDF}
+                    disabled={downloading}
+                    aria-label="Download cover letter as PDF"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                      bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
+                      shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.02]
+                      transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                    {downloading ? 'Generating…' : 'Download PDF'}
+                  </button>
+                )}
+
+                {/* Edit / Save / Cancel */}
+                {!isEditMode ? (
+                  <button
+                    onClick={() => {
+                      setIsEditMode(true)
+                      setEditedParagraphs(letter.paragraphs?.length ? letter.paragraphs : [letter.content])
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                      border border-[#F59E0B]/40 text-[#F59E0B] hover:bg-[#F59E0B]/10 transition-colors"
+                  >
+                    <Pencil className="w-3 h-3" />
+                    Edit
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={handleSaveEdits}
+                      disabled={saving}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                        bg-[#22C55E] text-white hover:bg-[#16A34A] transition-colors
+                        disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                      {saving ? 'Saving…' : saveSuccess ? 'Saved!' : 'Save Changes'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsEditMode(false)
+                        setActiveParagraphIdx(null)
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
+                        border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all"
+                    >
+                      <X className="w-3 h-3" />
+                      Cancel
+                    </button>
+                  </>
+                )}
+
                 <button
                   onClick={() => setDeleteTarget(true)}
                   aria-label="Delete this cover letter"
@@ -391,6 +637,12 @@ export default function CoverLetterDetailPage() {
                 <Calendar className="w-3.5 h-3.5" />
                 {formatDate(letter.updatedAt)}
               </div>
+              {isEditMode && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold
+                  bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B]">
+                  Editing
+                </span>
+              )}
             </div>
 
             {/* Opening hook callout */}
@@ -401,10 +653,50 @@ export default function CoverLetterDetailPage() {
               </div>
             )}
 
-            {/* Letter document preview */}
+            {/* AI Assist bar — edit mode only */}
+            {isEditMode && activeParagraphIdx !== null && (
+              <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl
+                border border-[#F59E0B]/20 bg-[#F59E0B]/5">
+                <p className="text-xs text-[#A0A0B8]">
+                  Paragraph {activeParagraphIdx + 1} selected — edit inline or rewrite with AI
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleAIAssist(activeParagraphIdx)}
+                    disabled={assistingIdx !== null}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                      bg-[#F59E0B] text-white hover:bg-[#D97706] transition-colors
+                      disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {assistingIdx === activeParagraphIdx
+                      ? <Loader2 className="w-3 h-3 animate-spin" />
+                      : <Sparkles className="w-3 h-3" />}
+                    {assistingIdx === activeParagraphIdx ? 'Rewriting…' : 'AI Rewrite'}
+                  </button>
+                  <button
+                    onClick={() => setActiveParagraphIdx(null)}
+                    className="p-1 rounded-lg text-[#60607A] hover:text-white hover:bg-white/5 transition-all"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Edit mode hint */}
+            {isEditMode && activeParagraphIdx === null && (
+              <p className="text-xs text-[#60607A] text-center py-1">
+                Click any paragraph to edit · AI Rewrite available per paragraph
+              </p>
+            )}
+
+            {/* Letter document */}
             <div
               ref={previewContainerRef}
               className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden"
+              onClick={() => {
+                if (isEditMode && activeParagraphIdx !== null) setActiveParagraphIdx(null)
+              }}
             >
               <div
                 className="rounded-xl border border-white/[0.05] overflow-hidden"
@@ -414,16 +706,30 @@ export default function CoverLetterDetailPage() {
                   width: `${LETTER_W}px`,
                   marginBottom: scale < 1 ? `${(scale - 1) * LETTER_H}px` : undefined,
                 }}
+                onClick={(e) => e.stopPropagation()}
               >
                 <div ref={letterDocRef}>
-                  <LetterDocReadOnly
-                    company={letter.company}
-                    name={profile?.personal?.name ?? ''}
-                    email={profile?.personal?.email ?? ''}
-                    phone={profile?.personal?.phone ?? ''}
-                    location={profile?.personal?.location ?? ''}
-                    paragraphs={letter.paragraphs?.length ? letter.paragraphs : [letter.content]}
-                  />
+                  {isEditMode ? (
+                    <LetterDocEditable
+                      company={letter.company}
+                      {...personal}
+                      paragraphs={editedParagraphs}
+                      activeParagraphIdx={activeParagraphIdx}
+                      assistingIdx={assistingIdx}
+                      onParagraphClick={(idx) =>
+                        setActiveParagraphIdx((prev) => prev === idx ? prev : idx)
+                      }
+                      onParagraphChange={(idx, val) =>
+                        setEditedParagraphs((prev) => prev.map((p, i) => (i === idx ? val : p)))
+                      }
+                    />
+                  ) : (
+                    <LetterDocReadOnly
+                      company={letter.company}
+                      {...personal}
+                      paragraphs={letter.paragraphs?.length ? letter.paragraphs : [letter.content]}
+                    />
+                  )}
                 </div>
               </div>
             </div>
