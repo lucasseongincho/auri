@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   Suspense,
@@ -217,10 +218,13 @@ function EditableParagraph({
 }: EditableParagraphProps) {
   const ref = useRef<HTMLDivElement>(null)
 
-  // Runs once when the edit div mounts (key="edit" forces a fresh mount each
-  // time isActive goes true → no stale user-typed content in the DOM).
-  useEffect(() => {
-    if (!ref.current) return
+  // Runs synchronously (before paint) each time isActive becomes true.
+  // useLayoutEffect ensures content is in the DOM before the browser draws,
+  // so the paragraph never flashes empty. `text` is intentionally excluded
+  // from deps — after init the browser owns the DOM; we must not overwrite
+  // the user's in-progress edits on every keystroke.
+  useLayoutEffect(() => {
+    if (!isActive || !ref.current) return
     ref.current.innerText = text
     const sel = window.getSelection()
     const range = document.createRange()
@@ -229,9 +233,8 @@ function EditableParagraph({
     sel?.removeAllRanges()
     sel?.addRange(range)
     ref.current.focus()
-  // text intentionally excluded: set once on mount, browser owns DOM after that
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isActive])
 
   // After AI assist completes, sync rewritten text into the DOM imperatively.
   useEffect(() => {
