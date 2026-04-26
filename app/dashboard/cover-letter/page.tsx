@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Mail,
@@ -27,7 +28,7 @@ import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
-import { saveCoverLetter } from '@/lib/firestore'
+import { saveCoverLetter, getSavedCoverLetter } from '@/lib/firestore'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 import type { CoverLetter } from '@/types'
@@ -352,6 +353,7 @@ function Toast({ message, type, onDismiss }: { message: string; type: 'success' 
 export default function CoverLetterPage() {
   const { user } = useAuth()
   const { profile } = useCareerStore()
+  const searchParams = useSearchParams()
 
   // Form fields
   const [position, setPosition] = useState(profile?.target?.position ?? '')
@@ -383,6 +385,30 @@ export default function CoverLetterPage() {
 
   const letterPrintRef = useRef<HTMLDivElement>(null)
   const { isStreaming, stream } = useAIStream()
+
+  // Load saved letter when ?id= is present in the URL
+  useEffect(() => {
+    const id = searchParams.get('id')
+    if (!id || !user?.uid) return
+    getSavedCoverLetter(user.uid, id).then((letter) => {
+      if (!letter) return
+      setCompany(letter.company)
+      setPosition(letter.position)
+      const ps = letter.paragraphs?.length ? letter.paragraphs : [letter.content]
+      setResult({
+        cover_letter: letter.content,
+        word_count: letter.wordCount,
+        opening_hook: letter.openingHook ?? '',
+        paragraphs: ps,
+      })
+      setParagraphs(ps)
+      setHistory([ps])
+      setHistoryIdx(0)
+      setSavedId(id)
+    })
+  // Only run when auth resolves and id is present — not on every profile change
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid, searchParams])
 
   // Scale the letter to fit the container
   useEffect(() => {

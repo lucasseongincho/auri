@@ -219,6 +219,13 @@ export async function getSavedCoverLetters(uid: string): Promise<SavedCoverLette
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as SavedCoverLetter))
 }
 
+export async function getSavedCoverLetter(uid: string, id: string): Promise<SavedCoverLetter | null> {
+  const ref = doc(db, 'users', uid, 'cover-letters', id)
+  const snap = await getDoc(ref)
+  if (!snap.exists()) return null
+  return { id: snap.id, ...snap.data() } as SavedCoverLetter
+}
+
 export async function saveCoverLetter(uid: string, letter: Omit<SavedCoverLetter, 'id'>): Promise<string> {
   const col = collection(db, 'users', uid, 'cover-letters')
   const newRef = doc(col)
