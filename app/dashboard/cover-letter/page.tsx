@@ -216,35 +216,30 @@ function EditableParagraph({
   onChange,
 }: EditableParagraphProps) {
   const ref = useRef<HTMLDivElement>(null)
-  const initializedRef = useRef(false)
 
-  // Set DOM content exactly once when paragraph first becomes active.
-  // Intentionally omits `text` — after init, the browser owns the DOM.
+  // Runs once when the edit div mounts (key="edit" forces a fresh mount each
+  // time isActive goes true → no stale user-typed content in the DOM).
   useEffect(() => {
-    if (isActive && !initializedRef.current && ref.current) {
-      ref.current.innerText = text
-      initializedRef.current = true
-      const range = document.createRange()
-      const sel = window.getSelection()
-      range.selectNodeContents(ref.current)
-      range.collapse(false)
-      sel?.removeAllRanges()
-      sel?.addRange(range)
-      ref.current.focus()
-    }
-    if (!isActive) {
-      initializedRef.current = false
-    }
+    if (!ref.current) return
+    ref.current.innerText = text
+    const sel = window.getSelection()
+    const range = document.createRange()
+    range.selectNodeContents(ref.current)
+    range.collapse(false)
+    sel?.removeAllRanges()
+    sel?.addRange(range)
+    ref.current.focus()
+  // text intentionally excluded: set once on mount, browser owns DOM after that
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive])
+  }, [])
 
-  // Sync new text from AI assist into DOM after rewrite completes.
+  // After AI assist completes, sync rewritten text into the DOM imperatively.
   useEffect(() => {
-    if (isActive && !isAssisting && ref.current && initializedRef.current) {
+    if (!isAssisting && ref.current) {
       ref.current.innerText = text
       try {
-        const range = document.createRange()
         const sel = window.getSelection()
+        const range = document.createRange()
         range.selectNodeContents(ref.current)
         range.collapse(false)
         sel?.removeAllRanges()
@@ -254,42 +249,43 @@ function EditableParagraph({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAssisting])
 
+  const base: React.CSSProperties = {
+    outline: 'none',
+    borderRadius: '4px',
+    transition: 'all 0.15s ease',
+    whiteSpace: 'pre-wrap',
+  }
+
   return (
-    <div
-      style={{ position: 'relative', marginBottom: '14px' }}
-      onClick={onClick}
-    >
-      <div
-        ref={ref}
-        contentEditable={isActive}
-        suppressContentEditableWarning
-        onInput={(e) => onChange((e.target as HTMLDivElement).innerText)}
-        onClick={(e) => { if (isActive) e.stopPropagation() }}
-        style={{
-          outline: 'none',
-          borderRadius: '4px',
-          padding: isActive ? '6px 8px' : '0',
-          border: isActive
-            ? '1.5px solid rgba(245,158,11,0.4)'
-            : '1.5px solid transparent',
-          background: isActive
-            ? 'rgba(245,158,11,0.04)'
-            : isAssisting
-            ? 'rgba(245,158,11,0.06)'
-            : 'transparent',
-          cursor: isActive ? 'text' : 'pointer',
-          transition: 'all 0.15s ease',
-          whiteSpace: 'pre-wrap',
-        }}
-      >
-        {/* When inactive, React owns the DOM and renders text normally.
-            When active, the useEffect sets innerText imperatively and React
-            must not touch the children — so we render nothing here. */}
-        {!isActive && !isAssisting && text}
-        {isAssisting && (
-          <span style={{ opacity: 0.5, fontStyle: 'italic' }}>Rewriting…</span>
-        )}
-      </div>
+    <div style={{ position: 'relative', marginBottom: '14px' }} onClick={onClick}>
+      {isActive ? (
+        // key="edit" — fresh DOM node every time editing starts; useEffect sets
+        // innerText on mount so React never writes children into this div.
+        <div
+          key="edit"
+          ref={ref}
+          contentEditable
+          suppressContentEditableWarning
+          onInput={(e) => onChange((e.target as HTMLDivElement).innerText)}
+          onClick={(e) => e.stopPropagation()}
+          style={{ ...base, padding: '6px 8px', cursor: 'text',
+            border: '1.5px solid rgba(245,158,11,0.4)',
+            background: 'rgba(245,158,11,0.04)' }}
+        />
+      ) : (
+        // key="view" — fresh DOM node every time editing ends; React owns it
+        // and renders {text}, which is always the latest typed value.
+        <div
+          key="view"
+          style={{ ...base, padding: '0', cursor: 'pointer',
+            border: '1.5px solid transparent',
+            background: isAssisting ? 'rgba(245,158,11,0.06)' : 'transparent' }}
+        >
+          {isAssisting
+            ? <span style={{ opacity: 0.5, fontStyle: 'italic' }}>Rewriting…</span>
+            : text}
+        </div>
+      )}
     </div>
   )
 }
