@@ -375,6 +375,34 @@ Return ONLY valid JSON with exactly these fields:
 Salutation to use: ${salutation}`
 }
 
+/**
+ * Rewrites a single paragraph in a cover letter.
+ * Receives the full letter context so the rewrite stays coherent
+ * and the total word count stays within the 280-300 window.
+ */
+export function buildCoverLetterAssistPrompt(
+  selectedParagraph: string,
+  allParagraphs: string[],
+  position: string,
+  company: string
+): string {
+  const currentTotal = allParagraphs.join(' ').trim().split(/\s+/).length
+  return `You are rewriting one paragraph of a cover letter for ${position} at ${company}.
+
+Full letter context (${currentTotal} words total — target is 280-300 words for the whole body):
+${allParagraphs.map((p, i) => `[Paragraph ${i + 1}]: ${p}`).join('\n\n')}
+
+Rewrite ONLY this paragraph to be more impactful, specific, and compelling:
+"${selectedParagraph}"
+
+Rules:
+- Keep the same structural role (opening hook, body argument, or closing CTA)
+- Make it more concrete — add a specific result, metric, or insight if possible
+- Do not add a salutation or sign-off
+- Adjust length slightly if needed to keep the full letter near 280-300 words
+- Return ONLY the rewritten paragraph text — no JSON, no labels, no explanation`
+}
+
 // ── Feature 9 — Interview Preparation System ─────────────────────────────────
 
 /**

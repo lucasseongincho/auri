@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { streamClaude, buildErrorResponse } from '@/lib/claude'
-import { buildCoverLetterPrompt } from '@/lib/prompts'
+import { buildCoverLetterPrompt, buildCoverLetterAssistPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
 import { checkBetaLimits, incrementBetaCall } from '@/lib/betaGuard'
@@ -10,6 +10,7 @@ export const runtime = 'nodejs'
 export const maxDuration = 60
 
 interface CoverLetterRequestBody {
+  mode?: 'generate' | 'assist'
   position: string
   company: string
   jobDescription: string
@@ -18,6 +19,9 @@ interface CoverLetterRequestBody {
   cityState?: string
   uid?: string
   isPro?: boolean
+  // assist mode
+  selectedParagraph?: string
+  allParagraphs?: string[]
 }
 
 async function attemptStream(prompt: string, retryCount = 0): Promise<ReadableStream<Uint8Array>> {
@@ -78,14 +82,27 @@ export async function POST(req: NextRequest) {
     }
     if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
 
-    const prompt = buildCoverLetterPrompt(
-      body.position,
-      body.company,
-      body.jobDescription ?? '',
-      body.experienceSummary ?? '',
-      body.hiringManagerName,
-      body.cityState
-    )
+    let prompt: string
+    if (body.mode === 'assist') {
+      if (!body.selectedParagraph || !body.allParagraphs?.length) {
+        return buildErrorResponse('selectedParagraph and allParagraphs are required for assist mode', 400)
+      }
+      prompt = buildCoverLetterAssistPrompt(
+        body.selectedParagraph,
+        body.allParagraphs,
+        body.position,
+        body.company
+      )
+    } else {
+      prompt = buildCoverLetterPrompt(
+        body.position,
+        body.company,
+        body.jobDescription ?? '',
+        body.experienceSummary ?? '',
+        body.hiringManagerName,
+        body.cityState
+      )
+    }
 
     const stream = await attemptStream(prompt)
 

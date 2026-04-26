@@ -13,7 +13,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { APP_CONFIG } from '@/lib/config'
-import type { CareerProfile, SavedResume, SavedInterviewPrep, InterviewPrep } from '@/types'
+import type { CareerProfile, SavedResume, SavedInterviewPrep, InterviewPrep, SavedCoverLetter } from '@/types'
 
 // ── User Profile Bootstrap ────────────────────────────────────────────────────
 // Called on sign-up and Google sign-in to persist auth metadata to Firestore.
@@ -208,6 +208,33 @@ export async function initBetaUsage(uid: string): Promise<void> {
     },
     { merge: true }
   )
+}
+
+// ── Cover Letters — users/{uid}/cover-letters/{id} ───────────────────────────
+
+export async function getSavedCoverLetters(uid: string): Promise<SavedCoverLetter[]> {
+  const col = collection(db, 'users', uid, 'cover-letters')
+  const q = query(col, orderBy('updatedAt', 'desc'))
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as SavedCoverLetter))
+}
+
+export async function saveCoverLetter(uid: string, letter: Omit<SavedCoverLetter, 'id'>): Promise<string> {
+  const col = collection(db, 'users', uid, 'cover-letters')
+  const newRef = doc(col)
+  const sanitized = JSON.parse(JSON.stringify(letter))
+  await setDoc(newRef, { ...sanitized, updatedAt: serverTimestamp() })
+  return newRef.id
+}
+
+export async function updateCoverLetter(uid: string, id: string, partial: Partial<SavedCoverLetter>): Promise<void> {
+  const ref = doc(db, 'users', uid, 'cover-letters', id)
+  await updateDoc(ref, { ...partial, updatedAt: serverTimestamp() })
+}
+
+export async function deleteCoverLetter(uid: string, id: string): Promise<void> {
+  const ref = doc(db, 'users', uid, 'cover-letters', id)
+  await deleteDoc(ref)
 }
 
 // ── localStorage helpers for guest users ─────────────────────────────────────

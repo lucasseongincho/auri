@@ -270,6 +270,19 @@ export interface SavedInterviewPrep {
   createdAt: string
 }
 
+// Saved cover letter: users/{uid}/cover-letters/{id}
+export interface SavedCoverLetter {
+  id: string
+  company: string
+  position: string
+  content: string         // full plain text
+  paragraphs: string[]    // editable paragraph array
+  wordCount: number
+  openingHook?: string
+  createdAt: string
+  updatedAt: string
+}
+
 // ============================================================
 // Auth types
 // ============================================================
