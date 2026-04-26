@@ -195,6 +195,101 @@ function CoverLetterLoadingState() {
   )
 }
 
+// ── Editable paragraph sub-component ─────────────────────────────────────────
+// Owns its own DOM — React never re-writes content after first activation,
+// which prevents the browser from resetting the cursor on every keystroke.
+
+interface EditableParagraphProps {
+  text: string
+  isActive: boolean
+  isAssisting: boolean
+  idx: number
+  onClick: () => void
+  onChange: (val: string) => void
+}
+
+function EditableParagraph({
+  text,
+  isActive,
+  isAssisting,
+  onClick,
+  onChange,
+}: EditableParagraphProps) {
+  const ref = useRef<HTMLDivElement>(null)
+  const initializedRef = useRef(false)
+
+  // Set DOM content exactly once when paragraph first becomes active.
+  // Intentionally omits `text` — after init, the browser owns the DOM.
+  useEffect(() => {
+    if (isActive && !initializedRef.current && ref.current) {
+      ref.current.innerText = text
+      initializedRef.current = true
+      const range = document.createRange()
+      const sel = window.getSelection()
+      range.selectNodeContents(ref.current)
+      range.collapse(false)
+      sel?.removeAllRanges()
+      sel?.addRange(range)
+      ref.current.focus()
+    }
+    if (!isActive) {
+      initializedRef.current = false
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive])
+
+  // Sync new text from AI assist into DOM after rewrite completes.
+  useEffect(() => {
+    if (isActive && !isAssisting && ref.current && initializedRef.current) {
+      ref.current.innerText = text
+      try {
+        const range = document.createRange()
+        const sel = window.getSelection()
+        range.selectNodeContents(ref.current)
+        range.collapse(false)
+        sel?.removeAllRanges()
+        sel?.addRange(range)
+      } catch { /* ignore */ }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAssisting])
+
+  return (
+    <div
+      style={{ position: 'relative', marginBottom: '14px' }}
+      onClick={onClick}
+    >
+      <div
+        ref={ref}
+        contentEditable={isActive}
+        suppressContentEditableWarning
+        onInput={(e) => onChange((e.target as HTMLDivElement).innerText)}
+        onClick={(e) => { if (isActive) e.stopPropagation() }}
+        style={{
+          outline: 'none',
+          borderRadius: '4px',
+          padding: isActive ? '6px 8px' : '0',
+          border: isActive
+            ? '1.5px solid rgba(245,158,11,0.4)'
+            : '1.5px solid transparent',
+          background: isActive
+            ? 'rgba(245,158,11,0.04)'
+            : isAssisting
+            ? 'rgba(245,158,11,0.06)'
+            : 'transparent',
+          cursor: isActive ? 'text' : 'pointer',
+          transition: 'all 0.15s ease',
+          whiteSpace: 'pre-wrap',
+        }}
+      >
+        {isAssisting && (
+          <span style={{ opacity: 0.5, fontStyle: 'italic' }}>Rewriting…</span>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── Formal letter document ────────────────────────────────────────────────────
 
 interface LetterDocProps {
@@ -268,44 +363,17 @@ function LetterDocument({
       <p style={{ marginBottom: '16px', fontWeight: 500 }}>{salutation}</p>
 
       {/* Body paragraphs — Easy Tune */}
-      {paragraphs.map((text, i) => {
-        const isActive = activeParagraphIdx === i
-        const isAssisting = assistingIdx === i
-        return (
-          <div
-            key={i}
-            style={{ position: 'relative', marginBottom: '14px' }}
-            onClick={() => onParagraphClick(i)}
-          >
-            <div
-              contentEditable={isActive}
-              suppressContentEditableWarning
-              onInput={(e) => onParagraphChange(i, (e.target as HTMLElement).innerText)}
-              onClick={(e) => { if (isActive) e.stopPropagation() }}
-              style={{
-                outline: 'none',
-                borderRadius: '4px',
-                padding: isActive ? '6px 8px' : '0',
-                border: isActive
-                  ? '1.5px solid rgba(245,158,11,0.4)'
-                  : '1.5px solid transparent',
-                background: isActive
-                  ? 'rgba(245,158,11,0.04)'
-                  : isAssisting
-                  ? 'rgba(245,158,11,0.06)'
-                  : 'transparent',
-                cursor: isActive ? 'text' : 'pointer',
-                transition: 'all 0.15s ease',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {isAssisting ? (
-                <span style={{ opacity: 0.5, fontStyle: 'italic' }}>Rewriting…</span>
-              ) : text}
-            </div>
-          </div>
-        )
-      })}
+      {paragraphs.map((text, i) => (
+        <EditableParagraph
+          key={i}
+          idx={i}
+          text={text}
+          isActive={activeParagraphIdx === i}
+          isAssisting={assistingIdx === i}
+          onClick={() => onParagraphClick(i)}
+          onChange={(val) => onParagraphChange(i, val)}
+        />
+      ))}
 
       {/* Closing */}
       <p style={{ marginBottom: '40px' }}>Sincerely,</p>
