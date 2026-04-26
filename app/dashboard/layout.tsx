@@ -27,6 +27,7 @@ const NAV_ITEMS = [
   { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin' },
   { id: 'strategy', label: 'Job Strategy', icon: Map, href: '/dashboard/strategy' },
   { id: 'cover-letter', label: 'Cover Letter', icon: Mail, href: '/dashboard/cover-letter' },
+  { id: 'my-cover-letters', label: 'My Cover Letters', icon: FolderOpen, href: '/dashboard/cover-letter/saved' },
   { id: 'interview', label: 'Interview Prep', icon: MessageSquare, href: '/dashboard/interview' },
 ] as const
 
@@ -79,6 +80,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       return (
         pathname === '/dashboard/resume/saved' ||
         (pathname.startsWith('/dashboard/resume/') && pathname !== '/dashboard/resume')
+      )
+    }
+    // Cover Letter: exact match only — prevents /cover-letter/saved from also lighting it up
+    if (href === '/dashboard/cover-letter') return pathname === '/dashboard/cover-letter'
+    // My Cover Letters: active on /dashboard/cover-letter/saved
+    if (href === '/dashboard/cover-letter/saved') {
+      return (
+        pathname === '/dashboard/cover-letter/saved' ||
+        (pathname.startsWith('/dashboard/cover-letter/') && pathname !== '/dashboard/cover-letter')
       )
     }
     return pathname.startsWith(href)

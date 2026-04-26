@@ -211,7 +211,7 @@ export default function ResumeEditor({
   }, [resumeData, pushToHistory, onDataChange])
 
   return (
-    <div className="relative" ref={editorRef} onMouseUp={handleMouseUp}>
+    <div className="relative" ref={editorRef} onMouseUp={handleMouseUp} tabIndex={-1}>
       {/* Undo / Redo toolbar */}
       <div className="flex items-center gap-2 mb-3">
         <div className="flex items-center gap-1 p-1 rounded-lg bg-[#13131A] border border-white/[0.08]">
@@ -290,7 +290,14 @@ export default function ResumeEditor({
       <div
         contentEditable
         suppressContentEditableWarning
-        onBlur={syncDOMToData}
+        onBlur={(e) => {
+          // Only sync when focus moves outside the editor entirely.
+          // relatedTarget is the element receiving focus; if it's still inside
+          // editorRef (e.g. clicking the AI Assist button), skip the sync to
+          // avoid resetting the selection mid-interaction.
+          if (editorRef.current?.contains(e.relatedTarget as Node)) return
+          syncDOMToData()
+        }}
         className="outline-none"
         style={{ cursor: 'text' }}
         aria-label="Editable resume content"

@@ -137,7 +137,7 @@ function CoverLetterLoadingState() {
         <motion.div
           className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706]
             flex items-center justify-center shadow-lg shadow-[#F59E0B]/30"
-          animate={{ scale: [1, 1.08, 1], rotate: [0, 3, -3, 0] }}
+          animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
         >
           <Mail className="w-9 h-9 text-white" />
@@ -175,7 +175,7 @@ function CoverLetterLoadingState() {
         <motion.div
           className="h-full rounded-full bg-gradient-to-r from-[#F59E0B] to-[#D97706]"
           animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
         />
       </div>
 
