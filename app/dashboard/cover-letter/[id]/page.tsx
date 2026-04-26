@@ -15,6 +15,7 @@ import {
   X,
   Pencil,
   ArrowLeft,
+  Download,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
@@ -118,7 +119,9 @@ export default function CoverLetterDetailPage() {
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [scale, setScale] = useState(1)
+  const [downloading, setDownloading] = useState(false)
   const previewContainerRef = useRef<HTMLDivElement>(null)
+  const letterDocRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const el = previewContainerRef.current
@@ -157,6 +160,20 @@ export default function CoverLetterDetailPage() {
     }
     load()
   }, [authLoading, user, id])
+
+  async function handleDownloadPDF() {
+    if (!letterDocRef.current || !letter) return
+    setDownloading(true)
+    try {
+      const { generatePDFFromElement } = await import('@/lib/pdf')
+      const slug = `${letter.company.replace(/\s+/g, '-').toLowerCase()}-${letter.position.replace(/\s+/g, '-').toLowerCase()}`
+      await generatePDFFromElement(letterDocRef.current, {
+        filename: `cover-letter-${slug || 'download'}.pdf`,
+      })
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   async function handleDelete() {
     if (!user?.uid) return
@@ -333,10 +350,22 @@ export default function CoverLetterDetailPage() {
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <WordBadge count={letter.wordCount} />
+                <button
+                  onClick={handleDownloadPDF}
+                  disabled={downloading}
+                  aria-label="Download cover letter as PDF"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                    bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
+                    shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.02]
+                    transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                  {downloading ? 'Generating…' : 'Download PDF'}
+                </button>
                 <Link
                   href={`/dashboard/cover-letter?id=${letter.id}`}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                    bg-[#F59E0B] text-white hover:bg-[#D97706] transition-colors"
+                    border border-[#F59E0B]/40 text-[#F59E0B] hover:bg-[#F59E0B]/10 transition-colors"
                 >
                   <Pencil className="w-3 h-3" />
                   Edit in Builder
@@ -386,14 +415,16 @@ export default function CoverLetterDetailPage() {
                   marginBottom: scale < 1 ? `${(scale - 1) * LETTER_H}px` : undefined,
                 }}
               >
-                <LetterDocReadOnly
-                  company={letter.company}
-                  name={profile?.personal?.name ?? ''}
-                  email={profile?.personal?.email ?? ''}
-                  phone={profile?.personal?.phone ?? ''}
-                  location={profile?.personal?.location ?? ''}
-                  paragraphs={letter.paragraphs?.length ? letter.paragraphs : [letter.content]}
-                />
+                <div ref={letterDocRef}>
+                  <LetterDocReadOnly
+                    company={letter.company}
+                    name={profile?.personal?.name ?? ''}
+                    email={profile?.personal?.email ?? ''}
+                    phone={profile?.personal?.phone ?? ''}
+                    location={profile?.personal?.location ?? ''}
+                    paragraphs={letter.paragraphs?.length ? letter.paragraphs : [letter.content]}
+                  />
+                </div>
               </div>
             </div>
           </motion.div>

@@ -11,6 +11,7 @@ import {
   FileText,
   Loader2,
   LogIn,
+  Pencil,
   Plus,
   Target,
   Trash2,
@@ -646,6 +647,17 @@ export default function SavedResumePage() {
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   Back
+                </Link>
+
+                {/* Edit in Builder */}
+                <Link
+                  href="/dashboard/resume"
+                  aria-label="Edit this resume in the builder"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                    bg-[#6366F1] text-white hover:bg-[#4F46E5] transition-colors duration-200"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  Edit in Builder
                 </Link>
 
                 {/* Delete */}
