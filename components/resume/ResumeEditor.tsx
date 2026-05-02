@@ -37,6 +37,10 @@ export default function ResumeEditor({
   const { pushToHistory, undo, redo, canUndo, canRedo, profile } = useCareerStore()
   const editorRef = useRef<HTMLDivElement>(null)
   const inputDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Incrementing this key forces the contenteditable to unmount+remount,
+  // which is the only way to make React re-render its DOM after undo/redo
+  // (suppressContentEditableWarning prevents normal reconciliation).
+  const [ceKey, setCEKey] = useState(0)
   const [aiAssist, setAIAssist] = useState<AIAssistState>({
     isVisible: false,
     isLoading: false,
@@ -46,8 +50,8 @@ export default function ResumeEditor({
   })
   const [lastSaved, setLastSaved] = useState(false)
 
-  // Mark structural elements (section headers, contact header) as non-editable
-  // so users can't type into them and silently lose those changes on save.
+  // Mark structural elements (section headers, contact header) as non-editable.
+  // Re-runs on ceKey change because remounting the contenteditable resets the DOM.
   useEffect(() => {
     if (!editorRef.current) return
     editorRef.current
@@ -56,28 +60,36 @@ export default function ResumeEditor({
         el.setAttribute('contenteditable', 'false')
         ;(el as HTMLElement).style.cursor = 'default'
       })
-  }, [])
+  }, [ceKey])
+
+  const handleUndo = useCallback(() => {
+    const prev = undo()
+    if (prev) { onDataChange(prev); setCEKey((k) => k + 1) }
+  }, [undo, onDataChange])
+
+  const handleRedo = useCallback(() => {
+    const next = redo()
+    if (next) { onDataChange(next); setCEKey((k) => k + 1) }
+  }, [redo, onDataChange])
 
   // Keyboard shortcut handler for Ctrl+Z / Ctrl+Y
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
         e.preventDefault()
-        const prev = undo()
-        if (prev) onDataChange(prev)
+        handleUndo()
       }
       if (
         ((e.ctrlKey || e.metaKey) && e.key === 'y') ||
         ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z')
       ) {
         e.preventDefault()
-        const next = redo()
-        if (next) onDataChange(next)
+        handleRedo()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [undo, redo, onDataChange])
+  }, [handleUndo, handleRedo])
 
   // Show AI Assist button when text is selected inside a bullet
   const handleMouseUp = useCallback(() => {
@@ -229,7 +241,7 @@ export default function ResumeEditor({
       <div className="flex items-center gap-2 mb-3">
         <div className="flex items-center gap-1 p-1 rounded-lg bg-[#13131A] border border-white/[0.08]">
           <button
-            onClick={() => { const prev = undo(); if (prev) onDataChange(prev) }}
+            onClick={handleUndo}
             disabled={!canUndo()}
             aria-label="Undo last edit (Ctrl+Z)"
             title="Undo (Ctrl+Z)"
@@ -239,7 +251,7 @@ export default function ResumeEditor({
             <Undo2 className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => { const next = redo(); if (next) onDataChange(next) }}
+            onClick={handleRedo}
             disabled={!canRedo()}
             aria-label="Redo last edit (Ctrl+Y)"
             title="Redo (Ctrl+Y)"
@@ -301,6 +313,7 @@ export default function ResumeEditor({
 
       {/* Contenteditable wrapper — makes all text in the resume editable */}
       <div
+        key={ceKey}
         contentEditable
         suppressContentEditableWarning
         onInput={() => {
