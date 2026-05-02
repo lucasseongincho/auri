@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -320,6 +320,9 @@ export default function SavedResumePage() {
   // Edit mode
   const [isEditMode, setIsEditMode] = useState(false)
   const [editedResumeData, setEditedResumeData] = useState<ResumeData | null>(null)
+  // Ref stays in sync synchronously so handleSaveEdits always reads the latest
+  // data even when the blur→setState hasn't re-rendered yet at click time.
+  const editedResumeDataRef = useRef<ResumeData | null>(null)
   const [saving, setSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
@@ -353,6 +356,7 @@ export default function SavedResumePage() {
           setNotFound(true)
         } else {
           setResumeData(data)
+          editedResumeDataRef.current = data.resumeData
           setEditedResumeData(data.resumeData)
           // Sync to global store
           setResume(data.resumeData)
@@ -399,14 +403,15 @@ export default function SavedResumePage() {
   )
 
   const handleSaveEdits = useCallback(async () => {
-    if (!user || !resume || !editedResumeData) return
+    const dataToSave = editedResumeDataRef.current ?? editedResumeData
+    if (!user || !resume || !dataToSave) return
     setSaving(true)
     try {
       await updateSavedResume(user.uid, resume.id, {
-        resumeData: editedResumeData,
+        resumeData: dataToSave,
         updatedAt: new Date().toISOString(),
       })
-      setResumeData((prev) => prev ? { ...prev, resumeData: editedResumeData } : prev)
+      setResumeData((prev) => prev ? { ...prev, resumeData: dataToSave } : prev)
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
       setIsEditMode(false)
@@ -716,6 +721,7 @@ export default function SavedResumePage() {
                     <button
                       onClick={() => {
                         setIsEditMode(false)
+                        editedResumeDataRef.current = resume.resumeData
                         setEditedResumeData(resume.resumeData)
                       }}
                       className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
@@ -815,7 +821,10 @@ export default function SavedResumePage() {
                     <ResumeEditor
                       resumeData={editedResumeData}
                       personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
-                      onDataChange={(updated) => setEditedResumeData(updated)}
+                      onDataChange={(updated) => {
+                        editedResumeDataRef.current = updated
+                        setEditedResumeData(updated)
+                      }}
                     >
                       <div style={{ zoom: editScale, width: '8.5in', margin: '0 auto' }}>
                         {(() => {
