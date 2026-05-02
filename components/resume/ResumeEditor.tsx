@@ -36,6 +36,7 @@ export default function ResumeEditor({
   useAuth() // auth context — user available for future AI assist attribution
   const { pushToHistory, undo, redo, canUndo, canRedo, profile } = useCareerStore()
   const editorRef = useRef<HTMLDivElement>(null)
+  const inputDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [aiAssist, setAIAssist] = useState<AIAssistState>({
     isVisible: false,
     isLoading: false,
@@ -290,11 +291,18 @@ export default function ResumeEditor({
       <div
         contentEditable
         suppressContentEditableWarning
+        onInput={() => {
+          // Debounce sync while typing; blur cancels the timer and syncs immediately.
+          if (inputDebounceRef.current) clearTimeout(inputDebounceRef.current)
+          inputDebounceRef.current = setTimeout(syncDOMToData, 400)
+        }}
         onBlur={(e) => {
+          // Cancel any pending debounce and sync immediately.
+          if (inputDebounceRef.current) {
+            clearTimeout(inputDebounceRef.current)
+            inputDebounceRef.current = null
+          }
           // Only sync when focus moves outside the editor entirely.
-          // relatedTarget is the element receiving focus; if it's still inside
-          // editorRef (e.g. clicking the AI Assist button), skip the sync to
-          // avoid resetting the selection mid-interaction.
           if (editorRef.current?.contains(e.relatedTarget as Node)) return
           syncDOMToData()
         }}
