@@ -36,7 +36,6 @@ export default function ResumeEditor({
   useAuth() // auth context — user available for future AI assist attribution
   const { pushToHistory, undo, redo, canUndo, canRedo, profile } = useCareerStore()
   const editorRef = useRef<HTMLDivElement>(null)
-  const inputDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Incrementing this key forces the contenteditable to unmount+remount,
   // which is the only way to make React re-render its DOM after undo/redo
   // (suppressContentEditableWarning prevents normal reconciliation).
@@ -317,17 +316,10 @@ export default function ResumeEditor({
         contentEditable
         suppressContentEditableWarning
         onInput={() => {
-          // Debounce sync while typing; blur cancels the timer and syncs immediately.
-          if (inputDebounceRef.current) clearTimeout(inputDebounceRef.current)
-          inputDebounceRef.current = setTimeout(syncDOMToData, 400)
+          // intentionally empty — contentEditable owns its DOM while typing.
+          // syncDOMToData is called on blur when focus leaves the editor.
         }}
         onBlur={(e) => {
-          // Cancel any pending debounce and sync immediately.
-          if (inputDebounceRef.current) {
-            clearTimeout(inputDebounceRef.current)
-            inputDebounceRef.current = null
-          }
-          // Only sync when focus moves outside the editor entirely.
           if (editorRef.current?.contains(e.relatedTarget as Node)) return
           syncDOMToData()
         }}
