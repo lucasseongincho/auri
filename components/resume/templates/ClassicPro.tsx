@@ -223,7 +223,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
                   {proj.url && <span className="job-dates">{proj.url}</span>}
                 </div>
                 {proj.description && (
-                  <p style={{ fontSize: '10.5px', margin: '1px 0 3px 0', lineHeight: 1.4 }}>{renderText(proj.description)}</p>
+                  <p style={{ fontSize: '10.5px', margin: '1px 0 3px 0', lineHeight: 1.4, marginLeft: '15px' }}>{renderText(proj.description)}</p>
                 )}
                 {proj.bullets.length > 0 && (
                   <ul>
