@@ -46,6 +46,18 @@ export default function ResumeEditor({
   })
   const [lastSaved, setLastSaved] = useState(false)
 
+  // Mark structural elements (section headers, contact header) as non-editable
+  // so users can't type into them and silently lose those changes on save.
+  useEffect(() => {
+    if (!editorRef.current) return
+    editorRef.current
+      .querySelectorAll('[data-ats-field="header"], .section-header, .main-section-header')
+      .forEach((el) => {
+        el.setAttribute('contenteditable', 'false')
+        ;(el as HTMLElement).style.cursor = 'default'
+      })
+  }, [])
+
   // Keyboard shortcut handler for Ctrl+Z / Ctrl+Y
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

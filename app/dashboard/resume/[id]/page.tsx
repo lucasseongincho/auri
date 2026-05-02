@@ -413,8 +413,11 @@ export default function SavedResumePage() {
       })
       setResumeData((prev) => prev ? { ...prev, resumeData: dataToSave } : prev)
       setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 3000)
-      setIsEditMode(false)
+      // Delay exiting edit mode so the "Saved!" state on the button is visible
+      setTimeout(() => {
+        setIsEditMode(false)
+        setSaveSuccess(false)
+      }, 1200)
     } catch {
       setError('Failed to save changes.')
     } finally {
