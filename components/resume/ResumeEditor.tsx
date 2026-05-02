@@ -229,6 +229,65 @@ export default function ResumeEditor({
       // else: keep original skills unchanged
     }
 
+    // Sync project descriptions and bullets
+    const projEls = editorRef.current.querySelectorAll('[data-ats-field="projects"] article')
+    if (projEls.length > 0) {
+      const newProjects = [...(updated.projects ?? [])]
+      projEls.forEach((articleEl, i) => {
+        if (!newProjects[i]) return
+        let proj = { ...newProjects[i] }
+
+        // Sync description paragraph (first <p> in the article)
+        const descEl = articleEl.querySelector('p')
+        if (descEl) {
+          const domText = (descEl as HTMLElement).innerText.trim()
+          const origStripped = stripAITags(resumeData.projects?.[i]?.description ?? '').trim()
+          if (domText !== origStripped) proj = { ...proj, description: domText }
+        }
+
+        // Sync bullets
+        const origBullets = resumeData.projects?.[i]?.bullets ?? []
+        const bullets: string[] = []
+        articleEl.querySelectorAll('li').forEach((li, bulletIndex) => {
+          const domText = (li as HTMLElement).innerText.trim()
+          if (!domText) return
+          const origBullet = origBullets[bulletIndex]
+          bullets.push(
+            origBullet !== undefined && stripAITags(origBullet).trim() === domText
+              ? origBullet
+              : domText
+          )
+        })
+        if (bullets.length > 0) proj = { ...proj, bullets }
+
+        newProjects[i] = proj
+      })
+      updated.projects = newProjects
+    }
+
+    // Sync certifications — <p> in most templates, .contact-item divs in ModernEdge
+    const certSection = editorRef.current.querySelector('[data-ats-field="certifications"]')
+    if (certSection) {
+      const certP = certSection.querySelector('p')
+      if (certP) {
+        const domText = (certP as HTMLElement).innerText.trim()
+        const origText = (resumeData.certifications ?? []).join(' · ')
+        if (domText !== origText) {
+          updated.certifications = domText.split(/\s*[·,]\s*/).filter(Boolean)
+        }
+      } else {
+        // ModernEdge: each cert is a separate .contact-item div
+        const certItems = certSection.querySelectorAll('.contact-item')
+        if (certItems.length > 0) {
+          const certs = Array.from(certItems).map((el) => (el as HTMLElement).innerText.trim()).filter(Boolean)
+          const origCerts = resumeData.certifications ?? []
+          if (JSON.stringify(certs) !== JSON.stringify(origCerts)) {
+            updated.certifications = certs
+          }
+        }
+      }
+    }
+
     // Push to undo history before updating
     pushToHistory(updated)
     onDataChange(updated)
