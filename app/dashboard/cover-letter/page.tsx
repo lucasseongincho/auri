@@ -22,7 +22,6 @@ import {
   X,
   Save,
   FolderOpen,
-  Wand2,
   RotateCcw,
   RotateCw,
 } from 'lucide-react'
@@ -203,7 +202,6 @@ function CoverLetterLoadingState() {
 interface EditableParagraphProps {
   text: string
   isActive: boolean
-  isAssisting: boolean
   idx: number
   onClick: () => void
   onChange: (val: string) => void
@@ -212,7 +210,6 @@ interface EditableParagraphProps {
 function EditableParagraph({
   text,
   isActive,
-  isAssisting,
   onClick,
   onChange,
 }: EditableParagraphProps) {
@@ -235,22 +232,6 @@ function EditableParagraph({
     ref.current.focus()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive])
-
-  // After AI assist completes, sync rewritten text into the DOM imperatively.
-  useEffect(() => {
-    if (!isAssisting && ref.current) {
-      ref.current.innerText = text
-      try {
-        const sel = window.getSelection()
-        const range = document.createRange()
-        range.selectNodeContents(ref.current)
-        range.collapse(false)
-        sel?.removeAllRanges()
-        sel?.addRange(range)
-      } catch { /* ignore */ }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAssisting])
 
   const base: React.CSSProperties = {
     outline: 'none',
@@ -280,13 +261,9 @@ function EditableParagraph({
         // and renders {text}, which is always the latest typed value.
         <div
           key="view"
-          style={{ ...base, padding: '0', cursor: 'pointer',
-            border: '1.5px solid transparent',
-            background: isAssisting ? 'rgba(245,158,11,0.06)' : 'transparent' }}
+          style={{ ...base, padding: '0', cursor: 'pointer', border: '1.5px solid transparent' }}
         >
-          {isAssisting
-            ? <span style={{ opacity: 0.5, fontStyle: 'italic' }}>Rewriting…</span>
-            : text}
+          {text}
         </div>
       )}
     </div>
@@ -302,7 +279,6 @@ interface LetterDocProps {
   hiringManagerName: string
   paragraphs: string[]
   activeParagraphIdx: number | null
-  assistingIdx: number | null
   onParagraphClick: (idx: number) => void
   onParagraphChange: (idx: number, val: string) => void
 }
@@ -314,7 +290,6 @@ function LetterDocument({
   hiringManagerName,
   paragraphs,
   activeParagraphIdx,
-  assistingIdx,
   onParagraphClick,
   onParagraphChange,
 }: LetterDocProps) {
@@ -372,7 +347,6 @@ function LetterDocument({
           idx={i}
           text={text}
           isActive={activeParagraphIdx === i}
-          isAssisting={assistingIdx === i}
           onClick={() => onParagraphClick(i)}
           onChange={(val) => onParagraphChange(i, val)}
         />
@@ -444,7 +418,6 @@ function CoverLetterContent() {
   const [history, setHistory] = useState<string[][]>([])
   const [historyIdx, setHistoryIdx] = useState(-1)
   const [activeParagraphIdx, setActiveParagraphIdx] = useState<number | null>(null)
-  const [assistingIdx, setAssistingIdx] = useState<number | null>(null)
   const [generateError, setGenerateError] = useState('')
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
@@ -578,38 +551,6 @@ function CoverLetterContent() {
   const handleParagraphBlur = useCallback(() => {
     pushHistory(paragraphs)
   }, [paragraphs, pushHistory])
-
-  // AI Assist on a paragraph
-  const handleAIAssist = useCallback(async (idx: number) => {
-    if (!result || assistingIdx !== null) return
-    setAssistingIdx(idx)
-    try {
-      const res = await fetch('/api/claude/cover-letter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'assist',
-          position,
-          company,
-          selectedParagraph: paragraphs[idx],
-          allParagraphs: paragraphs,
-          uid: user?.uid,
-        }),
-      })
-      if (!res.ok) throw new Error('Assist failed')
-      const text = await res.text()
-      const rewritten = text.trim()
-      if (rewritten) {
-        const next = paragraphs.map((p, i) => (i === idx ? rewritten : p))
-        setParagraphs(next)
-        pushHistory(next)
-      }
-    } catch {
-      setToast({ message: 'AI Assist failed. Please try again.', type: 'error' })
-    } finally {
-      setAssistingIdx(null)
-    }
-  }, [result, assistingIdx, position, company, paragraphs, user?.uid, pushHistory])
 
   // Copy
   const handleCopy = useCallback(async () => {
@@ -890,36 +831,6 @@ function CoverLetterContent() {
                   </button>
                 </div>
 
-                {/* AI Assist hint */}
-                {activeParagraphIdx !== null && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="print:hidden flex items-center gap-3 px-4 py-2.5 rounded-xl
-                      bg-[#F59E0B]/10 border border-[#F59E0B]/20"
-                  >
-                    <Wand2 className="w-4 h-4 text-[#F59E0B] flex-shrink-0" />
-                    <span className="text-xs text-[#FDE68A]">
-                      Paragraph {activeParagraphIdx + 1} selected — edit inline or use AI Assist to rewrite it
-                    </span>
-                    <button
-                      onClick={() => handleAIAssist(activeParagraphIdx)}
-                      disabled={assistingIdx !== null}
-                      className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                        bg-[#F59E0B] text-white hover:bg-[#D97706] transition-colors
-                        disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {assistingIdx === activeParagraphIdx
-                        ? <><Loader2 className="w-3 h-3 animate-spin" /> Rewriting…</>
-                        : <><Sparkles className="w-3 h-3" /> AI Assist</>}
-                    </button>
-                    <button onClick={() => setActiveParagraphIdx(null)} aria-label="Dismiss"
-                      className="p-1 rounded text-[#A0A0B8] hover:text-white transition-colors">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </motion.div>
-                )}
-
                 {/* Opening hook callout */}
                 {result.opening_hook && (
                   <div className="print:hidden p-3 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/20">
@@ -952,7 +863,6 @@ function CoverLetterContent() {
                       hiringManagerName={hiringManagerName}
                       paragraphs={paragraphs}
                       activeParagraphIdx={activeParagraphIdx}
-                      assistingIdx={assistingIdx}
                       onParagraphClick={handleParagraphClick}
                       onParagraphChange={handleParagraphChange}
                     />
@@ -968,7 +878,7 @@ function CoverLetterContent() {
 
                 {/* Easy Tune tip */}
                 <p className="print:hidden text-xs text-center text-[#60607A]">
-                  Click any paragraph to edit inline · Use AI Assist to rewrite · Ctrl+Z to undo
+                  Click any paragraph to edit inline · Ctrl+Z to undo
                 </p>
               </motion.div>
             )}

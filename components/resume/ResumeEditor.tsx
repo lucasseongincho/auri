@@ -2,9 +2,7 @@
 
 import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Undo2, Redo2, Loader2, CheckCircle } from 'lucide-react'
-import { getIdToken } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
+import { Undo2, Redo2, CheckCircle } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { stripAITags } from '@/lib/resumeHighlight'
@@ -20,14 +18,6 @@ interface ResumeEditorProps {
   syncRef?: React.RefObject<{ sync: () => void } | null>
 }
 
-interface AIAssistState {
-  isVisible: boolean
-  isLoading: boolean
-  fieldId: string
-  position: { top: number; left: number }
-  selectedText: string
-}
-
 export default function ResumeEditor({
   resumeData,
   personal: _personal,
@@ -35,20 +25,13 @@ export default function ResumeEditor({
   children,
   syncRef,
 }: ResumeEditorProps) {
-  useAuth() // auth context — user available for future AI assist attribution
-  const { pushToHistory, undo, redo, canUndo, canRedo, profile } = useCareerStore()
+  useAuth()
+  const { pushToHistory, undo, redo, canUndo, canRedo } = useCareerStore()
   const editorRef = useRef<HTMLDivElement>(null)
   // Incrementing this key forces the contenteditable to unmount+remount,
   // which is the only way to make React re-render its DOM after undo/redo
   // (suppressContentEditableWarning prevents normal reconciliation).
   const [ceKey, setCEKey] = useState(0)
-  const [aiAssist, setAIAssist] = useState<AIAssistState>({
-    isVisible: false,
-    isLoading: false,
-    fieldId: '',
-    position: { top: 0, left: 0 },
-    selectedText: '',
-  })
   const [lastSaved, setLastSaved] = useState(false)
 
   // Mark structural elements (section headers, contact header) as non-editable.
@@ -91,90 +74,6 @@ export default function ResumeEditor({
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleUndo, handleRedo])
-
-  // Show AI Assist button when text is selected inside a bullet
-  const handleMouseUp = useCallback(() => {
-    const selection = window.getSelection()
-    if (!selection || selection.isCollapsed || !selection.toString().trim()) {
-      setAIAssist((s) => ({ ...s, isVisible: false }))
-      return
-    }
-
-    const selectedText = selection.toString().trim()
-    const range = selection.getRangeAt(0)
-    const rect = range.getBoundingClientRect()
-    const editorRect = editorRef.current?.getBoundingClientRect()
-
-    if (!editorRect) return
-
-    // Only show if selection is inside the editor
-    const anchorNode = selection.anchorNode
-    if (!editorRef.current?.contains(anchorNode)) return
-
-    setAIAssist({
-      isVisible: true,
-      isLoading: false,
-      fieldId: '',
-      position: {
-        top: rect.top - editorRect.top - 48,
-        left: rect.left - editorRect.left + rect.width / 2,
-      },
-      selectedText,
-    })
-  }, [])
-
-  const handleAIAssist = useCallback(async () => {
-    if (!aiAssist.selectedText || !profile?.target.position) return
-
-    setAIAssist((s) => ({ ...s, isLoading: true }))
-
-    try {
-      let idToken: string | undefined
-      if (auth.currentUser) {
-        try { idToken = await getIdToken(auth.currentUser) } catch { /* guest */ }
-      }
-      const res = await fetch('/api/claude/resume', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
-        },
-        body: JSON.stringify({
-          careerProfile: profile,
-          target: {
-            position: profile.target.position,
-            company: profile.target.company,
-            companyType: profile.target.company_type,
-            jobDescription: profile.target.job_description ?? '',
-          },
-          mode: 'assist',
-          selectedText: aiAssist.selectedText,
-        }),
-      })
-
-      const json = await res.json() as { success: boolean; data: { rewritten: string } }
-      if (!json.success) throw new Error('AI Assist failed')
-
-      // Replace the selected text in the DOM (contenteditable)
-      const selection = window.getSelection()
-      if (selection && !selection.isCollapsed) {
-        const range = selection.getRangeAt(0)
-        range.deleteContents()
-        range.insertNode(document.createTextNode(json.data.rewritten))
-        selection.collapseToEnd()
-      }
-
-      // Sync the DOM changes back to ResumeData by reading the editor content
-      syncDOMToData()
-      setLastSaved(true)
-      setTimeout(() => setLastSaved(false), 2000)
-    } catch {
-      // Silent fail — user can try again
-    } finally {
-      setAIAssist((s) => ({ ...s, isLoading: false, isVisible: false }))
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [aiAssist.selectedText, profile])
 
   // Sync contenteditable DOM changes back to ResumeData state.
   // IMPORTANT: Easy Tune renders with renderText={stripAITags}, so the DOM only
@@ -313,7 +212,7 @@ export default function ResumeEditor({
   useImperativeHandle(syncRef, () => ({ sync: syncDOMToData }), [syncDOMToData])
 
   return (
-    <div className="relative" ref={editorRef} onMouseUp={handleMouseUp} tabIndex={-1}>
+    <div className="relative" ref={editorRef} tabIndex={-1}>
       {/* Undo / Redo toolbar */}
       <div className="flex items-center gap-2 mb-3">
         <div className="flex items-center gap-1 p-1 rounded-lg bg-[#13131A] border border-white/[0.08]">
@@ -338,7 +237,7 @@ export default function ResumeEditor({
             <Redo2 className="w-3.5 h-3.5" />
           </button>
         </div>
-        <span className="text-xs text-[#60607A]">Click any text to edit · Select text for AI Assist</span>
+        <span className="text-xs text-[#60607A]">Click any text to edit · Ctrl+Z to undo</span>
         <AnimatePresence>
           {lastSaved && (
             <motion.div
@@ -352,41 +251,6 @@ export default function ResumeEditor({
           )}
         </AnimatePresence>
       </div>
-
-      {/* AI Assist floating button */}
-      <AnimatePresence>
-        {aiAssist.isVisible && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 4 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={SPRING}
-            style={{
-              position: 'absolute',
-              top: aiAssist.position.top,
-              left: aiAssist.position.left,
-              transform: 'translateX(-50%)',
-              zIndex: 50,
-            }}
-          >
-            <button
-              onClick={handleAIAssist}
-              disabled={aiAssist.isLoading}
-              aria-label="Rewrite selected text with AI"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                text-white bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-                shadow-lg shadow-[#6366F1]/40 hover:shadow-[#6366F1]/60
-                hover:scale-[1.05] transition-all duration-200
-                disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {aiAssist.isLoading
-                ? <Loader2 className="w-3 h-3 animate-spin" />
-                : <Sparkles className="w-3 h-3" />}
-              {aiAssist.isLoading ? 'Rewriting...' : 'AI Rewrite'}
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Contenteditable wrapper — makes all text in the resume editable */}
       <div

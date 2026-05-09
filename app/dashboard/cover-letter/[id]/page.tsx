@@ -17,7 +17,6 @@ import {
   ArrowLeft,
   Download,
   Check,
-  Sparkles,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
@@ -42,7 +41,6 @@ const PAGE_PADDING = 96
 interface EditableParagraphProps {
   text: string
   isActive: boolean
-  isAssisting: boolean
   idx: number
   onClick: () => void
   onChange: (val: string) => void
@@ -51,7 +49,6 @@ interface EditableParagraphProps {
 function EditableParagraph({
   text,
   isActive,
-  isAssisting,
   onClick,
   onChange,
 }: EditableParagraphProps) {
@@ -69,21 +66,6 @@ function EditableParagraph({
     ref.current.focus()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive])
-
-  useEffect(() => {
-    if (!isAssisting && ref.current) {
-      ref.current.innerText = text
-      try {
-        const sel = window.getSelection()
-        const range = document.createRange()
-        range.selectNodeContents(ref.current)
-        range.collapse(false)
-        sel?.removeAllRanges()
-        sel?.addRange(range)
-      } catch { /* ignore */ }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAssisting])
 
   const base: React.CSSProperties = {
     outline: 'none',
@@ -109,13 +91,9 @@ function EditableParagraph({
       ) : (
         <div
           key="view"
-          style={{ ...base, padding: '0', cursor: 'pointer',
-            border: '1.5px solid transparent',
-            background: isAssisting ? 'rgba(245,158,11,0.06)' : 'transparent' }}
+          style={{ ...base, padding: '0', cursor: 'pointer', border: '1.5px solid transparent' }}
         >
-          {isAssisting
-            ? <span style={{ opacity: 0.5, fontStyle: 'italic' }}>Rewriting…</span>
-            : text}
+          {text}
         </div>
       )}
     </div>
@@ -191,7 +169,6 @@ function LetterDocReadOnly(props: Omit<LetterShellProps, 'children'> & { paragra
 interface LetterDocEditableProps extends Omit<LetterShellProps, 'children'> {
   paragraphs: string[]
   activeParagraphIdx: number | null
-  assistingIdx: number | null
   onParagraphClick: (idx: number) => void
   onParagraphChange: (idx: number, val: string) => void
 }
@@ -199,7 +176,6 @@ interface LetterDocEditableProps extends Omit<LetterShellProps, 'children'> {
 function LetterDocEditable({
   paragraphs,
   activeParagraphIdx,
-  assistingIdx,
   onParagraphClick,
   onParagraphChange,
   ...shellProps
@@ -212,7 +188,6 @@ function LetterDocEditable({
           idx={i}
           text={text}
           isActive={activeParagraphIdx === i}
-          isAssisting={assistingIdx === i}
           onClick={() => onParagraphClick(i)}
           onChange={(val) => onParagraphChange(i, val)}
         />
@@ -267,7 +242,6 @@ export default function CoverLetterDetailPage() {
   const [isEditMode, setIsEditMode] = useState(false)
   const [editedParagraphs, setEditedParagraphs] = useState<string[]>([])
   const [activeParagraphIdx, setActiveParagraphIdx] = useState<number | null>(null)
-  const [assistingIdx, setAssistingIdx] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
@@ -334,34 +308,6 @@ export default function CoverLetterDetailPage() {
       setSaving(false)
     }
   }, [user, letter, id, editedParagraphs])
-
-  const handleAIAssist = useCallback(async (idx: number) => {
-    if (!letter || assistingIdx !== null) return
-    setAssistingIdx(idx)
-    try {
-      const res = await fetch('/api/claude/cover-letter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'assist',
-          position: letter.position,
-          company: letter.company,
-          selectedParagraph: editedParagraphs[idx],
-          allParagraphs: editedParagraphs,
-          uid: user?.uid,
-        }),
-      })
-      if (!res.ok) throw new Error('Assist failed')
-      const rewritten = (await res.text()).trim()
-      if (rewritten) {
-        setEditedParagraphs((prev) => prev.map((p, i) => (i === idx ? rewritten : p)))
-      }
-    } catch {
-      // silent — user can try again
-    } finally {
-      setAssistingIdx(null)
-    }
-  }, [letter, assistingIdx, editedParagraphs, user])
 
   async function handleDownloadPDF() {
     if (!letterDocRef.current || !letter) return
@@ -653,40 +599,10 @@ export default function CoverLetterDetailPage() {
               </div>
             )}
 
-            {/* AI Assist bar — edit mode only */}
-            {isEditMode && activeParagraphIdx !== null && (
-              <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl
-                border border-[#F59E0B]/20 bg-[#F59E0B]/5">
-                <p className="text-xs text-[#A0A0B8]">
-                  Paragraph {activeParagraphIdx + 1} selected — edit inline or rewrite with AI
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleAIAssist(activeParagraphIdx)}
-                    disabled={assistingIdx !== null}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                      bg-[#F59E0B] text-white hover:bg-[#D97706] transition-colors
-                      disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {assistingIdx === activeParagraphIdx
-                      ? <Loader2 className="w-3 h-3 animate-spin" />
-                      : <Sparkles className="w-3 h-3" />}
-                    {assistingIdx === activeParagraphIdx ? 'Rewriting…' : 'AI Rewrite'}
-                  </button>
-                  <button
-                    onClick={() => setActiveParagraphIdx(null)}
-                    className="p-1 rounded-lg text-[#60607A] hover:text-white hover:bg-white/5 transition-all"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Edit mode hint */}
             {isEditMode && activeParagraphIdx === null && (
               <p className="text-xs text-[#60607A] text-center py-1">
-                Click any paragraph to edit · AI Rewrite available per paragraph
+                Click any paragraph to edit inline
               </p>
             )}
 
@@ -715,7 +631,6 @@ export default function CoverLetterDetailPage() {
                       {...personal}
                       paragraphs={editedParagraphs}
                       activeParagraphIdx={activeParagraphIdx}
-                      assistingIdx={assistingIdx}
                       onParagraphClick={(idx) =>
                         setActiveParagraphIdx((prev) => prev === idx ? prev : idx)
                       }
