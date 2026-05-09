@@ -433,13 +433,18 @@ YOU MUST RESPOND WITH VALID JSON ONLY.
 NO preamble. NO explanation. NO markdown. NO code blocks. NO backticks.
 START your response with { and END with }
 
+STRICT JSON RULES — violations will break parsing:
+- Never use double-quote characters (") inside any string value. Use single quotes (') if you need to quote text.
+- Keep each star_example under 120 words. Write it as one continuous paragraph with inline Situation/Task/Action/Result labels.
+- No line breaks inside string values.
+
 Return this exact structure:
 {
   "questions": [
     {
       "question": "string",
       "answer_framework": "string",
-      "star_example": "Situation: ... Task: ... Action: ... Result: ..."
+      "star_example": "Situation: [1-2 sentences]. Task: [1 sentence]. Action: [2-3 sentences]. Result: [1-2 sentences with metric]."
     }
   ],
   "questions_to_ask": ["string"]

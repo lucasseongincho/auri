@@ -308,23 +308,7 @@ function sanitizeControlChars(json: string): string {
   while (i < json.length) {
     const ch = json[i]
     if (ch === '\\' && inStr) { out += ch + (json[i + 1] ?? ''); i += 2; continue }
-    if (ch === '"') {
-      if (!inStr) {
-        inStr = true
-        out += ch
-      } else {
-        // Peek past whitespace: closing quote or inner unescaped quote?
-        let j = i + 1
-        while (j < json.length && (json[j] === ' ' || json[j] === '\t' || json[j] === '\r' || json[j] === '\n')) j++
-        const nxt = j < json.length ? json[j] : ''
-        if (nxt === ':' || nxt === ',' || nxt === '}' || nxt === ']' || nxt === '') {
-          inStr = false
-          out += ch
-        } else {
-          out += '\\"'
-        }
-      }
-    }
+    if (ch === '"') { inStr = !inStr; out += ch }
     else if (inStr && ch === '\n') { out += '\\n' }
     else if (inStr && ch === '\r') { /* skip */ }
     else if (inStr && ch === '\t') { out += '\\t' }
