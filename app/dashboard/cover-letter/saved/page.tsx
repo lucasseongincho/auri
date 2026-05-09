@@ -17,7 +17,7 @@ import {
   Search,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { getSavedCoverLetters, deleteCoverLetter } from '@/lib/firestore'
+import { getSavedCoverLetters, deleteCoverLetter, getGuestCoverLetters, deleteGuestCoverLetter } from '@/lib/firestore'
 import { toDate, formatResumeDate } from '@/lib/utils'
 import type { SavedCoverLetter } from '@/types'
 
@@ -74,6 +74,14 @@ export default function SavedCoverLettersPage() {
     load()
   }, [user, authLoading])
 
+  useEffect(() => {
+    if (user) return // authenticated users use Firestore
+    if (authLoading) return
+    const guestLetters = getGuestCoverLetters()
+    setLetters(guestLetters)
+    setLoading(false)
+  }, [user, authLoading])
+
   const filtered = useMemo(() => {
     let list = [...letters]
     if (search.trim()) {
@@ -92,10 +100,13 @@ export default function SavedCoverLettersPage() {
   }, [letters, search, sort])
 
   async function handleDelete(id: string) {
-    if (!user?.uid) return
     setDeleting(true)
     try {
-      await deleteCoverLetter(user.uid, id)
+      if (user?.uid) {
+        await deleteCoverLetter(user.uid, id)
+      } else {
+        deleteGuestCoverLetter(id)
+      }
       setLetters((prev) => prev.filter((l) => l.id !== id))
     } catch {
       setError('Failed to delete cover letter.')
@@ -200,7 +211,7 @@ export default function SavedCoverLettersPage() {
           </div>
         )}
 
-        {!loading && user?.uid && letters.length === 0 && (
+        {!loading && letters.length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -226,7 +237,7 @@ export default function SavedCoverLettersPage() {
           </motion.div>
         )}
 
-        {!loading && user?.uid && letters.length > 0 && filtered.length === 0 && (
+        {!loading && letters.length > 0 && filtered.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

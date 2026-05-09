@@ -32,7 +32,7 @@ import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
-import { saveCoverLetter, getSavedCoverLetter } from '@/lib/firestore'
+import { saveCoverLetter, getSavedCoverLetter, saveGuestCoverLetter } from '@/lib/firestore'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 import type { CoverLetter } from '@/types'
@@ -533,6 +533,21 @@ function CoverLetterContent() {
         setHistory([ps])
         setHistoryIdx(0)
         setMobileView('preview')
+
+        // Guest — save to localStorage so the letter survives a page refresh
+        if (!user?.uid) {
+          const guestId = saveGuestCoverLetter({
+            company,
+            position,
+            content: ps.join('\n\n'),
+            paragraphs: ps,
+            wordCount: parsed.word_count,
+            openingHook: parsed.opening_hook ?? '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          })
+          setSavedId(guestId)
+        }
       } catch {
         setGenerateError('Could not parse the cover letter. Please try again.')
       }

@@ -13,7 +13,7 @@ import {
 } from 'firebase/auth'
 import { auth, hasConfig } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
-import { ensureUserProfileFields } from '@/lib/firestore'
+import { ensureUserProfileFields, migrateGuestToFirestore, migrateGuestInterviewPrepsToFirestore, migrateGuestCoverLettersToFirestore } from '@/lib/firestore'
 import type { AuthUser } from '@/types'
 
 interface SignUpOptions {
@@ -55,6 +55,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Single source of truth: loadFromFirestore only here, not in sign-in methods.
         // This prevents double-reads on sign-in (listener fires after signInWithPopup resolves).
         await useCareerStore.getState().loadFromFirestore(firebaseUser.uid)
+        // Migrate any guest localStorage data to Firestore on sign-in (non-blocking)
+        Promise.all([
+          migrateGuestToFirestore(firebaseUser.uid),
+          migrateGuestInterviewPrepsToFirestore(firebaseUser.uid),
+          migrateGuestCoverLettersToFirestore(firebaseUser.uid),
+        ]).catch(() => {/* non-blocking */})
         // Persist auth metadata to Firestore for Google sign-ins and any gaps.
         // ensureUserProfileFields only writes fields that are missing — no overwrites.
         ensureUserProfileFields(firebaseUser.uid, {

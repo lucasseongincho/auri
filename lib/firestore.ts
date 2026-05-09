@@ -320,3 +320,55 @@ export async function migrateGuestToFirestore(uid: string): Promise<void> {
   await saveCareerProfile(uid, merged)
   clearGuestProfile()
 }
+
+// ── Guest cover letters (localStorage) ───────────────────────────────────────
+
+const GUEST_COVER_LETTERS_KEY = 'auri_guest_cover_letters'
+
+export function getGuestCoverLetters(): SavedCoverLetter[] {
+  if (typeof window === 'undefined') return []
+  const raw = localStorage.getItem(GUEST_COVER_LETTERS_KEY)
+  if (!raw) return []
+  try { return JSON.parse(raw) as SavedCoverLetter[] } catch { return [] }
+}
+
+export function saveGuestCoverLetter(
+  letter: Omit<SavedCoverLetter, 'id'>
+): string {
+  if (typeof window === 'undefined') return ''
+  const letters = getGuestCoverLetters()
+  const id = `guest_${Date.now()}`
+  const full: SavedCoverLetter = {
+    ...letter,
+    id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+  letters.unshift(full)
+  // Keep max 10 guest cover letters
+  localStorage.setItem(
+    GUEST_COVER_LETTERS_KEY,
+    JSON.stringify(letters.slice(0, 10))
+  )
+  return id
+}
+
+export function deleteGuestCoverLetter(id: string): void {
+  if (typeof window === 'undefined') return
+  const letters = getGuestCoverLetters().filter((l) => l.id !== id)
+  localStorage.setItem(GUEST_COVER_LETTERS_KEY, JSON.stringify(letters))
+}
+
+export async function migrateGuestCoverLettersToFirestore(
+  uid: string
+): Promise<void> {
+  const letters = getGuestCoverLetters()
+  if (letters.length === 0) return
+  await Promise.all(
+    letters.map((l) => {
+      const { id: _id, ...rest } = l
+      return saveCoverLetter(uid, rest)
+    })
+  )
+  localStorage.removeItem(GUEST_COVER_LETTERS_KEY)
+}
