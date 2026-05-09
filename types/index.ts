@@ -125,7 +125,7 @@ export interface ResumeData {
   languages?: Language[]
   html?: string
   plain?: string
-  templateId: TemplateId
+  templateId: string
   createdAt?: string
   updatedAt?: string
 }
@@ -136,7 +136,7 @@ export interface SavedResume {
   name: string           // user-given name or auto-generated
   targetPosition: string
   targetCompany: string
-  templateId: TemplateId
+  templateId: string
   atsScore?: number
   resumeData: ResumeData
   personalInfo: PersonalInfo
@@ -200,23 +200,8 @@ export interface InterviewPrep {
   questions_to_ask: string[]
 }
 
-// ============================================================
-// Template types
-// ============================================================
-
-export type TemplateId =
-  | 'classic-pro'
-  | 'modern-edge'
-  | 'executive-dark'
-  | 'creative-pulse'
-  | 'minimal-seoul'
-
-export const TEMPLATE_LABELS: Record<TemplateId, string> = {
+export const TEMPLATE_LABELS: Record<string, string> = {
   'classic-pro': 'Classic Pro',
-  'modern-edge': 'Modern Edge',
-  'executive-dark': 'Executive Dark',
-  'creative-pulse': 'Creative Pulse',
-  'minimal-seoul': 'Minimal Seoul',
 }
 
 // ============================================================

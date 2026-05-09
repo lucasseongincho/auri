@@ -28,11 +28,7 @@ import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import EstimateDisclaimerModal from '@/components/resume/EstimateDisclaimerModal'
 import { stripAITags } from '@/lib/resumeHighlight'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
-import ModernEdge from '@/components/resume/templates/ModernEdge'
-import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
-import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
-import CreativePulse from '@/components/resume/templates/CreativePulse'
-import type { ResumeData, PersonalInfo, SavedResume, ATSScore, TemplateId } from '@/types'
+import type { ResumeData, PersonalInfo, SavedResume, ATSScore } from '@/types'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 import { toDate } from '@/lib/utils'
 
@@ -101,7 +97,7 @@ type PagePhase = 'input' | 'review' | 'tune'
 
 export default function RewriterPage() {
   const { user } = useAuth()
-  const { profile, selectedTemplate, setSelectedTemplate, updateProfile } = useCareerStore()
+  const { profile, updateProfile } = useCareerStore()
 
   // ── Phase ──────────────────────────────────────────────────────────────────
   const [pagePhase, setPagePhase] = useState<PagePhase>('input')
@@ -253,7 +249,7 @@ export default function RewriterPage() {
     if (fullText) {
       try {
         const parsed = parseResumeJSON(fullText)
-        setRewrittenData({ ...parsed, templateId: selectedTemplate })
+        setRewrittenData({ ...parsed, templateId: 'classic-pro' })
         setPagePhase('review')
         if (!profile?.hasSeenEstimateDisclaimer) {
           setShowEstimateDisclaimer(true)
@@ -263,15 +259,15 @@ export default function RewriterPage() {
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputMethod, auriText, pastedText, targetPosition, targetCompany, companyType, jobDescription, extraToggles, user?.uid, selectedTemplate, stream])
+  }, [inputMethod, auriText, pastedText, targetPosition, targetCompany, companyType, jobDescription, extraToggles, user?.uid, 'classic-pro', stream])
 
   // ── Accept All ─────────────────────────────────────────────────────────────
   const handleAcceptAll = useCallback(() => {
     if (!rewrittenData) return
-    setEditedResume({ ...rewrittenData, templateId: selectedTemplate })
+    setEditedResume({ ...rewrittenData, templateId: 'classic-pro' })
     setPagePhase('tune')
     setIsEditing(false)
-  }, [rewrittenData, selectedTemplate])
+  }, [rewrittenData, 'classic-pro'])
 
   // ── Fix All ATS Issues ─────────────────────────────────────────────────────
   const handleFixAll = useCallback(async () => {
@@ -291,7 +287,7 @@ export default function RewriterPage() {
       })
       if (fullText) {
         const parsed = parseResumeJSON(fullText)
-        const updated = { ...editedResume, ...parsed, templateId: selectedTemplate }
+        const updated = { ...editedResume, ...parsed, templateId: 'classic-pro' }
         setEditedResume(updated)
         if (jobDescription) {
           await runATSScore(resumeToPlainText(updated, personal), jobDescription)
@@ -303,7 +299,7 @@ export default function RewriterPage() {
       setIsFixingATS(false)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputMethod, auriText, pastedText, editedResume, targetPosition, targetCompany, companyType, jobDescription, extraToggles, user?.uid, selectedTemplate, stream, runATSScore, personal])
+  }, [inputMethod, auriText, pastedText, editedResume, targetPosition, targetCompany, companyType, jobDescription, extraToggles, user?.uid, 'classic-pro', stream, runATSScore, personal])
 
   // ── Save ───────────────────────────────────────────────────────────────────
   const handleSave = useCallback(async () => {
@@ -317,8 +313,8 @@ export default function RewriterPage() {
         name: `Rewritten — ${tag}`,
         targetPosition,
         targetCompany,
-        templateId: selectedTemplate,
-        resumeData: { ...toSave, templateId: selectedTemplate },
+        templateId: 'classic-pro',
+        resumeData: { ...toSave, templateId: 'classic-pro' },
         personalInfo: personal,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -330,18 +326,12 @@ export default function RewriterPage() {
     } finally {
       setIsSaving(false)
     }
-  }, [editedResume, rewrittenData, user?.uid, targetPosition, targetCompany, selectedTemplate, personal])
+  }, [editedResume, rewrittenData, user?.uid, targetPosition, targetCompany, 'classic-pro', personal])
 
   // ── Template renderer for ResumeEditor ────────────────────────────────────
-  const renderTemplate = (data: ResumeData) => {
-    switch (selectedTemplate) {
-      case 'modern-edge':    return <ModernEdge data={data} personal={personal} isEditing renderText={stripAITags} />
-      case 'minimal-seoul':  return <MinimalSeoul data={data} personal={personal} isEditing renderText={stripAITags} />
-      case 'executive-dark': return <ExecutiveDark data={data} personal={personal} isEditing renderText={stripAITags} />
-      case 'creative-pulse': return <CreativePulse data={data} personal={personal} isEditing renderText={stripAITags} />
-      default:               return <ClassicPro data={data} personal={personal} isEditing renderText={stripAITags} />
-    }
-  }
+  const renderTemplate = (data: ResumeData) => (
+    <ClassicPro data={data} personal={personal} isEditing renderText={stripAITags} />
+  )
 
   // ── Start Over ─────────────────────────────────────────────────────────────
   const handleStartOver = () => {
@@ -899,10 +889,6 @@ export default function RewriterPage() {
                     personal={personal}
                     isStreaming={isStreaming}
                     streamText={streamedText}
-                    onTemplateChange={(id: TemplateId) => {
-                      setSelectedTemplate(id)
-                      if (editedResume) setEditedResume({ ...editedResume, templateId: id })
-                    }}
                   />
                 )}
 

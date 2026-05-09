@@ -41,10 +41,6 @@ import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import EstimateDisclaimerModal from '@/components/resume/EstimateDisclaimerModal'
 import { stripAITags } from '@/lib/resumeHighlight'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
-import ModernEdge from '@/components/resume/templates/ModernEdge'
-import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
-import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
-import CreativePulse from '@/components/resume/templates/CreativePulse'
 import type {
   Experience,
   Education,
@@ -53,7 +49,6 @@ import type {
   Language,
   Project,
   ResumeData,
-  TemplateId,
   ATSScore,
 } from '@/types'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
@@ -1217,11 +1212,9 @@ export default function ResumePage() {
   const {
     profile,
     currentResume,
-    selectedTemplate,
     atsScore,
     setResume,
     setATSScore,
-    setSelectedTemplate,
     syncToFirestore,
     updateProfile,
   } = useCareerStore()
@@ -1483,10 +1476,10 @@ export default function ResumePage() {
           html: parsed.html,
           // Build plain text for ATS scoring from the structured data
           plain: buildPlainText(
-            { ...parsed, templateId: selectedTemplate },
+            { ...parsed, templateId: 'classic-pro' },
             profile.personal
           ),
-          templateId: selectedTemplate,
+          templateId: 'classic-pro',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }
@@ -1502,7 +1495,7 @@ export default function ResumePage() {
         setGenerateError('Failed to parse AI response. Please try again.')
       }
     }
-  }, [profile, selectedTemplate, validateStep, stream, resetStream, setResume])
+  }, [profile, validateStep, stream, resetStream, setResume])
 
   // ── Save Resume ──────────────────────────────────────────────────────────────
 
@@ -1527,7 +1520,7 @@ export default function ResumePage() {
         name: resumeName,
         targetPosition: profile?.target.position ?? '',
         targetCompany: profile?.target.company ?? '',
-        templateId: selectedTemplate,
+        templateId: 'classic-pro' as const,
         atsScore: atsScore?.score,
         resumeData: activeResume,
         personalInfo: profile?.personal ?? {
@@ -1556,7 +1549,7 @@ export default function ResumePage() {
       // Always reset — whether save succeeded, failed, or threw synchronously.
       setIsSaving(false)
     }
-  }, [activeResume, isAuthenticated, user?.uid, profile, selectedTemplate, atsScore])
+  }, [activeResume, isAuthenticated, user?.uid, profile, atsScore])
 
   // ── Render step content ──────────────────────────────────────────────────────
 
@@ -1594,13 +1587,7 @@ export default function ResumePage() {
       linkedin_url: '',
       website: '',
     }
-    switch (selectedTemplate) {
-      case 'modern-edge':    return <ModernEdge data={data} personal={personal} isEditing renderText={stripAITags} />
-      case 'minimal-seoul':  return <MinimalSeoul data={data} personal={personal} isEditing renderText={stripAITags} />
-      case 'executive-dark': return <ExecutiveDark data={data} personal={personal} isEditing renderText={stripAITags} />
-      case 'creative-pulse': return <CreativePulse data={data} personal={personal} isEditing renderText={stripAITags} />
-      default:               return <ClassicPro data={data} personal={personal} isEditing renderText={stripAITags} />
-    }
+    return <ClassicPro data={data} personal={personal} isEditing renderText={stripAITags} />
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -1928,14 +1915,6 @@ export default function ResumePage() {
                 isStreaming={isStreaming}
                 streamText={streamedText}
                 forcedScale={editScale}
-                onTemplateChange={(id: TemplateId) => {
-                  setSelectedTemplate(id)
-                  if (displayResume) {
-                    const updated = { ...displayResume, templateId: id }
-                    setResume(updated)
-                    setEditedResume(updated)
-                  }
-                }}
               />
             )}
           </div>

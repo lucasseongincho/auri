@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, useInView } from 'framer-motion'
 import {
-  FileText, Edit3, Layout, RefreshCw, Linkedin,
+  FileText, Edit3, RefreshCw, Linkedin,
   Map, Mail, MessageSquare, CheckCircle, ArrowRight,
   Sparkles, Target, ChevronRight,
 } from 'lucide-react'
@@ -107,7 +107,6 @@ const FEATURES = [
   { icon: FileText, label: 'Smart Resume Builder', desc: 'AI-generated, ATS-optimized resumes tailored to every job', href: '/dashboard/resume', color: 'from-[#6366F1] to-[#4F46E5]' },
   { icon: Target, label: 'ATS Score & Optimizer', desc: 'Real-time match score with one-click fix suggestions', href: '/dashboard/ats', color: 'from-[#8B5CF6] to-[#6366F1]' },
   { icon: Edit3, label: 'Easy Tune Editor', desc: 'Inline editing with per-bullet AI rewrites', href: '/dashboard/resume', color: 'from-[#A78BFA] to-[#8B5CF6]' },
-  { icon: Layout, label: 'Resume Templates', desc: '5 premium templates that still pass ATS', href: '/dashboard/resume', color: 'from-[#6366F1] to-[#8B5CF6]' },
   { icon: RefreshCw, label: 'Resume Rewriter', desc: 'Transform your existing resume for any new role', href: '/dashboard/rewriter', color: 'from-[#4F46E5] to-[#6366F1]' },
   { icon: Linkedin, label: 'LinkedIn Rewriter', desc: 'Attract recruiters with an optimized profile', href: '/dashboard/linkedin', color: 'from-[#0EA5E9] to-[#6366F1]' },
   { icon: Map, label: '7-Day Job Strategy', desc: 'A personalized, day-by-day job search action plan', href: '/dashboard/strategy', color: 'from-[#22C55E] to-[#16A34A]' },
@@ -116,14 +115,6 @@ const FEATURES = [
 ]
 
 // TODO: Replace with real testimonials after beta
-
-const TEMPLATES = [
-  { id: 'classic-pro', label: 'Classic Pro', desc: 'Timeless. Maximum ATS safety.' },
-  { id: 'modern-edge', label: 'Modern Edge', desc: 'Sidebar layout with accent strip.' },
-  { id: 'executive-dark', label: 'Executive Dark', desc: 'Premium typography for senior roles.' },
-  { id: 'creative-pulse', label: 'Creative Pulse', desc: 'Bold name treatment for creative fields.' },
-  { id: 'minimal-seoul', label: 'Minimal Seoul', desc: 'Ultra-minimal, inspired by Korean design.' },
-]
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -147,10 +138,10 @@ export default function LandingPage() {
           <span className="font-heading font-bold text-white text-lg">AURI</span>
         </div>
         <div className="hidden md:flex items-center gap-8">
-          {['Features', 'Templates', 'Pricing'].map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`}
+          {[['Features', '#features'], ['How It Works', '#how-it-works'], ['Pricing', '#pricing']].map(([label, href]) => (
+            <a key={label} href={href}
               className="text-sm text-[#A0A0B8] hover:text-white transition-colors duration-200">
-              {item}
+              {label}
             </a>
           ))}
           <Link href="/blog"
@@ -400,7 +391,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── 4. How It Works ── */}
-      <section className="py-16 md:py-24 px-6">
+      <section id="how-it-works" className="py-16 md:py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <FadeInSection className="text-center mb-16">
             <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">How it works</h2>
@@ -500,45 +491,6 @@ export default function LandingPage() {
                 </ul>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 6. Templates Preview ── */}
-      <section id="templates" className="py-16 md:py-24 px-6 overflow-hidden">
-        <div className="max-w-6xl mx-auto">
-          <FadeInSection className="text-center mb-12">
-            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
-              5 premium resume templates
-            </h2>
-            <p className="text-[#A0A0B8]">Visually stunning. ATS-safe. Switch anytime without losing your content.</p>
-          </FadeInSection>
-
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
-            {TEMPLATES.map((t) => (
-              <motion.div
-                key={t.id}
-                whileHover={{ scale: 1.03, y: -4 }}
-                transition={SPRING}
-                className="flex-shrink-0 w-44 sm:w-56 rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 cursor-pointer"
-              >
-                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4">
-                  {/* Mini template preview */}
-                  <div className="w-full h-32 rounded-lg bg-gradient-to-br
-                    from-white/[0.04] to-white/[0.02] mb-3 flex flex-col p-3 gap-1.5">
-                    <div className="h-3 w-20 rounded bg-[#6366F1]/40" />
-                    <div className="h-2 w-16 rounded bg-white/20" />
-                    <div className="h-px w-full bg-white/10 my-1" />
-                    <div className="h-2 w-12 rounded bg-white/30 mb-1" />
-                    {[70, 85, 60].map((w, j) => (
-                      <div key={j} className="h-1.5 rounded bg-white/[0.08]" style={{ width: `${w}%` }} />
-                    ))}
-                  </div>
-                  <p className="font-heading font-semibold text-white text-sm">{t.label}</p>
-                  <p className="text-xs text-[#60607A] mt-0.5">{t.desc}</p>
-                </div>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>

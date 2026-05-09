@@ -16,7 +16,6 @@ export function useCareerProfile() {
   const {
     profile,
     currentResume,
-    selectedTemplate,
     atsScore,
     isGenerating,
     isSyncing,
@@ -25,7 +24,6 @@ export function useCareerProfile() {
     setProfile,
     setResume,
     setATSScore,
-    setSelectedTemplate,
     setIsGenerating,
     syncToFirestore,
     resetProfile,
@@ -42,7 +40,6 @@ export function useCareerProfile() {
   return {
     profile,
     currentResume,
-    selectedTemplate,
     atsScore,
     isGenerating,
     isSyncing,
@@ -51,7 +48,6 @@ export function useCareerProfile() {
     setProfile,
     setResume,
     setATSScore,
-    setSelectedTemplate,
     setIsGenerating,
     resetProfile,
   }

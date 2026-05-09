@@ -77,7 +77,16 @@
       "mcp__claude_ai_Vercel__list_deployments",
       "mcp__claude_ai_Vercel__list_teams",
       "mcp__claude_ai_Vercel__list_projects",
-      "mcp__claude_ai_Vercel__get_deployment_build_logs"
+      "mcp__claude_ai_Vercel__get_deployment_build_logs",
+      "Bash(npm ls *)",
+      "Bash(npm info *)",
+      "Bash(git stash *)",
+      "Bash(git pull *)",
+      "Bash(Remove-Item \"C:\\\\resume_builder\\\\components\\\\resume\\\\templates\\\\ModernEdge.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\resume_builder\\\\components\\\\resume\\\\templates\\\\ExecutiveDark.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\resume_builder\\\\components\\\\resume\\\\templates\\\\CreativePulse.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\resume_builder\\\\components\\\\resume\\\\templates\\\\MinimalSeoul.tsx\" -Force)",
+      "Bash(Write-Output \"Deleted\")"
     ]
   }
 }

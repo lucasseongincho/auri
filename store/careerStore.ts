@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import type { CareerProfile, ResumeData, ATSScore, TemplateId, FeatureId, EditHistoryEntry } from '@/types'
+import type { CareerProfile, ResumeData, ATSScore, FeatureId, EditHistoryEntry } from '@/types'
 import { saveCareerProfile, getCareerProfile } from '@/lib/firestore'
 
 const DEFAULT_PROFILE: CareerProfile = {
@@ -27,7 +27,6 @@ const MAX_HISTORY = 50 // max undo steps
 interface CareerStore {
   profile: CareerProfile | null
   currentResume: ResumeData | null
-  selectedTemplate: TemplateId
   atsScore: ATSScore | null
   isGenerating: boolean
   activeFeature: FeatureId
@@ -48,7 +47,6 @@ interface CareerStore {
   setProfile: (profile: CareerProfile) => void
   setResume: (resume: ResumeData) => void
   setATSScore: (score: ATSScore) => void
-  setSelectedTemplate: (id: TemplateId) => void
   setIsGenerating: (val: boolean) => void
   setActiveFeature: (id: FeatureId) => void
   resetProfile: () => void
@@ -73,7 +71,6 @@ export const useCareerStore = create<CareerStore>()(
     (set, get) => ({
       profile: DEFAULT_PROFILE,
       currentResume: null,
-      selectedTemplate: 'classic-pro',
       atsScore: null,
       isGenerating: false,
       activeFeature: 'dashboard',
@@ -106,7 +103,6 @@ export const useCareerStore = create<CareerStore>()(
         }))
       },
 
-      setSelectedTemplate: (id) => set({ selectedTemplate: id }),
       setIsGenerating: (val) => set({ isGenerating: val }),
       setActiveFeature: (id) => set({ activeFeature: id }),
       resetProfile: () => set({
@@ -200,7 +196,6 @@ export const useCareerStore = create<CareerStore>()(
       partialize: (state) => ({
         profile: state.profile,
         currentResume: state.currentResume,
-        selectedTemplate: state.selectedTemplate,
       }),
     }
   )

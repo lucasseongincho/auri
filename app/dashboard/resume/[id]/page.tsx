@@ -24,10 +24,6 @@ import { useLetterScale } from '@/hooks/useLetterScale'
 import ResumePreview from '@/components/resume/ResumePreview'
 import ResumeEditor from '@/components/resume/ResumeEditor'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
-import ModernEdge from '@/components/resume/templates/ModernEdge'
-import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
-import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
-import CreativePulse from '@/components/resume/templates/CreativePulse'
 import { stripAITags } from '@/lib/resumeHighlight'
 import {
   deleteSavedResume,
@@ -35,7 +31,7 @@ import {
   getSavedResumes,
   updateSavedResume,
 } from '@/lib/firestore'
-import type { ResumeData, SavedResume, TemplateId } from '@/types'
+import type { ResumeData, SavedResume } from '@/types'
 import { TEMPLATE_LABELS } from '@/types'
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
@@ -302,7 +298,7 @@ export default function SavedResumePage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
   const { user, loading: authLoading, isAuthenticated } = useAuth()
-  const { setResume, setSelectedTemplate } = useCareerStore()
+  const { setResume } = useCareerStore()
   // Measure the shared wrapper that holds both view and edit modes.
   // innerPadding=8 accounts for the p-1 card (4px × 2 sides) sitting between
   // this container and the actual template, so the scale is identical in both modes.
@@ -360,7 +356,6 @@ export default function SavedResumePage() {
           setEditedResumeData(data.resumeData)
           // Sync to global store
           setResume(data.resumeData)
-          setSelectedTemplate(data.templateId)
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load resume')
@@ -384,23 +379,10 @@ export default function SavedResumePage() {
 
     loadResume()
     loadList()
-  }, [authLoading, isAuthenticated, user, params.id, setResume, setSelectedTemplate])
+  }, [authLoading, isAuthenticated, user, params.id, setResume])
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
-  const handleTemplateChange = useCallback(
-    async (id: TemplateId) => {
-      if (!resume || !user) return
-      setSelectedTemplate(id)
-      setResumeData((prev) => (prev ? { ...prev, templateId: id } : prev))
-      try {
-        await updateSavedResume(user.uid, resume.id, { templateId: id })
-      } catch {
-        // Silent — UI already updated optimistically
-      }
-    },
-    [resume, user, setSelectedTemplate]
-  )
 
   const handleSaveEdits = useCallback(async () => {
     const dataToSave = editedResumeDataRef.current ?? editedResumeData
@@ -830,16 +812,12 @@ export default function SavedResumePage() {
                       }}
                     >
                       <div style={{ zoom: editScale, width: '8.5in', margin: '0 auto' }}>
-                        {(() => {
-                          const p = resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }
-                          switch (resume.templateId) {
-                            case 'modern-edge':    return <ModernEdge data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
-                            case 'minimal-seoul':  return <MinimalSeoul data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
-                            case 'executive-dark': return <ExecutiveDark data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
-                            case 'creative-pulse': return <CreativePulse data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
-                            default:               return <ClassicPro data={editedResumeData} personal={p} isEditing renderText={stripAITags} />
-                          }
-                        })()}
+                        <ClassicPro
+                          data={editedResumeData}
+                          personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
+                          isEditing
+                          renderText={stripAITags}
+                        />
                       </div>
                     </ResumeEditor>
                   </div>
@@ -849,7 +827,6 @@ export default function SavedResumePage() {
                   data={resume.resumeData}
                   personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
                   isStreaming={false}
-                  onTemplateChange={handleTemplateChange}
                   forcedScale={editScale}
                 />
               )}

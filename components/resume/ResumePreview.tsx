@@ -3,16 +3,11 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Download, Copy, CheckCircle, Loader2, Layout, AlertTriangle, X } from 'lucide-react'
-import { useCareerStore } from '@/store/careerStore'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
-import ModernEdge from '@/components/resume/templates/ModernEdge'
-import MinimalSeoul from '@/components/resume/templates/MinimalSeoul'
-import ExecutiveDark from '@/components/resume/templates/ExecutiveDark'
-import CreativePulse from '@/components/resume/templates/CreativePulse'
 import VerificationBanner from '@/components/resume/VerificationBanner'
 import ResumeHighlightedText from '@/components/resume/ResumeHighlightedText'
 import { countAllEstimates, stripAllAITags } from '@/lib/resumeHighlight'
-import type { ResumeData, TemplateId, PersonalInfo } from '@/types'
+import type { ResumeData, PersonalInfo } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -28,20 +23,11 @@ const LOADING_MESSAGES = [
 const LETTER_W = 816  // 8.5in at 96 dpi
 const LETTER_H = 1056 // 11in at 96 dpi
 
-const TEMPLATES: { id: TemplateId; label: string }[] = [
-  { id: 'classic-pro', label: 'Classic Pro' },
-  { id: 'modern-edge', label: 'Modern Edge' },
-  { id: 'minimal-seoul', label: 'Minimal Seoul' },
-  { id: 'executive-dark', label: 'Executive Dark' },
-  { id: 'creative-pulse', label: 'Creative Pulse' },
-]
-
 interface ResumePreviewProps {
   data: ResumeData | null
   personal: PersonalInfo
   isStreaming: boolean
   streamText?: string
-  onTemplateChange?: (id: TemplateId) => void
   /** When provided, overrides the internal ResizeObserver scale. Use this to sync with an adjacent edit mode. */
   forcedScale?: number
 }
@@ -278,10 +264,8 @@ export default function ResumePreview({
   personal,
   isStreaming,
   streamText = '',
-  onTemplateChange,
   forcedScale,
 }: ResumePreviewProps) {
-  const { selectedTemplate, setSelectedTemplate } = useCareerStore()
   const previewRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
@@ -336,11 +320,6 @@ export default function ResumePreview({
     ),
     []
   )
-
-  const handleTemplateChange = (id: TemplateId) => {
-    setSelectedTemplate(id)
-    onTemplateChange?.(id)
-  }
 
   // Scroll to first unverified amber highlight
   const handleReviewClick = useCallback(() => {
@@ -429,27 +408,7 @@ export default function ResumePreview({
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar — no-print ensures it never appears in PDF export */}
-      <div className="no-print flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
-        {/* Template switcher */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#13131A] border border-white/[0.08] overflow-x-auto max-w-full">
-          <Layout className="w-3.5 h-3.5 text-[#60607A] ml-2 flex-shrink-0" />
-          {TEMPLATES.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => handleTemplateChange(t.id)}
-              aria-label={`Switch to ${t.label} template`}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
-                ${selectedTemplate === t.id
-                  ? 'bg-[#6366F1] text-white shadow-sm'
-                  : 'text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/5'
-                }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Action buttons */}
+      <div className="no-print flex items-center justify-end gap-2 mb-3">
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={handleCopyATS}
@@ -592,21 +551,7 @@ export default function ResumePreview({
                           id="resume-content"
                           className="w-full"
                         >
-                          {selectedTemplate === 'classic-pro' && (
-                            <ClassicPro data={safeData} personal={personal} renderText={renderText} />
-                          )}
-                          {selectedTemplate === 'modern-edge' && (
-                            <ModernEdge data={safeData} personal={personal} renderText={renderText} />
-                          )}
-                          {selectedTemplate === 'minimal-seoul' && (
-                            <MinimalSeoul data={safeData} personal={personal} renderText={renderText} />
-                          )}
-                          {selectedTemplate === 'executive-dark' && (
-                            <ExecutiveDark data={safeData} personal={personal} renderText={renderText} />
-                          )}
-                          {selectedTemplate === 'creative-pulse' && (
-                            <CreativePulse data={safeData} personal={personal} renderText={renderText} />
-                          )}
+                          <ClassicPro data={safeData} personal={personal} renderText={renderText} />
                         </motion.div>
                       </div>
                     </div>
