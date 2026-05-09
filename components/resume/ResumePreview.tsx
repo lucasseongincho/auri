@@ -175,11 +175,11 @@ function MobileResumeCard({ data, personal }: MobileResumeCardProps) {
         {/* Header */}
         <div className="border-b border-gray-100 pb-3">
           <h1 className="text-lg font-bold text-gray-900">{personal.name}</h1>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 mt-0.5 break-words">
             {[personal.email, personal.phone, personal.location].filter(Boolean).join(' · ')}
           </p>
           {(personal.linkedin_url || personal.website) && (
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-400 mt-0.5 break-all">
               {[personal.linkedin_url, personal.website].filter(Boolean).join(' · ')}
             </p>
           )}

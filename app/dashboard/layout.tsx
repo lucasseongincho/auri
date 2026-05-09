@@ -336,7 +336,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </motion.aside>
 
       {/* ── Main content ── */}
-      <div className="flex-1 md:ml-[72px] flex flex-col h-screen">
+      <div className="flex-1 md:ml-[72px] flex flex-col h-screen overflow-x-hidden">
         {/* Top header */}
         <header className="flex-shrink-0 border-b border-white/[0.06] bg-[#0A0A0F]/80 backdrop-blur-xl px-6 py-4
           flex items-center justify-between">
@@ -381,7 +381,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Page content — flex-1 overflow-y-auto so child pages that use h-full get a real height */}
-        <main className="flex-1 overflow-y-auto p-6 pb-24 md:pb-6 max-w-7xl w-full mx-auto">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 pb-24 md:pb-6 max-w-7xl w-full mx-auto">
           {/* Owner beta status banner */}
           {isOwner && APP_CONFIG.BETA_MODE && (
             <div className="mb-4 rounded-lg px-4 py-2 text-sm
