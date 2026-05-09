@@ -235,7 +235,7 @@ export default function CoverLetterDetailPage() {
   const [deleteTarget, setDeleteTarget] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [scale, setScale] = useState(1)
+  const [scale, setScale] = useState(0)
   const [downloading, setDownloading] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -251,7 +251,7 @@ export default function CoverLetterDetailPage() {
 
   useEffect(() => { setSidebarOpen(false) }, [id])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = previewContainerRef.current
     if (!el) return
     const observer = new ResizeObserver(() => {
@@ -259,6 +259,8 @@ export default function CoverLetterDetailPage() {
       setScale(Math.min(1, w / LETTER_W))
     })
     observer.observe(el)
+    const w = el.clientWidth - 32
+    if (w > 0) setScale(Math.min(1, w / LETTER_W))
     return () => observer.disconnect()
   }, [])
 
@@ -486,31 +488,47 @@ export default function CoverLetterDetailPage() {
             className="space-y-4 pb-6"
           >
             {/* Top bar */}
-            <div className="flex items-center justify-between gap-2 min-w-0 w-full">
-              <div className="flex items-center gap-3 min-w-0">
-                <Link
-                  href="/dashboard/cover-letter/saved"
-                  className="p-1.5 rounded-lg text-[#60607A] hover:text-white hover:bg-white/5 transition-all flex-shrink-0"
-                  aria-label="Back to My Cover Letters"
+            <div className="flex flex-col gap-2 w-full min-w-0">
+
+              {/* Row 1 — back arrow + title + delete */}
+              <div className="flex items-center justify-between gap-2 min-w-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Link
+                    href="/dashboard/cover-letter/saved"
+                    className="p-1.5 rounded-lg text-[#60607A] hover:text-white hover:bg-white/5
+                      transition-all flex-shrink-0"
+                    aria-label="Back to My Cover Letters"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </Link>
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#F59E0B]/20 to-[#D97706]/20
+                    border border-[#F59E0B]/30 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-3.5 h-3.5 text-[#F59E0B]" />
+                  </div>
+                  <div className="min-w-0">
+                    <h1 className="font-heading text-base font-bold text-white truncate">
+                      {letter.company}
+                    </h1>
+                    <p className="text-xs text-[#60607A] truncate">{letter.position}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setDeleteTarget(true)}
+                  aria-label="Delete this cover letter"
+                  className="p-2 rounded-xl text-[#60607A] hover:text-[#EF4444]
+                    hover:bg-[#EF4444]/10 transition-all duration-200 flex-shrink-0"
                 >
-                  <ArrowLeft className="w-4 h-4" />
-                </Link>
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#F59E0B]/20 to-[#D97706]/20
-                  border border-[#F59E0B]/30 flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-3.5 h-3.5 text-[#F59E0B]" />
-                </div>
-                <div className="min-w-0">
-                  <h1 className="font-heading text-lg font-bold text-white truncate">{letter.company}</h1>
-                  <p className="text-xs text-[#60607A] truncate">{letter.position}</p>
-                </div>
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0 flex-wrap min-w-0">
+
+              {/* Row 2 — word count + actions */}
+              <div className="flex items-center gap-2 flex-wrap">
                 <WordBadge count={isEditMode
                   ? editedParagraphs.join(' ').split(/\s+/).filter(Boolean).length
                   : letter.wordCount}
                 />
 
-                {/* Download PDF — always available */}
                 {!isEditMode && (
                   <button
                     onClick={handleDownloadPDF}
@@ -526,7 +544,6 @@ export default function CoverLetterDetailPage() {
                   </button>
                 )}
 
-                {/* Edit / Save / Cancel */}
                 {!isEditMode ? (
                   <button
                     onClick={() => {
@@ -564,16 +581,8 @@ export default function CoverLetterDetailPage() {
                     </button>
                   </>
                 )}
-
-                <button
-                  onClick={() => setDeleteTarget(true)}
-                  aria-label="Delete this cover letter"
-                  className="p-2 rounded-xl text-[#60607A] hover:text-[#EF4444]
-                    hover:bg-[#EF4444]/10 transition-all duration-200"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
               </div>
+
             </div>
 
             {/* Meta row */}
@@ -613,6 +622,10 @@ export default function CoverLetterDetailPage() {
             <div
               ref={previewContainerRef}
               className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden"
+              style={{
+                visibility: scale === 0 ? 'hidden' : 'visible',
+                height: scale > 0 ? `${LETTER_H * scale + 32}px` : 'auto',
+              }}
               onClick={() => {
                 if (isEditMode && activeParagraphIdx !== null) setActiveParagraphIdx(null)
               }}
