@@ -119,6 +119,87 @@ export async function checkBetaLimits(uid: string, email?: string): Promise<Beta
 }
 
 /**
+ * Atomically checks beta limits AND increments the call counter in one
+ * Firestore transaction. Prevents race conditions from concurrent requests.
+ *
+ * Use this instead of calling checkBetaLimits + incrementBetaCall separately.
+ */
+export async function checkAndIncrementBetaCall(
+  uid: string,
+  email?: string
+): Promise<BetaGuardResult> {
+  if (!adminDb) return { allowed: true }
+
+  // Owner is always exempt
+  const ownerEmail = process.env.NEXT_PUBLIC_OWNER_EMAIL
+  if (ownerEmail && email && email === ownerEmail) return { allowed: true }
+
+  return adminDb.runTransaction(async (tx) => {
+    const profileRef = adminDb!.doc(`users/${uid}/profile/data`)
+    const usageRef = adminDb!.doc(`users/${uid}/betaUsage/data`)
+
+    const [profileSnap, usageSnap] = await Promise.all([
+      tx.get(profileRef),
+      tx.get(usageRef),
+    ])
+
+    // 1. Check betaApproved
+    const betaApproved = profileSnap.exists
+      ? profileSnap.data()?.betaApproved === true
+      : false
+
+    if (!betaApproved) {
+      return {
+        allowed: false,
+        status: 403,
+        body: {
+          success: false,
+          error: 'BETA_ACCESS_REQUIRED',
+          message: 'You need a valid invite code to use AURI during beta.',
+        },
+      }
+    }
+
+    // 2. Calculate current week usage
+    const usageData = usageSnap.exists ? usageSnap.data()! : {}
+    const thisMonday = getThisMonday()
+    const storedWeekStart: Date | null = usageData.betaWeekStart?.toDate?.() ?? null
+    const needsReset = !storedWeekStart || storedWeekStart < thisMonday
+    const callsThisWeek: number = needsReset ? 0 : (usageData.betaCallsThisWeek ?? 0)
+
+    // 3. Enforce limit before incrementing
+    if (callsThisWeek >= APP_CONFIG.BETA_WEEKLY_CALL_LIMIT) {
+      return {
+        allowed: false,
+        status: 429,
+        body: {
+          success: false,
+          error: 'BETA_LIMIT_REACHED',
+          message: `You have used all ${APP_CONFIG.BETA_WEEKLY_CALL_LIMIT} beta calls this week.`,
+          resetsOn: getNextMondayString(),
+          callsUsed: callsThisWeek,
+          callsTotal: APP_CONFIG.BETA_WEEKLY_CALL_LIMIT,
+        },
+      }
+    }
+
+    // 4. Atomically increment — inside the same transaction
+    if (needsReset) {
+      tx.set(usageRef, {
+        betaCallsThisWeek: 1,
+        betaWeekStart: thisMonday,
+      }, { merge: true })
+    } else {
+      tx.update(usageRef, {
+        betaCallsThisWeek: FieldValue.increment(1),
+      })
+    }
+
+    return { allowed: true }
+  })
+}
+
+/**
  * Increments the weekly call counter for a user.
  * Uses Firestore FieldValue.increment to avoid race conditions.
  */

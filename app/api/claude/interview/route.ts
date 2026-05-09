@@ -3,7 +3,7 @@ import { streamClaude, callClaude, buildErrorResponse, parseClaudeJSON } from '@
 import { buildInterviewPrepPrompt, buildPracticeFeedbackPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
-import { checkBetaLimits, incrementBetaCall } from '@/lib/betaGuard'
+import { checkAndIncrementBetaCall } from '@/lib/betaGuard'
 import { APP_CONFIG } from '@/lib/config'
 
 export const runtime = 'nodejs'
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       if (!verifiedUser?.uid) {
         return Response.json({ error: 'Beta requires sign-in', code: 'AUTH_REQUIRED' }, { status: 401 })
       }
-      const beta = await checkBetaLimits(verifiedUser.uid, verifiedUser.email)
+      const beta = await checkAndIncrementBetaCall(verifiedUser.uid, verifiedUser.email)
       if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
     }
 
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       const prompt = buildPracticeFeedbackPrompt(body.question, body.userAnswer, body.targetPosition)
       const { text, inputTokens, outputTokens } = await callClaude(prompt, 1024)
       const data = parseClaudeJSON(text)
-      if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
+
       return Response.json({
         success: true,
         data,
@@ -104,7 +104,6 @@ export async function POST(req: NextRequest) {
       body.experienceSummary ?? ''
     )
 
-    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
     const stream = await attemptStream(prompt)
 
     return new Response(stream, {

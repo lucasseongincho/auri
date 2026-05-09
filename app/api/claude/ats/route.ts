@@ -3,7 +3,7 @@ import { callClaude, buildErrorResponse, parseClaudeJSON, MAX_TOKENS_ANALYSIS } 
 import { buildATSScorePrompt, buildATSFixPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
-import { checkBetaLimits, incrementBetaCall } from '@/lib/betaGuard'
+import { checkAndIncrementBetaCall } from '@/lib/betaGuard'
 import { APP_CONFIG } from '@/lib/config'
 import type { ATSScore } from '@/types'
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       if (!verifiedUser?.uid) {
         return Response.json({ error: 'Beta requires sign-in', code: 'AUTH_REQUIRED' }, { status: 401 })
       }
-      const beta = await checkBetaLimits(verifiedUser.uid, verifiedUser.email)
+      const beta = await checkAndIncrementBetaCall(verifiedUser.uid, verifiedUser.email)
       if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
     }
 
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       )
       // Plain text output — higher token limit to allow full resume
       const { text, inputTokens, outputTokens } = await callClaude(prompt, MAX_TOKENS_ANALYSIS)
-      if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
+
 
       return Response.json({
         success: true,
@@ -78,7 +78,6 @@ export async function POST(req: NextRequest) {
     const prompt = buildATSScorePrompt(resumePlainText, body.jobDescription)
     const { text, inputTokens, outputTokens } = await callClaude(prompt, MAX_TOKENS_ANALYSIS)
     const data = parseClaudeJSON<ATSScore>(text)
-    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
 
     return Response.json({
       success: true,

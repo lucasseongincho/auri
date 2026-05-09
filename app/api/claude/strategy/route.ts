@@ -3,7 +3,7 @@ import { streamClaude, buildErrorResponse } from '@/lib/claude'
 import { buildJobStrategyPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
-import { checkBetaLimits, incrementBetaCall } from '@/lib/betaGuard'
+import { checkAndIncrementBetaCall } from '@/lib/betaGuard'
 import { APP_CONFIG } from '@/lib/config'
 
 export const runtime = 'nodejs'
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       if (!verifiedUser?.uid) {
         return Response.json({ error: 'Beta requires sign-in', code: 'AUTH_REQUIRED' }, { status: 401 })
       }
-      const beta = await checkBetaLimits(verifiedUser.uid, verifiedUser.email)
+      const beta = await checkAndIncrementBetaCall(verifiedUser.uid, verifiedUser.email)
       if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
     }
 
@@ -82,7 +82,6 @@ export async function POST(req: NextRequest) {
       body.companySizeOrType ?? ''
     )
 
-    if (APP_CONFIG.BETA_MODE && verifiedUser?.uid) await incrementBetaCall(verifiedUser.uid)
     const stream = await attemptStream(prompt)
 
     return new Response(stream, {
