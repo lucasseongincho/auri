@@ -1,4 +1,4 @@
-import { useRef, useState, useLayoutEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 const LETTER_W = 816
 
@@ -12,9 +12,9 @@ const LETTER_W = 816
  */
 export function useLetterScale(innerPadding = 0) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [scale, setScale] = useState(0)
+  const [scale, setScale] = useState(1)
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const el = containerRef.current
     if (!el) return
     const update = () => {

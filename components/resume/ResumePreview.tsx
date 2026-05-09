@@ -200,8 +200,6 @@ export default function ResumePreview({
   }, [])
 
   const scale = forcedScale ?? Math.min(1, containerWidth / LETTER_W)
-  // True once we have a real measurement — guards against rendering at scale 0 or 1 before layout fires
-  const isScaleKnown = scale > 0
 
   // Sanitise data once so all 5 templates receive guaranteed non-null arrays.
   const safeData = data ? sanitizeResumeData(data) : null
@@ -461,7 +459,7 @@ export default function ResumePreview({
                   </div>
                 </div>
               </motion.div>
-            ) : isScaleKnown && safeData ? (
+            ) : containerWidth > 0 && safeData ? (
               /* Scale wrapper — sets the scroll area to the scaled dimensions */
               <div style={{ width: `${LETTER_W * scale}px`, minHeight: `${LETTER_H * scale}px`, margin: '0 auto' }}>
                 {/* Transform wrapper — scales the 816px content visually without affecting html2canvas capture */}
