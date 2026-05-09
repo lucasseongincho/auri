@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -1231,6 +1231,7 @@ export default function ResumePage() {
 
   // ── Shared letter-size scale — drives both view and edit modes identically ───
   const { containerRef: editContainerRef, scale: editScale } = useLetterScale(8)
+  const editorSyncRef = useRef<{ sync: () => void }>(null)
 
   // ── Local UI state ──────────────────────────────────────────────────────────
   const [currentStep, setCurrentStep] = useState(1)
@@ -1912,6 +1913,7 @@ export default function ResumePage() {
                     resumeData={displayResume}
                     personal={personal}
                     onDataChange={(updated) => setEditedResume(updated)}
+                    syncRef={editorSyncRef}
                   >
                     <div style={{ zoom: editScale, width: '8.5in', margin: '0 auto' }}>
                       {renderTemplate(displayResume)}
@@ -1948,7 +1950,14 @@ export default function ResumePage() {
                 className="flex-shrink-0 flex justify-center"
               >
                 <button
-                  onClick={() => setIsEditing((v) => !v)}
+                  onClick={() => {
+                    if (isEditing) {
+                      editorSyncRef.current?.sync()
+                      setIsEditing(false)
+                    } else {
+                      setIsEditing(true)
+                    }
+                  }}
                   aria-label={isEditing ? 'Exit editing mode' : 'Enter Easy Tune editing mode'}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium
                     border transition-all duration-200

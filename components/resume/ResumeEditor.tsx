@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Undo2, Redo2, Loader2, CheckCircle } from 'lucide-react'
 import { getIdToken } from 'firebase/auth'
@@ -17,6 +17,7 @@ interface ResumeEditorProps {
   personal: PersonalInfo
   onDataChange: (updated: ResumeData) => void
   children: React.ReactNode  // the rendered template passed as children
+  syncRef?: React.RefObject<{ sync: () => void } | null>
 }
 
 interface AIAssistState {
@@ -32,6 +33,7 @@ export default function ResumeEditor({
   personal: _personal,
   onDataChange,
   children,
+  syncRef,
 }: ResumeEditorProps) {
   useAuth() // auth context — user available for future AI assist attribution
   const { pushToHistory, undo, redo, canUndo, canRedo, profile } = useCareerStore()
@@ -222,7 +224,8 @@ export default function ResumeEditor({
     const skillsEl = editorRef.current.querySelector('[data-ats-field="skills"] p')
     if (skillsEl) {
       const domText = (skillsEl as HTMLElement).innerText.trim()
-      const origSkillsText = stripAITags((resumeData.skills ?? []).join(', ')).trim()
+      // Use the same separator the template renders with (' · ') so unchanged skills compare equal
+      const origSkillsText = stripAITags((resumeData.skills ?? []).join(' · ')).trim()
       if (domText !== origSkillsText) {
         updated.skills = domText.split(/[,·]/).map((s) => s.trim()).filter(Boolean)
       }
@@ -292,6 +295,8 @@ export default function ResumeEditor({
     pushToHistory(updated)
     onDataChange(updated)
   }, [resumeData, pushToHistory, onDataChange])
+
+  useImperativeHandle(syncRef, () => ({ sync: syncDOMToData }), [syncDOMToData])
 
   return (
     <div className="relative" ref={editorRef} onMouseUp={handleMouseUp} tabIndex={-1}>
