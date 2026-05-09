@@ -405,7 +405,7 @@ export default function LandingPage() {
 
             {[
               { step: '01', title: 'Add Your Experience', desc: 'Fill in your background or paste your existing resume. Takes 3 minutes.' },
-              { step: '02', title: 'AI Magic Happens', desc: 'Claude rewrites, optimizes, and tailors everything to your target role.' },
+              { step: '02', title: 'AI Magic Happens', desc: 'AURI rewrites, optimizes, and tailors everything to your target role.' },
               { step: '03', title: 'Get Hired', desc: 'Download your ATS-optimized resume, apply, and land the interview.' },
             ].map((item, i) => (
               <FadeInSection key={item.step} delay={i * 0.15}>
