@@ -199,10 +199,18 @@ export default function ResumeEditor({
       // else: keep resumeData.summary with ai-estimate tags intact
     }
 
-    // Sync experience bullets — compare by bullet index to preserve tags on unedited bullets
+    // Sync experience title + bullets
     const expEls = editorRef.current.querySelectorAll('[data-ats-field="experience"] article')
     expEls.forEach((articleEl, i) => {
       if (!updated.experience[i]) return
+      let exp = { ...updated.experience[i] }
+
+      const titleEl = articleEl.querySelector('.job-title')
+      if (titleEl) {
+        const domText = (titleEl as HTMLElement).innerText.trim()
+        if (domText !== (resumeData.experience[i]?.title ?? '')) exp = { ...exp, title: domText }
+      }
+
       const origBullets = resumeData.experience[i]?.bullets ?? []
       const bullets: string[] = []
       articleEl.querySelectorAll('li').forEach((li, bulletIndex) => {
@@ -210,14 +218,13 @@ export default function ResumeEditor({
         if (!domText) return
         const origBullet = origBullets[bulletIndex]
         if (origBullet !== undefined && stripAITags(origBullet).trim() === domText) {
-          // Unchanged — keep original bullet with ai-estimate tags
           bullets.push(origBullet)
         } else {
-          // User edited this bullet — use plain DOM text
           bullets.push(domText)
         }
       })
-      updated.experience[i] = { ...updated.experience[i], bullets }
+      exp = { ...exp, bullets }
+      updated.experience[i] = exp
     })
 
     // Sync skills — only update if changed (skills rarely have ai-estimate tags)
@@ -239,6 +246,13 @@ export default function ResumeEditor({
       projEls.forEach((articleEl, i) => {
         if (!newProjects[i]) return
         let proj = { ...newProjects[i] }
+
+        // Sync project name (.job-title span)
+        const nameEl = articleEl.querySelector('.job-title')
+        if (nameEl) {
+          const domText = (nameEl as HTMLElement).innerText.trim()
+          if (domText !== (resumeData.projects?.[i]?.name ?? '')) proj = { ...proj, name: domText }
+        }
 
         // Sync description paragraph (first <p> in the article)
         const descEl = articleEl.querySelector('p')
