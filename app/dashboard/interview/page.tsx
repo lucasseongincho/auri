@@ -345,6 +345,38 @@ export default function InterviewPage() {
     })
 
     if (fullText) {
+      // Escape literal control characters (newlines, tabs) that appear inside
+      // JSON string values — Claude often emits these unescaped in star_example
+      // fields, which is technically invalid JSON and causes JSON.parse to throw.
+      const sanitizeJSONStrings = (json: string): string => {
+        let result = ''
+        let inString = false
+        let i = 0
+        while (i < json.length) {
+          const ch = json[i]
+          if (ch === '\\' && inString) {
+            // Copy escape sequence verbatim (handles \" \\ \n etc.)
+            result += ch + (json[i + 1] ?? '')
+            i += 2
+            continue
+          }
+          if (ch === '"') {
+            inString = !inString
+            result += ch
+          } else if (inString && ch === '\n') {
+            result += '\\n'
+          } else if (inString && ch === '\r') {
+            // skip bare CR
+          } else if (inString && ch === '\t') {
+            result += '\\t'
+          } else {
+            result += ch
+          }
+          i++
+        }
+        return result
+      }
+
       const parseInterviewJSON = (raw: string): InterviewPrep | null => {
         try {
           let cleaned = raw
@@ -352,8 +384,7 @@ export default function InterviewPage() {
             .replace(/\s*```\s*$/i, '')
             .trim()
 
-          // Use bracket-depth matching to find the outermost { }
-          // (lastIndexOf fails on deeply nested objects)
+          // Bracket-depth matching to isolate the outermost { }
           const start = cleaned.indexOf('{')
           if (start !== -1) {
             let depth = 0
@@ -368,28 +399,34 @@ export default function InterviewPage() {
             if (end !== -1) cleaned = cleaned.slice(start, end + 1)
           }
 
-          // Try direct parse, then repair trailing commas + smart quotes
+          // Repair: trailing commas, smart quotes, unescaped control chars
+          const repaired = sanitizeJSONStrings(
+            cleaned
+              .replace(/,(\s*[}\]])/g, '$1')
+              .replace(/[""]/g, '"')
+              .replace(/['']/g, "'")
+          )
+
           let parsed: InterviewPrep | null = null
           try {
-            parsed = JSON.parse(cleaned) as InterviewPrep
-          } catch {
-            const repaired = cleaned
-              .replace(/,(\s*[}\]])/g, '$1')
-              .replace(/[“”]/g, '"')
-              .replace(/[‘’]/g, "'")
             parsed = JSON.parse(repaired) as InterviewPrep
-          }
-
-          // Validate shape — be lenient: only require questions array
-          if (!parsed || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+          } catch (err) {
+            console.error('[InterviewPrep] JSON.parse failed after repair:', err)
+            console.error('[InterviewPrep] raw (first 500 chars):', raw.slice(0, 500))
+            console.error('[InterviewPrep] repaired (first 500 chars):', repaired.slice(0, 500))
             return null
           }
-          // Ensure questions_to_ask exists even if Claude omitted it
+
+          if (!parsed || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+            console.error('[InterviewPrep] Parsed OK but shape invalid:', parsed)
+            return null
+          }
           if (!Array.isArray(parsed.questions_to_ask)) {
             parsed.questions_to_ask = []
           }
           return parsed
-        } catch {
+        } catch (err) {
+          console.error('[InterviewPrep] Unexpected error in parseInterviewJSON:', err)
           return null
         }
       }
