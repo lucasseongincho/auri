@@ -58,6 +58,39 @@ export async function streamClaude(
 // Handles markdown fences, preamble text, smart quotes, trailing commas, and
 // nested objects (bracket-depth extraction instead of lastIndexOf).
 
+// Walk the JSON string character-by-character, tracking whether the cursor is
+// inside a quoted string value. When inside a string, replace bare newlines /
+// carriage-returns / tabs with their JSON escape sequences so JSON.parse
+// accepts them. Proper escape sequences already in the text are left intact.
+function sanitizeJSONControlChars(json: string): string {
+  let result = ''
+  let inString = false
+  let i = 0
+  while (i < json.length) {
+    const ch = json[i]
+    if (ch === '\\' && inString) {
+      // Copy escape sequence verbatim and skip past it
+      result += ch + (json[i + 1] ?? '')
+      i += 2
+      continue
+    }
+    if (ch === '"') {
+      inString = !inString
+      result += ch
+    } else if (inString && ch === '\n') {
+      result += '\\n'
+    } else if (inString && ch === '\r') {
+      // bare CR — skip (CRLF pairs: the \n above handles the line break)
+    } else if (inString && ch === '\t') {
+      result += '\\t'
+    } else {
+      result += ch
+    }
+    i++
+  }
+  return result
+}
+
 class JSONParseError extends Error {
   constructor(message: string, public readonly rawText: string) {
     super(message)
@@ -100,10 +133,15 @@ export function parseClaudeJSON<T>(raw: string): T {
   }
 
   // Repair common Claude quirks: smart quotes + trailing commas
-  const repaired = cleaned
-    .replace(/[‘’]/g, "'")
-    .replace(/[“”]/g, '"')
+  const preRepaired = cleaned
+    .replace(/['']/g, "'")
+    .replace(/[""]/g, '"')
     .replace(/,(\s*[}\]])/g, '$1')
+
+  // Escape literal control characters (newlines, tabs, CRs) that appear inside
+  // JSON string values. Claude emits these unescaped in multi-line fields like
+  // star_example, which makes the output structurally invalid JSON.
+  const repaired = sanitizeJSONControlChars(preRepaired)
 
   try {
     return JSON.parse(repaired) as T
