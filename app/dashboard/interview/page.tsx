@@ -23,6 +23,7 @@ import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
+import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 import { saveInterviewPrep, saveGuestInterviewPrep } from '@/lib/firestore'
@@ -295,6 +296,55 @@ interface Toast {
   link?: { label: string; href: string }
 }
 
+// ── Interview JSON parser ─────────────────────────────────────────────────────
+// Defined at module level so it is not re-created on every render.
+// The sanitizeControlChars pass is the critical fix: Claude emits literal
+// newlines inside star_example string values, which is invalid JSON.
+
+function sanitizeControlChars(json: string): string {
+  let out = ''
+  let inStr = false
+  let i = 0
+  while (i < json.length) {
+    const ch = json[i]
+    if (ch === '\\' && inStr) { out += ch + (json[i + 1] ?? ''); i += 2; continue }
+    if (ch === '"') { inStr = !inStr; out += ch }
+    else if (inStr && ch === '\n') { out += '\\n' }
+    else if (inStr && ch === '\r') { /* skip */ }
+    else if (inStr && ch === '\t') { out += '\\t' }
+    else { out += ch }
+    i++
+  }
+  return out
+}
+
+function parseInterviewPrep(raw: string): InterviewPrep | null {
+  try {
+    let s = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
+
+    const start = s.indexOf('{')
+    if (start !== -1) {
+      let depth = 0, end = -1
+      for (let i = start; i < s.length; i++) {
+        if (s[i] === '{') depth++
+        else if (s[i] === '}' && --depth === 0) { end = i; break }
+      }
+      if (end !== -1) s = s.slice(start, end + 1)
+    }
+
+    const repaired = sanitizeControlChars(
+      s.replace(/['']/g, "'").replace(/[""]/g, '"').replace(/,(\s*[}\]])/g, '$1')
+    )
+
+    const parsed = JSON.parse(repaired) as InterviewPrep
+    if (!Array.isArray(parsed.questions) || parsed.questions.length === 0) return null
+    if (!Array.isArray(parsed.questions_to_ask)) parsed.questions_to_ask = []
+    return parsed
+  } catch {
+    return null
+  }
+}
+
 // ── Main page ────────────────────────────────────────────────────────────────
 
 export default function InterviewPage() {
@@ -311,9 +361,10 @@ export default function InterviewPage() {
   const [currentCard, setCurrentCard] = useState(0)
   const [savedToStudyList, setSavedToStudyList] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [isGenerating, setIsGenerating] = useState(false)
   const [toast, setToast] = useState<Toast | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const { isStreaming, stream } = useAIStream()
 
   const showToast = useCallback((t: Toast) => {
     setToast(t)
@@ -330,49 +381,30 @@ export default function InterviewPage() {
     setCurrentCard(0)
     setSavedToStudyList(false)
     setIsPracticeMode(false)
-    setIsGenerating(true)
 
-    try {
-      let idToken: string | undefined
-      if (auth.currentUser) {
-        try { idToken = await getIdToken(auth.currentUser) } catch { /* guest */ }
+    const fullText = await stream('/api/claude/interview', {
+      mode: 'generate',
+      position,
+      company,
+      experienceSummary,
+      uid: user?.uid,
+      isPro: false,
+    }, {
+      onError: (err) => setGenerateError(err),
+    })
+
+    if (fullText) {
+      const parsed = parseInterviewPrep(fullText)
+      if (parsed) {
+        setPrep(parsed)
+        if (profile) {
+          updateProfile({ generated: { ...profile.generated, interview_prep: parsed } })
+        }
+      } else {
+        setGenerateError('Could not parse the interview prep. Please try again.')
       }
-
-      const res = await fetch('/api/claude/interview', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
-        },
-        body: JSON.stringify({
-          mode: 'generate',
-          position,
-          company,
-          experienceSummary,
-          uid: user?.uid,
-          isPro: false,
-        }),
-      })
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ error: 'Request failed' }))
-        throw new Error(errorData.error ?? `Request failed: ${res.status}`)
-      }
-
-      const json = await res.json()
-      if (!json.success) throw new Error(json.error ?? 'Generation failed')
-
-      const parsed = json.data as InterviewPrep
-      setPrep(parsed)
-      if (profile) {
-        updateProfile({ generated: { ...profile.generated, interview_prep: parsed } })
-      }
-    } catch (err) {
-      setGenerateError(err instanceof Error ? err.message : 'Interview prep generation failed. Please try again.')
-    } finally {
-      setIsGenerating(false)
     }
-  }, [position, company, experienceSummary, user?.uid, profile, updateProfile])
+  }, [position, company, experienceSummary, user?.uid, stream, profile, updateProfile])
 
   const handleSaveToStudyList = useCallback(async () => {
     if (!prep) return
@@ -481,13 +513,13 @@ export default function InterviewPage() {
 
               <button
                 onClick={handleGenerate}
-                disabled={!position.trim() || !company.trim() || isGenerating}
+                disabled={!position.trim() || !company.trim() || isStreaming}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
                   bg-gradient-to-r from-[#EF4444] to-[#DC2626] text-white font-semibold text-sm
                   shadow-lg shadow-[#EF4444]/25 hover:shadow-[#EF4444]/50 hover:scale-[1.01]
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                {isGenerating
+                {isStreaming
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Preparing…</>
                   : <><Sparkles className="w-4 h-4" /> Generate Interview Prep</>
                 }
@@ -578,7 +610,7 @@ export default function InterviewPage() {
           className="space-y-6"
         >
           <AnimatePresence mode="wait">
-            {isGenerating ? (
+            {isStreaming ? (
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <div className="rounded-2xl border border-[#EF4444]/20 bg-[#EF4444]/5 p-4 flex items-center gap-3">
                   <Loader2 className="w-4 h-4 text-[#EF4444] animate-spin" />
