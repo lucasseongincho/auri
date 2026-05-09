@@ -24,6 +24,9 @@ import {
   FolderOpen,
   RotateCcw,
   RotateCw,
+  Edit3,
+  Eye,
+  ChevronLeft,
 } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
@@ -171,7 +174,7 @@ function CoverLetterLoadingState() {
       </div>
 
       {/* Progress bar */}
-      <div className="w-64 h-1.5 rounded-full bg-[#F0F0F0] overflow-hidden">
+      <div className="w-full max-w-[256px] h-1.5 rounded-full bg-[#F0F0F0] overflow-hidden">
         <motion.div
           className="h-full rounded-full bg-gradient-to-r from-[#F59E0B] to-[#D97706]"
           animate={{ width: `${progress}%` }}
@@ -424,6 +427,7 @@ function CoverLetterContent() {
   const [saving, setSaving] = useState(false)
   const [savedId, setSavedId] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [mobileView, setMobileView] = useState<'form' | 'preview'>('form')
 
   // Preview scaling
   const previewContainerRef = useRef<HTMLDivElement>(null)
@@ -528,6 +532,7 @@ function CoverLetterContent() {
         setParagraphs(ps)
         setHistory([ps])
         setHistoryIdx(0)
+        setMobileView('preview')
       } catch {
         setGenerateError('Could not parse the cover letter. Please try again.')
       }
@@ -641,6 +646,33 @@ function CoverLetterContent() {
           </div>
         </div>
 
+        {/* Mobile view toggle — only visible on mobile */}
+        <div className="flex md:hidden items-center gap-1 p-1 rounded-xl
+          bg-[#13131A] border border-white/[0.08]">
+          <button
+            onClick={() => setMobileView('form')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all
+              ${mobileView === 'form'
+                ? 'bg-[#F59E0B] text-white shadow-sm'
+                : 'text-[#60607A] hover:text-[#A0A0B8]'
+              }`}
+          >
+            <Edit3 className="w-3 h-3" />
+            Form
+          </button>
+          <button
+            onClick={() => setMobileView('preview')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all
+              ${mobileView === 'preview'
+                ? 'bg-[#F59E0B] text-white shadow-sm'
+                : 'text-[#60607A] hover:text-[#A0A0B8]'
+              }`}
+          >
+            <Eye className="w-3 h-3" />
+            Preview
+          </button>
+        </div>
+
         <Link
           href="/dashboard/cover-letter/saved"
           className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
@@ -659,8 +691,8 @@ function CoverLetterContent() {
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ ...SPRING, delay: 0.05 }}
-          style={{ width: '40%', minWidth: '380px', flexShrink: 0 }}
-          className="flex flex-col overflow-hidden"
+          className={`flex flex-col overflow-hidden w-full md:w-[40%] md:min-w-[380px] md:flex-shrink-0
+            ${mobileView === 'preview' ? 'hidden md:flex' : 'flex'}`}
         >
           <div className="flex-1 min-h-0 rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 flex flex-col">
             <div className="flex-1 min-h-0 rounded-xl border border-white/[0.05] bg-[#1C1C26] flex flex-col overflow-hidden">
@@ -749,9 +781,21 @@ function CoverLetterContent() {
           initial={{ opacity: 0, x: 16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ ...SPRING, delay: 0.1 }}
-          className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col gap-4"
+          className={`flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col gap-4
+            ${mobileView === 'form' ? 'hidden md:flex' : 'flex'}`}
           style={{ minHeight: 0 }}
         >
+          {mobileView === 'preview' && (
+            <button
+              onClick={() => setMobileView('form')}
+              className="md:hidden flex items-center gap-1.5 text-xs text-[#A0A0B8]
+                hover:text-white transition-colors mb-2"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              Back to form
+            </button>
+          )}
+
           <AnimatePresence mode="wait">
 
             {/* Loading state */}
@@ -789,12 +833,12 @@ function CoverLetterContent() {
                 <div className="flex items-center gap-2 flex-wrap print:hidden">
                   {/* Undo / Redo */}
                   <button onClick={handleUndo} disabled={!canUndo} aria-label="Undo"
-                    className="p-2 rounded-lg border border-white/[0.08] text-[#A0A0B8]
+                    className="p-2 min-h-[36px] rounded-lg border border-white/[0.08] text-[#A0A0B8]
                       hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={handleRedo} disabled={!canRedo} aria-label="Redo"
-                    className="p-2 rounded-lg border border-white/[0.08] text-[#A0A0B8]
+                    className="p-2 min-h-[36px] rounded-lg border border-white/[0.08] text-[#A0A0B8]
                       hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                     <RotateCw className="w-3.5 h-3.5" />
                   </button>
@@ -803,7 +847,7 @@ function CoverLetterContent() {
 
                   {/* Copy */}
                   <button onClick={handleCopy}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium
+                    className="flex items-center gap-1.5 px-3 py-2 min-h-[36px] rounded-xl text-sm font-medium
                       border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all">
                     {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#22C55E]" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied ? 'Copied!' : 'Copy'}
@@ -812,7 +856,7 @@ function CoverLetterContent() {
                   {/* Save */}
                   {user?.uid && (
                     <button onClick={handleSave} disabled={saving}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium
+                      className="flex items-center gap-1.5 px-3 py-2 min-h-[36px] rounded-xl text-sm font-medium
                         border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
                         transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                       {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
@@ -822,7 +866,7 @@ function CoverLetterContent() {
 
                   {/* Download PDF */}
                   <button onClick={handleDownloadPDF} disabled={downloading}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold
+                    className="flex items-center gap-1.5 px-4 py-2 min-h-[36px] rounded-xl text-sm font-semibold
                       bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
                       shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.02]
                       transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
