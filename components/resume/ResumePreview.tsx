@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useCallback, useEffect, useLayoutEffect } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Download, Copy, CheckCircle, Loader2, Layout, AlertTriangle, X } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
@@ -175,7 +175,7 @@ export default function ResumePreview({
   const [showPDFWarning, setShowPDFWarning] = useState(false)
   const [verifiedCount, setVerifiedCount] = useState(0)
   const [msgIdx, setMsgIdx] = useState(0)
-  const [containerWidth, setContainerWidth] = useState(0)
+  const [containerWidth, setContainerWidth] = useState(LETTER_W)
 
   // Cycle loading messages every 2s while streaming
   useEffect(() => {
@@ -184,10 +184,8 @@ export default function ResumePreview({
     return () => clearInterval(id)
   }, [isStreaming])
 
-  // Track container width for scale transform.
-  // useLayoutEffect fires synchronously before paint so the correct scale
-  // is applied on the first frame — prevents full-size flash on mobile.
-  useLayoutEffect(() => {
+  // Track container width for scale transform
+  useEffect(() => {
     const el = containerRef.current
     if (!el) return
     setContainerWidth(el.clientWidth || LETTER_W)
@@ -459,9 +457,9 @@ export default function ResumePreview({
                   </div>
                 </div>
               </motion.div>
-            ) : containerWidth > 0 && safeData ? (
+            ) : safeData ? (
               /* Scale wrapper — sets the scroll area to the scaled dimensions */
-              <div style={{ width: `${LETTER_W * scale}px`, minHeight: `${LETTER_H * scale}px`, margin: '0 auto' }}>
+              <div style={{ width: `${LETTER_W * scale}px`, minHeight: `${LETTER_H * scale}px`, margin: '0 auto', overflow: 'hidden' }}>
                 {/* Transform wrapper — scales the 816px content visually without affecting html2canvas capture */}
                 <div style={{ width: LETTER_W, minHeight: LETTER_H, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
                   <motion.div
@@ -490,12 +488,6 @@ export default function ResumePreview({
                 )}
                   </motion.div>
                 </div>
-              </div>
-            ) : safeData ? (
-              /* containerWidth still 0 — ResizeObserver hasn't fired yet. Show a
-                 spinner so the resume isn't rendered at scale 0 or full-size. */
-              <div className="w-full h-64 flex items-center justify-center">
-                <div className="w-6 h-6 rounded-full border-2 border-[#6366F1] border-t-transparent animate-spin" />
               </div>
             ) : (
               <motion.div
