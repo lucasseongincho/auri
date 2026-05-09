@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, FileText, FolderOpen, RefreshCw, Target, Linkedin,
   Map, Mail, MessageSquare, Settings, ChevronRight,
-  Sparkles, User, Cloud, CloudOff, FlaskConical,
+  Sparkles, User, Cloud, CloudOff, FlaskConical, MoreHorizontal, X,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
@@ -59,11 +59,29 @@ const BOTTOM_ITEMS = [
   { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/settings' },
 ] as const
 
+const MOBILE_PRIMARY_ITEMS = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
+  { id: 'resume', label: 'Resume', icon: FileText, href: '/dashboard/resume' },
+  { id: 'my-resumes', label: 'My Resumes', icon: FolderOpen, href: '/dashboard/resume/saved' },
+  { id: 'cover-letter', label: 'Cover Letter', icon: Mail, href: '/dashboard/cover-letter' },
+] as const
+
+const MOBILE_MORE_ITEMS = [
+  { id: 'rewriter', label: 'Rewriter', icon: RefreshCw, href: '/dashboard/rewriter' },
+  { id: 'ats', label: 'ATS Score', icon: Target, href: '/dashboard/ats' },
+  { id: 'strategy', label: 'Strategy', icon: Map, href: '/dashboard/strategy' },
+  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin' },
+  { id: 'my-cover-letters', label: 'My Letters', icon: FolderOpen, href: '/dashboard/cover-letter/saved' },
+  { id: 'interview', label: 'Interview', icon: MessageSquare, href: '/dashboard/interview' },
+  { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/settings' },
+] as const
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false)
+  const [moreDrawerOpen, setMoreDrawerOpen] = useState(false)
   const { user, loading } = useAuth()
   const { isSyncing, syncError, isGenerating } = useCareerStore()
   const [betaRefreshKey, setBetaRefreshKey] = useState(0)
@@ -78,6 +96,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     prevGenerating.current = isGenerating
   }, [isGenerating])
   const isOwner = user?.email === process.env.NEXT_PUBLIC_OWNER_EMAIL && !!process.env.NEXT_PUBLIC_OWNER_EMAIL
+
+  // Close More drawer on route change
+  useEffect(() => { setMoreDrawerOpen(false) }, [pathname])
 
   // Auth + beta gate
   useEffect(() => {
@@ -360,7 +381,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Page content — flex-1 overflow-y-auto so child pages that use h-full get a real height */}
-        <main className="flex-1 overflow-y-auto p-6 max-w-7xl w-full mx-auto">
+        <main className="flex-1 overflow-y-auto p-6 pb-24 md:pb-6 max-w-7xl w-full mx-auto">
           {/* Owner beta status banner */}
           {isOwner && APP_CONFIG.BETA_MODE && (
             <div className="mb-4 rounded-lg px-4 py-2 text-sm flex justify-between items-center
@@ -380,7 +401,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}
         aria-label="Mobile navigation"
       >
-        {[...NAV_ITEMS.slice(0, 4), ...BOTTOM_ITEMS].map((item) => {
+        {MOBILE_PRIMARY_ITEMS.map((item) => {
           const active = isActive(item.href)
           return (
             <Link key={item.id} href={item.href} aria-label={item.label}
@@ -393,7 +414,90 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
           )
         })}
+        <button
+          onClick={() => setMoreDrawerOpen(true)}
+          aria-label="More navigation options"
+          className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl
+            transition-colors duration-200 min-w-0 min-h-[44px] justify-center"
+        >
+          <MoreHorizontal className={`w-5 h-5 ${moreDrawerOpen ? 'text-[#818CF8]' : 'text-[#60607A]'}`} />
+          <span className={`text-[9px] font-medium ${moreDrawerOpen ? 'text-[#818CF8]' : 'text-[#60607A]'}`}>More</span>
+        </button>
       </nav>
+
+      {/* ── Mobile More Drawer ── */}
+      <AnimatePresence>
+        {moreDrawerOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMoreDrawerOpen(false)}
+              className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={SPRING}
+              className="md:hidden fixed bottom-0 left-0 right-0 z-50
+                bg-[#13131A] border-t border-white/[0.08] rounded-t-2xl"
+              style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 16px)' }}
+            >
+              {/* Handle bar */}
+              <div className="flex justify-center pt-3 pb-4">
+                <div className="w-10 h-1 rounded-full bg-white/20" />
+              </div>
+              {/* Close button */}
+              <button
+                onClick={() => setMoreDrawerOpen(false)}
+                aria-label="Close menu"
+                className="absolute top-3 right-4 p-1.5 rounded-lg text-[#60607A] hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              {/* 3-column grid */}
+              <div className="grid grid-cols-3 gap-2 px-4 pb-4">
+                {MOBILE_MORE_ITEMS.map((item) => {
+                  const active = isActive(item.href)
+                  return (
+                    <Link key={item.id} href={item.href} aria-label={item.label}
+                      className={`flex flex-col items-center gap-2 p-3 rounded-xl
+                        transition-colors duration-200 text-center
+                        ${active
+                          ? 'bg-[#6366F1]/20 text-white'
+                          : 'text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/[0.04]'
+                        }`}
+                    >
+                      <item.icon className={`w-5 h-5 ${active ? 'text-[#818CF8]' : ''}`} />
+                      <span className="text-[10px] font-medium leading-tight">{item.label}</span>
+                    </Link>
+                  )
+                })}
+              </div>
+              {/* User section */}
+              <div className="border-t border-white/[0.06] mx-4 pt-4 pb-2">
+                <button
+                  onClick={() => { setMoreDrawerOpen(false); setProfileDrawerOpen(true) }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
+                    text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/[0.04] transition-colors duration-200"
+                >
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-medium text-[#A0A0B8]">
+                      {user?.displayName ?? user?.email ?? 'Guest'}
+                    </p>
+                    <p className="text-xs text-[#60607A]">View Profile</p>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* ── Career Profile Drawer ── */}
       <CareerProfileDrawer
