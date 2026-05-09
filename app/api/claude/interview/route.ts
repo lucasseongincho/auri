@@ -1,10 +1,11 @@
 import { NextRequest } from 'next/server'
-import { streamClaude, callClaudeJSON, buildErrorResponse } from '@/lib/claude'
+import { callClaudeJSON, buildErrorResponse } from '@/lib/claude'
 import { buildInterviewPrepPrompt, buildPracticeFeedbackPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
 import { checkAndIncrementBetaCall } from '@/lib/betaGuard'
 import { APP_CONFIG } from '@/lib/config'
+import type { InterviewPrep } from '@/types'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -22,36 +23,6 @@ interface InterviewRequestBody {
   // auth
   uid?: string
   isPro?: boolean
-}
-
-async function attemptStream(prompt: string, retryCount = 0): Promise<ReadableStream<Uint8Array>> {
-  try {
-    const claudeStream = await streamClaude(prompt, 8192)
-    return new ReadableStream<Uint8Array>({
-      async start(controller) {
-        try {
-          for await (const event of claudeStream) {
-            if (
-              event.type === 'content_block_delta' &&
-              event.delta.type === 'text_delta'
-            ) {
-              controller.enqueue(new TextEncoder().encode(event.delta.text))
-            }
-          }
-          controller.close()
-        } catch (err) {
-          controller.error(err)
-        }
-      },
-    })
-  } catch (err) {
-    const status = (err as { status?: number }).status
-    if (status === 529 && retryCount < 1) {
-      await new Promise((r) => setTimeout(r, 2000))
-      return attemptStream(prompt, retryCount + 1)
-    }
-    throw err
-  }
 }
 
 export async function POST(req: NextRequest) {
@@ -77,14 +48,13 @@ export async function POST(req: NextRequest) {
       if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
     }
 
-    // Practice mode — short non-streaming response
+    // Practice mode
     if (body.mode === 'practice') {
       if (!body.question || !body.userAnswer || !body.targetPosition) {
         return buildErrorResponse('question, userAnswer, and targetPosition required for practice mode', 400)
       }
       const prompt = buildPracticeFeedbackPrompt(body.question, body.userAnswer, body.targetPosition)
       const { data, inputTokens, outputTokens } = await callClaudeJSON(prompt, 1024)
-
       return Response.json({
         success: true,
         data,
@@ -92,7 +62,9 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // Generate mode — streaming
+    // Generate mode — non-streaming so the server parses and validates the JSON
+    // before returning. Streaming JSON client-side is unreliable: unescaped newlines
+    // and other Claude quirks in star_example fields break JSON.parse.
     if (!body.position?.trim() || !body.company?.trim()) {
       return buildErrorResponse('position and company are required', 400)
     }
@@ -103,14 +75,17 @@ export async function POST(req: NextRequest) {
       body.experienceSummary ?? ''
     )
 
-    const stream = await attemptStream(prompt)
+    const { data, inputTokens, outputTokens } = await callClaudeJSON<InterviewPrep>(prompt, 8192)
 
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Transfer-Encoding': 'chunked',
-        'X-Content-Type-Options': 'nosniff',
-      },
+    // Ensure questions_to_ask is always present even if Claude omits it
+    if (!Array.isArray(data.questions_to_ask)) {
+      data.questions_to_ask = []
+    }
+
+    return Response.json({
+      success: true,
+      data,
+      usage: { input_tokens: inputTokens, output_tokens: outputTokens },
     })
   } catch (err) {
     return buildErrorResponse(err instanceof Error ? err.message : 'Interview prep generation failed')

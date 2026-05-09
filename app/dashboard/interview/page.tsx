@@ -23,7 +23,6 @@ import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
-import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 import { saveInterviewPrep, saveGuestInterviewPrep } from '@/lib/firestore'
@@ -312,10 +311,9 @@ export default function InterviewPage() {
   const [currentCard, setCurrentCard] = useState(0)
   const [savedToStudyList, setSavedToStudyList] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
   const [toast, setToast] = useState<Toast | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const { isStreaming, stream } = useAIStream()
 
   const showToast = useCallback((t: Toast) => {
     setToast(t)
@@ -332,116 +330,49 @@ export default function InterviewPage() {
     setCurrentCard(0)
     setSavedToStudyList(false)
     setIsPracticeMode(false)
+    setIsGenerating(true)
 
-    const fullText = await stream('/api/claude/interview', {
-      mode: 'generate',
-      position,
-      company,
-      experienceSummary,
-      uid: user?.uid,
-      isPro: false,
-    }, {
-      onError: (err) => setGenerateError(err),
-    })
-
-    if (fullText) {
-      // Escape literal control characters (newlines, tabs) that appear inside
-      // JSON string values — Claude often emits these unescaped in star_example
-      // fields, which is technically invalid JSON and causes JSON.parse to throw.
-      const sanitizeJSONStrings = (json: string): string => {
-        let result = ''
-        let inString = false
-        let i = 0
-        while (i < json.length) {
-          const ch = json[i]
-          if (ch === '\\' && inString) {
-            // Copy escape sequence verbatim (handles \" \\ \n etc.)
-            result += ch + (json[i + 1] ?? '')
-            i += 2
-            continue
-          }
-          if (ch === '"') {
-            inString = !inString
-            result += ch
-          } else if (inString && ch === '\n') {
-            result += '\\n'
-          } else if (inString && ch === '\r') {
-            // skip bare CR
-          } else if (inString && ch === '\t') {
-            result += '\\t'
-          } else {
-            result += ch
-          }
-          i++
-        }
-        return result
+    try {
+      let idToken: string | undefined
+      if (auth.currentUser) {
+        try { idToken = await getIdToken(auth.currentUser) } catch { /* guest */ }
       }
 
-      const parseInterviewJSON = (raw: string): InterviewPrep | null => {
-        try {
-          let cleaned = raw
-            .replace(/^```(?:json)?\s*/i, '')
-            .replace(/\s*```\s*$/i, '')
-            .trim()
+      const res = await fetch('/api/claude/interview', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+        },
+        body: JSON.stringify({
+          mode: 'generate',
+          position,
+          company,
+          experienceSummary,
+          uid: user?.uid,
+          isPro: false,
+        }),
+      })
 
-          // Bracket-depth matching to isolate the outermost { }
-          const start = cleaned.indexOf('{')
-          if (start !== -1) {
-            let depth = 0
-            let end = -1
-            for (let i = start; i < cleaned.length; i++) {
-              if (cleaned[i] === '{') depth++
-              else if (cleaned[i] === '}') {
-                depth--
-                if (depth === 0) { end = i; break }
-              }
-            }
-            if (end !== -1) cleaned = cleaned.slice(start, end + 1)
-          }
-
-          // Repair: trailing commas, smart quotes, unescaped control chars
-          const repaired = sanitizeJSONStrings(
-            cleaned
-              .replace(/,(\s*[}\]])/g, '$1')
-              .replace(/[""]/g, '"')
-              .replace(/['']/g, "'")
-          )
-
-          let parsed: InterviewPrep | null = null
-          try {
-            parsed = JSON.parse(repaired) as InterviewPrep
-          } catch (err) {
-            console.error('[InterviewPrep] JSON.parse failed after repair:', err)
-            console.error('[InterviewPrep] raw (first 500 chars):', raw.slice(0, 500))
-            console.error('[InterviewPrep] repaired (first 500 chars):', repaired.slice(0, 500))
-            return null
-          }
-
-          if (!parsed || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
-            console.error('[InterviewPrep] Parsed OK but shape invalid:', parsed)
-            return null
-          }
-          if (!Array.isArray(parsed.questions_to_ask)) {
-            parsed.questions_to_ask = []
-          }
-          return parsed
-        } catch (err) {
-          console.error('[InterviewPrep] Unexpected error in parseInterviewJSON:', err)
-          return null
-        }
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: 'Request failed' }))
+        throw new Error(errorData.error ?? `Request failed: ${res.status}`)
       }
 
-      const parsed = parseInterviewJSON(fullText)
-      if (parsed) {
-        setPrep(parsed)
-        if (profile) {
-          updateProfile({ generated: { ...profile.generated, interview_prep: parsed } })
-        }
-      } else {
-        setGenerateError('Could not parse the interview prep. Please try again.')
+      const json = await res.json()
+      if (!json.success) throw new Error(json.error ?? 'Generation failed')
+
+      const parsed = json.data as InterviewPrep
+      setPrep(parsed)
+      if (profile) {
+        updateProfile({ generated: { ...profile.generated, interview_prep: parsed } })
       }
+    } catch (err) {
+      setGenerateError(err instanceof Error ? err.message : 'Interview prep generation failed. Please try again.')
+    } finally {
+      setIsGenerating(false)
     }
-  }, [position, company, experienceSummary, user?.uid, stream, profile, updateProfile])
+  }, [position, company, experienceSummary, user?.uid, profile, updateProfile])
 
   const handleSaveToStudyList = useCallback(async () => {
     if (!prep) return
@@ -550,13 +481,13 @@ export default function InterviewPage() {
 
               <button
                 onClick={handleGenerate}
-                disabled={!position.trim() || !company.trim() || isStreaming}
+                disabled={!position.trim() || !company.trim() || isGenerating}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
                   bg-gradient-to-r from-[#EF4444] to-[#DC2626] text-white font-semibold text-sm
                   shadow-lg shadow-[#EF4444]/25 hover:shadow-[#EF4444]/50 hover:scale-[1.01]
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                {isStreaming
+                {isGenerating
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Preparing…</>
                   : <><Sparkles className="w-4 h-4" /> Generate Interview Prep</>
                 }
@@ -647,7 +578,7 @@ export default function InterviewPage() {
           className="space-y-6"
         >
           <AnimatePresence mode="wait">
-            {isStreaming ? (
+            {isGenerating ? (
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <div className="rounded-2xl border border-[#EF4444]/20 bg-[#EF4444]/5 p-4 flex items-center gap-3">
                   <Loader2 className="w-4 h-4 text-[#EF4444] animate-spin" />
