@@ -1623,15 +1623,15 @@ export default function ResumePage() {
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={SPRING}
-        className="flex-shrink-0 flex items-center justify-between gap-4 mb-4 px-1"
+        className="flex-shrink-0 flex items-center justify-between gap-2 mb-4 px-1 min-w-0"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 min-w-0 flex-shrink">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6366F1] to-[#4F46E5]
             flex items-center justify-center flex-shrink-0">
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="font-heading text-xl font-bold text-white leading-tight">
+            <h1 className="font-heading text-xl font-bold text-white leading-tight truncate">
               Resume Builder
             </h1>
             <p className="text-xs text-[#60607A] hidden sm:block">
@@ -1657,7 +1657,7 @@ export default function ResumePage() {
           <button
             onClick={() => setMobileView('form')}
             aria-label="Show form"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all
               ${mobileView === 'form'
                 ? 'bg-[#6366F1] text-white'
                 : 'text-[#60607A] hover:text-[#A0A0B8]'
@@ -1669,7 +1669,7 @@ export default function ResumePage() {
           <button
             onClick={() => setMobileView('preview')}
             aria-label="Show preview"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all
               ${mobileView === 'preview'
                 ? 'bg-[#6366F1] text-white'
                 : 'text-[#60607A] hover:text-[#A0A0B8]'

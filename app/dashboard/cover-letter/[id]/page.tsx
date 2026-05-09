@@ -366,7 +366,7 @@ export default function CoverLetterDetailPage() {
   }
 
   return (
-    <div className="h-full flex gap-6 min-h-0">
+    <div className="h-full flex gap-6 min-h-0 overflow-x-hidden">
 
       {/* ── Left sidebar ──────────────────────────────────────────────────── */}
       <div className="hidden md:flex flex-col w-[250px] flex-shrink-0 h-full">
@@ -486,7 +486,7 @@ export default function CoverLetterDetailPage() {
             className="space-y-4 pb-6"
           >
             {/* Top bar */}
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-2 min-w-0 w-full">
               <div className="flex items-center gap-3 min-w-0">
                 <Link
                   href="/dashboard/cover-letter/saved"
@@ -504,7 +504,7 @@ export default function CoverLetterDetailPage() {
                   <p className="text-xs text-[#60607A] truncate">{letter.position}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 flex-shrink-0 flex-wrap min-w-0">
                 <WordBadge count={isEditMode
                   ? editedParagraphs.join(' ').split(/\s+/).filter(Boolean).length
                   : letter.wordCount}

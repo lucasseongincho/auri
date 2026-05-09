@@ -384,10 +384,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <main className="flex-1 overflow-y-auto p-6 pb-24 md:pb-6 max-w-7xl w-full mx-auto">
           {/* Owner beta status banner */}
           {isOwner && APP_CONFIG.BETA_MODE && (
-            <div className="mb-4 rounded-lg px-4 py-2 text-sm flex justify-between items-center
-              bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#A5B4FC]">
-              <span>🧪 Beta Mode is ON — all approved users get {APP_CONFIG.BETA_WEEKLY_CALL_LIMIT} calls/week free.</span>
-              <span className="font-mono text-xs text-[#818CF8]">Set BETA_MODE = false in lib/config.ts to go paid</span>
+            <div className="mb-4 rounded-lg px-4 py-2 text-sm
+              bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#A5B4FC]
+              flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+              <span className="text-sm">🧪 Beta Mode is ON — all approved users get {APP_CONFIG.BETA_WEEKLY_CALL_LIMIT} calls/week free.</span>
+              <span className="font-mono text-xs text-[#818CF8] sm:flex-shrink-0">Set BETA_MODE = false in lib/config.ts to go paid</span>
             </div>
           )}
           {children}
