@@ -235,7 +235,7 @@ export default function CoverLetterDetailPage() {
   const [deleteTarget, setDeleteTarget] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [scale, setScale] = useState(0)
+  const [scale, setScale] = useState(1)
   const [downloading, setDownloading] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -263,6 +263,12 @@ export default function CoverLetterDetailPage() {
     if (w > 0) setScale(Math.min(1, w / LETTER_W))
     return () => observer.disconnect()
   }, [])
+
+  useEffect(() => {
+    if (!letter || !previewContainerRef.current) return
+    const w = previewContainerRef.current.clientWidth - 32
+    if (w > 0) setScale(Math.min(1, w / LETTER_W))
+  }, [letter])
 
   useEffect(() => {
     if (authLoading) return
@@ -623,8 +629,7 @@ export default function CoverLetterDetailPage() {
               ref={previewContainerRef}
               className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden"
               style={{
-                visibility: scale === 0 ? 'hidden' : 'visible',
-                height: scale > 0 ? `${LETTER_H * scale + 32}px` : 'auto',
+                height: `${LETTER_H * scale + 32}px`,
               }}
               onClick={() => {
                 if (isEditMode && activeParagraphIdx !== null) setActiveParagraphIdx(null)
