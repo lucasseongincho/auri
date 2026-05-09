@@ -165,7 +165,7 @@ export default function LandingPage() {
           </Link>
           <button
             onClick={() => router.push(getStartedRedirect('free'))}
-            className="px-4 py-2 rounded-xl text-sm font-semibold text-white
+            className="px-3 py-2 sm:px-4 rounded-xl text-sm font-semibold text-white
               bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
               shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
               hover:scale-[1.02] transition-all duration-200">
@@ -175,7 +175,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ── 1. Hero ── */}
-      <section className="relative min-h-screen flex items-center justify-center pt-24 px-6">
+      <section className="relative min-h-screen flex items-center justify-center pt-20 px-4 md:px-6">
         {/* Gradient background orbs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full
@@ -184,7 +184,7 @@ export default function LandingPage() {
             bg-[#8B5CF6]/8 blur-[100px]" />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+        <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Left — copy */}
           <div>
             <motion.div
@@ -202,7 +202,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ ...SPRING, delay: 0.2 }}
-              className="font-heading text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-6"
+              className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-6"
             >
               Get Hired{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#6366F1] via-[#8B5CF6] to-[#A78BFA]">
@@ -215,7 +215,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ ...SPRING, delay: 0.3 }}
-              className="text-lg text-[#A0A0B8] leading-relaxed mb-8 max-w-lg"
+              className="text-base md:text-lg text-[#A0A0B8] leading-relaxed mb-8 max-w-lg"
             >
               Generate ATS-optimized resumes, rewrite your LinkedIn, craft cover letters,
               and prepare for interviews — all from one AI-powered career toolkit.
@@ -228,7 +228,7 @@ export default function LandingPage() {
               className="flex flex-col sm:flex-row gap-4"
             >
               <MagneticButton href="/login"
-                className="px-8 py-4 rounded-xl font-semibold text-white cursor-pointer
+                className="px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-semibold text-white cursor-pointer
                   bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
                   shadow-lg shadow-[#6366F1]/30 hover:shadow-[#6366F1]/60
                   hover:scale-[1.02] transition-all duration-200 text-center">
@@ -236,7 +236,7 @@ export default function LandingPage() {
                 <ArrowRight className="inline-block ml-2 w-4 h-4" />
               </MagneticButton>
               <MagneticButton href="/login"
-                className="px-8 py-4 rounded-xl font-medium cursor-pointer
+                className="px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-medium cursor-pointer
                   border border-white/15 text-[#A0A0B8] hover:text-white
                   hover:bg-white/5 transition-all duration-200 text-center">
                 Upload Existing Resume
@@ -247,7 +247,7 @@ export default function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="flex items-center gap-4 mt-8"
+              className="flex items-center gap-4 mt-6 md:mt-8"
             >
               <div className="flex -space-x-2">
                 {['#6366F1', '#8B5CF6', '#A78BFA', '#818CF8'].map((c, i) => (
@@ -315,7 +315,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── 2. Beta Banner (replaces social proof — TODO: Replace with real testimonials after beta) ── */}
-      <section className="py-24 px-6">
+      <section className="py-16 md:py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <FadeInSection>
             {/* Badge */}
@@ -325,10 +325,10 @@ export default function LandingPage() {
               🧪 Private Beta
             </div>
 
-            <h2 className="font-heading text-3xl md:text-4xl font-bold text-white mb-4">
+            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
               Built for real job seekers
             </h2>
-            <p className="text-[#A0A0B8] text-lg max-w-xl mx-auto mb-12 leading-relaxed">
+            <p className="text-[#A0A0B8] text-base md:text-lg max-w-xl mx-auto mb-12 leading-relaxed">
               AURI is currently in private beta. Every feature was designed to solve real hiring
               challenges. Your feedback shapes what we build next.
             </p>
@@ -355,16 +355,16 @@ export default function LandingPage() {
       </section>
 
       {/* ── 3. Features Grid ── */}
-      <section id="features" className="py-24 px-6">
+      <section id="features" className="py-16 md:py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <FadeInSection className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-[#6366F1] mb-3 block">
               Everything you need
             </span>
-            <h2 className="font-heading text-4xl font-bold text-white mb-4">
+            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
               One toolkit. Every career need.
             </h2>
-            <p className="text-[#A0A0B8] max-w-xl mx-auto">
+            <p className="text-[#A0A0B8] max-w-xl mx-auto px-4">
               Every feature shares your career data. Enter your experience once — use it everywhere.
             </p>
           </FadeInSection>
@@ -379,7 +379,7 @@ export default function LandingPage() {
                     transition={SPRING}
                     className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 cursor-pointer group h-full"
                   >
-                    <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 h-full flex flex-col justify-start">
+                    <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 md:p-5 h-full flex flex-col justify-start">
                       <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4 flex-shrink-0
                         group-hover:shadow-lg group-hover:shadow-[#6366F1]/20 transition-shadow duration-300`}>
                         <f.icon className="w-5 h-5 text-white" />
@@ -400,10 +400,10 @@ export default function LandingPage() {
       </section>
 
       {/* ── 4. How It Works ── */}
-      <section className="py-24 px-6">
+      <section className="py-16 md:py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <FadeInSection className="text-center mb-16">
-            <h2 className="font-heading text-4xl font-bold text-white mb-4">How it works</h2>
+            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">How it works</h2>
             <p className="text-[#A0A0B8]">From zero to hired in three steps.</p>
           </FadeInSection>
 
@@ -436,14 +436,14 @@ export default function LandingPage() {
       </section>
 
       {/* ── 5. ATS Section ── */}
-      <section id="ats" className="py-24 px-6" ref={atsRef}>
+      <section id="ats" className="py-16 md:py-24 px-6" ref={atsRef}>
         <div className="max-w-5xl mx-auto">
           <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-            <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-10 lg:p-16
-              grid lg:grid-cols-2 gap-12 items-center">
+            <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 sm:p-8 md:p-10 lg:p-16
+              grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
               {/* Score meter */}
               <FadeInSection className="text-center">
-                <div className="relative w-48 h-48 mx-auto">
+                <div className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto">
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
                     <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
                     <motion.circle
@@ -465,7 +465,7 @@ export default function LandingPage() {
                     </defs>
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="font-heading font-bold text-4xl text-white">{atsScore}</span>
+                    <span className="font-heading font-bold text-3xl sm:text-4xl text-white">{atsScore}</span>
                     <span className="text-sm text-[#A0A0B8]">ATS Score</span>
                   </div>
                 </div>
@@ -477,7 +477,7 @@ export default function LandingPage() {
                 <span className="text-xs font-semibold uppercase tracking-widest text-[#6366F1] mb-3 block">
                   Why ATS matters
                 </span>
-                <h2 className="font-heading text-3xl font-bold text-white mb-4">
+                <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4">
                   75% of resumes are rejected before a human sees them
                 </h2>
                 <p className="text-[#A0A0B8] leading-relaxed mb-6">
@@ -505,10 +505,10 @@ export default function LandingPage() {
       </section>
 
       {/* ── 6. Templates Preview ── */}
-      <section id="templates" className="py-24 px-6 overflow-hidden">
+      <section id="templates" className="py-16 md:py-24 px-6 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <FadeInSection className="text-center mb-12">
-            <h2 className="font-heading text-4xl font-bold text-white mb-4">
+            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
               5 premium resume templates
             </h2>
             <p className="text-[#A0A0B8]">Visually stunning. ATS-safe. Switch anytime without losing your content.</p>
@@ -520,7 +520,7 @@ export default function LandingPage() {
                 key={t.id}
                 whileHover={{ scale: 1.03, y: -4 }}
                 transition={SPRING}
-                className="flex-shrink-0 w-56 rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 cursor-pointer"
+                className="flex-shrink-0 w-44 sm:w-56 rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 cursor-pointer"
               >
                 <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4">
                   {/* Mini template preview */}
@@ -544,10 +544,10 @@ export default function LandingPage() {
       </section>
 
       {/* ── 7. Pricing ── */}
-      <section id="pricing" className="py-24 px-6">
+      <section id="pricing" className="py-16 md:py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <FadeInSection className="text-center mb-16">
-            <h2 className="font-heading text-4xl font-bold text-white mb-4">Simple pricing</h2>
+            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">Simple pricing</h2>
             <p className="text-[#A0A0B8]">Start free. Upgrade when you land the job.</p>
           </FadeInSection>
 
@@ -555,10 +555,10 @@ export default function LandingPage() {
             {/* Free */}
             <FadeInSection>
               <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-8">
+                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 md:p-8">
                   <p className="font-heading font-semibold text-[#A0A0B8] mb-1">Free</p>
                   <div className="flex items-end gap-1 mb-6">
-                    <span className="font-heading font-bold text-4xl text-white">$0</span>
+                    <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$0</span>
                     <span className="text-[#60607A] mb-1">/month</span>
                   </div>
                   <ul className="space-y-3 mb-8">
@@ -585,19 +585,19 @@ export default function LandingPage() {
                   bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-xs font-semibold">
                   {APP_CONFIG.BETA_MODE ? '🧪 Beta' : 'Most Popular'}
                 </div>
-                <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] p-8">
+                <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] p-6 md:p-8">
                   <p className="font-heading font-semibold text-[#818CF8] mb-1">Pro</p>
                   {APP_CONFIG.BETA_MODE ? (
                     <div className="mb-6">
                       <div className="flex items-end gap-2">
-                        <span className="font-heading font-bold text-4xl text-white">Free</span>
+                        <span className="font-heading font-bold text-3xl sm:text-4xl text-white">Free</span>
                         <span className="text-[#60607A] mb-1">during beta</span>
                       </div>
                       <p className="text-sm text-[#60607A] mt-1 line-through">$19/month after beta</p>
                     </div>
                   ) : (
                     <div className="flex items-end gap-1 mb-6">
-                      <span className="font-heading font-bold text-4xl text-white">$19</span>
+                      <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$19</span>
                       <span className="text-[#60607A] mb-1">/month</span>
                     </div>
                   )}
@@ -636,16 +636,16 @@ export default function LandingPage() {
       </section>
 
       {/* ── 8. Final CTA ── */}
-      <section className="py-24 px-6">
+      <section className="py-16 md:py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="rounded-2xl overflow-hidden relative">
             <div className="absolute inset-0 bg-gradient-to-br from-[#6366F1]/20 to-[#8B5CF6]/20" />
             <div className="absolute inset-0 border border-[#6366F1]/30 rounded-2xl" />
-            <div className="relative p-12 lg:p-16 text-center">
-              <h2 className="font-heading text-4xl lg:text-5xl font-bold text-white mb-4">
+            <div className="relative p-8 sm:p-10 md:p-12 lg:p-16 text-center">
+              <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
                 Your next job is waiting.
               </h2>
-              <p className="text-lg text-[#A0A0B8] mb-8 max-w-xl mx-auto">
+              <p className="text-base md:text-lg text-[#A0A0B8] mb-8 max-w-xl mx-auto">
                 Join the private beta and get early access to every feature.
                 Invite code required.
               </p>
@@ -669,7 +669,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-white/[0.06]">
+      <footer className="py-10 px-4 md:px-6 border-t border-white/[0.06]">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
