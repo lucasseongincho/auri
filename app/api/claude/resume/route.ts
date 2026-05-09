@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { streamClaude, callClaude, buildErrorResponse, parseClaudeJSON, MAX_TOKENS_RESUME, MAX_TOKENS_ASSIST } from '@/lib/claude'
+import { streamClaude, callClaudeJSON, buildErrorResponse, MAX_TOKENS_RESUME, MAX_TOKENS_ASSIST } from '@/lib/claude'
 import { buildResumePrompt, buildEasyTunePrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
@@ -86,8 +86,7 @@ export async function POST(req: NextRequest) {
         return buildErrorResponse('selectedText and target.position required for assist mode', 400)
       }
       const prompt = buildEasyTunePrompt(selectedText, target.position)
-      const { text, inputTokens, outputTokens } = await callClaude(prompt, MAX_TOKENS_ASSIST)
-      const data = parseClaudeJSON<{ rewritten: string }>(text)
+      const { data, inputTokens, outputTokens } = await callClaudeJSON<{ rewritten: string }>(prompt, MAX_TOKENS_ASSIST)
       return Response.json({
         success: true,
         data,

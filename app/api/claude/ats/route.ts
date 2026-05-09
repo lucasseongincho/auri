@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { callClaude, buildErrorResponse, parseClaudeJSON, MAX_TOKENS_ANALYSIS } from '@/lib/claude'
+import { callClaude, callClaudeJSON, buildErrorResponse, MAX_TOKENS_ANALYSIS } from '@/lib/claude'
 import { buildATSScorePrompt, buildATSFixPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
@@ -76,8 +76,7 @@ export async function POST(req: NextRequest) {
     }
 
     const prompt = buildATSScorePrompt(resumePlainText, body.jobDescription)
-    const { text, inputTokens, outputTokens } = await callClaude(prompt, MAX_TOKENS_ANALYSIS)
-    const data = parseClaudeJSON<ATSScore>(text)
+    const { data, inputTokens, outputTokens } = await callClaudeJSON<ATSScore>(prompt, MAX_TOKENS_ANALYSIS)
 
     return Response.json({
       success: true,

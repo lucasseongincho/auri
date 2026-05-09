@@ -55,38 +55,88 @@ export async function streamClaude(
 }
 
 // ── JSON parse helper ─────────────────────────────────────────────────────────
-// Handles markdown fences, preamble text, trailing commas, and other common
-// Claude formatting quirks that break a raw JSON.parse call.
+// Handles markdown fences, preamble text, smart quotes, trailing commas, and
+// nested objects (bracket-depth extraction instead of lastIndexOf).
 
-export function safeParseJSON<T>(raw: string): T {
-  // Step 1: Strip markdown code fences
+class JSONParseError extends Error {
+  constructor(message: string, public readonly rawText: string) {
+    super(message)
+    this.name = 'JSONParseError'
+  }
+}
+
+export function parseClaudeJSON<T>(raw: string): T {
+  // Strip markdown fences
   let cleaned = raw.trim()
   if (cleaned.startsWith('```')) {
     cleaned = cleaned
-      .replace(/^```json\n?/i, '')
-      .replace(/^```\n?/, '')
+      .replace(/^```(?:json)?\n?/i, '')
       .replace(/```\s*$/, '')
       .trim()
   }
 
-  // Step 2: Extract JSON between the outermost { } in case there is preamble text
+  // Use bracket-depth counting to extract the outermost JSON object or array
   const firstBrace = cleaned.indexOf('{')
-  const lastBrace = cleaned.lastIndexOf('}')
-  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    cleaned = cleaned.slice(firstBrace, lastBrace + 1)
+  const firstBracket = cleaned.indexOf('[')
+  const startChar =
+    firstBrace !== -1
+      ? firstBracket !== -1
+        ? firstBrace < firstBracket ? '{' : '['
+        : '{'
+      : '['
+  const endChar = startChar === '{' ? '}' : ']'
+  const start = cleaned.indexOf(startChar)
+  if (start !== -1) {
+    let depth = 0
+    let end = -1
+    for (let i = start; i < cleaned.length; i++) {
+      if (cleaned[i] === startChar) depth++
+      else if (cleaned[i] === endChar) {
+        depth--
+        if (depth === 0) { end = i; break }
+      }
+    }
+    if (end !== -1) cleaned = cleaned.slice(start, end + 1)
   }
 
-  // Step 3: Parse — on failure, fix trailing commas and retry once
+  // Repair common Claude quirks: smart quotes + trailing commas
+  const repaired = cleaned
+    .replace(/[‘’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/,(\s*[}\]])/g, '$1')
+
   try {
-    return JSON.parse(cleaned) as T
-  } catch {
-    const fixed = cleaned.replace(/,(\s*[}\]])/g, '$1')
-    return JSON.parse(fixed) as T
+    return JSON.parse(repaired) as T
+  } catch (err) {
+    throw new JSONParseError(
+      `Claude JSON parse failed: ${(err as Error).message}`,
+      raw
+    )
   }
 }
 
-// Alias kept for backwards-compatibility with existing route imports
-export const parseClaudeJSON = safeParseJSON
+// ── callClaudeJSON — non-streaming call that parses JSON with one retry ───────
+
+export async function callClaudeJSON<T>(
+  prompt: string,
+  maxTokens: number = MAX_TOKENS_ANALYSIS,
+  retries = 1
+): Promise<{ data: T; inputTokens: number; outputTokens: number }> {
+  let lastError: unknown
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const { text, inputTokens, outputTokens } = await callClaude(prompt, maxTokens)
+    try {
+      const data = parseClaudeJSON<T>(text)
+      return { data, inputTokens, outputTokens }
+    } catch (err) {
+      lastError = err
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, 1000))
+      }
+    }
+  }
+  throw lastError
+}
 
 // ── Standardized error shape per CLAUDE.md §7 ─────────────────────────────────
 

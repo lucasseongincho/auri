@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { streamClaude, callClaude, buildErrorResponse, parseClaudeJSON } from '@/lib/claude'
+import { streamClaude, callClaudeJSON, buildErrorResponse } from '@/lib/claude'
 import { buildInterviewPrepPrompt, buildPracticeFeedbackPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
@@ -83,8 +83,7 @@ export async function POST(req: NextRequest) {
         return buildErrorResponse('question, userAnswer, and targetPosition required for practice mode', 400)
       }
       const prompt = buildPracticeFeedbackPrompt(body.question, body.userAnswer, body.targetPosition)
-      const { text, inputTokens, outputTokens } = await callClaude(prompt, 1024)
-      const data = parseClaudeJSON(text)
+      const { data, inputTokens, outputTokens } = await callClaudeJSON(prompt, 1024)
 
       return Response.json({
         success: true,
