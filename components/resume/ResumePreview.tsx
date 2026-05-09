@@ -238,20 +238,52 @@ export default function ResumePreview({
     if (!previewRef.current || !safeData) return
     setDownloading(true)
     setShowPDFWarning(false)
-    try {
-      const { generatePDFFromElement } = await import('@/lib/pdf')
-      const el = previewRef.current
 
-      // Add .printing class so amber highlights render as plain text in html2canvas
+    const el = previewRef.current
+    const name = personal.name?.replace(/\s+/g, '-').toLowerCase() || 'resume'
+    const filename = `${name}-resume.pdf`
+
+    try {
+      // Add .printing class so amber highlights render as plain text
       el.classList.add('printing')
 
-      const name = personal.name?.replace(/\s+/g, '-').toLowerCase() || 'resume'
-      await generatePDFFromElement(el, {
-        filename: `${name}-resume.pdf`,
-        imageQuality: 0.98,
+      // Try server-side Puppeteer first
+      const { getResumeHTML } = await import('@/lib/pdf')
+      const html = getResumeHTML(el)
+
+      const res = await fetch('/api/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html, filename }),
       })
 
+      if (res.ok) {
+        const blob = await res.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      } else {
+        // Fallback to client-side html2pdf.js if server fails
+        console.warn('Server PDF failed, falling back to html2pdf.js')
+        const { generatePDFFromElement } = await import('@/lib/pdf')
+        await generatePDFFromElement(el, { filename, imageQuality: 0.98 })
+      }
+
       el.classList.remove('printing')
+    } catch (err) {
+      console.error('PDF download error:', err)
+      try {
+        const { generatePDFFromElement } = await import('@/lib/pdf')
+        await generatePDFFromElement(el, { filename, imageQuality: 0.98 })
+        el.classList.remove('printing')
+      } catch {
+        el.classList.remove('printing')
+      }
     } finally {
       setDownloading(false)
     }
