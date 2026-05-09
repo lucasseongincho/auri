@@ -159,6 +159,120 @@ function buildPlainTextFromData(data: ResumeData, personal: PersonalInfo): strin
   return lines.join('\n').trim()
 }
 
+// ── Mobile card view (replaces the scaled paper preview on small screens) ────
+
+interface MobileResumeCardProps {
+  data: ResumeData
+  personal: PersonalInfo
+}
+
+function MobileResumeCard({ data, personal }: MobileResumeCardProps) {
+  const safe = sanitizeResumeData(data)
+  return (
+    <div className="md:hidden w-full rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
+      <div className="rounded-xl border border-white/[0.05] bg-white p-5 space-y-4 text-gray-900">
+
+        {/* Header */}
+        <div className="border-b border-gray-100 pb-3">
+          <h1 className="text-lg font-bold text-gray-900">{personal.name}</h1>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {[personal.email, personal.phone, personal.location].filter(Boolean).join(' · ')}
+          </p>
+          {(personal.linkedin_url || personal.website) && (
+            <p className="text-xs text-gray-400 mt-0.5">
+              {[personal.linkedin_url, personal.website].filter(Boolean).join(' · ')}
+            </p>
+          )}
+        </div>
+
+        {/* Summary */}
+        {safe.summary && (
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Summary</h2>
+            <p className="text-xs text-gray-700 leading-relaxed">{safe.summary}</p>
+          </div>
+        )}
+
+        {/* Experience */}
+        {safe.experience.length > 0 && (
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Experience</h2>
+            <div className="space-y-3">
+              {safe.experience.map((job, i) => (
+                <div key={i}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-900">{job.title}</p>
+                      <p className="text-xs text-gray-500">{job.company}</p>
+                    </div>
+                    <p className="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">
+                      {job.start} – {job.end || 'Present'}
+                    </p>
+                  </div>
+                  {job.bullets.length > 0 && (
+                    <ul className="mt-1 space-y-0.5 ml-2">
+                      {job.bullets.map((b, j) => (
+                        <li key={j} className="text-[11px] text-gray-600 leading-relaxed flex gap-1.5">
+                          <span className="text-gray-400 flex-shrink-0 mt-0.5">·</span>
+                          <span>{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Education */}
+        {safe.education.length > 0 && (
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Education</h2>
+            <div className="space-y-1.5">
+              {safe.education.map((edu, i) => (
+                <div key={i} className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-semibold text-gray-900">{edu.institution}</p>
+                    <p className="text-xs text-gray-500">{edu.degree}{edu.field ? `, ${edu.field}` : ''}</p>
+                  </div>
+                  <p className="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">{edu.year}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Skills */}
+        {safe.skills.length > 0 && (
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Skills</h2>
+            <div className="flex flex-wrap gap-1.5">
+              {safe.skills.map((s, i) => (
+                <span key={i} className="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] text-gray-600 font-medium">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Certifications */}
+        {safe.certifications && safe.certifications.length > 0 && (
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Certifications</h2>
+            <ul className="space-y-0.5">
+              {safe.certifications.map((c, i) => (
+                <li key={i} className="text-xs text-gray-700">· {c}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function ResumePreview({
   data,
   personal,
@@ -458,37 +572,51 @@ export default function ResumePreview({
                 </div>
               </motion.div>
             ) : safeData ? (
-              /* Scale wrapper — sets the scroll area to the scaled dimensions */
-              <div style={{ width: `${LETTER_W * scale}px`, minHeight: `${LETTER_H * scale}px`, margin: '0 auto', overflow: 'hidden' }}>
-                {/* Transform wrapper — scales the 816px content visually without affecting html2canvas capture */}
-                <div style={{ width: LETTER_W, minHeight: LETTER_H, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
-                  <motion.div
-                    key="resume"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={SPRING}
-                    ref={previewRef}
-                    id="resume-content"
-                    className="w-full"
-                  >
-                {selectedTemplate === 'classic-pro' && (
-                  <ClassicPro data={safeData} personal={personal} renderText={renderText} />
-                )}
-                {selectedTemplate === 'modern-edge' && (
-                  <ModernEdge data={safeData} personal={personal} renderText={renderText} />
-                )}
-                {selectedTemplate === 'minimal-seoul' && (
-                  <MinimalSeoul data={safeData} personal={personal} renderText={renderText} />
-                )}
-                {selectedTemplate === 'executive-dark' && (
-                  <ExecutiveDark data={safeData} personal={personal} renderText={renderText} />
-                )}
-                {selectedTemplate === 'creative-pulse' && (
-                  <CreativePulse data={safeData} personal={personal} renderText={renderText} />
-                )}
-                  </motion.div>
+              <>
+                {/* Mobile card view — readable text, no scale transform */}
+                <MobileResumeCard data={safeData} personal={personal} />
+
+                {/* Desktop paper preview — hidden on mobile */}
+                <div className="hidden md:block">
+                  {containerWidth > 0 ? (
+                    /* Scale wrapper — sets the scroll area to the scaled dimensions */
+                    <div style={{ width: `${LETTER_W * scale}px`, minHeight: `${LETTER_H * scale}px`, margin: '0 auto', overflow: 'hidden' }}>
+                      {/* Transform wrapper — scales the 816px content visually without affecting html2canvas capture */}
+                      <div style={{ width: LETTER_W, minHeight: LETTER_H, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
+                        <motion.div
+                          key="resume"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={SPRING}
+                          ref={previewRef}
+                          id="resume-content"
+                          className="w-full"
+                        >
+                          {selectedTemplate === 'classic-pro' && (
+                            <ClassicPro data={safeData} personal={personal} renderText={renderText} />
+                          )}
+                          {selectedTemplate === 'modern-edge' && (
+                            <ModernEdge data={safeData} personal={personal} renderText={renderText} />
+                          )}
+                          {selectedTemplate === 'minimal-seoul' && (
+                            <MinimalSeoul data={safeData} personal={personal} renderText={renderText} />
+                          )}
+                          {selectedTemplate === 'executive-dark' && (
+                            <ExecutiveDark data={safeData} personal={personal} renderText={renderText} />
+                          )}
+                          {selectedTemplate === 'creative-pulse' && (
+                            <CreativePulse data={safeData} personal={personal} renderText={renderText} />
+                          )}
+                        </motion.div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-64 flex items-center justify-center">
+                      <div className="w-6 h-6 rounded-full border-2 border-[#6366F1] border-t-transparent animate-spin" />
+                    </div>
+                  )}
                 </div>
-              </div>
+              </>
             ) : (
               <motion.div
                 key="empty"

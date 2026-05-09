@@ -199,7 +199,7 @@ export default function ATSPage() {
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6">
         {/* ── Left: Input Form ──────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -106,7 +106,7 @@ export default function SavedCoverLettersPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col pb-20 md:pb-0">
 
       {/* Header */}
       <motion.div

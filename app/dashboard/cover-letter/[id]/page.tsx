@@ -237,6 +237,7 @@ export default function CoverLetterDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [scale, setScale] = useState(1)
   const [downloading, setDownloading] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Edit mode
   const [isEditMode, setIsEditMode] = useState(false)
@@ -247,6 +248,8 @@ export default function CoverLetterDetailPage() {
 
   const previewContainerRef = useRef<HTMLDivElement>(null)
   const letterDocRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => { setSidebarOpen(false) }, [id])
 
   useEffect(() => {
     const el = previewContainerRef.current
@@ -651,6 +654,86 @@ export default function CoverLetterDetailPage() {
           </motion.div>
         )}
       </div>
+
+      {/* ── Mobile sidebar toggle FAB ─────────────────────────────────────── */}
+      <div className="lg:hidden fixed bottom-20 right-4 z-30">
+        <button
+          onClick={() => setSidebarOpen((v) => !v)}
+          aria-label="Toggle saved letters list"
+          className="w-10 h-10 rounded-xl bg-[#F59E0B] text-white flex items-center justify-center
+            shadow-lg shadow-[#F59E0B]/40 hover:bg-[#D97706] transition-all"
+        >
+          {sidebarOpen ? <X className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
+        </button>
+      </div>
+
+      {/* ── Mobile sidebar drawer ─────────────────────────────────────────── */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            <motion.div
+              className="lg:hidden fixed inset-0 z-30 bg-black/50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSidebarOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, x: -280 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -280 }}
+              transition={SPRING}
+              className="lg:hidden fixed left-0 top-0 bottom-0 z-40 w-64
+                bg-[#13131A] border-r border-white/[0.08] overflow-y-auto p-3 pt-16"
+            >
+              <div className="flex items-center justify-between mb-3 px-1">
+                <span className="text-sm font-semibold text-white">Saved Letters</span>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  aria-label="Close letters list"
+                  className="p-1 rounded-lg hover:bg-white/5 text-[#60607A] hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <Link
+                href="/dashboard/cover-letter"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3
+                  bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B] text-xs font-semibold"
+                onClick={() => setSidebarOpen(false)}
+              >
+                <Plus className="w-3.5 h-3.5" /> New Cover Letter
+              </Link>
+              <ul className="space-y-1">
+                {allLetters.map((l) => {
+                  const isActive = l.id === id
+                  return (
+                    <li key={l.id}>
+                      <button
+                        onClick={() => {
+                          router.push(`/dashboard/cover-letter/${l.id}`)
+                          setSidebarOpen(false)
+                        }}
+                        className={`w-full text-left px-2.5 py-2 rounded-lg transition-all
+                          ${isActive
+                            ? 'border border-[#F59E0B]/40 bg-[#F59E0B]/5'
+                            : 'border border-transparent hover:bg-white/[0.03]'
+                          }`}
+                      >
+                        <p className={`text-xs font-semibold truncate ${isActive ? 'text-[#F59E0B]' : 'text-white'}`}>
+                          {l.company}
+                        </p>
+                        <p className="text-[10px] text-[#60607A] truncate mt-0.5">{l.position}</p>
+                        <p className="text-[10px] text-[#60607A] mt-0.5">{formatDate(l.updatedAt)}</p>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* ── Delete confirmation modal ──────────────────────────────────────── */}
       <AnimatePresence>

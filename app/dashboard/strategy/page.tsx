@@ -238,7 +238,7 @@ export default function StrategyPage() {
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6">
         {/* ── Left: Form ──────────────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

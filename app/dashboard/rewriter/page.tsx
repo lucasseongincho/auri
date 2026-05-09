@@ -420,7 +420,7 @@ export default function RewriterPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={SPRING}
-            className="grid grid-cols-1 xl:grid-cols-2 gap-6"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
           >
             {/* Left: Input form */}
             <div className="space-y-4">
@@ -786,7 +786,7 @@ export default function RewriterPage() {
             </div>
 
             {/* Before / After grid */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Before */}
               <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
                 <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] overflow-hidden">
@@ -878,7 +878,7 @@ export default function RewriterPage() {
             </div>
 
             {/* Preview / Editor + ATS grid */}
-            <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
               {/* Left: Resume preview or editor */}
               <div className="space-y-3">
                 {isEditing ? (
