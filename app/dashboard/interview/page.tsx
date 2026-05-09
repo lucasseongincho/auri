@@ -324,10 +324,14 @@ function parseInterviewPrep(raw: string): InterviewPrep | null {
 
     const start = s.indexOf('{')
     if (start !== -1) {
-      let depth = 0, end = -1
+      let depth = 0, end = -1, inStr = false
       for (let i = start; i < s.length; i++) {
-        if (s[i] === '{') depth++
-        else if (s[i] === '}' && --depth === 0) { end = i; break }
+        const c = s[i]
+        if (c === '\\' && inStr) { i++; continue }
+        if (c === '"') { inStr = !inStr; continue }
+        if (inStr) continue
+        if (c === '{') depth++
+        else if (c === '}' && --depth === 0) { end = i; break }
       }
       if (end !== -1) s = s.slice(start, end + 1)
     }
@@ -337,10 +341,15 @@ function parseInterviewPrep(raw: string): InterviewPrep | null {
     )
 
     const parsed = JSON.parse(repaired) as InterviewPrep
-    if (!Array.isArray(parsed.questions) || parsed.questions.length === 0) return null
+    if (!Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+      console.error('[parseInterviewPrep] shape invalid', JSON.stringify(parsed).slice(0, 300))
+      return null
+    }
     if (!Array.isArray(parsed.questions_to_ask)) parsed.questions_to_ask = []
     return parsed
-  } catch {
+  } catch (err) {
+    console.error('[parseInterviewPrep] parse error:', err instanceof Error ? err.message : String(err))
+    console.error('[parseInterviewPrep] raw (first 600):', raw.slice(0, 600))
     return null
   }
 }
@@ -401,7 +410,7 @@ export default function InterviewPage() {
           updateProfile({ generated: { ...profile.generated, interview_prep: parsed } })
         }
       } else {
-        setGenerateError('Could not parse the interview prep. Please try again.')
+        setGenerateError('Could not parse the interview prep. Check browser console (F12) for details.')
       }
     }
   }, [position, company, experienceSummary, user?.uid, stream, profile, updateProfile])
