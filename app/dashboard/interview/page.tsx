@@ -347,19 +347,47 @@ export default function InterviewPage() {
     if (fullText) {
       const parseInterviewJSON = (raw: string): InterviewPrep | null => {
         try {
-          let cleaned = raw.trim()
-          if (cleaned.startsWith('```')) {
-            cleaned = cleaned.replace(/^```json\n?/i, '').replace(/^```\n?/, '').replace(/```\s*$/, '').trim()
+          let cleaned = raw
+            .replace(/^```(?:json)?\s*/i, '')
+            .replace(/\s*```\s*$/i, '')
+            .trim()
+
+          // Use bracket-depth matching to find the outermost { }
+          // (lastIndexOf fails on deeply nested objects)
+          const start = cleaned.indexOf('{')
+          if (start !== -1) {
+            let depth = 0
+            let end = -1
+            for (let i = start; i < cleaned.length; i++) {
+              if (cleaned[i] === '{') depth++
+              else if (cleaned[i] === '}') {
+                depth--
+                if (depth === 0) { end = i; break }
+              }
+            }
+            if (end !== -1) cleaned = cleaned.slice(start, end + 1)
           }
-          const fb = cleaned.indexOf('{'), lb = cleaned.lastIndexOf('}')
-          if (fb !== -1 && lb > fb) cleaned = cleaned.slice(fb, lb + 1)
-          let parsed: InterviewPrep
+
+          // Try direct parse, then repair trailing commas + smart quotes
+          let parsed: InterviewPrep | null = null
           try {
             parsed = JSON.parse(cleaned) as InterviewPrep
           } catch {
-            parsed = JSON.parse(cleaned.replace(/,(\s*[}\]])/g, '$1')) as InterviewPrep
+            const repaired = cleaned
+              .replace(/,(\s*[}\]])/g, '$1')
+              .replace(/[“”]/g, '"')
+              .replace(/[‘’]/g, "'")
+            parsed = JSON.parse(repaired) as InterviewPrep
           }
-          if (!parsed?.questions?.length || !Array.isArray(parsed.questions_to_ask)) return null
+
+          // Validate shape — be lenient: only require questions array
+          if (!parsed || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+            return null
+          }
+          // Ensure questions_to_ask exists even if Claude omitted it
+          if (!Array.isArray(parsed.questions_to_ask)) {
+            parsed.questions_to_ask = []
+          }
           return parsed
         } catch {
           return null
@@ -373,17 +401,7 @@ export default function InterviewPage() {
           updateProfile({ generated: { ...profile.generated, interview_prep: parsed } })
         }
       } else {
-        // Auto-retry once
-        const retryText = await stream('/api/claude/interview', {
-          mode: 'generate', position, company, experienceSummary, uid: user?.uid, isPro: false,
-        }, { onError: (err) => setGenerateError(err) })
-        const retryParsed = retryText ? parseInterviewJSON(retryText) : null
-        if (retryParsed) {
-          setPrep(retryParsed)
-          if (profile) updateProfile({ generated: { ...profile.generated, interview_prep: retryParsed } })
-        } else {
-          setGenerateError('Could not parse the interview prep. Please try again.')
-        }
+        setGenerateError('Could not parse the interview prep. Please try again.')
       }
     }
   }, [position, company, experienceSummary, user?.uid, stream, profile, updateProfile])
