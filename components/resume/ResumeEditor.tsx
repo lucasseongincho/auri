@@ -6,7 +6,7 @@ import { Undo2, Redo2, CheckCircle } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { stripAITags } from '@/lib/resumeHighlight'
-import type { ResumeData, PersonalInfo } from '@/types'
+import type { ResumeData, PersonalInfo, Language } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -200,6 +200,30 @@ export default function ResumeEditor({
           if (JSON.stringify(certs) !== JSON.stringify(origCerts)) {
             updated.certifications = certs
           }
+        }
+      }
+    }
+
+    // Sync languages -- rendered as "Name (Proficiency) · Name (Proficiency)"
+    const langSection = editorRef.current.querySelector('[data-ats-field="languages"]')
+    if (langSection) {
+      const langP = langSection.querySelector('p')
+      if (langP) {
+        const domText = (langP as HTMLElement).innerText.trim()
+        const origLangText = (resumeData.languages ?? []).map((l) => `${l.name} (${l.proficiency})`).join(' · ')
+        if (domText !== origLangText) {
+          const validProf = ['Native', 'Fluent', 'Intermediate', 'Basic']
+          updated.languages = domText.split(/\s*·\s*/).filter(Boolean).map((part, i) => {
+            const m = part.match(/^(.+?)\s*\((.+?)\)$/)
+            const proficiency = m && validProf.includes(m[2].trim())
+              ? m[2].trim() as Language['proficiency']
+              : 'Fluent' as const
+            return {
+              id: resumeData.languages?.[i]?.id ?? `lang_${i}`,
+              name: m ? m[1].trim() : part.trim(),
+              proficiency,
+            }
+          })
         }
       }
     }
