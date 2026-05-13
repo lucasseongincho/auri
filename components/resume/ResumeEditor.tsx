@@ -84,6 +84,24 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
 
   useImperativeHandle(syncRef, () => ({ sync: () => {} }), [])
 
+  // One-time migration: move proj.description → bullets[0] so it's editable in the form.
+  // Runs once on mount; safe to re-run because description becomes '' after migration.
+  const migrationDone = useRef(false)
+  useEffect(() => {
+    if (migrationDone.current) return
+    migrationDone.current = true
+    const hasDescriptions = (resumeData.projects ?? []).some((p) => p.description?.trim())
+    if (!hasDescriptions) return
+    onDataChange({
+      ...resumeData,
+      projects: (resumeData.projects ?? []).map((p) => {
+        if (!p.description?.trim()) return p
+        return { ...p, description: '', bullets: [p.description.trim(), ...(p.bullets ?? [])] }
+      }),
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleUndo = useCallback(() => {
     const prev = undo()
     if (prev) onDataChange(prev)
