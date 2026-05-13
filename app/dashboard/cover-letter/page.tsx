@@ -690,14 +690,38 @@ function CoverLetterContent() {
           </button>
         </div>
 
-        <Link
-          href="/dashboard/cover-letter/saved"
-          className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-            border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all"
-        >
-          <FolderOpen className="w-3.5 h-3.5" />
-          Saved Letters
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* Save — only show when a result exists */}
+          {result && (
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              aria-label="Save cover letter"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
+                shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50
+                hover:scale-[1.02] transition-all duration-200
+                disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              {saving
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                : savedId
+                ? <CheckCircle className="w-3.5 h-3.5" />
+                : <Save className="w-3.5 h-3.5" />
+              }
+              {saving ? 'Saving…' : savedId ? 'Saved!' : 'Save'}
+            </button>
+          )}
+          <Link
+            href="/dashboard/cover-letter/saved"
+            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
+              border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+              transition-all duration-200"
+          >
+            <FolderOpen className="w-3.5 h-3.5" />
+            My Letters
+          </Link>
+        </div>
       </motion.div>
 
       {/* Split layout */}
@@ -869,17 +893,6 @@ function CoverLetterContent() {
                     {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#22C55E]" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
-
-                  {/* Save */}
-                  {user?.uid && (
-                    <button onClick={handleSave} disabled={saving}
-                      className="flex items-center gap-1.5 px-3 py-2 min-h-[36px] rounded-xl text-sm font-medium
-                        border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
-                        transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                      {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                      {saving ? 'Saving…' : savedId ? 'Saved ✓' : 'Save'}
-                    </button>
-                  )}
 
                   {/* Download PDF */}
                   <button onClick={handleDownloadPDF} disabled={downloading}

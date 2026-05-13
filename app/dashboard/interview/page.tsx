@@ -477,13 +477,38 @@ export default function InterviewPage() {
             </div>
             <h1 className="font-heading text-2xl font-bold text-white">Interview Prep</h1>
           </div>
-          <Link
-            href="/dashboard/interview/saved"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all"
-          >
-            <BookMarked className="w-3.5 h-3.5" />
-            Saved Sessions
-          </Link>
+          <div className="flex items-center gap-2">
+            {/* Save — only show when prep results exist */}
+            {prep && (
+              <button
+                onClick={handleSaveToStudyList}
+                disabled={savedToStudyList || isSaving}
+                aria-label="Save to study list"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                  bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
+                  shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
+                  hover:scale-[1.02] transition-all duration-200
+                  disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {isSaving
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : savedToStudyList
+                  ? <CheckCircle className="w-3.5 h-3.5" />
+                  : <BookMarked className="w-3.5 h-3.5" />
+                }
+                {isSaving ? 'Saving…' : savedToStudyList ? 'Saved!' : 'Save'}
+              </button>
+            )}
+            <Link
+              href="/dashboard/interview/saved"
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
+                border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+                transition-all duration-200"
+            >
+              <BookMarked className="w-3.5 h-3.5" />
+              My Sessions
+            </Link>
+          </div>
         </div>
         <p className="text-[#A0A0B8] text-sm ml-12">
           8 likely questions with STAR frameworks, plus 3 strategic questions to ask.
@@ -585,29 +610,6 @@ export default function InterviewPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={handleSaveToStudyList}
-                  disabled={savedToStudyList || isSaving}
-                  className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium transition-all ${
-                    savedToStudyList
-                      ? 'bg-[#22C55E]/20 text-[#22C55E] border border-[#22C55E]/30 cursor-default'
-                      : 'border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {isSaving
-                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    : savedToStudyList
-                    ? <CheckCircle className="w-3.5 h-3.5" />
-                    : <BookMarked className="w-3.5 h-3.5" />
-                  }
-                  {savedToStudyList ? 'Saved!' : 'Save to Study List'}
-                </button>
-
-                {!user && (
-                  <p className="text-xs text-[#60607A] text-center">
-                    Saving without sign-in stores locally on this device.
-                  </p>
-                )}
               </div>
             </motion.div>
           )}

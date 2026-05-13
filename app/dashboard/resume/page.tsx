@@ -1240,6 +1240,7 @@ export default function ResumePage() {
   })
   const [generateError, setGenerateError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
   const [showSignUpModal, setShowSignUpModal] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [isATSLoading, setIsATSLoading] = useState(false)
@@ -1539,6 +1540,8 @@ export default function ResumePage() {
       JSON.stringify(savePayload)
 
       await saveResume(user.uid, savePayload)
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
       setToast({ message: 'Resume saved successfully!', type: 'success' })
     } catch (error) {
       console.error('Save resume error:', error)
@@ -1611,16 +1614,38 @@ export default function ResumePage() {
           </div>
         </div>
 
-        {/* My Resumes link — desktop */}
-        <Link
-          href="/dashboard/resume/saved"
-          className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-            border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
-            transition-all duration-200"
-        >
-          <FolderOpen className="w-3.5 h-3.5" />
-          My Resumes
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* Save — only show when a resume exists */}
+          {displayResume && (
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              aria-label="Save resume"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
+                shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
+                hover:scale-[1.02] transition-all duration-200
+                disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              {isSaving
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                : saveSuccess
+                ? <CheckCircle className="w-3.5 h-3.5" />
+                : <Save className="w-3.5 h-3.5" />
+              }
+              {isSaving ? 'Saving…' : saveSuccess ? 'Saved!' : 'Save'}
+            </button>
+          )}
+          <Link
+            href="/dashboard/resume/saved"
+            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
+              border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+              transition-all duration-200"
+          >
+            <FolderOpen className="w-3.5 h-3.5" />
+            My Resumes
+          </Link>
+        </div>
 
         {/* Mobile: Toggle form / preview */}
         <div className="flex md:hidden items-center gap-1 p-1 rounded-xl
@@ -1841,38 +1866,6 @@ export default function ResumePage() {
             ${mobileView === 'form' ? 'hidden md:flex' : 'flex'}
           `}
         >
-          {/* Save button row — shown when resume exists */}
-          <AnimatePresence>
-            {displayResume && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={SPRING}
-                className="flex-shrink-0 flex items-center justify-between gap-3"
-              >
-                <div className="flex items-center gap-2" />
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  aria-label="Save resume"
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
-                    bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                    shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                    hover:scale-[1.02] transition-all duration-200
-                    disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
-                >
-                  {isSaving ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4" />
-                  )}
-                  {isSaving ? 'Saving...' : 'Save Resume'}
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* Resume Preview / Editor — ref on shared wrapper so both modes use the same scale */}
           <div ref={editContainerRef} className="flex-shrink-0 overflow-x-hidden">
             {isEditing && displayResume ? (
