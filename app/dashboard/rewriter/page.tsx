@@ -467,7 +467,7 @@ export default function RewriterPage() {
                             </a>
                           </div>
                         ) : (
-                          <div className="space-y-2">
+                          <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                             {savedResumes.map((r) => (
                               <button
                                 key={r.id}
