@@ -17,7 +17,7 @@ try {
   adminDb = admin.firestore()
   adminAuth = admin.auth()
 } catch (e) {
-  console.error('Firebase Admin init failed — check FIREBASE_ADMIN_* env vars:', e)
+  if (process.env.NODE_ENV !== 'production') console.error('Firebase Admin init failed — check FIREBASE_ADMIN_* env vars:', e)
   // adminDb and adminAuth remain null.
   // Routes checking for null will return clear errors rather than
   // silently treating all requests as unauthenticated guests.

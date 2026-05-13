@@ -342,14 +342,16 @@ function parseInterviewPrep(raw: string): InterviewPrep | null {
 
     const parsed = JSON.parse(repaired) as InterviewPrep
     if (!Array.isArray(parsed.questions) || parsed.questions.length === 0) {
-      console.error('[parseInterviewPrep] shape invalid', JSON.stringify(parsed).slice(0, 300))
+      if (process.env.NODE_ENV !== 'production') console.error('[parseInterviewPrep] shape invalid', JSON.stringify(parsed).slice(0, 300))
       return null
     }
     if (!Array.isArray(parsed.questions_to_ask)) parsed.questions_to_ask = []
     return parsed
   } catch (err) {
-    console.error('[parseInterviewPrep] parse error:', err instanceof Error ? err.message : String(err))
-    console.error('[parseInterviewPrep] raw (first 600):', raw.slice(0, 600))
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[parseInterviewPrep] parse error:', err instanceof Error ? err.message : String(err))
+      console.error('[parseInterviewPrep] raw (first 600):', raw.slice(0, 600))
+    }
     return null
   }
 }

@@ -4,6 +4,10 @@
 import Anthropic from '@anthropic-ai/sdk'
 
 // ANTHROPIC_API_KEY is server-side only per CLAUDE.md §11 security rule
+if (!process.env.ANTHROPIC_API_KEY) {
+  throw new Error('ANTHROPIC_API_KEY environment variable is not set')
+}
+
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })

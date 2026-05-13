@@ -114,8 +114,6 @@ const FEATURES = [
   { icon: MessageSquare, label: 'Interview Prep', desc: '8 likely questions + STAR frameworks + flip cards', href: '/dashboard/interview', color: 'from-[#EF4444] to-[#DC2626]' },
 ]
 
-// TODO: Replace with real testimonials after beta
-
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
