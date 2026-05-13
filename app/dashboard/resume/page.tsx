@@ -723,6 +723,22 @@ function StepProjects() {
   const { profile, updateProfile } = useCareerStore()
   const projects: Project[] = profile?.projects ?? []
 
+  // Migrate any existing description → first bullet, matching ResumeEditor behavior
+  const migrationDone = useRef(false)
+  useEffect(() => {
+    if (migrationDone.current) return
+    migrationDone.current = true
+    const hasDescriptions = projects.some((p) => p.description?.trim())
+    if (!hasDescriptions) return
+    updateProfile({
+      projects: projects.map((p) => {
+        if (!p.description?.trim()) return p
+        return { ...p, description: '', bullets: [p.description.trim(), ...(p.bullets ?? [])] }
+      }),
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const addProject = () => {
     const blank: Project = {
       id: genId(),
@@ -798,16 +814,6 @@ function StepProjects() {
                   />
                 </Field>
               </div>
-              <Field label="Short Description">
-                <input
-                  type="text"
-                  className={INPUT_CLASS}
-                  placeholder="A SaaS platform for..."
-                  value={proj.description}
-                  onChange={(e) => updateProj(proj.id, 'description', e.target.value)}
-                  aria-label={`Description for project ${idx + 1}`}
-                />
-              </Field>
               <Field label="Key Points / Bullets (one per line)">
                 <textarea
                   className={TEXTAREA_CLASS}
