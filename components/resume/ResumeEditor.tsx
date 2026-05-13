@@ -464,12 +464,6 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                         onChange={(e) => updateProj(i, { url: e.target.value })} />
                     </div>
                   </div>
-                  <div className="mb-3">
-                    <label className={LABEL_CLASS}>Description</label>
-                    <textarea className={INPUT_CLASS} rows={2}
-                      value={stripAITags(proj.description)}
-                      onChange={(e) => updateProj(i, { description: e.target.value })} />
-                  </div>
                   <label className={LABEL_CLASS}>Bullets</label>
                   <div className="space-y-2">
                     {(proj.bullets ?? []).map((bullet, bi) => (
