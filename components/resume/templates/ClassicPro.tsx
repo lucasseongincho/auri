@@ -222,12 +222,9 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
                   <span className="job-title">{proj.name}</span>
                   {proj.url && <span className="job-dates">{proj.url}</span>}
                 </div>
-                {proj.description && (
-                  <p style={{ fontSize: '10.5px', margin: '1px 0 3px 0', lineHeight: 1.4, marginLeft: '15px' }}>{renderText(proj.description)}</p>
-                )}
                 {proj.bullets.length > 0 && (
                   <ul>
-                    {proj.bullets.slice(0, 2).map((b, i) => <li key={i}>{renderText(b)}</li>)}
+                    {proj.bullets.map((b, i) => <li key={i}>{renderText(b)}</li>)}
                   </ul>
                 )}
               </article>
