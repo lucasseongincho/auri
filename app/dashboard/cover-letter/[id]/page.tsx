@@ -109,9 +109,11 @@ interface LetterShellProps {
   phone: string
   location: string
   children: React.ReactNode
+  signerName?: string
+  onSignerNameChange?: (val: string) => void
 }
 
-function LetterShell({ company, name, email, phone, location, children }: LetterShellProps) {
+function LetterShell({ company, name, email, phone, location, children, signerName, onSignerNameChange }: LetterShellProps) {
   const today = new Date().toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
   })
@@ -144,9 +146,30 @@ function LetterShell({ company, name, email, phone, location, children }: Letter
       <p style={{ marginBottom: '16px', fontWeight: 500 }}>Dear Hiring Manager,</p>
       {children}
       <p style={{ marginBottom: '40px' }}>Sincerely,</p>
-      <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700 }}>
-        {name || 'Your Name'}
-      </p>
+      {onSignerNameChange ? (
+        <input
+          value={signerName ?? name}
+          onChange={(e) => onSignerNameChange(e.target.value)}
+          placeholder="Your Name"
+          style={{
+            fontFamily: 'Arial, sans-serif',
+            fontWeight: 700,
+            fontSize: '11pt',
+            color: '#1a1a1a',
+            border: '1.5px solid rgba(245,158,11,0.4)',
+            background: 'rgba(245,158,11,0.04)',
+            borderRadius: '4px',
+            padding: '4px 8px',
+            width: '280px',
+            outline: 'none',
+            boxSizing: 'border-box',
+          }}
+        />
+      ) : (
+        <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700 }}>
+          {(signerName ?? name) || 'Your Name'}
+        </p>
+      )}
     </div>
   )
 }
@@ -242,9 +265,11 @@ export default function CoverLetterDetailPage() {
   // Edit mode
   const [isEditMode, setIsEditMode] = useState(false)
   const [editedParagraphs, setEditedParagraphs] = useState<string[]>([])
+  const [editedSignerName, setEditedSignerName] = useState('')
   const [activeParagraphIdx, setActiveParagraphIdx] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
+  const [contentHeight, setContentHeight] = useState(LETTER_H)
 
   const previewContainerRef = useRef<HTMLDivElement>(null)
   const letterDocRef = useRef<HTMLDivElement>(null)
@@ -270,6 +295,17 @@ export default function CoverLetterDetailPage() {
     if (w > 0) setScale(Math.min(1, w / LETTER_W))
   }, [letter])
 
+  // Track actual letter content height to avoid clipping the signature
+  useEffect(() => {
+    const el = letterDocRef.current
+    if (!el || !letter) return
+    const update = () => setContentHeight(el.offsetHeight || LETTER_H)
+    const observer = new ResizeObserver(update)
+    observer.observe(el)
+    update()
+    return () => observer.disconnect()
+  }, [letter])
+
   useEffect(() => {
     if (authLoading) return
     if (!user?.uid) {
@@ -287,6 +323,7 @@ export default function CoverLetterDetailPage() {
         } else {
           setLetter(single)
           setEditedParagraphs(single.paragraphs?.length ? single.paragraphs : [single.content])
+          setEditedSignerName(single.signerName ?? '')
         }
         setAllLetters(all.sort((a, b) => toMs(b.updatedAt) - toMs(a.updatedAt)))
       } catch {
@@ -305,10 +342,11 @@ export default function CoverLetterDetailPage() {
       const wordCount = editedParagraphs.join(' ').split(/\s+/).filter(Boolean).length
       await updateCoverLetter(user.uid, id, {
         paragraphs: editedParagraphs,
+        signerName: editedSignerName,
         wordCount,
         updatedAt: new Date().toISOString(),
       })
-      setLetter((prev) => prev ? { ...prev, paragraphs: editedParagraphs, wordCount } : prev)
+      setLetter((prev) => prev ? { ...prev, paragraphs: editedParagraphs, signerName: editedSignerName, wordCount } : prev)
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
       setIsEditMode(false)
@@ -318,7 +356,7 @@ export default function CoverLetterDetailPage() {
     } finally {
       setSaving(false)
     }
-  }, [user, letter, id, editedParagraphs])
+  }, [user, letter, id, editedParagraphs, editedSignerName])
 
   async function handleDownloadPDF() {
     if (!letterDocRef.current || !letter) return
@@ -555,6 +593,7 @@ export default function CoverLetterDetailPage() {
                     onClick={() => {
                       setIsEditMode(true)
                       setEditedParagraphs(letter.paragraphs?.length ? letter.paragraphs : [letter.content])
+                      setEditedSignerName(letter.signerName ?? personal.name)
                     }}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
                       border border-[#F59E0B]/40 text-[#F59E0B] hover:bg-[#F59E0B]/10 transition-colors"
@@ -629,7 +668,7 @@ export default function CoverLetterDetailPage() {
               ref={previewContainerRef}
               className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden"
               style={{
-                height: `${LETTER_H * scale + 32}px`,
+                height: `${contentHeight * scale + 32}px`,
               }}
               onClick={() => {
                 if (isEditMode && activeParagraphIdx !== null) setActiveParagraphIdx(null)
@@ -641,7 +680,7 @@ export default function CoverLetterDetailPage() {
                   transformOrigin: 'top left',
                   transform: `scale(${scale})`,
                   width: `${LETTER_W}px`,
-                  marginBottom: scale < 1 ? `${(scale - 1) * LETTER_H}px` : undefined,
+                  marginBottom: scale < 1 ? `${(scale - 1) * contentHeight}px` : undefined,
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -650,6 +689,8 @@ export default function CoverLetterDetailPage() {
                     <LetterDocEditable
                       company={letter.company}
                       {...personal}
+                      signerName={editedSignerName}
+                      onSignerNameChange={setEditedSignerName}
                       paragraphs={editedParagraphs}
                       activeParagraphIdx={activeParagraphIdx}
                       onParagraphClick={(idx) =>
@@ -663,6 +704,7 @@ export default function CoverLetterDetailPage() {
                     <LetterDocReadOnly
                       company={letter.company}
                       {...personal}
+                      signerName={letter.signerName}
                       paragraphs={letter.paragraphs?.length ? letter.paragraphs : [letter.content]}
                     />
                   )}

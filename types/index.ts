@@ -264,6 +264,7 @@ export interface SavedCoverLetter {
   paragraphs: string[]    // editable paragraph array
   wordCount: number
   openingHook?: string
+  signerName?: string     // name shown after "Sincerely,"
   createdAt: string
   updatedAt: string
 }

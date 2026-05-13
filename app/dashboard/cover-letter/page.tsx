@@ -543,6 +543,7 @@ function CoverLetterContent() {
             paragraphs: ps,
             wordCount: parsed.word_count,
             openingHook: parsed.opening_hook ?? '',
+            signerName: profile?.personal?.name ?? '',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           })
@@ -609,6 +610,7 @@ function CoverLetterContent() {
         paragraphs,
         wordCount,
         openingHook: result.opening_hook,
+        signerName: profile?.personal?.name ?? '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
