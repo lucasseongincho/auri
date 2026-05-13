@@ -38,9 +38,6 @@ import { saveResume } from '@/lib/firestore'
 import ResumePreview from '@/components/resume/ResumePreview'
 import ResumeEditor from '@/components/resume/ResumeEditor'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
-import EstimateDisclaimerModal from '@/components/resume/EstimateDisclaimerModal'
-import { stripAITags } from '@/lib/resumeHighlight'
-import ClassicPro from '@/components/resume/templates/ClassicPro'
 import type {
   Experience,
   Education,
@@ -1238,7 +1235,6 @@ export default function ResumePage() {
   const [generateError, setGenerateError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [showSignUpModal, setShowSignUpModal] = useState(false)
-  const [showEstimateDisclaimer, setShowEstimateDisclaimer] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [isATSLoading, setIsATSLoading] = useState(false)
   const [isFixingATS, setIsFixingATS] = useState(false)
@@ -1487,10 +1483,6 @@ export default function ResumePage() {
         setEditedResume(resume)
         setHasSessionResume(true)
         setIsEditing(false) // start in preview mode; user clicks Edit to enter inline editing
-        // Show estimate disclaimer on first generation
-        if (!profile.hasSeenEstimateDisclaimer) {
-          setShowEstimateDisclaimer(true)
-        }
       } catch {
         setGenerateError('Failed to parse AI response. Please try again.')
       }
@@ -1574,20 +1566,6 @@ export default function ResumePage() {
       default:
         return null
     }
-  }
-
-  // ── Template renderer for ResumeEditor children ──────────────────────────────
-
-  const renderTemplate = (data: ResumeData) => {
-    const personal = profile?.personal ?? {
-      name: '',
-      email: '',
-      phone: '',
-      location: '',
-      linkedin_url: '',
-      website: '',
-    }
-    return <ClassicPro data={data} personal={personal} isEditing renderText={stripAITags} />
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -1894,18 +1872,14 @@ export default function ResumePage() {
             {isEditing && displayResume ? (
               <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
                 <div
-                  className="rounded-xl border border-white/[0.05] bg-white overflow-x-hidden overflow-y-auto"
+                  className="rounded-xl border border-white/[0.05] bg-[#0A0A0F] overflow-x-hidden overflow-y-auto"
                   style={{ minHeight: '600px' }}>
                   <ResumeEditor
                     resumeData={displayResume}
                     personal={personal}
                     onDataChange={(updated) => setEditedResume(updated)}
                     syncRef={editorSyncRef}
-                  >
-                    <div style={{ zoom: editScale, width: '8.5in', margin: '0 auto' }}>
-                      {renderTemplate(displayResume)}
-                    </div>
-                  </ResumeEditor>
+                  />
                 </div>
               </div>
             ) : (
@@ -2056,17 +2030,6 @@ export default function ResumePage() {
         )}
       </AnimatePresence>
 
-      {/* First-use AI estimate disclaimer */}
-      <EstimateDisclaimerModal
-        open={showEstimateDisclaimer}
-        onClose={() => {
-          setShowEstimateDisclaimer(false)
-          // Persist that the user has seen the disclaimer
-          if (profile && !profile.hasSeenEstimateDisclaimer) {
-            updateProfile({ hasSeenEstimateDisclaimer: true })
-          }
-        }}
-      />
     </div>
   )
 }

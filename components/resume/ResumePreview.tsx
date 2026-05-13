@@ -2,11 +2,9 @@
 
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, Copy, CheckCircle, Loader2, Layout, AlertTriangle, X } from 'lucide-react'
+import { Download, Copy, CheckCircle, Loader2, Layout } from 'lucide-react'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
-import VerificationBanner from '@/components/resume/VerificationBanner'
-import ResumeHighlightedText from '@/components/resume/ResumeHighlightedText'
-import { countAllEstimates, stripAllAITags } from '@/lib/resumeHighlight'
+import { stripAllAITags } from '@/lib/resumeHighlight'
 import type { ResumeData, PersonalInfo } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -270,8 +268,6 @@ export default function ResumePreview({
   const containerRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
-  const [showPDFWarning, setShowPDFWarning] = useState(false)
-  const [verifiedCount, setVerifiedCount] = useState(0)
   const [msgIdx, setMsgIdx] = useState(0)
   const [containerWidth, setContainerWidth] = useState(LETTER_W)
 
@@ -300,37 +296,9 @@ export default function ResumePreview({
   // Sanitise data once so all 5 templates receive guaranteed non-null arrays.
   const safeData = data ? sanitizeResumeData(data) : null
 
-  // Count total AI estimates in the current resume data
-  const totalEstimates = safeData ? countAllEstimates(safeData) : 0
-
-  // Reset verified count whenever data changes (e.g. after Easy Tune saves cleaned text)
-  useEffect(() => {
-    setVerifiedCount(0)
-  }, [data])
-
-  // renderText: passed to templates to convert <ai-estimate> tags into
-  // interactive amber highlights. When the user verifies an estimate,
-  // we increment the verified counter for the banner.
-  const renderText = useCallback(
-    (text: string) => (
-      <ResumeHighlightedText
-        text={text}
-        onVerify={() => setVerifiedCount((c) => c + 1)}
-      />
-    ),
-    []
-  )
-
-  // Scroll to first unverified amber highlight
-  const handleReviewClick = useCallback(() => {
-    const firstHighlight = previewRef.current?.querySelector('[data-estimate="true"]')
-    firstHighlight?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }, [])
-
   const executePDFDownload = useCallback(async () => {
     if (!previewRef.current || !safeData) return
     setDownloading(true)
-    setShowPDFWarning(false)
 
     const el = previewRef.current
     const name = personal.name?.replace(/\s+/g, '-').toLowerCase() || 'resume'
@@ -384,13 +352,8 @@ export default function ResumePreview({
 
   const handleDownloadPDF = useCallback(async () => {
     if (!safeData) return
-    const remaining = totalEstimates - verifiedCount
-    if (remaining > 0) {
-      setShowPDFWarning(true)
-    } else {
-      await executePDFDownload()
-    }
-  }, [safeData, totalEstimates, verifiedCount, executePDFDownload])
+    await executePDFDownload()
+  }, [safeData, executePDFDownload])
 
   const handleCopyATS = useCallback(async () => {
     if (!safeData) return
@@ -436,15 +399,6 @@ export default function ResumePreview({
           </button>
         </div>
       </div>
-
-      {/* Verification Banner — shown after generation when estimates exist */}
-      {safeData && !isStreaming && (
-        <VerificationBanner
-          estimateCount={totalEstimates}
-          verifiedCount={verifiedCount}
-          onReviewClick={handleReviewClick}
-        />
-      )}
 
       {/* Preview area */}
       <div className="flex-1 rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden">
@@ -551,7 +505,7 @@ export default function ResumePreview({
                           id="resume-content"
                           className="w-full"
                         >
-                          <ClassicPro data={safeData} personal={personal} renderText={renderText} />
+                          <ClassicPro data={safeData} personal={personal} renderText={stripAllAITags} />
                         </motion.div>
                       </div>
                     </div>
@@ -581,70 +535,6 @@ export default function ResumePreview({
         </div>
       </div>
 
-      {/* PDF Download Warning Modal */}
-      <AnimatePresence>
-        {showPDFWarning && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-            onClick={(e) => { if (e.target === e.currentTarget) setShowPDFWarning(false) }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 8 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={SPRING}
-              className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 w-full max-w-md"
-            >
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                    <h3 className="text-white font-semibold text-base">Your resume has unverified numbers</h3>
-                  </div>
-                  <button
-                    onClick={() => setShowPDFWarning(false)}
-                    className="text-[#60607A] hover:text-white transition-colors"
-                    aria-label="Close warning"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <p className="text-[#A0A0B8] text-sm mb-2">
-                  AURI estimated <span className="text-amber-300 font-medium">{totalEstimates - verifiedCount} numbers</span> that
-                  you haven&apos;t verified yet. Submitting a resume with unverified numbers could hurt you in interviews.
-                </p>
-                <p className="text-[#60607A] text-xs mb-6">
-                  Amber highlights in the preview show exactly which numbers to check.
-                </p>
-
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => { setShowPDFWarning(false); handleReviewClick() }}
-                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold
-                      bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                      shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                      hover:scale-[1.02] transition-all duration-200"
-                  >
-                    Review &amp; Fix
-                  </button>
-                  <button
-                    onClick={executePDFDownload}
-                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium
-                      border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
-                      transition-all duration-200"
-                  >
-                    Download Anyway
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }

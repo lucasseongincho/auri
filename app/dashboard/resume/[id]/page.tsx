@@ -23,8 +23,6 @@ import { useCareerStore } from '@/store/careerStore'
 import { useLetterScale } from '@/hooks/useLetterScale'
 import ResumePreview from '@/components/resume/ResumePreview'
 import ResumeEditor from '@/components/resume/ResumeEditor'
-import ClassicPro from '@/components/resume/templates/ClassicPro'
-import { stripAITags } from '@/lib/resumeHighlight'
 import {
   deleteSavedResume,
   getSavedResume,
@@ -801,7 +799,7 @@ export default function SavedResumePage() {
               {isEditMode && editedResumeData ? (
                 <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
                   <div
-                    className="rounded-xl border border-white/[0.05] bg-white overflow-x-hidden overflow-y-auto"
+                    className="rounded-xl border border-white/[0.05] bg-[#0A0A0F] overflow-x-hidden overflow-y-auto"
                     style={{ minHeight: '600px' }}>
                     <ResumeEditor
                       resumeData={editedResumeData}
@@ -810,16 +808,7 @@ export default function SavedResumePage() {
                         editedResumeDataRef.current = updated
                         setEditedResumeData(updated)
                       }}
-                    >
-                      <div style={{ zoom: editScale, width: '8.5in', margin: '0 auto' }}>
-                        <ClassicPro
-                          data={editedResumeData}
-                          personal={resume.personalInfo ?? { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' }}
-                          isEditing
-                          renderText={stripAITags}
-                        />
-                      </div>
-                    </ResumeEditor>
+                    />
                   </div>
                 </div>
               ) : (
