@@ -410,7 +410,7 @@ function CoverLetterContent() {
   const [company, setCompany] = useState(profile?.target?.company ?? '')
   const [jobDescription, setJobDescription] = useState(profile?.target?.job_description ?? '')
   const [experienceSummary, setExperienceSummary] = useState(
-    profile && profile.experience.length > 0 ? buildExperienceSummary(profile) : ''
+    profile && profile.experience.length > 0 ? buildExperienceSummary(profile, profile?.target?.position) : ''
   )
   const [hiringManagerName, setHiringManagerName] = useState('')
   const [cityState, setCityState] = useState(profile?.personal?.location ?? '')

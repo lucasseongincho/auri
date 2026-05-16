@@ -364,7 +364,7 @@ export default function InterviewPage() {
 
   const [position, setPosition] = useState(profile?.target?.position ?? '')
   const [company, setCompany] = useState(profile?.target?.company ?? '')
-  const experienceSummary = profile && profile.experience.length > 0 ? buildExperienceSummary(profile) : ''
+  const experienceSummary = profile && profile.experience.length > 0 ? buildExperienceSummary(profile, position) : ''
 
   const [prep, setPrep] = useState<InterviewPrep | null>(null)
   const [generateError, setGenerateError] = useState('')

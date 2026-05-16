@@ -363,6 +363,16 @@ STRUCTURE REQUIREMENTS:
 - Final paragraph (closing): A confident, specific call to action. Show you understand HOW this company operates (culture, pace, structure) and that you've already demonstrated that behavior — with one brief, specific example. Never echo the company mission statement back to them. Never say 'I am excited to contribute to [mission].' Instead, connect your working style to their operational culture. 45-55 words.
 - Tone: human, direct, no-nonsense. Write like someone who is confident and doesn't need to impress — they just need to show they'll get the job done. Avoid: corporate buzzwords, mission echoes, vague enthusiasm, phrases like 'I am passionate about' or 'I am excited to'. Every sentence must earn its place.
 
+ROLE FOCUS RULE: The experience summary below includes relevance hints in brackets ([PRIMARY], [SECONDARY], [SUPPORTING]). Follow them strictly:
+- PRIMARY experiences: feature prominently, use their specific details, name their tools and metrics directly
+- SECONDARY experiences: mention at most in one brief sentence, reframed through the lens of the target role — never as a separate paragraph, never with dev/technical details that don't apply to the target role
+- SUPPORTING experiences: include only if word count needs filling, one sentence maximum
+
+If the target role is IT support/help desk:
+- Do NOT write a full paragraph about software engineering or ML research
+- Do NOT mention JavaScript, HTML, SQL, React, or other dev frameworks unless the JD specifically asks for them
+- DO mention: Active Directory, ticketing systems, TCP/IP/DNS/DHCP, Windows/macOS, hardware troubleshooting, documentation — if present in the candidate's background
+
 My experience:
 ${experienceSummary}
 
@@ -639,16 +649,55 @@ Return this exact JSON structure. Always include certifications, projects, leade
 
 // ── Experience summary helper (used by Cover Letter + Interview Prep) ─────────
 
-export function buildExperienceSummary(profile: CareerProfile): string {
+/**
+ * Builds an experience summary for AI prompts.
+ * Includes full experience but adds role-type tagging so Claude
+ * knows which experiences are most relevant to the target role.
+ * This prevents Claude from over-indexing on dev experience for
+ * IT support roles and vice versa.
+ */
+export function buildExperienceSummary(
+  profile: CareerProfile,
+  targetPosition?: string
+): string {
   const lines: string[] = []
 
+  // Detect role type from target position for relevance hints
+  const target = (targetPosition ?? '').toLowerCase()
+  const isITRole = /\b(it|help desk|support|technician|sysadmin|network|infrastructure|desktop)\b/.test(target)
+  const isDevRole = /\b(engineer|developer|software|frontend|backend|fullstack|full.stack|swe)\b/.test(target)
+
   profile.experience.forEach((exp) => {
-    lines.push(`${exp.title} at ${exp.company} (${exp.start}–${exp.end})`)
+    const title = exp.title.toLowerCase()
+    const isITExp = /\b(it|help desk|support|technician|sysadmin|network|desktop)\b/.test(title)
+    const isDevExp = /\b(engineer|developer|software|intern|frontend|backend|fullstack|full.stack)\b/.test(title)
+    const isResearchExp = /\b(research|assistant|analyst)\b/.test(title)
+
+    // Add a relevance hint so Claude knows how to weight this experience
+    let relevanceHint = ''
+    if (isITRole && isITExp) relevanceHint = ' [PRIMARY — most relevant to target role]'
+    if (isITRole && isDevExp) relevanceHint = ' [SECONDARY — mention briefly if space allows, reframe around IT/support skills not dev skills]'
+    if (isITRole && isResearchExp) relevanceHint = ' [SUPPORTING — include only technical/documentation aspects]'
+    if (isDevRole && isDevExp) relevanceHint = ' [PRIMARY — most relevant to target role]'
+    if (isDevRole && isITExp) relevanceHint = ' [SUPPORTING — include technical breadth only]'
+
+    lines.push(`${exp.title} at ${exp.company} (${exp.start}–${exp.end})${relevanceHint}`)
     exp.bullets.forEach((b) => lines.push(`  • ${b}`))
   })
 
+  if (profile.education.length > 0) {
+    lines.push('\nEducation:')
+    profile.education.forEach((edu) => {
+      lines.push(`  ${edu.degree}${edu.field ? ` in ${edu.field}` : ''}, ${edu.institution} (${edu.year})`)
+    })
+  }
+
   if (profile.skills.length > 0) {
     lines.push(`\nKey skills: ${profile.skills.join(', ')}`)
+  }
+
+  if (profile.certifications && profile.certifications.length > 0) {
+    lines.push(`\nCertifications: ${profile.certifications.join(', ')}`)
   }
 
   return lines.join('\n')
