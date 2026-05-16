@@ -7,6 +7,9 @@
 - Paragraph-level inline editing (EditableParagraph component)
 - Save button in page header (amber/F59E0B color scheme)
 - Prompts: see lib/prompts.ts → buildCoverLetterPrompt()
+- Concept: direct hook → JD-keyword-rich body → practical requirements →
+  culture fit → specific closing. Never echo mission. See comment block
+  above buildCoverLetterPrompt() for full rationale.
 
 ## Saved Cover Letters
 - Route: /dashboard/cover-letter/saved — lists all saved letters

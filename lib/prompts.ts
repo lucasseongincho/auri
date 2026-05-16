@@ -316,21 +316,26 @@ Be specific and immediately executable. Include real URLs. No vague advice.`
 // ── Feature 8 — Cover Letter Generator ───────────────────────────────────────
 
 /**
- * Why "NOT I am applying for...": This is the single most common
- * cover letter mistake. Explicit negative instruction outperforms
- * "start with a hook" because it eliminates the most likely
- * failure mode directly.
+ * Cover Letter Generator prompt — v2
  *
- * Why 3-6 flexible paragraphs: Mirrors how real cover letters are
- * written — the number of paragraphs depends on how much substantive
- * content the user's experience provides. Enables per-paragraph editing
- * in the UI and a professional letter layout.
+ * Core concept: The best cover letters are direct, keyword-rich, and
+ * show the candidate actually read the job posting. They don't echo
+ * the company mission — they show the candidate's working standard.
  *
- * Why 280-300 words: Long enough to give a complete narrative,
- * short enough for a hiring manager to read in < 60 seconds.
+ * Why explicit JD keywords: Generic descriptions fail ATS and
+ * fail human readers. Naming "Active Directory" beats "user management
+ * systems" every time. Forces Claude to scan the JD, not write generically.
  *
- * Why return opening_hook separately: Lets the UI highlight the
- * first sentence distinctively so users can quickly judge impact.
+ * Why address practical requirements: Most candidates skip shift/on-call
+ * requirements. Addressing them directly signals genuine interest and
+ * saves both parties time.
+ *
+ * Why no mission echoes in closing: Echoing a company's mission back
+ * to them reads as filler. A closing that connects the candidate's
+ * working style to the company's operational culture is 10x stronger.
+ *
+ * Why 280-300 words: Long enough for a complete narrative, short enough
+ * for a hiring manager to read in under 60 seconds.
  */
 export function buildCoverLetterPrompt(
   position: string,
@@ -353,16 +358,20 @@ The paragraphs array MUST contain a MINIMUM of 280 words and a MAXIMUM of 300 wo
 
 STRUCTURE REQUIREMENTS:
 - Write 3 to 4 paragraphs total. The exact number should match the depth of the content needed to stay within 280-300 words.
-- Paragraph 1 (opening): Begin with a powerful, memorable hook. NOT "I am applying for..." and NOT "I am writing to express my interest...". Hook the reader immediately with insight, a bold claim, or a specific result. This paragraph alone should be 55-65 words.
+- Paragraph 1 (opening): Begin with a powerful, memorable hook. NOT "I am applying for..." and NOT "I am writing to express my interest...". Hook the reader with a bold, direct statement about the candidate's work standard or attitude — ideally one that signals reliability, ownership, or technical confidence. It should feel like something only THIS candidate would say, not a generic opener. Never echo the company's mission statement. This paragraph alone should be 55-65 words.
 - Middle paragraphs (body): Connect specific experience to the company's exact needs. Be concrete — name technologies, metrics, or outcomes. These paragraphs together should be 155-175 words.
-- Final paragraph (closing): A confident call to action. Express genuine enthusiasm. 45-55 words.
-- Tone: human, direct, compelling. Not corporate. Not generic.
+- Final paragraph (closing): A confident, specific call to action. Show you understand HOW this company operates (culture, pace, structure) and that you've already demonstrated that behavior — with one brief, specific example. Never echo the company mission statement back to them. Never say 'I am excited to contribute to [mission].' Instead, connect your working style to their operational culture. 45-55 words.
+- Tone: human, direct, no-nonsense. Write like someone who is confident and doesn't need to impress — they just need to show they'll get the job done. Avoid: corporate buzzwords, mission echoes, vague enthusiasm, phrases like 'I am passionate about' or 'I am excited to'. Every sentence must earn its place.
 
 My experience:
 ${experienceSummary}
 
 Job description:
 ${jobDescription || '(not provided — write for the role and company generally)'}
+
+JD KEYWORD RULE: Scan the job description for specific tools, systems, certifications, and requirements. Name them explicitly in the letter body — do not use generic descriptions. For example: if the JD says 'Active Directory', write 'Active Directory', not 'user account management systems'. If the JD mentions specific certifications as a plus, and the candidate has them or is pursuing them, connect them to a specific JD requirement — explain WHY the certification matters for this role, not just that it exists.
+
+PRACTICAL REQUIREMENTS RULE: If the job description mentions specific practical requirements (shift flexibility, on-call availability, travel, physical requirements, etc.), acknowledge them directly and confidently in the letter. Do not ignore them. Most candidates skip these — addressing them directly shows the candidate read the posting carefully and is not deterred. Keep it brief — one sentence is enough.
 
 Return ONLY valid JSON with exactly these fields:
 {
