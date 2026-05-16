@@ -497,25 +497,30 @@ interface ExtraSections {
   languages?: unknown[] | null
   leadership?: unknown[] | null
   volunteer?: unknown[] | null
+  projects?: unknown[] | null
   extras?: unknown[] | null
 }
 
 function serializeExtraSections(extra: ExtraSections): string {
   const parts: string[] = []
   if (extra.certifications?.length) {
-    parts.push(`CERTIFICATIONS PROVIDED (include if page has space):\n${(extra.certifications as string[]).join('\n')}`)
+    parts.push(`CERTIFICATIONS PROVIDED (include — rewrite for target role):\n${(extra.certifications as string[]).join('\n')}`)
   }
   if (extra.languages?.length) {
     const langs = extra.languages as Array<{ name: string; proficiency: string }>
-    parts.push(`LANGUAGES PROVIDED (include if page has space):\n${langs.map((l) => `${l.name} (${l.proficiency})`).join('\n')}`)
+    parts.push(`LANGUAGES PROVIDED (include — list as-is):\n${langs.map((l) => `${l.name} (${l.proficiency})`).join('\n')}`)
   }
   if (extra.leadership?.length) {
     const items = extra.leadership as Array<{ role: string; organization: string; start: string; end: string; bullets?: string[] }>
-    parts.push(`LEADERSHIP PROVIDED (include if page has space):\n${items.map((l) => `${l.role} at ${l.organization} (${l.start}–${l.end})`).join('\n')}`)
+    parts.push(`LEADERSHIP PROVIDED (include — rewrite bullets for target role):\n${items.map((l) => `${l.role} at ${l.organization} (${l.start}–${l.end})${l.bullets?.length ? '\n' + l.bullets.map((b) => `  • ${b}`).join('\n') : ''}`).join('\n')}`)
   }
   if (extra.volunteer?.length) {
     const items = extra.volunteer as Array<{ role: string; organization: string; description: string }>
-    parts.push(`VOLUNTEER PROVIDED (include if page has space):\n${items.map((v) => `${v.role} at ${v.organization}: ${v.description}`).join('\n')}`)
+    parts.push(`VOLUNTEER PROVIDED (include — rewrite for target role):\n${items.map((v) => `${v.role} at ${v.organization}: ${v.description}`).join('\n')}`)
+  }
+  if (extra.projects?.length) {
+    const items = extra.projects as Array<{ name: string; description: string; bullets?: string[] }>
+    parts.push(`PROJECTS PROVIDED (include — rewrite bullets for target role):\n${items.map((p) => `${p.name}: ${p.description}${p.bullets?.length ? '\n' + p.bullets.map((b) => `  • ${b}`).join('\n') : ''}`).join('\n')}`)
   }
   return parts.join('\n\n')
 }
@@ -537,6 +542,16 @@ Replace every responsibility with a measurable achievement.
 Eliminate everything generic.
 Make the candidate's value impossible to ignore.
 Optimize every bullet point for ATS keyword matching based on the job description provided.
+
+CONTENT VOLUME RULE: The rewritten resume must match the approximate length and content volume of the original resume. Count the number of sections and bullet points in the original. If your rewrite produces fewer sections or significantly fewer bullet points, you are leaving blank space on the page — this is wrong.
+
+To fill the page:
+1. First, add more specific and detailed bullet points to the experience sections you have already written (never pad with generic filler — every bullet must be specific and valuable)
+2. If experience bullets are already sufficient, include optional sections from the original resume (Projects, Leadership, Certifications) — rewrite their content to be relevant to the target role, but keep them
+
+NEVER return a resume that is noticeably shorter than the original.
+
+SECTION PRESERVATION RULE: You may reframe or rewrite any section's content for the target role. You may NOT silently drop entire sections unless the original resume has more content than fits on one page. If the original has Projects, include Projects. If it has Leadership, include Leadership. Rewrite the bullets to connect to the target role — do not delete the section.
 
 CRITICAL — AI ESTIMATE TAGGING RULES:
 You must clearly distinguish between information the user actually provided and numbers/claims you are estimating.
@@ -578,10 +593,9 @@ Core sections (always include):
 - Experience (max 3 most recent jobs, max 3 bullets each, each bullet under 120 characters)
 - Education, Skills (max 12 items as a flat list)
 
-Page filling rules — after core sections, if the page looks sparse:
-${hasExtras ? extrasBlock : '- No extra sections provided — if still sparse, expand skill descriptions or add a brief projects section (max 2, max 2 bullets each)'}
-- Only include extra sections if they help fill the page — never force them in if the page is already full
-- If still sparse after extras → expand skill descriptions or add a brief projects section
+Optional sections — include all that appeared in the original resume (rewrite content for target role):
+${hasExtras ? extrasBlock : '- No extra sections provided — if page is sparse, expand experience bullets or add a brief projects section (max 2, max 2 bullets each)'}
+- Include optional sections from the original even if the page feels full — trim bullets per the rules below to keep it to one page
 
 One-page trimming rules — if content is too long:
 - Trim bullets to 2 per job
@@ -600,7 +614,7 @@ YOU MUST RESPOND WITH VALID JSON ONLY.
 NO preamble. NO explanation. NO markdown. NO code blocks. NO backticks.
 START your response with { and END with }
 
-Return this exact JSON structure (include leadership/languages/volunteer only if you added them):
+Return this exact JSON structure. Always include certifications, projects, leadership, and languages arrays — use empty array [] if not present in original:
 {
   "summary": "string",
   "experience": [{ "id": "string", "company": "string", "title": "string", "start": "string", "end": "string", "bullets": ["string"] }],

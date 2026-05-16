@@ -14,6 +14,7 @@ interface ExtraSectionsPayload {
   languages?: unknown[] | null
   leadership?: unknown[] | null
   volunteer?: unknown[] | null
+  projects?: unknown[] | null
   extras?: unknown[] | null
 }
 

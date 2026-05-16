@@ -64,6 +64,17 @@ function resumeToPlainText(
       for (const b of p.bullets ?? []) lines.push(`• ${b}`)
     }
   }
+  if (r.leadership?.length) {
+    lines.push('', 'LEADERSHIP')
+    for (const l of r.leadership) {
+      lines.push(`${l.role} at ${l.organization} (${l.start} – ${l.end})`)
+      for (const b of l.bullets ?? []) lines.push(`• ${b}`)
+    }
+  }
+  if (r.languages?.length) {
+    lines.push('', 'LANGUAGES')
+    for (const lang of r.languages) lines.push(`${lang.name} (${lang.proficiency})`)
+  }
   return lines.join('\n').trim()
 }
 
@@ -124,6 +135,7 @@ export default function RewriterPage() {
     languages: profile?.languages?.length ? profile.languages : null,
     leadership: profile?.leadership?.length ? profile.leadership : null,
     volunteer: profile?.volunteer?.length ? profile.volunteer : null,
+    projects: profile?.projects?.length ? profile.projects : null,
   }
   const hasAnyExtra = Object.values(extraSections).some((v) => v !== null)
 
@@ -134,6 +146,7 @@ export default function RewriterPage() {
       if (profile?.languages?.length && prev.languages === undefined) next.languages = true
       if (profile?.leadership?.length && prev.leadership === undefined) next.leadership = true
       if (profile?.volunteer?.length && prev.volunteer === undefined) next.volunteer = true
+      if (profile?.projects?.length && prev.projects === undefined) next.projects = true
       return next
     })
   }, [profile])
@@ -217,6 +230,7 @@ export default function RewriterPage() {
     languages: extraToggles.languages ? extraSections.languages : null,
     leadership: extraToggles.leadership ? extraSections.leadership : null,
     volunteer: extraToggles.volunteer ? extraSections.volunteer : null,
+    projects: extraToggles.projects ? extraSections.projects : null,
     extras: null,
   })
 
@@ -599,6 +613,7 @@ export default function RewriterPage() {
                                   languages: 'Languages',
                                   leadership: 'Leadership',
                                   volunteer: 'Volunteer',
+                                  projects: 'Projects',
                                 }
                                 return (
                                   <div key={key} className="flex items-center justify-between">
