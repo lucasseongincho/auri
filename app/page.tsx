@@ -345,7 +345,7 @@ export default function LandingPage() {
             {/* Stat cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { stat: '9 AI-powered tools', desc: 'Resume, cover letter, interview prep, and more' },
+                { stat: '8 AI-powered tools', desc: 'Resume, cover letter, interview prep, and more' },
                 { stat: 'ATS-optimized output', desc: 'Structured for Workday, Greenhouse, Lever & iCIMS' },
                 { stat: 'Built with AURI AI', desc: 'Powered by Anthropic\'s most capable model' },
               ].map((item, i) => (
@@ -532,7 +532,7 @@ export default function LandingPage() {
                     <span className="text-[#60607A] mb-1">/month</span>
                   </div>
                   <ul className="space-y-3 mb-8">
-                    {['3 resume generations/month', 'All 5 templates', 'ATS scoring', 'Cover letter generator'].map(f => (
+                    {['3 resume generations/month', 'ATS scoring', 'Cover letter generator'].map(f => (
                       <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
                         <CheckCircle className="w-4 h-4 text-[#22C55E]" /> {f}
                       </li>

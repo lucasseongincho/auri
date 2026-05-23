@@ -9,7 +9,6 @@ const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
 const FREE_FEATURES = [
   '3 resume generations/month',
-  'All 5 resume templates',
   'ATS scoring & optimizer',
   'Cover letter generator',
 ]
@@ -20,7 +19,7 @@ const PRO_FEATURES = [
   'LinkedIn profile rewriter',
   '7-day job search strategy',
   'Interview prep with AI scoring',
-  'PDF export (all templates)',
+  'PDF export',
   'Priority support',
 ]
 

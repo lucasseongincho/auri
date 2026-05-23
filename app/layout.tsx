@@ -84,7 +84,6 @@ const jsonLd = {
     '7-day job search strategy',
     'Interview preparation system',
     'ATS score optimizer',
-    '5 premium resume templates',
   ],
 }
 
