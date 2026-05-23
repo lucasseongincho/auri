@@ -309,7 +309,11 @@ export default function LandingPage() {
           <div className="h-px w-full bg-gradient-to-r from-transparent via-[#6366F1]/35 to-transparent" />
           <FadeInSection className="text-center py-10 md:py-12">
             <p className="font-heading text-xl sm:text-2xl font-semibold text-white leading-snug mb-3">
-              Our users have landed interviews at Amazon and leading tech companies worldwide.
+              Our users have landed interviews at{' '}
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#6366F1] via-[#8B5CF6] to-[#A78BFA]">
+                Amazon
+              </span>{' '}
+              and leading tech companies worldwide.
             </p>
             <p className="text-sm text-[#A0A0B8]">
               Real interviews. Real companies. In the first month of beta.
