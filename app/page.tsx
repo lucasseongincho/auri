@@ -303,6 +303,22 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── 1.5. Social Proof ── */}
+      <section className="py-12 md:py-16 px-6 bg-[#0A0A0F]">
+        <div className="max-w-2xl mx-auto">
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-[#6366F1]/35 to-transparent" />
+          <FadeInSection className="text-center py-10 md:py-12">
+            <p className="font-heading text-xl sm:text-2xl font-semibold text-white leading-snug mb-3">
+              Our users have landed interviews at Amazon and leading tech companies worldwide.
+            </p>
+            <p className="text-sm text-[#A0A0B8]">
+              Real interviews. Real companies. In the first month of beta.
+            </p>
+          </FadeInSection>
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-[#6366F1]/35 to-transparent" />
+        </div>
+      </section>
+
       {/* ── 2. Beta Banner (replaces social proof — TODO: Replace with real testimonials after beta) ── */}
       <section className="py-16 md:py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
