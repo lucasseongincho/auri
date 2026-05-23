@@ -1628,8 +1628,14 @@ export default function ResumePage() {
           experience: parsed.experience ?? profile.experience,
           education: parsed.education ?? profile.education,
           skills: parsed.skills ?? profile.skills,
-          certifications: parsed.certifications ?? profile.certifications,
-          projects: parsed.projects ?? profile.projects,
+          // Guard: only keep certifications/projects the user actually provided.
+          // If profile has none, ignore whatever the AI returned to prevent hallucination.
+          certifications: profile.certifications.length > 0
+            ? (parsed.certifications ?? profile.certifications).slice(0, profile.certifications.length)
+            : [],
+          projects: profile.projects.length > 0
+            ? (parsed.projects ?? profile.projects).slice(0, profile.projects.length)
+            : [],
           // User-controlled sections — capped to prevent single-page overflow
           leadership: (profile.leadership ?? []).slice(0, 2),
           volunteer: (profile.volunteer ?? []).slice(0, 1),

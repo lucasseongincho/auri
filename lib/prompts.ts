@@ -88,13 +88,18 @@ ATS RULES YOU MUST ENFORCE:
 - No tables, no columns in the output
 - Keywords from the JD injected naturally, never stuffed
 
+ANTI-HALLUCINATION RULES (NON-NEGOTIABLE):
+- ONLY include certifications from the user's CAREER PROFILE certifications array. If it is empty, return "certifications": []. NEVER invent certifications.
+- ONLY include projects from the user's CAREER PROFILE projects array. If it is empty, return "projects": []. NEVER invent projects.
+- NEVER add any content (certifications, projects, jobs, skills, etc.) that the user did not explicitly provide.
+
 ONE-PAGE CONSTRAINT (CRITICAL — do NOT exceed these limits):
 - summary: exactly 2 sentences, max 45 words total
 - experience bullets: MAXIMUM 4 bullets per job entry, no exceptions
 - experience entries: include at most 3 most recent jobs
 - skills: MAXIMUM 12 items as a flat list
-- certifications: max 3 items
-- projects: max 2 projects, max 2 bullets each
+- certifications: rewrite up to 3 items from user's certifications — only if certifications were provided
+- projects: rewrite up to 2 projects from user's projects — only if projects were provided, max 2 bullets each
 - Every bullet must be one line (under 120 characters). The entire resume MUST fit on one A4 page.
 
 ${originalResumeText ? `ORIGINAL RESUME TEXT:\n${originalResumeText}\n` : ''}
@@ -619,7 +624,7 @@ Core sections (always include):
 - Education, Skills (max 12 items as a flat list)
 
 Optional sections — include all that appeared in the original resume (rewrite content for target role):
-${hasExtras ? extrasBlock : '- No extra sections provided — if page is sparse, expand experience bullets or add a brief projects section (max 2, max 2 bullets each)'}
+${hasExtras ? extrasBlock : '- No extra sections provided — if the page feels sparse, expand experience bullets with more specific and detailed achievements. NEVER invent projects, certifications, or any other sections the user did not provide.'}
 - Include optional sections from the original even if the page feels full — trim bullets per the rules below to keep it to one page
 
 One-page trimming rules — if content is too long:
