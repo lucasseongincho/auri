@@ -378,7 +378,7 @@ export default function LandingPage() {
             </p>
           </FadeInSection>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
             style={{ gridAutoRows: '1fr' }}>
             {FEATURES.map((f, i) => (
               <FadeInSection key={f.label} delay={i * 0.05} className="h-full">
