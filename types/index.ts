@@ -27,6 +27,8 @@ export interface Education {
   institution: string
   degree: string
   field: string
+  additionalMajors?: string[]
+  minors?: string[]
   year: string
   gpa?: string  // e.g. "3.8/4.0" — omit if below 3.5
 }
@@ -103,8 +105,16 @@ export interface CareerProfile {
 // Feature-specific response types
 // ============================================================
 
+export interface ATSDimensionScores {
+  keyword: number      // 0-40  (40% weight)
+  achievement: number  // 0-25  (25% weight)
+  formatting: number   // 0-20  (20% weight)
+  readability: number  // 0-15  (15% weight)
+}
+
 export interface ATSScore {
   score: number // 0-100
+  dimension_scores?: ATSDimensionScores
   matched_keywords: string[]
   missing_keywords: string[]
   formatting_issues: string[]

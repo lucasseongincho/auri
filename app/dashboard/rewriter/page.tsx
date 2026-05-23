@@ -52,8 +52,10 @@ function resumeToPlainText(
   }
   if (r.education?.length) {
     lines.push('', 'EDUCATION')
-    for (const edu of r.education)
-      lines.push(`${edu.degree} in ${edu.field}, ${edu.institution} (${edu.year})`)
+    for (const edu of r.education) {
+      const majors = [edu.field, ...(edu.additionalMajors ?? [])].filter(Boolean).join(' & ')
+      lines.push(`${edu.degree}${majors ? ` in ${majors}` : ''}, ${edu.institution} (${edu.year})${edu.minors?.length ? ` — Minor${edu.minors.length > 1 ? 's' : ''}: ${edu.minors.join(', ')}` : ''}`)
+    }
   }
   if (r.skills?.length) lines.push('', 'SKILLS', r.skills.join(', '))
   if (r.certifications?.length) lines.push('', 'CERTIFICATIONS', r.certifications.join(', '))

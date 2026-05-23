@@ -413,6 +413,232 @@ function StepExperience({ errors }: { errors: Step2Errors }) {
 
 // ─── Step 3: Education ────────────────────────────────────────────────────────
 
+function EducationCard({
+  edu,
+  idx,
+  onUpdate,
+  onRemove,
+}: {
+  edu: Education
+  idx: number
+  onUpdate: (patch: Partial<Education>) => void
+  onRemove: () => void
+}) {
+  const [majorInput, setMajorInput] = useState('')
+  const [minorInput, setMinorInput] = useState('')
+
+  const addMajor = (raw: string) => {
+    const trimmed = raw.trim()
+    if (!trimmed) return
+    const existing = edu.additionalMajors ?? []
+    if (!existing.includes(trimmed)) {
+      onUpdate({ additionalMajors: [...existing, trimmed] })
+    }
+    setMajorInput('')
+  }
+
+  const removeMajor = (major: string) => {
+    onUpdate({ additionalMajors: (edu.additionalMajors ?? []).filter((m) => m !== major) })
+  }
+
+  const addMinor = (raw: string) => {
+    const trimmed = raw.trim()
+    if (!trimmed) return
+    const existing = edu.minors ?? []
+    if (!existing.includes(trimmed)) {
+      onUpdate({ minors: [...existing, trimmed] })
+    }
+    setMinorInput('')
+  }
+
+  const removeMinor = (minor: string) => {
+    onUpdate({ minors: (edu.minors ?? []).filter((m) => m !== minor) })
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={SPRING}
+      className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+    >
+      <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide">
+            Education {idx + 1}
+          </span>
+          <button
+            onClick={onRemove}
+            aria-label={`Remove education ${idx + 1}`}
+            className="p-1.5 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Field label="Institution">
+            <input
+              type="text"
+              className={INPUT_CLASS}
+              placeholder="MIT"
+              value={edu.institution}
+              onChange={(e) => onUpdate({ institution: e.target.value })}
+              aria-label={`Institution for education ${idx + 1}`}
+            />
+          </Field>
+          <Field label="Degree">
+            <input
+              type="text"
+              className={INPUT_CLASS}
+              placeholder="Bachelor of Science"
+              value={edu.degree}
+              onChange={(e) => onUpdate({ degree: e.target.value })}
+              aria-label={`Degree for education ${idx + 1}`}
+            />
+          </Field>
+          <Field label="Primary Major / Field of Study">
+            <input
+              type="text"
+              className={INPUT_CLASS}
+              placeholder="Computer Science"
+              value={edu.field}
+              onChange={(e) => onUpdate({ field: e.target.value })}
+              aria-label={`Field of study for education ${idx + 1}`}
+            />
+          </Field>
+          <Field label="Graduation Year">
+            <input
+              type="text"
+              className={INPUT_CLASS}
+              placeholder="2021"
+              value={edu.year}
+              onChange={(e) => onUpdate({ year: e.target.value })}
+              aria-label={`Graduation year for education ${idx + 1}`}
+            />
+          </Field>
+          <Field label="GPA (optional — omit if below 3.5)">
+            <input
+              type="text"
+              className={INPUT_CLASS}
+              placeholder="3.8/4.0"
+              value={edu.gpa ?? ''}
+              onChange={(e) => onUpdate({ gpa: e.target.value })}
+              aria-label={`GPA for education ${idx + 1}`}
+            />
+          </Field>
+        </div>
+
+        <Field label="Additional Major(s) — press Enter or comma to add">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              className={INPUT_CLASS}
+              placeholder="e.g. Mathematics"
+              value={majorInput}
+              onChange={(e) => setMajorInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                  e.preventDefault()
+                  addMajor(majorInput)
+                }
+              }}
+              aria-label={`Additional major for education ${idx + 1}`}
+            />
+            <button
+              onClick={() => addMajor(majorInput)}
+              aria-label="Add additional major"
+              className="px-4 py-3 rounded-xl bg-[#6366F1]/20 border border-[#6366F1]/30
+                text-[#6366F1] text-sm font-medium hover:bg-[#6366F1]/30 transition-all flex-shrink-0"
+            >
+              Add
+            </button>
+          </div>
+          {(edu.additionalMajors?.length ?? 0) > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              <AnimatePresence initial={false}>
+                {(edu.additionalMajors ?? []).map((major) => (
+                  <motion.span
+                    key={major}
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.85 }}
+                    transition={SPRING}
+                    className="flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full
+                      bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8] text-xs font-medium"
+                  >
+                    {major}
+                    <button
+                      onClick={() => removeMajor(major)}
+                      aria-label={`Remove major ${major}`}
+                      className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-[#6366F1]/30 transition-all"
+                    >
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </motion.span>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </Field>
+
+        <Field label="Minor(s) — press Enter or comma to add">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              className={INPUT_CLASS}
+              placeholder="e.g. Statistics"
+              value={minorInput}
+              onChange={(e) => setMinorInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                  e.preventDefault()
+                  addMinor(minorInput)
+                }
+              }}
+              aria-label={`Minor for education ${idx + 1}`}
+            />
+            <button
+              onClick={() => addMinor(minorInput)}
+              aria-label="Add minor"
+              className="px-4 py-3 rounded-xl bg-[#6366F1]/20 border border-[#6366F1]/30
+                text-[#6366F1] text-sm font-medium hover:bg-[#6366F1]/30 transition-all flex-shrink-0"
+            >
+              Add
+            </button>
+          </div>
+          {(edu.minors?.length ?? 0) > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              <AnimatePresence initial={false}>
+                {(edu.minors ?? []).map((minor) => (
+                  <motion.span
+                    key={minor}
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.85 }}
+                    transition={SPRING}
+                    className="flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full
+                      bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 text-[#A78BFA] text-xs font-medium"
+                  >
+                    {minor}
+                    <button
+                      onClick={() => removeMinor(minor)}
+                      aria-label={`Remove minor ${minor}`}
+                      className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-[#8B5CF6]/30 transition-all"
+                    >
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </motion.span>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </Field>
+      </div>
+    </motion.div>
+  )
+}
+
 function StepEducation() {
   const { profile, updateProfile } = useCareerStore()
   const educations: Education[] = profile?.education ?? []
@@ -432,10 +658,10 @@ function StepEducation() {
     updateProfile({ education: educations.filter((e) => e.id !== id) })
   }
 
-  const updateEdu = (id: string, key: keyof Education, value: string) => {
+  const updateEdu = (id: string, patch: Partial<Education>) => {
     updateProfile({
       education: educations.map((e) =>
-        e.id === id ? { ...e, [key]: value } : e
+        e.id === id ? { ...e, ...patch } : e
       ),
     })
   }
@@ -444,81 +670,13 @@ function StepEducation() {
     <div className="space-y-4">
       <AnimatePresence initial={false}>
         {educations.map((edu, idx) => (
-          <motion.div
+          <EducationCard
             key={edu.id}
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={SPRING}
-            className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
-          >
-            <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide">
-                  Education {idx + 1}
-                </span>
-                <button
-                  onClick={() => removeEducation(edu.id)}
-                  aria-label={`Remove education ${idx + 1}`}
-                  className="p-1.5 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Field label="Institution">
-                  <input
-                    type="text"
-                    className={INPUT_CLASS}
-                    placeholder="MIT"
-                    value={edu.institution}
-                    onChange={(e) => updateEdu(edu.id, 'institution', e.target.value)}
-                    aria-label={`Institution for education ${idx + 1}`}
-                  />
-                </Field>
-                <Field label="Degree">
-                  <input
-                    type="text"
-                    className={INPUT_CLASS}
-                    placeholder="Bachelor of Science"
-                    value={edu.degree}
-                    onChange={(e) => updateEdu(edu.id, 'degree', e.target.value)}
-                    aria-label={`Degree for education ${idx + 1}`}
-                  />
-                </Field>
-                <Field label="Field of Study">
-                  <input
-                    type="text"
-                    className={INPUT_CLASS}
-                    placeholder="Computer Science"
-                    value={edu.field}
-                    onChange={(e) => updateEdu(edu.id, 'field', e.target.value)}
-                    aria-label={`Field of study for education ${idx + 1}`}
-                  />
-                </Field>
-                <Field label="Graduation Year">
-                  <input
-                    type="text"
-                    className={INPUT_CLASS}
-                    placeholder="2021"
-                    value={edu.year}
-                    onChange={(e) => updateEdu(edu.id, 'year', e.target.value)}
-                    aria-label={`Graduation year for education ${idx + 1}`}
-                  />
-                </Field>
-                <Field label="GPA (optional — omit if below 3.5)">
-                  <input
-                    type="text"
-                    className={INPUT_CLASS}
-                    placeholder="3.8/4.0"
-                    value={edu.gpa ?? ''}
-                    onChange={(e) => updateEdu(edu.id, 'gpa', e.target.value)}
-                    aria-label={`GPA for education ${idx + 1}`}
-                  />
-                </Field>
-              </div>
-            </div>
-          </motion.div>
+            edu={edu}
+            idx={idx}
+            onUpdate={(patch) => updateEdu(edu.id, patch)}
+            onRemove={() => removeEducation(edu.id)}
+          />
         ))}
       </AnimatePresence>
 

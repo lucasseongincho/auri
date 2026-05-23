@@ -129,6 +129,13 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
           flex-shrink: 0;
           margin-left: 8px;
         }
+        .classic-pro .edu-minor {
+          font-size: 10px;
+          color: #555;
+          font-family: Arial, sans-serif;
+          font-style: italic;
+          margin-top: 1px;
+        }
         .classic-pro .resume-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
         @media print {
           .classic-pro { padding: 18mm 20mm 16mm !important; }
@@ -186,9 +193,18 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
             {data.education.map((edu) => (
               <div key={edu.id} className="edu-row">
                 <div>
-                  <span className="edu-degree">{edu.degree}{edu.field ? ` in ${edu.field}` : ''}</span>
+                  <span className="edu-degree">
+                    {edu.degree}
+                    {edu.field ? ` in ${edu.field}` : ''}
+                    {(edu.additionalMajors?.length ?? 0) > 0 ? ` & ${edu.additionalMajors!.join(' & ')}` : ''}
+                  </span>
                   <span className="edu-school">, {edu.institution}</span>
                   {edu.gpa && <span className="edu-school"> · GPA {edu.gpa}</span>}
+                  {(edu.minors?.length ?? 0) > 0 && (
+                    <div className="edu-minor">
+                      {edu.minors!.length > 1 ? 'Minors' : 'Minor'}: {edu.minors!.join(', ')}
+                    </div>
+                  )}
                 </div>
                 <span className="edu-year">{edu.year}</span>
               </div>

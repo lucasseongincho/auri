@@ -105,7 +105,7 @@ Return ONLY valid JSON with this exact shape:
 {
   "summary": "string",
   "experience": [{ "id": "string", "company": "string", "title": "string", "start": "string", "end": "string", "bullets": ["string"] }],
-  "education": [{ "id": "string", "institution": "string", "degree": "string", "field": "string", "year": "string" }],
+  "education": [{ "id": "string", "institution": "string", "degree": "string", "field": "string", "additionalMajors": ["string"], "minors": ["string"], "year": "string" }],
   "skills": ["string"],
   "certifications": ["string"],
   "projects": [{ "id": "string", "name": "string", "description": "string", "bullets": ["string"] }]
@@ -129,11 +129,11 @@ export function buildATSScorePrompt(
   return `You are an ATS system and senior recruiter combined.
 Analyze this resume against this job description with expert precision.
 
-Scoring criteria:
-- Keyword match (40%): exact and semantic matches to JD terms
-- Achievement orientation (25%): measurable results vs responsibility lists
-- Formatting compliance (20%): ATS-parseable structure, no tables/columns
-- Readability (15%): clarity, action verbs, conciseness
+Scoring criteria and maximum points:
+- Keyword match (max 40 pts): exact and semantic matches to JD terms, critical keywords present, density appropriate
+- Achievement orientation (max 25 pts): measurable results with metrics, action verbs, impact-driven bullets vs responsibility lists
+- Formatting compliance (max 20 pts): ATS-parseable structure, standard section headers, no tables/columns/graphics
+- Readability (max 15 pts): clarity, conciseness, consistent tense, appropriate length
 
 Job Description:
 ${jobDescription}
@@ -143,7 +143,13 @@ ${resumePlainText}
 
 Return ONLY valid JSON:
 {
-  "score": number,
+  "score": number (0-100, sum of all four dimension scores),
+  "dimension_scores": {
+    "keyword": number (0-40),
+    "achievement": number (0-25),
+    "formatting": number (0-20),
+    "readability": number (0-15)
+  },
   "matched_keywords": ["string"],
   "missing_keywords": ["string"],
   "formatting_issues": ["string"],
@@ -637,7 +643,7 @@ Return this exact JSON structure. Always include certifications, projects, leade
 {
   "summary": "string",
   "experience": [{ "id": "string", "company": "string", "title": "string", "start": "string", "end": "string", "bullets": ["string"] }],
-  "education": [{ "id": "string", "institution": "string", "degree": "string", "field": "string", "year": "string" }],
+  "education": [{ "id": "string", "institution": "string", "degree": "string", "field": "string", "additionalMajors": ["string"], "minors": ["string"], "year": "string" }],
   "skills": ["string"],
   "certifications": ["string"],
   "projects": [{ "id": "string", "name": "string", "description": "string", "bullets": ["string"] }],
@@ -688,7 +694,8 @@ export function buildExperienceSummary(
   if (profile.education.length > 0) {
     lines.push('\nEducation:')
     profile.education.forEach((edu) => {
-      lines.push(`  ${edu.degree}${edu.field ? ` in ${edu.field}` : ''}, ${edu.institution} (${edu.year})`)
+      const majors = [edu.field, ...(edu.additionalMajors ?? [])].filter(Boolean).join(' & ')
+      lines.push(`  ${edu.degree}${majors ? ` in ${majors}` : ''}, ${edu.institution} (${edu.year})${edu.minors?.length ? ` — Minor${edu.minors.length > 1 ? 's' : ''}: ${edu.minors.join(', ')}` : ''}`)
     })
   }
 
