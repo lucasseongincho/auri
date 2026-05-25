@@ -340,9 +340,9 @@ export default function LandingPage() {
               on what actually matters: showing up prepared and confident.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-stretch">
               {[
-                { stat: '10 AI-powered tools', desc: 'Resume, cover letter, interview prep, and more' },
+                { stat: '8 AI-powered tools', desc: 'Resume, cover letter, interview prep, and more' },
                 { stat: 'ATS-optimized output', desc: 'Structured for Workday, Greenhouse, Lever & iCIMS' },
                 { stat: 'Powered by Claude AI', desc: "Anthropic's most capable model, built into every feature" },
               ].map((item, i) => (
@@ -352,10 +352,10 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ ...SPRING, delay: i * 0.1 }}
-                  className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+                  className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-full"
                 >
                   <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 text-center
-                    flex flex-col items-center justify-center min-h-[110px]">
+                    flex flex-col items-center justify-center h-full min-h-[120px]">
                     <p className="font-heading text-lg font-bold text-white mb-1">{item.stat}</p>
                     <p className="text-sm text-[#60607A]">{item.desc}</p>
                   </div>
