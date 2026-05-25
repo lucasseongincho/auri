@@ -3,8 +3,6 @@ import { callClaude, callClaudeJSON, buildErrorResponse, MAX_TOKENS_ANALYSIS } f
 import { buildATSScorePrompt, buildATSFixPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
-import { checkAndIncrementBetaCall } from '@/lib/betaGuard'
-import { APP_CONFIG } from '@/lib/config'
 import type { ATSScore } from '@/types'
 
 export const runtime = 'nodejs'
@@ -32,15 +30,6 @@ export async function POST(req: NextRequest) {
     const identifier = getIdentifier(req, verifiedUser?.uid)
     const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)
-
-    // Beta gate — requires sign-in; guests are blocked in beta mode
-    if (APP_CONFIG.BETA_MODE) {
-      if (!verifiedUser?.uid) {
-        return Response.json({ error: 'Beta requires sign-in', code: 'AUTH_REQUIRED' }, { status: 401 })
-      }
-      const beta = await checkAndIncrementBetaCall(verifiedUser.uid, verifiedUser.email)
-      if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
-    }
 
     const mode = body.mode ?? 'score'
 

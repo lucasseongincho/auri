@@ -1,20 +1,17 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, FileText, FolderOpen, RefreshCw, Target, Linkedin,
   Map, Mail, MessageSquare, Settings, ChevronRight,
-  Sparkles, User, Cloud, CloudOff, FlaskConical, MoreHorizontal, X,
+  Sparkles, User, Cloud, CloudOff, MoreHorizontal, X,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
-import { useBetaUsage } from '@/hooks/useBetaUsage'
-import { APP_CONFIG } from '@/lib/config'
 import CareerProfileDrawer from '@/components/shared/CareerProfileDrawer'
-import BetaLimitModal from '@/components/shared/BetaLimitModal'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -83,37 +80,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false)
   const [moreDrawerOpen, setMoreDrawerOpen] = useState(false)
   const { user, loading } = useAuth()
-  const { isSyncing, syncError, isGenerating } = useCareerStore()
-  const [betaRefreshKey, setBetaRefreshKey] = useState(0)
-  const prevGenerating = useRef(false)
-  const betaUsage = useBetaUsage(APP_CONFIG.BETA_MODE ? user?.uid : undefined, betaRefreshKey)
-
-  // Refresh beta usage counter after each AI generation completes
-  useEffect(() => {
-    if (prevGenerating.current && !isGenerating) {
-      setBetaRefreshKey((k) => k + 1)
-    }
-    prevGenerating.current = isGenerating
-  }, [isGenerating])
-  const isOwner = user?.email === process.env.NEXT_PUBLIC_OWNER_EMAIL && !!process.env.NEXT_PUBLIC_OWNER_EMAIL
+  const { isSyncing, syncError } = useCareerStore()
 
   // Close More drawer on route change
   useEffect(() => { setMoreDrawerOpen(false) }, [pathname])
 
-  // Auth + beta gate
+  // Auth gate
   useEffect(() => {
     if (loading) return
     if (!user) {
       router.replace('/login')
-      return
     }
-    if (!APP_CONFIG.BETA_MODE) return
-    if (isOwner) return
-    // Only redirect once we have usage data confirming they're not approved
-    if (betaUsage && !betaUsage.betaApproved) {
-      router.replace('/beta-access')
-    }
-  }, [betaUsage, user, loading, router, isOwner])
+  }, [user, loading, router])
 
   const isActive = (href: string) => {
     // Dashboard: exact match only
@@ -212,57 +190,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             )
           })}
         </nav>
-
-        {/* Beta usage indicator */}
-        {APP_CONFIG.BETA_MODE && sidebarExpanded && isOwner && (
-          <div className="px-2 pb-2">
-            <div className="rounded-xl bg-[#0A0A0F] border border-white/[0.06] p-3 space-y-1">
-              <div className="flex items-center gap-1.5">
-                <FlaskConical className="w-3 h-3 text-[#6366F1] flex-shrink-0" />
-                <span className="text-xs font-semibold text-[#A0A0B8]">Beta Access</span>
-              </div>
-              <p className="text-[10px] text-[#22C55E]">Unlimited calls (owner)</p>
-            </div>
-          </div>
-        )}
-        {APP_CONFIG.BETA_MODE && betaUsage && sidebarExpanded && !isOwner && (
-          <div className="px-2 pb-2">
-            <div className="rounded-xl bg-[#0A0A0F] border border-white/[0.06] p-3 space-y-2">
-              <div className="flex items-center gap-1.5">
-                <FlaskConical className="w-3 h-3 text-[#6366F1] flex-shrink-0" />
-                <span className="text-xs font-semibold text-[#A0A0B8]">Beta Access</span>
-              </div>
-              {betaUsage.remainingCalls === 0 ? (
-                <p className="text-[10px] text-[#EF4444] leading-snug">
-                  Weekly limit reached. Resets {betaUsage.resetsOn} 🔄
-                </p>
-              ) : (
-                <>
-                  <div
-                    className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden"
-                    title={`Each AI generation uses 1 call. Easy Tune assists also count as 1 call each.`}
-                  >
-                    <div
-                      className="h-full rounded-full transition-all duration-300"
-                      style={{
-                        width: `${Math.min((betaUsage.callsThisWeek / APP_CONFIG.BETA_WEEKLY_CALL_LIMIT) * 100, 100)}%`,
-                        backgroundColor:
-                          betaUsage.callsThisWeek >= 18
-                            ? '#EF4444'
-                            : betaUsage.callsThisWeek >= 14
-                            ? '#F59E0B'
-                            : '#22C55E',
-                      }}
-                    />
-                  </div>
-                  <p className="text-[10px] text-[#60607A]">
-                    {betaUsage.callsThisWeek}/{APP_CONFIG.BETA_WEEKLY_CALL_LIMIT} calls · Resets {betaUsage.resetsOn}
-                  </p>
-                </>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Bottom: sync status + settings + user */}
         <div className="py-4 px-2 border-t border-white/[0.06] space-y-1">
@@ -382,15 +309,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Page content — flex-1 overflow-y-auto so child pages that use h-full get a real height */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 pb-24 md:pb-6 max-w-7xl w-full mx-auto">
-          {/* Owner beta status banner */}
-          {isOwner && APP_CONFIG.BETA_MODE && (
-            <div className="mb-4 rounded-lg px-4 py-2 text-sm
-              bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#A5B4FC]
-              flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-              <span className="text-sm">🧪 Beta Mode is ON — all approved users get {APP_CONFIG.BETA_WEEKLY_CALL_LIMIT} calls/week free.</span>
-              <span className="font-mono text-xs text-[#818CF8] sm:flex-shrink-0">Set BETA_MODE = false in lib/config.ts to go paid</span>
-            </div>
-          )}
           {children}
         </main>
       </div>
@@ -505,9 +423,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         open={profileDrawerOpen}
         onClose={() => setProfileDrawerOpen(false)}
       />
-
-      {/* ── Beta Limit Modal ── */}
-      <BetaLimitModal />
     </div>
   )
 }

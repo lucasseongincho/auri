@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Target, CheckCircle, XCircle, AlertTriangle, Lightbulb, Zap, Loader2, TrendingUp } from 'lucide-react'
-import type { ATSScore } from '@/types'
+import type { ATSScore, ATSDimensionScores } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -57,6 +57,76 @@ function ScoreMeter({ score, prevScore }: { score: number; prevScore?: number })
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="font-heading font-bold text-2xl text-white leading-none">{displayed}</span>
         <span className="text-[10px] text-[#60607A] mt-0.5">/ 100</span>
+      </div>
+    </div>
+  )
+}
+
+interface DimensionBarProps {
+  label: string
+  value: number
+  max: number
+  color: string
+  delay: number
+}
+
+function DimensionBar({ label, value, max, color, delay }: DimensionBarProps) {
+  const pct = Math.round((value / max) * 100)
+  const barColor =
+    pct >= 80 ? '#22C55E' : pct >= 55 ? '#F59E0B' : '#EF4444'
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ ...SPRING, delay }}
+      className="space-y-1"
+    >
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] text-[#A0A0B8]">{label}</span>
+        <span className="text-[11px] font-semibold" style={{ color: barColor }}>
+          {value}<span className="text-[#60607A] font-normal">/{max}</span>
+        </span>
+      </div>
+      <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+        <motion.div
+          className="h-full rounded-full"
+          style={{ backgroundColor: barColor }}
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.8, ease: 'easeOut', delay }}
+        />
+      </div>
+    </motion.div>
+  )
+}
+
+interface DimensionBreakdownProps {
+  dims: ATSDimensionScores
+}
+
+function DimensionBreakdown({ dims }: DimensionBreakdownProps) {
+  const bars: Array<{ label: string; key: keyof ATSDimensionScores; max: number; color: string }> = [
+    { label: 'Keyword Match', key: 'keyword', max: 40, color: '#6366F1' },
+    { label: 'Achievement Orientation', key: 'achievement', max: 25, color: '#8B5CF6' },
+    { label: 'Formatting Compliance', key: 'formatting', max: 20, color: '#06B6D4' },
+    { label: 'Readability', key: 'readability', max: 15, color: '#10B981' },
+  ]
+
+  return (
+    <div>
+      <p className="text-[10px] font-semibold text-[#60607A] uppercase tracking-wide mb-2.5">Score Breakdown</p>
+      <div className="space-y-2.5">
+        {bars.map((bar, i) => (
+          <DimensionBar
+            key={bar.key}
+            label={bar.label}
+            value={dims[bar.key]}
+            max={bar.max}
+            color={bar.color}
+            delay={i * 0.07}
+          />
+        ))}
       </div>
     </div>
   )
@@ -128,6 +198,13 @@ export default function ATSScorePanel({ score, isLoading, onFixAll, isFixing, fi
             </button>
           </div>
         </div>
+
+        {/* Dimension breakdown — only shown when sub-scores are present */}
+        {score.dimension_scores && (
+          <div className="border-t border-white/[0.05] pt-4">
+            <DimensionBreakdown dims={score.dimension_scores} />
+          </div>
+        )}
 
         {/* Strength areas */}
         {score.strength_areas.length > 0 && (

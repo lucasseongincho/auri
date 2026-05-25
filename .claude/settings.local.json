@@ -86,7 +86,26 @@
       "Bash(Remove-Item \"C:\\\\resume_builder\\\\components\\\\resume\\\\templates\\\\ExecutiveDark.tsx\" -Force)",
       "Bash(Remove-Item \"C:\\\\resume_builder\\\\components\\\\resume\\\\templates\\\\CreativePulse.tsx\" -Force)",
       "Bash(Remove-Item \"C:\\\\resume_builder\\\\components\\\\resume\\\\templates\\\\MinimalSeoul.tsx\" -Force)",
-      "Bash(Write-Output \"Deleted\")"
+      "Bash(Write-Output \"Deleted\")",
+      "Bash(python3 *)",
+      "Bash(Get-ChildItem -Path C:\\\\resume_builder -Recurse -Filter \"*.ts\" -o File)",
+      "Bash(Select-Object -First 20)",
+      "Bash(where chrome *)",
+      "Bash(where chromium *)",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Bash(npx playwright *)",
+      "Bash(pkill -f \"next dev --port 3333\")",
+      "Bash(Get-ChildItem -Recurse -Include \"*.tsx\",\"*.ts\",\"*.md\" -Path app,components,lib,context -ErrorAction SilentlyContinue)",
+      "Bash(Select-String -Pattern \"\\(?i\\)template\")",
+      "Bash(Select-Object Path, LineNumber, Line -First 100)",
+      "Bash(powershell *)",
+      "Bash(npx next *)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(taskkill /PID 12188 /F)",
+      "PowerShell(Stop-Process *)",
+      "Bash(git checkout *)",
+      "Bash(npx tsx *)"
     ]
   }
 }

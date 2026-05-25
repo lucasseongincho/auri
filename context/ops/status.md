@@ -20,7 +20,7 @@
 - [x] /blog with MDX support
 - [x] Stripe integration (test mode, beta bypass)
 - [x] Rate limiting (Upstash Redis)
-- [x] Beta guard with atomic call counter
+- [x] Beta mode removed — app is now public
 - [x] Error boundaries on all dashboard routes
 - [x] Mobile responsive (all pages)
 - [x] Unified Save button in header across all feature pages
@@ -31,7 +31,7 @@
 - contentEditable: replaced with structured form editor
 
 ## Parking Lot (Not Yet Built)
-- [ ] Pricing tiers (Free vs Pro) — beta ends 2026-07-01
+- [ ] Pricing tiers (Free vs Pro) — live
 - [ ] Job description URL auto-scraping
 - [ ] Email notifications
 - [ ] Analytics (Mixpanel or Posthog)

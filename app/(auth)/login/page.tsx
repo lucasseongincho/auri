@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Sparkles, Mail, Lock, Chrome } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { APP_CONFIG } from '@/lib/config'
-
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
 export default function LoginPage() {
@@ -21,8 +19,7 @@ export default function LoginPage() {
   const getPostAuthRedirect = (): string => {
     const intent = sessionStorage.getItem('postAuthIntent')
     sessionStorage.removeItem('postAuthIntent')
-    // Pro intent only triggers Stripe when beta is off; during beta everyone gets full access
-    if (intent === 'pro' && !APP_CONFIG.BETA_MODE) {
+    if (intent === 'pro') {
       return '/api/stripe/checkout'
     }
     return '/dashboard'

@@ -3,8 +3,6 @@ import { streamClaude, buildErrorResponse } from '@/lib/claude'
 import { buildJobStrategyPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
-import { checkAndIncrementBetaCall } from '@/lib/betaGuard'
-import { APP_CONFIG } from '@/lib/config'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -64,15 +62,6 @@ export async function POST(req: NextRequest) {
 
     if (!body.targetPosition?.trim()) {
       return buildErrorResponse('targetPosition is required', 400)
-    }
-
-    // Beta gate — requires sign-in; guests are blocked in beta mode
-    if (APP_CONFIG.BETA_MODE) {
-      if (!verifiedUser?.uid) {
-        return Response.json({ error: 'Beta requires sign-in', code: 'AUTH_REQUIRED' }, { status: 401 })
-      }
-      const beta = await checkAndIncrementBetaCall(verifiedUser.uid, verifiedUser.email)
-      if (!beta.allowed) return Response.json(beta.body, { status: beta.status })
     }
 
     const prompt = buildJobStrategyPrompt(

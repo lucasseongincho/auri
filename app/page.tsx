@@ -9,7 +9,6 @@ import {
   Map, Mail, MessageSquare, CheckCircle, ArrowRight,
   Sparkles, Target, ChevronRight,
 } from 'lucide-react'
-import { APP_CONFIG } from '@/lib/config'
 import { getStartedRedirect } from '@/lib/getStartedRedirect'
 
 // Spring config per CLAUDE.md §9
@@ -553,24 +552,14 @@ export default function LandingPage() {
               <div className="rounded-2xl border border-[#6366F1]/40 bg-[#13131A] p-1 relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full
                   bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-xs font-semibold">
-                  {APP_CONFIG.BETA_MODE ? '🧪 Beta' : 'Most Popular'}
+                  Most Popular
                 </div>
                 <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] p-6 md:p-8">
                   <p className="font-heading font-semibold text-[#818CF8] mb-1">Pro</p>
-                  {APP_CONFIG.BETA_MODE ? (
-                    <div className="mb-6">
-                      <div className="flex items-end gap-2">
-                        <span className="font-heading font-bold text-3xl sm:text-4xl text-white">Free</span>
-                        <span className="text-[#60607A] mb-1">during beta</span>
-                      </div>
-                      <p className="text-sm text-[#60607A] mt-1 line-through">$19/month after beta</p>
-                    </div>
-                  ) : (
-                    <div className="flex items-end gap-1 mb-6">
-                      <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$19</span>
-                      <span className="text-[#60607A] mb-1">/month</span>
-                    </div>
-                  )}
+                  <div className="flex items-end gap-1 mb-6">
+                    <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$19</span>
+                    <span className="text-[#60607A] mb-1">/month</span>
+                  </div>
                   <ul className="space-y-3 mb-8">
                     {[
                       'Unlimited generations',
@@ -591,13 +580,8 @@ export default function LandingPage() {
                       bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
                       shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
                       hover:scale-[1.02] transition-all duration-200">
-                    {APP_CONFIG.BETA_MODE ? 'Join Beta' : 'Start Pro Free'}
+                    Start Pro Free
                   </button>
-                  {APP_CONFIG.BETA_MODE && (
-                    <p className="text-center text-xs text-[#22C55E] mt-3">
-                      Full Pro access while we&apos;re in beta 🎉
-                    </p>
-                  )}
                 </div>
               </div>
             </FadeInSection>

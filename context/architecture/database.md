@@ -6,11 +6,8 @@ users/{uid}/
   resumes/{resumeId}    — SavedResume (resumeData, personalInfo, templateId, createdAt)
   cover-letters/{id}    — SavedCoverLetter (company, position, paragraphs, wordCount)
   interview-prep/{id}   — SavedInterviewPrep (position, company, questions)
-  betaUsage/data        — { betaCallsThisWeek, betaWeekStart }
-
 ## Firestore Rules
 - Users can only read/write their own users/{uid}/... documents
-- invite_codes: authenticated users can read, write blocked from client
 - All other paths denied
 - Rules are live — do not change without testing in Rules Playground
 

@@ -35,7 +35,7 @@ async function main() {
     uid = created.uid
   }
   
-  await db.doc(`users/${uid}/profile/data`).set({ betaApproved: true, email: QA_EMAIL, displayName: 'QA Tester', isPro: true }, { merge: true })
+  await db.doc(`users/${uid}/profile/data`).set({ email: QA_EMAIL, displayName: 'QA Tester', isPro: true }, { merge: true })
   
   const customToken = await auth.createCustomToken(uid)
   

@@ -24,12 +24,6 @@ IMPORTANT: All Claude calls go through /api/claude/* routes — never from clien
 - No full-page reloads — Next.js client-side routing only
 - Rate limiting: 10 calls/min free tier, 60/min Pro (lib/rateLimit.ts)
 
-## Beta Mode
-- Currently BETA_MODE = true in lib/config.ts
-- Beta ends: 2026-07-01
-- Weekly call limit: 12 per user
-- See lib/config.ts for full beta → paid transition checklist
-
 ## Environment Variables
 NEXT_PUBLIC_FIREBASE_API_KEY, AUTH_DOMAIN, PROJECT_ID, STORAGE_BUCKET,
 MESSAGING_SENDER_ID, APP_ID

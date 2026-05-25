@@ -7,12 +7,6 @@ PDF export: /app/api/pdf/route.ts (Puppeteer + html2pdf.js fallback)
 ## Auth on Every Route
 1. getAuthenticatedUser(req) — Firebase Admin token verification
 2. checkRateLimit(identifier, isPro) — Upstash Redis + in-memory fallback
-3. checkAndIncrementBetaCall(uid, email) — atomic Firestore transaction (prevents race condition)
-
-## Beta Guard
-- IMPORTANT: Use checkAndIncrementBetaCall (NOT the old 2-step check+increment)
-- This is an atomic Firestore transaction that prevents double-billing
-- See lib/betaGuard.ts
 
 ## Claude JSON Parsing
 - Use callClaudeJSON<T>() for non-streaming routes — includes repair + 1 retry

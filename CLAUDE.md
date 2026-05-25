@@ -15,7 +15,6 @@ IMPORTANT: Never put ANTHROPIC_API_KEY in client-side code or NEXT_PUBLIC_ varia
 IMPORTANT: Never call Claude API directly from client — always use /api/claude/* routes
 IMPORTANT: Never use contentEditable for resume editing — use the structured form editor
 IMPORTANT: Always use claude-sonnet-4-5 — never change the model
-IMPORTANT: Use checkAndIncrementBetaCall() not the old 2-step check+increment
 IMPORTANT: Never push broken builds — run npm run build before every commit
 
 ## Core Conventions
