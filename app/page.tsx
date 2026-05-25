@@ -354,7 +354,8 @@ export default function LandingPage() {
                   transition={{ ...SPRING, delay: i * 0.1 }}
                   className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
                 >
-                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 text-center">
+                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 text-center
+                    flex flex-col items-center justify-center min-h-[110px]">
                     <p className="font-heading text-lg font-bold text-white mb-1">{item.stat}</p>
                     <p className="text-sm text-[#60607A]">{item.desc}</p>
                   </div>
