@@ -244,7 +244,7 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-sm text-[#60607A]">
-                🧪 Currently in <span className="text-white font-medium">private beta</span>
+                Trusted by job seekers landing interviews at top companies
               </p>
             </motion.div>
           </div>
@@ -315,47 +315,50 @@ export default function LandingPage() {
               and leading tech companies worldwide.
             </p>
             <p className="text-sm text-[#A0A0B8]">
-              Real interviews. Real companies. In the first month of beta.
+              Real interviews. Real companies. Real results.
             </p>
           </FadeInSection>
           <div className="h-px w-full bg-gradient-to-r from-transparent via-[#6366F1]/35 to-transparent" />
         </div>
       </section>
 
-      {/* ── 2. Beta Banner (replaces social proof — TODO: Replace with real testimonials after beta) ── */}
+      {/* ── 2. Social Proof ── */}
       <section className="py-16 md:py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <FadeInSection>
-            {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
               border border-[#6366F1]/30 bg-[#6366F1]/10 text-[#818CF8] text-xs font-semibold
               tracking-wide mb-6">
-              🧪 Private Beta
+              ✦ AI-Powered Career Toolkit
             </div>
 
             <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
-              Built for real job seekers
+              Everything you need to land your next role
             </h2>
             <p className="text-[#A0A0B8] text-base md:text-lg max-w-xl mx-auto mb-12 leading-relaxed">
-              AURI is currently in private beta. Every feature was designed to solve real hiring
-              challenges. Your feedback shapes what we build next.
+              AURI handles the tedious parts of job searching — so you can focus
+              on what actually matters: showing up prepared and confident.
             </p>
 
-            {/* Stat cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { stat: '8 AI-powered tools', desc: 'Resume, cover letter, interview prep, and more' },
+                { stat: '10 AI-powered tools', desc: 'Resume, cover letter, interview prep, and more' },
                 { stat: 'ATS-optimized output', desc: 'Structured for Workday, Greenhouse, Lever & iCIMS' },
-                { stat: 'Built with AURI AI', desc: 'Powered by Anthropic\'s most capable model' },
+                { stat: 'Powered by Claude AI', desc: "Anthropic's most capable model, built into every feature" },
               ].map((item, i) => (
-                <FadeInSection key={item.stat} delay={i * 0.1}>
-                  <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-full">
-                    <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 h-full flex flex-col items-center text-center gap-2">
-                      <p className="font-heading font-bold text-white text-lg">{item.stat}</p>
-                      <p className="text-xs text-[#60607A] leading-snug">{item.desc}</p>
-                    </div>
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ ...SPRING, delay: i * 0.1 }}
+                  className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+                >
+                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 text-center">
+                    <p className="font-heading text-lg font-bold text-white mb-1">{item.stat}</p>
+                    <p className="text-sm text-[#60607A]">{item.desc}</p>
                   </div>
-                </FadeInSection>
+                </motion.div>
               ))}
             </div>
           </FadeInSection>
@@ -600,8 +603,8 @@ export default function LandingPage() {
                 Your next job is waiting.
               </h2>
               <p className="text-base md:text-lg text-[#A0A0B8] mb-8 max-w-xl mx-auto">
-                Join the private beta and get early access to every feature.
-                Invite code required.
+                Start building your best resume in minutes.
+                No credit card required.
               </p>
 
               <button
@@ -615,7 +618,7 @@ export default function LandingPage() {
               </button>
 
               <p className="text-xs text-[#60607A] mt-4">
-                Private beta · Invite code required
+                Free to start · No credit card required
               </p>
             </div>
           </div>
