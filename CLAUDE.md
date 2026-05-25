@@ -6,7 +6,7 @@
 - **Product:** AURI — ATS-optimized career toolkit
 - **Stack:** Next.js 14 App Router, TypeScript, Tailwind CSS, Firebase Auth + Firestore,
   Anthropic Claude API (claude-sonnet-4-5), Zustand, Upstash Redis, Stripe, Vercel
-- **URL:** https://auri-beta.vercel.app
+- **URL:** https://www.auri-resume.com
 - **GitHub:** https://github.com/lucasseongincho/auri
 
 ## Must NOT Do

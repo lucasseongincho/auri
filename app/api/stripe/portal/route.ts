@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://auri-beta.vercel.app'}/dashboard/settings`,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.auri-resume.com'}/dashboard/settings`,
     })
 
     return Response.json({ url: session.url })

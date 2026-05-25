@@ -72,7 +72,7 @@ async function main() {
   
   await db.doc(`users/${uid}/resumes/${resumeId}`).set(resume)
   console.log('Saved resume ID:', resumeId)
-  console.log('URL: https://auri-beta.vercel.app/dashboard/resume/' + resumeId)
+  console.log('URL: https://www.auri-resume.com/dashboard/resume/' + resumeId)
   process.exit(0)
 }
 

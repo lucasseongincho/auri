@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
         '/login',
       ],
     },
-    sitemap: 'https://auri-beta.vercel.app/sitemap.xml',
-    host: 'https://auri-beta.vercel.app',
+    sitemap: 'https://www.auri-resume.com/sitemap.xml',
+    host: 'https://www.auri-resume.com',
   }
 }

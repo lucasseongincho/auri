@@ -229,7 +229,7 @@ export default async function Image() {
             letterSpacing: '0.02em',
           }}
         >
-          auri-beta.vercel.app
+          auri-resume.com
         </span>
       </div>
     ),

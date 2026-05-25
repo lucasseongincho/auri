@@ -5,7 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getAllPosts()
 
   const blogEntries: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `https://auri-beta.vercel.app/blog/${post.slug}`,
+    url: `https://www.auri-resume.com/blog/${post.slug}`,
     lastModified: new Date(post.date),
     changeFrequency: 'monthly',
     priority: 0.6,
@@ -13,19 +13,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: 'https://auri-beta.vercel.app',
+      url: 'https://www.auri-resume.com',
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,
     },
     {
-      url: 'https://auri-beta.vercel.app/pricing',
+      url: 'https://www.auri-resume.com/pricing',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: 'https://auri-beta.vercel.app/blog',
+      url: 'https://www.auri-resume.com/blog',
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.7,
