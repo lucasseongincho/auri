@@ -534,13 +534,16 @@ export default function LandingPage() {
                     <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$0</span>
                     <span className="text-[#60607A] mb-1">/month</span>
                   </div>
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {['3 AI generations/month', 'ATS scoring & optimizer', 'Cover letter generator'].map(f => (
+                  <ul className="space-y-3 mb-2 flex-1">
+                    {['3 AI generations/month', 'Resume builder & ATS optimizer', 'Cover letter generator'].map(f => (
                       <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
                         <CheckCircle className="w-4 h-4 text-[#22C55E]" /> {f}
                       </li>
                     ))}
                   </ul>
+                  <p className="text-xs text-[#60607A] mt-2 mb-8">
+                    LinkedIn, Strategy, Interview &amp; Rewriter require Pro
+                  </p>
                   <button
                     onClick={() => router.push(getStartedRedirect('free'))}
                     className="w-full py-3 rounded-xl border border-white/15

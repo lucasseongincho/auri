@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, FileText, FolderOpen, RefreshCw, Target, Linkedin,
   Map, Mail, MessageSquare, Settings, ChevronRight,
-  Sparkles, User, Cloud, CloudOff, MoreHorizontal, X,
+  Sparkles, User, Cloud, CloudOff, MoreHorizontal, X, Crown,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
@@ -40,17 +40,17 @@ function getBreadcrumbLabel(pathname: string): string {
 }
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-  { id: 'resume', label: 'Resume Builder', icon: FileText, href: '/dashboard/resume' },
-  { id: 'my-resumes', label: 'My Resumes', icon: FolderOpen, href: '/dashboard/resume/saved' },
-  { id: 'rewriter', label: 'Resume Rewriter', icon: RefreshCw, href: '/dashboard/rewriter' },
-  { id: 'ats', label: 'ATS Optimizer', icon: Target, href: '/dashboard/ats' },
-  { id: 'strategy', label: 'Job Strategy', icon: Map, href: '/dashboard/strategy' },
-  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin' },
-  { id: 'cover-letter', label: 'Cover Letter', icon: Mail, href: '/dashboard/cover-letter' },
-  { id: 'my-cover-letters', label: 'My Cover Letters', icon: FolderOpen, href: '/dashboard/cover-letter/saved' },
-  { id: 'interview', label: 'Interview Prep', icon: MessageSquare, href: '/dashboard/interview' },
-] as const
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', isPro: false },
+  { id: 'resume', label: 'Resume Builder', icon: FileText, href: '/dashboard/resume', isPro: false },
+  { id: 'my-resumes', label: 'My Resumes', icon: FolderOpen, href: '/dashboard/resume/saved', isPro: false },
+  { id: 'rewriter', label: 'Resume Rewriter', icon: RefreshCw, href: '/dashboard/rewriter', isPro: true },
+  { id: 'ats', label: 'ATS Optimizer', icon: Target, href: '/dashboard/ats', isPro: false },
+  { id: 'strategy', label: 'Job Strategy', icon: Map, href: '/dashboard/strategy', isPro: true },
+  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin', isPro: true },
+  { id: 'cover-letter', label: 'Cover Letter', icon: Mail, href: '/dashboard/cover-letter', isPro: false },
+  { id: 'my-cover-letters', label: 'My Cover Letters', icon: FolderOpen, href: '/dashboard/cover-letter/saved', isPro: false },
+  { id: 'interview', label: 'Interview Prep', icon: MessageSquare, href: '/dashboard/interview', isPro: true },
+]
 
 const BOTTOM_ITEMS = [
   { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/settings' },
@@ -64,14 +64,14 @@ const MOBILE_PRIMARY_ITEMS = [
 ] as const
 
 const MOBILE_MORE_ITEMS = [
-  { id: 'rewriter', label: 'Rewriter', icon: RefreshCw, href: '/dashboard/rewriter' },
-  { id: 'ats', label: 'ATS Score', icon: Target, href: '/dashboard/ats' },
-  { id: 'strategy', label: 'Strategy', icon: Map, href: '/dashboard/strategy' },
-  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin' },
-  { id: 'my-cover-letters', label: 'My Letters', icon: FolderOpen, href: '/dashboard/cover-letter/saved' },
-  { id: 'interview', label: 'Interview', icon: MessageSquare, href: '/dashboard/interview' },
-  { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/settings' },
-] as const
+  { id: 'rewriter', label: 'Rewriter', icon: RefreshCw, href: '/dashboard/rewriter', isPro: true },
+  { id: 'ats', label: 'ATS Score', icon: Target, href: '/dashboard/ats', isPro: false },
+  { id: 'strategy', label: 'Strategy', icon: Map, href: '/dashboard/strategy', isPro: true },
+  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin', isPro: true },
+  { id: 'my-cover-letters', label: 'My Letters', icon: FolderOpen, href: '/dashboard/cover-letter/saved', isPro: false },
+  { id: 'interview', label: 'Interview', icon: MessageSquare, href: '/dashboard/interview', isPro: true },
+  { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/settings', isPro: false },
+]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -80,7 +80,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false)
   const [moreDrawerOpen, setMoreDrawerOpen] = useState(false)
   const { user, loading } = useAuth()
-  const { isSyncing, syncError } = useCareerStore()
+  const { isSyncing, syncError, profile } = useCareerStore()
+  const userIsPro = profile?.isPro === true
 
   // Close More drawer on route change
   useEffect(() => { setMoreDrawerOpen(false) }, [pathname])
@@ -182,6 +183,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       </motion.span>
                     )}
                   </AnimatePresence>
+                  {sidebarExpanded && item.isPro && !userIsPro && !active && (
+                    <Crown className="w-3 h-3 text-[#F59E0B] flex-shrink-0 ml-auto" />
+                  )}
                   {active && (
                     <div className="ml-auto w-1 h-4 rounded-full bg-[#6366F1] flex-shrink-0" />
                   )}
@@ -390,6 +394,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         }`}
                     >
                       <item.icon className={`w-5 h-5 ${active ? 'text-[#818CF8]' : ''}`} />
+                      {item.isPro && !userIsPro && (
+                        <Crown className="w-3 h-3 text-[#F59E0B]" />
+                      )}
                       <span className="text-[10px] font-medium leading-tight">{item.label}</span>
                     </Link>
                   )

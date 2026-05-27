@@ -20,6 +20,7 @@ import { useCareerStore } from '@/store/careerStore'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
+import ProGate from '@/components/shared/ProGate'
 import type { JobStrategy, JobStrategyAction, JobStrategyDay } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -227,6 +228,11 @@ export default function StrategyPage() {
   const completedCount = Object.values(completed).filter(Boolean).length
 
   return (
+    <ProGate
+      featureName="7-Day Job Search Strategy"
+      featureDescription="Get a personalized, immediately executable 7-day action plan for your target role — with specific job sites, search terms, and daily actions."
+      icon={<Map className="w-6 h-6 text-[#6366F1]" />}
+    >
     <div className="space-y-6 pb-20 md:pb-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center gap-3 mb-1">
@@ -377,5 +383,6 @@ export default function StrategyPage() {
         </motion.div>
       </div>
     </div>
+    </ProGate>
   )
 }

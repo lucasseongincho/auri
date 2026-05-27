@@ -30,6 +30,7 @@ import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import EstimateDisclaimerModal from '@/components/resume/EstimateDisclaimerModal'
 import { stripAITags } from '@/lib/resumeHighlight'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
+import ProGate from '@/components/shared/ProGate'
 import type { ResumeData, PersonalInfo, SavedResume, ATSScore } from '@/types'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 import { toDate } from '@/lib/utils'
@@ -366,6 +367,11 @@ export default function RewriterPage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
+    <ProGate
+      featureName="Resume Rewriter"
+      featureDescription="Upload your existing resume and rewrite it completely for a new target role. Side-by-side before/after view with full Easy Tune editing."
+      icon={<RefreshCw className="w-6 h-6 text-[#6366F1]" />}
+    >
     <div className="space-y-6 pb-20 md:pb-0">
 
       {/* ── Page Header ── */}
@@ -1001,5 +1007,6 @@ export default function RewriterPage() {
         }}
       />
     </div>
+    </ProGate>
   )
 }

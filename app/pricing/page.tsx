@@ -10,7 +10,7 @@ const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
 const FREE_FEATURES = [
   '3 AI generations/month',
-  'ATS scoring & optimizer',
+  'Resume builder & ATS optimizer',
   'Cover letter generator',
 ]
 
@@ -158,13 +158,16 @@ export default function PricingPage() {
                   <p className="text-xs text-[#60607A] mt-2">No credit card required</p>
                 </div>
 
-                <ul className="space-y-3 mb-8 flex-1">
+                <ul className="space-y-3 mb-2 flex-1">
                   {FREE_FEATURES.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
                       <CheckCircle className="w-4 h-4 text-[#22C55E] flex-shrink-0" /> {f}
                     </li>
                   ))}
                 </ul>
+                <p className="text-xs text-[#60607A] mt-2 mb-8">
+                  LinkedIn, Strategy, Interview &amp; Rewriter require Pro
+                </p>
 
                 <Link
                   href="/dashboard"

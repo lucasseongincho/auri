@@ -28,6 +28,7 @@ import { useAIStream } from '@/hooks/useAIStream'
 import { buildExperienceSummary } from '@/lib/prompts'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 import { saveInterviewPrep, saveGuestInterviewPrep } from '@/lib/firestore'
+import ProGate from '@/components/shared/ProGate'
 import type { InterviewPrep, InterviewQuestion } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -443,6 +444,11 @@ export default function InterviewPage() {
   }, [prep, user?.uid, position, company, showToast])
 
   return (
+    <ProGate
+      featureName="Interview Prep System"
+      featureDescription="Generate the 8 most likely interview questions with STAR frameworks, plus 3 strategic questions to ask. Practice mode with AI feedback included."
+      icon={<MessageSquare className="w-6 h-6 text-[#6366F1]" />}
+    >
     <div className="space-y-6 pb-20 md:pb-0">
       {/* ── Toast ─────────────────────────────────────────── */}
       <AnimatePresence>
@@ -726,5 +732,6 @@ export default function InterviewPage() {
         </motion.div>
       </div>
     </div>
+    </ProGate>
   )
 }

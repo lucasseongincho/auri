@@ -17,6 +17,7 @@ import {
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
+import ProGate from '@/components/shared/ProGate'
 import type { LinkedInRewrite } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -151,6 +152,11 @@ export default function LinkedInPage() {
   const hasProfileInput = headline.trim() || aboutSection.trim() || experiences.trim()
 
   return (
+    <ProGate
+      featureName="LinkedIn Profile Rewriter"
+      featureDescription="Rewrite your headline, About section, and top experiences to attract recruiters for your target role. Optimized for LinkedIn's search algorithm."
+      icon={<Linkedin className="w-6 h-6 text-[#6366F1]" />}
+    >
     <div className="space-y-6 pb-20 md:pb-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center gap-3 mb-1">
@@ -274,5 +280,6 @@ export default function LinkedInPage() {
         </motion.div>
       </div>
     </div>
+    </ProGate>
   )
 }
