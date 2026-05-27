@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, Sparkles, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -96,27 +96,43 @@ export default function PricingPage() {
           transition={{ ...SPRING, delay: 0.05 }}
           className="flex justify-center mb-10"
         >
-          <div className="inline-flex items-center rounded-xl border border-white/[0.08] bg-[#13131A] p-1 gap-1">
+          <div className="relative flex items-center p-1 rounded-xl
+            bg-[#13131A] border border-white/[0.08]">
+            {/* Sliding background */}
+            <motion.div
+              layout
+              transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+              className="absolute rounded-lg bg-[#6366F1]"
+              style={{
+                width: 'calc(50% - 4px)',
+                height: 'calc(100% - 8px)',
+                top: 4,
+                left: billing === 'monthly' ? 4 : 'calc(50%)',
+              }}
+            />
             <button
               onClick={() => setBilling('monthly')}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                billing === 'monthly'
-                  ? 'bg-[#1C1C26] text-white border border-white/[0.08]'
-                  : 'text-[#60607A] hover:text-[#A0A0B8]'
+              className={`relative z-10 px-5 py-2 rounded-lg text-sm font-medium
+                transition-colors duration-200 ${
+                billing === 'monthly' ? 'text-white' : 'text-[#60607A] hover:text-[#A0A0B8]'
               }`}
             >
               Monthly
             </button>
             <button
               onClick={() => setBilling('annual')}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                billing === 'annual'
-                  ? 'bg-[#1C1C26] text-white border border-white/[0.08]'
-                  : 'text-[#60607A] hover:text-[#A0A0B8]'
+              className={`relative z-10 px-5 py-2 rounded-lg text-sm font-medium
+                transition-colors duration-200 flex items-center gap-2 ${
+                billing === 'annual' ? 'text-white' : 'text-[#60607A] hover:text-[#A0A0B8]'
               }`}
             >
               Annual
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[#22C55E]/15 text-[#22C55E]">
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold
+                transition-colors duration-200 ${
+                billing === 'annual'
+                  ? 'bg-white/20 text-white'
+                  : 'bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E]'
+              }`}>
                 Save 17%
               </span>
             </button>
@@ -177,22 +193,33 @@ export default function PricingPage() {
                 <div className="mb-6">
                   <p className="font-heading font-semibold text-[#818CF8] mb-2">Pro</p>
                   <div className="flex items-end gap-1">
-                    <motion.span
-                      key={displayPrice}
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={SPRING}
-                      className="font-heading font-bold text-4xl text-white"
-                    >
-                      ${displayPrice}
-                    </motion.span>
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={billing}
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.18, ease: 'easeOut' }}
+                        className="font-heading font-bold text-4xl text-white"
+                      >
+                        {billing === 'annual' ? '$15.83' : '$19'}
+                      </motion.span>
+                    </AnimatePresence>
                     <span className="text-[#60607A] mb-1">/month</span>
                   </div>
-                  {billing === 'annual' ? (
-                    <p className="text-xs text-[#60607A] mt-2">Billed annually · ${Math.round(annualMonthlyPrice * 12)}/yr</p>
-                  ) : (
-                    <p className="text-xs text-[#60607A] mt-2">Cancel anytime</p>
-                  )}
+                  <AnimatePresence>
+                    {billing === 'annual' && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.15 }}
+                        className="text-xs text-[#22C55E] mt-1"
+                      >
+                        $190 billed annually
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 <ul className="space-y-3 mb-8 flex-1">
