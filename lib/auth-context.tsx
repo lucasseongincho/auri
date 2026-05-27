@@ -3,8 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import {
   onAuthStateChanged,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
@@ -38,22 +37,6 @@ const googleProvider = new GoogleAuthProvider()
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result?.user) {
-          // Redirect completed — send user to their intended destination
-          const intent = sessionStorage.getItem('postAuthIntent')
-          sessionStorage.removeItem('postAuthIntent')
-          const destination = intent === 'pro' ? '/pricing' : '/dashboard'
-          window.location.href = destination
-        }
-      })
-      .catch((error) => {
-        console.error('Redirect sign-in error:', error)
-      })
-  }, [])
 
   useEffect(() => {
     // Guard: Firebase env vars not set (e.g. Vercel preview without env config)
@@ -94,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = useCallback(async () => {
     if (!hasConfig) throw new Error('Firebase is not configured.')
-    await signInWithRedirect(auth, googleProvider)
+    await signInWithPopup(auth, googleProvider)
   }, [])
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
