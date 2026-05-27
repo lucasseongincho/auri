@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FileText, Target, Linkedin, Map, Mail, MessageSquare,
-  ChevronRight, TrendingUp, CheckCircle, AlertCircle, Sparkles, X,
+  ChevronRight, TrendingUp, CheckCircle, AlertCircle, Sparkles, X, Zap,
 } from 'lucide-react'
 import { useCareerProfile } from '@/hooks/useCareerProfile'
 import { useAuth } from '@/hooks/useAuth'
@@ -80,6 +80,58 @@ const QUICK_ACTIONS = [
   { label: 'Job Strategy', desc: '7-day action plan', icon: Map, href: '/dashboard/strategy', color: 'from-[#22C55E] to-[#16A34A]' },
 ]
 
+function UpgradeBanner() {
+  const [isPro, setIsPro] = useState<boolean | null>(null)
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (!user?.uid) return
+    ;(async () => {
+      try {
+        const { doc, getDoc } = await import('firebase/firestore')
+        const { db } = await import('@/lib/firebase')
+        if (!db) return
+        const snap = await getDoc(doc(db, `users/${user.uid}/profile/data`))
+        setIsPro(snap.exists() ? (snap.data()?.isPro === true) : false)
+      } catch {
+        setIsPro(null)
+      }
+    })()
+  }, [user?.uid])
+
+  if (isPro !== false) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={SPRING}
+      className="rounded-2xl border border-[#6366F1]/30 bg-[#13131A] p-1"
+    >
+      <div className="rounded-xl border border-[#6366F1]/15 bg-gradient-to-r from-[#6366F1]/10 to-[#8B5CF6]/10 p-4 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center flex-shrink-0">
+            <Zap className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-white">3 free generations/month</p>
+            <p className="text-xs text-[#A0A0B8]">Upgrade to Pro for unlimited access to all AI tools.</p>
+          </div>
+        </div>
+        <Link
+          href="/pricing"
+          className="flex-shrink-0 px-4 py-2 rounded-xl font-semibold text-white text-sm
+            bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
+            shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/40
+            hover:scale-[1.02] transition-all duration-200 whitespace-nowrap"
+        >
+          Upgrade to Pro
+        </Link>
+      </div>
+    </motion.div>
+  )
+}
+
 export default function DashboardPage() {
   const { profile, atsScore } = useCareerProfile()
   const { user } = useAuth()
@@ -110,6 +162,9 @@ export default function DashboardPage() {
       <Suspense fallback={null}>
         <UpgradeSuccessHandler />
       </Suspense>
+
+      {/* Free tier upgrade prompt */}
+      <UpgradeBanner />
 
       {/* Welcome */}
       <motion.div

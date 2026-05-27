@@ -3,6 +3,7 @@ import { streamClaude, buildErrorResponse } from '@/lib/claude'
 import { buildCoverLetterPrompt, buildCoverLetterAssistPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
+import { checkAndIncrementFreeUsage } from '@/lib/freeTier'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -65,6 +66,20 @@ export async function POST(req: NextRequest) {
     const identifier = getIdentifier(req, verifiedUser?.uid)
     const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser?.isPro ?? false)
     if (!allowed) return rateLimitResponse(retryAfter)
+
+    // Free tier monthly limit (authenticated non-pro users only)
+    if (verifiedUser && !verifiedUser.isPro) {
+      const freeTier = await checkAndIncrementFreeUsage(verifiedUser.uid)
+      if (!freeTier.allowed) {
+        return Response.json({
+          success: false,
+          error: 'FREE_TIER_LIMIT_REACHED',
+          message: 'You have used all 3 free generations this month. Upgrade to Pro for unlimited access.',
+          used: freeTier.used,
+          limit: freeTier.limit,
+        }, { status: 403 })
+      }
+    }
 
     if (!body.position?.trim() || !body.company?.trim()) {
       return buildErrorResponse('position and company are required', 400)

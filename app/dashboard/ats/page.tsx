@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Target, Sparkles, Loader2, AlertCircle, FileText, ClipboardList, Copy, CheckCircle, RefreshCw } from 'lucide-react'
+import { Target, Sparkles, Loader2, AlertCircle, FileText, ClipboardList, Copy, CheckCircle, RefreshCw, Zap } from 'lucide-react'
 import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
@@ -248,10 +249,23 @@ export default function ATSPage() {
               </div>
 
               {error && (
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20">
-                  <AlertCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0" />
-                  <p className="text-xs text-[#EF4444]">{error}</p>
-                </div>
+                error === 'FREE_TIER_LIMIT_REACHED' ? (
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-[#6366F1]/10 border border-[#6366F1]/20">
+                    <Zap className="w-4 h-4 text-[#6366F1] flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-white">Monthly limit reached</p>
+                      <p className="text-xs text-[#A0A0B8]">You&apos;ve used all 3 free generations this month.</p>
+                    </div>
+                    <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#818CF8] hover:text-white transition-colors">
+                      Upgrade →
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20">
+                    <AlertCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0" />
+                    <p className="text-xs text-[#EF4444]">{error}</p>
+                  </div>
+                )
               )}
 
               <button

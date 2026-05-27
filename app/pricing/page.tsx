@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { CheckCircle, Sparkles, ArrowLeft } from 'lucide-react'
@@ -8,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth'
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
 const FREE_FEATURES = [
-  '3 resume generations/month',
+  '3 AI generations/month',
   'ATS scoring & optimizer',
   'Cover letter generator',
 ]
@@ -25,6 +26,11 @@ const PRO_FEATURES = [
 
 export default function PricingPage() {
   const { user } = useAuth()
+  const [billing, setBilling] = useState<'monthly' | 'annual'>('annual')
+
+  const monthlyPrice = 19
+  const annualMonthlyPrice = 15.83
+  const displayPrice = billing === 'annual' ? annualMonthlyPrice : monthlyPrice
 
   const handleUpgrade = async () => {
     if (!user) {
@@ -39,6 +45,7 @@ export default function PricingPage() {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ plan: billing }),
       })
       const data = await res.json() as { url?: string; error?: string }
       if (data.url) window.location.href = data.url
@@ -60,7 +67,7 @@ export default function PricingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={SPRING}
-          className="text-center mb-16"
+          className="text-center mb-10"
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#6366F1]/30 bg-[#6366F1]/10 text-[#818CF8] text-xs font-medium mb-6">
             <Sparkles className="w-3 h-3" /> Simple, transparent pricing
@@ -73,13 +80,47 @@ export default function PricingPage() {
           </p>
         </motion.div>
 
+        {/* Billing toggle */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...SPRING, delay: 0.05 }}
+          className="flex justify-center mb-10"
+        >
+          <div className="inline-flex items-center rounded-xl border border-white/[0.08] bg-[#13131A] p-1 gap-1">
+            <button
+              onClick={() => setBilling('monthly')}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                billing === 'monthly'
+                  ? 'bg-[#1C1C26] text-white border border-white/[0.08]'
+                  : 'text-[#60607A] hover:text-[#A0A0B8]'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBilling('annual')}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                billing === 'annual'
+                  ? 'bg-[#1C1C26] text-white border border-white/[0.08]'
+                  : 'text-[#60607A] hover:text-[#A0A0B8]'
+              }`}
+            >
+              Annual
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[#22C55E]/15 text-[#22C55E]">
+                Save 17%
+              </span>
+            </button>
+          </div>
+        </motion.div>
+
         {/* Plans */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Free */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ ...SPRING, delay: 0.05 }}
+            transition={{ ...SPRING, delay: 0.08 }}
           >
             <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-full">
               <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-8 h-full flex flex-col">
@@ -116,7 +157,7 @@ export default function PricingPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ ...SPRING, delay: 0.1 }}
+            transition={{ ...SPRING, delay: 0.12 }}
           >
             <div className="rounded-2xl border border-[#6366F1]/40 bg-[#13131A] p-1 h-full relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full
@@ -127,10 +168,22 @@ export default function PricingPage() {
                 <div className="mb-6">
                   <p className="font-heading font-semibold text-[#818CF8] mb-2">Pro</p>
                   <div className="flex items-end gap-1">
-                    <span className="font-heading font-bold text-4xl text-white">$19</span>
+                    <motion.span
+                      key={displayPrice}
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={SPRING}
+                      className="font-heading font-bold text-4xl text-white"
+                    >
+                      ${displayPrice}
+                    </motion.span>
                     <span className="text-[#60607A] mb-1">/month</span>
                   </div>
-                  <p className="text-xs text-[#60607A] mt-2">Cancel anytime</p>
+                  {billing === 'annual' ? (
+                    <p className="text-xs text-[#60607A] mt-2">Billed annually · ${Math.round(annualMonthlyPrice * 12)}/yr</p>
+                  ) : (
+                    <p className="text-xs text-[#60607A] mt-2">Cancel anytime</p>
+                  )}
                 </div>
 
                 <ul className="space-y-3 mb-8 flex-1">
