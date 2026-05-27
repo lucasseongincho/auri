@@ -35,7 +35,12 @@ export async function getAuthenticatedUser(req: Request): Promise<VerifiedUser |
     const uid = decoded.uid
 
     const snap = await adminDb.doc(`users/${uid}/profile/data`).get()
-    const isPro = snap.exists ? (snap.data()?.isPro === true) : false
+    const firestoreIsPro = snap.exists ? (snap.data()?.isPro === true) : false
+    const isAdmin = decoded.email === 'lucas.seongin.cho@gmail.com' ||
+      (process.env.NEXT_PUBLIC_OWNER_EMAIL
+        ? decoded.email === process.env.NEXT_PUBLIC_OWNER_EMAIL
+        : false)
+    const isPro = firestoreIsPro || isAdmin
 
     // Fire-and-forget: update lastActiveAt on every authenticated API call.
     // Non-blocking — never delays the response if Firestore is slow.
