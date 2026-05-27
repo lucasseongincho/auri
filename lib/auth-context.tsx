@@ -3,7 +3,8 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import {
   onAuthStateChanged,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
@@ -25,7 +26,7 @@ interface AuthContextValue {
   user: AuthUser | null
   loading: boolean
   isAuthenticated: boolean
-  signInWithGoogle: () => Promise<User>
+  signInWithGoogle: () => Promise<void>
   signInWithEmail: (email: string, password: string) => Promise<User>
   signUpWithEmail: (email: string, password: string, options?: SignUpOptions) => Promise<User>
   logout: () => Promise<void>
@@ -37,6 +38,19 @@ const googleProvider = new GoogleAuthProvider()
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result?.user) {
+          // User signed in via redirect — onAuthStateChanged will
+          // handle the state update automatically
+        }
+      })
+      .catch((error) => {
+        console.error('Redirect sign-in error:', error)
+      })
+  }, [])
 
   useEffect(() => {
     // Guard: Firebase env vars not set (e.g. Vercel preview without env config)
@@ -53,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           photoURL: firebaseUser.photoURL,
         })
         // Single source of truth: loadFromFirestore only here, not in sign-in methods.
-        // This prevents double-reads on sign-in (listener fires after signInWithPopup resolves).
+        // This prevents double-reads on sign-in (listener fires after redirect/email sign-in resolves).
         await useCareerStore.getState().loadFromFirestore(firebaseUser.uid)
         // Migrate any guest localStorage data to Firestore on sign-in (non-blocking)
         Promise.all([
@@ -77,8 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = useCallback(async () => {
     if (!hasConfig) throw new Error('Firebase is not configured.')
-    const result = await signInWithPopup(auth, googleProvider)
-    return result.user
+    await signInWithRedirect(auth, googleProvider)
   }, [])
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
