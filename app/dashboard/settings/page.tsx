@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Settings, Crown, Zap } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -21,7 +22,6 @@ export default function SettingsPage() {
   const { user, isAuthenticated } = useAuth()
   const { handleSignOut } = useSignOut()
   const [billingLoading, setBillingLoading] = useState(false)
-  const [upgradeLoading, setUpgradeLoading] = useState(false)
   const [isPro, setIsPro] = useState<boolean | null>(null)
 
   useEffect(() => {
@@ -54,25 +54,6 @@ export default function SettingsPage() {
       // silent
     } finally {
       setBillingLoading(false)
-    }
-  }
-
-  const handleUpgrade = async () => {
-    setUpgradeLoading(true)
-    try {
-      const token = await getToken()
-      if (!token) { window.location.href = '/login'; return }
-      const res = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ plan: 'annual' }),
-      })
-      const data = await res.json() as { url?: string; error?: string }
-      if (data.url) window.location.href = data.url
-    } catch {
-      // silent
-    } finally {
-      setUpgradeLoading(false)
     }
   }
 
@@ -149,18 +130,17 @@ export default function SettingsPage() {
             </button>
           )}
           {isPro === false && (
-            <button
-              type="button"
-              onClick={handleUpgrade}
-              disabled={upgradeLoading}
-              className="px-4 py-2 rounded-xl font-semibold text-white text-sm
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                font-semibold text-white text-sm
                 bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
                 shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/40
-                hover:scale-[1.02] transition-all duration-200
-                disabled:opacity-50 disabled:cursor-not-allowed"
+                hover:scale-[1.02] transition-all duration-200"
             >
-              {upgradeLoading ? 'Loading…' : 'Upgrade to Pro'}
-            </button>
+              <Crown className="w-3.5 h-3.5" />
+              View Plans
+            </Link>
           )}
         </div>
       </motion.div>

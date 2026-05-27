@@ -67,8 +67,12 @@ export default function PricingPage() {
     <main className="min-h-screen bg-[#0A0A0F] px-6 py-16">
       <div className="max-w-4xl mx-auto">
         {/* Back link */}
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[#60607A] hover:text-white transition-colors mb-12">
-          <ArrowLeft className="w-4 h-4" /> Back to home
+        <Link
+          href={user ? '/dashboard' : '/'}
+          className="inline-flex items-center gap-1.5 text-sm text-[#60607A] hover:text-white transition-colors mb-12"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {user ? 'Back to dashboard' : 'Back to home'}
         </Link>
 
         {/* Header */}
@@ -127,12 +131,8 @@ export default function PricingPage() {
               }`}
             >
               Annual
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold
-                transition-colors duration-200 ${
-                billing === 'annual'
-                  ? 'bg-white/20 text-white'
-                  : 'bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E]'
-              }`}>
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full
+                bg-[#22C55E] text-white">
                 Save 17%
               </span>
             </button>
