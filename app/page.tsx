@@ -120,6 +120,7 @@ export default function LandingPage() {
   const atsRef = useRef(null)
   const atsInView = useInView(atsRef, { once: true })
   const atsScore = useCounter(87, 2500, atsInView)
+  const [billing, setBilling] = useState<'monthly' | 'annual'>('annual')
 
   return (
     <main className="min-h-screen bg-[#0A0A0F] overflow-x-hidden">
@@ -523,6 +524,38 @@ export default function LandingPage() {
             <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">Simple pricing</h2>
             <p className="text-[#A0A0B8]">Start free. Upgrade when you land the job.</p>
           </FadeInSection>
+
+          <div className="flex justify-center mb-10">
+            <div className="inline-flex items-center rounded-xl
+              border border-white/[0.08] bg-[#13131A] p-1 gap-1">
+              <button
+                onClick={() => setBilling('monthly')}
+                className={`px-5 py-2 rounded-lg text-sm font-medium
+                  transition-all duration-200 ${
+                  billing === 'monthly'
+                    ? 'bg-[#1C1C26] text-white border border-white/[0.08]'
+                    : 'text-[#60607A] hover:text-[#A0A0B8]'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBilling('annual')}
+                className={`px-5 py-2 rounded-lg text-sm font-medium
+                  transition-all duration-200 flex items-center gap-2 ${
+                  billing === 'annual'
+                    ? 'bg-[#1C1C26] text-white border border-white/[0.08]'
+                    : 'text-[#60607A] hover:text-[#A0A0B8]'
+                }`}
+              >
+                Annual
+                <span className="text-[10px] font-semibold px-1.5 py-0.5
+                  rounded-full bg-[#22C55E] text-white">
+                  Save 17%
+                </span>
+              </button>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {/* Free */}
