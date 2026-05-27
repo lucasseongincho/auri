@@ -41,14 +41,16 @@ export default function SignupPage() {
     setError('')
     setLoading(true)
     try {
+      // signInWithGoogle uses signInWithRedirect — browser navigates away.
+      // Redirect to /dashboard is handled by getRedirectResult in auth-context.tsx.
       await signInWithGoogle()
-      router.push('/dashboard')
+      // Code below only runs if redirect fails (e.g. blocked) — keep loading state
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code ?? ''
       console.error('[Google Sign-In Error]', err)
       if (code === 'auth/popup-blocked') {
-        setError('Popup was blocked by your browser. Please allow popups for this site and try again.')
-      } else if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        setError('Popup was blocked. Please allow popups and try again.')
+      } else if (code === 'auth/cancelled-popup-request') {
         setError('Sign-in was cancelled. Please try again.')
       } else if (code === 'auth/unauthorized-domain') {
         setError('This domain is not authorized. Please contact support.')
@@ -57,9 +59,9 @@ export default function SignupPage() {
       } else {
         setError('Google sign-in failed. Please try again.')
       }
-    } finally {
       setLoading(false)
     }
+    // Don't call setLoading(false) in finally — page will navigate away on success
   }
 
   return (

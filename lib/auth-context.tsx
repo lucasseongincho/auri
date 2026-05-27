@@ -43,8 +43,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     getRedirectResult(auth)
       .then((result) => {
         if (result?.user) {
-          // User signed in via redirect — onAuthStateChanged will
-          // handle the state update automatically
+          // Redirect completed — send user to their intended destination
+          const intent = sessionStorage.getItem('postAuthIntent')
+          sessionStorage.removeItem('postAuthIntent')
+          const destination = intent === 'pro' ? '/pricing' : '/dashboard'
+          window.location.href = destination
         }
       })
       .catch((error) => {
