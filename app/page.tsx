@@ -535,7 +535,7 @@ export default function LandingPage() {
                     <span className="text-[#60607A] mb-1">/month</span>
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
-                    {['3 resume generations/month', 'ATS scoring', 'Cover letter generator'].map(f => (
+                    {['3 AI generations/month', 'ATS scoring & optimizer', 'Cover letter generator'].map(f => (
                       <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
                         <CheckCircle className="w-4 h-4 text-[#22C55E]" /> {f}
                       </li>
@@ -566,10 +566,10 @@ export default function LandingPage() {
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
                     {[
-                      'Unlimited generations',
-                      'All Free features',
-                      'LinkedIn rewriter',
-                      '7-day job strategy',
+                      'Unlimited AI generations',
+                      'All Free features included',
+                      'LinkedIn profile rewriter',
+                      '7-day job search strategy',
                       'Interview prep system',
                       'Priority support',
                     ].map(f => (
@@ -609,10 +609,10 @@ export default function LandingPage() {
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
                     {[
-                      'Unlimited generations',
-                      'All Free features',
-                      'LinkedIn rewriter',
-                      '7-day job strategy',
+                      'Unlimited AI generations',
+                      'All Free features included',
+                      'LinkedIn profile rewriter',
+                      '7-day job search strategy',
                       'Interview prep system',
                       'Priority support',
                       '2 months free vs monthly',

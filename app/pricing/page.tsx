@@ -19,9 +19,18 @@ const PRO_FEATURES = [
   'All Free features included',
   'LinkedIn profile rewriter',
   '7-day job search strategy',
-  'Interview prep with AI scoring',
-  'PDF export',
+  'Interview prep system',
   'Priority support',
+]
+
+const ANNUAL_FEATURES = [
+  'Unlimited AI generations',
+  'All Free features included',
+  'LinkedIn profile rewriter',
+  '7-day job search strategy',
+  'Interview prep system',
+  'Priority support',
+  '2 months free vs monthly',
 ]
 
 export default function PricingPage() {
