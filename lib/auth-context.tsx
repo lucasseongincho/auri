@@ -123,6 +123,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (hasConfig) await signOut(auth)
     } finally {
       setUser(null)
+      // Clear cached profile so the next user starts fresh with no stale isPro data
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auri_guest_profile')
+      }
     }
   }, [])
 

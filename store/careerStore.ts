@@ -185,7 +185,13 @@ export const useCareerStore = create<CareerStore>()(
       ),
       // Don't persist edit history — only persists active data
       partialize: (state) => ({
-        profile: state.profile,
+        profile: state.profile
+          ? {
+              ...state.profile,
+              isPro: undefined,              // never cache isPro in localStorage
+              stripeCustomerId: undefined,   // never cache payment data locally
+            }
+          : null,
         currentResume: state.currentResume,
       }),
     }
