@@ -100,39 +100,31 @@ export default function PricingPage() {
           transition={{ ...SPRING, delay: 0.05 }}
           className="flex justify-center mb-10"
         >
-          <div className="relative flex items-center p-1 rounded-xl
-            bg-[#13131A] border border-white/[0.08]">
-            {/* Sliding background */}
-            <motion.div
-              layout
-              transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-              className="absolute rounded-lg bg-[#6366F1]"
-              style={{
-                width: 'calc(50% - 4px)',
-                height: 'calc(100% - 8px)',
-                top: 4,
-                left: billing === 'monthly' ? 4 : 'calc(50%)',
-              }}
-            />
+          <div className="inline-flex items-center rounded-xl
+            border border-white/[0.08] bg-[#13131A] p-1 gap-1">
             <button
               onClick={() => setBilling('monthly')}
-              className={`relative z-10 px-5 py-2 rounded-lg text-sm font-medium
-                transition-colors duration-200 ${
-                billing === 'monthly' ? 'text-white' : 'text-[#60607A] hover:text-[#A0A0B8]'
+              className={`px-5 py-2 rounded-lg text-sm font-medium
+                transition-all duration-200 ${
+                billing === 'monthly'
+                  ? 'bg-[#6366F1] text-white'
+                  : 'text-[#60607A] hover:text-[#A0A0B8]'
               }`}
             >
               Monthly
             </button>
             <button
               onClick={() => setBilling('annual')}
-              className={`relative z-10 px-5 py-2 rounded-lg text-sm font-medium
-                transition-colors duration-200 flex items-center gap-2 ${
-                billing === 'annual' ? 'text-white' : 'text-[#60607A] hover:text-[#A0A0B8]'
+              className={`px-5 py-2 rounded-lg text-sm font-medium
+                transition-all duration-200 flex items-center gap-2 ${
+                billing === 'annual'
+                  ? 'bg-[#6366F1] text-white'
+                  : 'text-[#60607A] hover:text-[#A0A0B8]'
               }`}
             >
               Annual
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full
-                bg-[#22C55E] text-white">
+              <span className="text-[10px] font-semibold px-1.5 py-0.5
+                rounded-full bg-[#22C55E] text-white">
                 Save 17%
               </span>
             </button>
