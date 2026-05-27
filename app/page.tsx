@@ -518,23 +518,23 @@ export default function LandingPage() {
 
       {/* ── 7. Pricing ── */}
       <section id="pricing" className="py-16 md:py-24 px-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <FadeInSection className="text-center mb-16">
             <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">Simple pricing</h2>
             <p className="text-[#A0A0B8]">Start free. Upgrade when you land the job.</p>
           </FadeInSection>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {/* Free */}
             <FadeInSection>
-              <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 md:p-8">
+              <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-full">
+                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 md:p-8 h-full flex flex-col">
                   <p className="font-heading font-semibold text-[#A0A0B8] mb-1">Free</p>
                   <div className="flex items-end gap-1 mb-6">
                     <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$0</span>
                     <span className="text-[#60607A] mb-1">/month</span>
                   </div>
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-8 flex-1">
                     {['3 resume generations/month', 'ATS scoring', 'Cover letter generator'].map(f => (
                       <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
                         <CheckCircle className="w-4 h-4 text-[#22C55E]" /> {f}
@@ -553,18 +553,18 @@ export default function LandingPage() {
 
             {/* Pro */}
             <FadeInSection delay={0.1}>
-              <div className="rounded-2xl border border-[#6366F1]/40 bg-[#13131A] p-1 relative">
+              <div className="rounded-2xl border border-[#6366F1]/40 bg-[#13131A] p-1 relative h-full">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full
                   bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-xs font-semibold">
                   Most Popular
                 </div>
-                <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] p-6 md:p-8">
+                <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] p-6 md:p-8 h-full flex flex-col">
                   <p className="font-heading font-semibold text-[#818CF8] mb-1">Pro</p>
                   <div className="flex items-end gap-1 mb-6">
                     <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$19</span>
                     <span className="text-[#60607A] mb-1">/month</span>
                   </div>
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-8 flex-1">
                     {[
                       'Unlimited generations',
                       'All Free features',
@@ -585,6 +585,50 @@ export default function LandingPage() {
                       shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
                       hover:scale-[1.02] transition-all duration-200">
                     Start Pro Free
+                  </button>
+                </div>
+              </div>
+            </FadeInSection>
+
+            {/* Pro Annual */}
+            <FadeInSection delay={0.2}>
+              <div className="rounded-2xl border border-[#22C55E]/30 bg-[#13131A] p-1 relative h-full">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full
+                  bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-white text-xs font-semibold
+                  whitespace-nowrap">
+                  Save 17%
+                </div>
+                <div className="rounded-xl border border-[#22C55E]/15 bg-[#1C1C26] p-6 md:p-8 h-full flex flex-col">
+                  <div>
+                    <p className="font-heading font-semibold text-[#22C55E] mb-1">Pro Annual</p>
+                    <div className="flex items-end gap-1 mb-1">
+                      <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$15.83</span>
+                      <span className="text-[#60607A] mb-1">/month</span>
+                    </div>
+                    <p className="text-xs text-[#22C55E] mb-6">$190 billed once a year</p>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {[
+                      'Unlimited generations',
+                      'All Free features',
+                      'LinkedIn rewriter',
+                      '7-day job strategy',
+                      'Interview prep system',
+                      'Priority support',
+                      '2 months free vs monthly',
+                    ].map(f => (
+                      <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
+                        <CheckCircle className="w-4 h-4 text-[#22C55E] flex-shrink-0" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => router.push(getStartedRedirect('pro'))}
+                    className="w-full py-3 rounded-xl font-semibold text-white
+                      bg-gradient-to-r from-[#22C55E] to-[#16A34A]
+                      shadow-lg shadow-[#22C55E]/25 hover:shadow-[#22C55E]/40
+                      hover:scale-[1.02] transition-all duration-200">
+                    Get Annual Plan
                   </button>
                 </div>
               </div>
