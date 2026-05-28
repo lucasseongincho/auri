@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -17,6 +17,7 @@ import {
   deleteStrategy,
   getGuestStrategies,
   deleteGuestStrategy,
+  updateStrategyCompleted,
 } from '@/lib/firestore'
 import type { SavedStrategy, JobStrategyAction, JobStrategyDay } from '@/types'
 
@@ -30,14 +31,21 @@ const DAY_COLORS = [
   { bg: 'bg-[#EC4899]/10', border: 'border-[#EC4899]/20', text: 'text-[#F472B6]' },
 ]
 
-function ActionItem({ action, completed }: { action: JobStrategyAction; completed: boolean }) {
+function ActionItem({ action, completed, onToggle }: {
+  action: JobStrategyAction
+  completed: boolean
+  onToggle: () => void
+}) {
   return (
     <div className={`flex items-start gap-3 p-3 rounded-xl border transition-all duration-200 ${
       completed ? 'border-[#22C55E]/20 bg-[#22C55E]/5' : 'border-white/[0.06] bg-[#0A0A0F]/40'
     }`}>
-      <div className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${
-        completed ? 'border-[#22C55E] bg-[#22C55E]' : 'border-white/20'
-      }`}>
+      <div
+        onClick={onToggle}
+        className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center cursor-pointer transition-all duration-200 mt-0.5 ${
+          completed ? 'border-[#22C55E] bg-[#22C55E]' : 'border-white/20 hover:border-[#6366F1]'
+        }`}
+      >
         {completed && <CheckCircle className="w-3 h-3 text-white" />}
       </div>
       <div className="flex-1 min-w-0">
@@ -59,10 +67,11 @@ function ActionItem({ action, completed }: { action: JobStrategyAction; complete
   )
 }
 
-function DayCard({ day, dayIndex, completed }: {
+function DayCard({ day, dayIndex, completed, onToggle }: {
   day: JobStrategyDay
   dayIndex: number
   completed: Record<string, boolean>
+  onToggle: (key: string) => void
 }) {
   const [expanded, setExpanded] = useState(dayIndex === 0)
   const color = DAY_COLORS[dayIndex % DAY_COLORS.length]
@@ -107,6 +116,7 @@ function DayCard({ day, dayIndex, completed }: {
                     key={ai}
                     action={action}
                     completed={completed[`${day.day}-${ai}`] ?? false}
+                    onToggle={() => onToggle(`${day.day}-${ai}`)}
                   />
                 ))}
               </div>
@@ -125,6 +135,7 @@ export default function SavedStrategyDetailPage() {
   const id = params?.id as string
 
   const [saved, setSaved] = useState<SavedStrategy | null>(null)
+  const [completed, setCompleted] = useState<Record<string, boolean>>({})
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
@@ -154,6 +165,22 @@ export default function SavedStrategyDetailPage() {
     }
     load()
   }, [user, authLoading, id])
+
+  useEffect(() => {
+    if (saved) setCompleted(saved.completed ?? {})
+  }, [saved])
+
+  const handleToggle = useCallback(async (key: string) => {
+    const updated = { ...completed, [key]: !completed[key] }
+    setCompleted(updated)
+    if (user && id) {
+      try {
+        await updateStrategyCompleted(user.uid, id as string, updated)
+      } catch {
+        // silent — state already updated locally
+      }
+    }
+  }, [completed, user, id])
 
   async function handleDelete() {
     if (!saved) return
@@ -207,7 +234,7 @@ export default function SavedStrategyDetailPage() {
   }
 
   const totalActions = saved.strategy.days.reduce((sum, d) => sum + d.actions.length, 0)
-  const completedCount = Object.values(saved.completed).filter(Boolean).length
+  const completedCount = Object.values(completed).filter(Boolean).length
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-[#F8F8FF]">
@@ -279,7 +306,7 @@ export default function SavedStrategyDetailPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: dayIndex * 0.05 }}
             >
-              <DayCard day={day} dayIndex={dayIndex} completed={saved.completed} />
+              <DayCard day={day} dayIndex={dayIndex} completed={completed} onToggle={handleToggle} />
             </motion.div>
           ))}
         </div>
