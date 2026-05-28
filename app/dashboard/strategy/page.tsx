@@ -15,12 +15,15 @@ import {
   Globe,
   Clock,
   Zap,
+  Save,
+  FolderOpen,
 } from 'lucide-react'
 import { useCareerStore } from '@/store/careerStore'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import ProGate from '@/components/shared/ProGate'
+import { saveStrategy, saveGuestStrategy } from '@/lib/firestore'
 import type { JobStrategy, JobStrategyAction, JobStrategyDay } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -154,6 +157,8 @@ export default function StrategyPage() {
   const [strategy, setStrategy] = useState<JobStrategy | null>(null)
   const [generateError, setGenerateError] = useState('')
   const [copied, setCopied] = useState(false)
+  const [savedId, setSavedId] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
 
   const [completed, setCompleted] = useState<CompletedMap>(() => {
     // Prefer Firestore-synced data from the career profile (loaded on mount via store)
@@ -186,6 +191,7 @@ export default function StrategyPage() {
     if (!targetPosition.trim()) return
     setStrategy(null)
     setGenerateError('')
+    setSavedId(null)
     const cityOrRemote = isRemote ? 'Remote' : (city.trim() || 'Remote')
 
     const fullText = await stream('/api/claude/strategy', {
@@ -220,6 +226,35 @@ export default function StrategyPage() {
     }
   }, [targetPosition, sectorOrIndustry, city, isRemote, companySizeOrType, user?.uid, stream, profile, updateProfile])
 
+  const handleSave = useCallback(async () => {
+    if (!strategy) return
+    setSaving(true)
+    try {
+      if (user) {
+        const id = await saveStrategy(
+          user.uid,
+          targetPosition,
+          sectorOrIndustry,
+          isRemote ? 'Remote' : city,
+          strategy
+        )
+        setSavedId(id)
+      } else {
+        const id = saveGuestStrategy(
+          targetPosition,
+          sectorOrIndustry,
+          isRemote ? 'Remote' : city,
+          strategy
+        )
+        setSavedId(id)
+      }
+    } catch {
+      // silent
+    } finally {
+      setSaving(false)
+    }
+  }, [strategy, user, targetPosition, sectorOrIndustry, city, isRemote])
+
   const toggleAction = (key: string) => {
     setCompleted((prev) => ({ ...prev, [key]: !prev[key] }))
   }
@@ -235,11 +270,44 @@ export default function StrategyPage() {
     >
     <div className="space-y-6 pb-20 md:pb-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#22C55E] to-[#16A34A] flex items-center justify-center">
-            <Map className="w-5 h-5 text-white" />
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#22C55E] to-[#16A34A] flex items-center justify-center">
+              <Map className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="font-heading text-2xl font-bold text-white">7-Day Job Strategy</h1>
           </div>
-          <h1 className="font-heading text-2xl font-bold text-white">7-Day Job Strategy</h1>
+          <div className="flex items-center gap-2">
+            {strategy && (
+              <button
+                onClick={handleSave}
+                disabled={saving || !!savedId}
+                aria-label="Save strategy"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
+                  bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
+                  shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
+                  hover:scale-[1.02] transition-all duration-200
+                  disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {saving
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : savedId
+                  ? <CheckCircle className="w-3.5 h-3.5" />
+                  : <Save className="w-3.5 h-3.5" />
+                }
+                {saving ? 'Saving…' : savedId ? 'Saved!' : 'Save'}
+              </button>
+            )}
+            <Link
+              href="/dashboard/strategy/saved"
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
+                border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+                transition-all duration-200"
+            >
+              <FolderOpen className="w-3.5 h-3.5" />
+              My Strategies
+            </Link>
+          </div>
         </div>
         <p className="text-[#A0A0B8] text-sm ml-12">
           A personalized, immediately executable day-by-day job search plan with specific sites, search terms, and daily actions.

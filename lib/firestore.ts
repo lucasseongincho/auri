@@ -11,7 +11,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import type { CareerProfile, SavedResume, SavedInterviewPrep, InterviewPrep, SavedCoverLetter } from '@/types'
+import type { CareerProfile, SavedResume, SavedInterviewPrep, InterviewPrep, SavedCoverLetter, SavedStrategy, JobStrategy } from '@/types'
 
 // ── User Profile Bootstrap ────────────────────────────────────────────────────
 // Called on sign-up and Google sign-in to persist auth metadata to Firestore.
@@ -234,6 +234,107 @@ export async function migrateGuestInterviewPrepsToFirestore(uid: string): Promis
   if (preps.length === 0) return
   await Promise.all(preps.map((p) => saveInterviewPrep(uid, p.position, p.company, p.prep)))
   localStorage.removeItem(GUEST_INTERVIEW_KEY)
+}
+
+// ── Job Strategies ────────────────────────────────────────────────────────────
+
+export async function saveStrategy(
+  uid: string,
+  position: string,
+  industry: string,
+  city: string,
+  strategy: JobStrategy
+): Promise<string> {
+  const ref = doc(collection(db, `users/${uid}/strategies`))
+  await setDoc(ref, {
+    position,
+    industry,
+    city,
+    strategy,
+    completed: {},
+    createdAt: serverTimestamp(),
+  })
+  return ref.id
+}
+
+export async function getSavedStrategies(uid: string): Promise<SavedStrategy[]> {
+  const snap = await getDocs(
+    query(
+      collection(db, `users/${uid}/strategies`),
+      orderBy('createdAt', 'desc')
+    )
+  )
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as SavedStrategy))
+}
+
+export async function getSavedStrategy(
+  uid: string,
+  strategyId: string
+): Promise<SavedStrategy | null> {
+  const snap = await getDoc(doc(db, `users/${uid}/strategies/${strategyId}`))
+  if (!snap.exists()) return null
+  return { id: snap.id, ...snap.data() } as SavedStrategy
+}
+
+export async function deleteStrategy(uid: string, strategyId: string): Promise<void> {
+  await deleteDoc(doc(db, `users/${uid}/strategies/${strategyId}`))
+}
+
+export async function updateStrategyCompleted(
+  uid: string,
+  strategyId: string,
+  completed: Record<string, boolean>
+): Promise<void> {
+  await updateDoc(doc(db, `users/${uid}/strategies/${strategyId}`), { completed })
+}
+
+// ── Guest strategies (localStorage) ──────────────────────────────────────────
+
+const GUEST_STRATEGIES_KEY = 'auri_guest_strategies'
+
+export function getGuestStrategies(): SavedStrategy[] {
+  if (typeof window === 'undefined') return []
+  const raw = localStorage.getItem(GUEST_STRATEGIES_KEY)
+  if (!raw) return []
+  try { return JSON.parse(raw) as SavedStrategy[] } catch { return [] }
+}
+
+export function saveGuestStrategy(
+  position: string,
+  industry: string,
+  city: string,
+  strategy: JobStrategy
+): string {
+  if (typeof window === 'undefined') return ''
+  const strategies = getGuestStrategies()
+  const id = `guest_${Date.now()}`
+  const full: SavedStrategy = {
+    id,
+    position,
+    industry,
+    city,
+    strategy,
+    completed: {},
+    createdAt: new Date().toISOString(),
+  }
+  strategies.unshift(full)
+  localStorage.setItem(GUEST_STRATEGIES_KEY, JSON.stringify(strategies.slice(0, 10)))
+  return id
+}
+
+export function deleteGuestStrategy(id: string): void {
+  if (typeof window === 'undefined') return
+  const strategies = getGuestStrategies().filter((s) => s.id !== id)
+  localStorage.setItem(GUEST_STRATEGIES_KEY, JSON.stringify(strategies))
+}
+
+export async function migrateGuestStrategiesToFirestore(uid: string): Promise<void> {
+  const strategies = getGuestStrategies()
+  if (strategies.length === 0) return
+  await Promise.all(
+    strategies.map((s) => saveStrategy(uid, s.position, s.industry, s.city, s.strategy))
+  )
+  localStorage.removeItem(GUEST_STRATEGIES_KEY)
 }
 
 export async function migrateGuestToFirestore(uid: string): Promise<void> {

@@ -13,7 +13,7 @@ import {
 } from 'firebase/auth'
 import { auth, hasConfig } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
-import { ensureUserProfileFields, migrateGuestToFirestore, migrateGuestInterviewPrepsToFirestore, migrateGuestCoverLettersToFirestore } from '@/lib/firestore'
+import { ensureUserProfileFields, migrateGuestToFirestore, migrateGuestInterviewPrepsToFirestore, migrateGuestCoverLettersToFirestore, migrateGuestStrategiesToFirestore } from '@/lib/firestore'
 import type { AuthUser } from '@/types'
 
 interface SignUpOptions {
@@ -60,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           migrateGuestToFirestore(firebaseUser.uid),
           migrateGuestInterviewPrepsToFirestore(firebaseUser.uid),
           migrateGuestCoverLettersToFirestore(firebaseUser.uid),
+          migrateGuestStrategiesToFirestore(firebaseUser.uid),
         ]).catch(() => {/* non-blocking */})
         // Persist auth metadata to Firestore for Google sign-ins and any gaps.
         // ensureUserProfileFields only writes fields that are missing — no overwrites.

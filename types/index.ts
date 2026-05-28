@@ -259,6 +259,17 @@ export interface ClaudeAPIResponse<T = unknown> {
   error?: string
 }
 
+// Saved job strategy: users/{uid}/strategies/{id}
+export interface SavedStrategy {
+  id: string
+  position: string
+  industry: string
+  city: string
+  strategy: JobStrategy
+  completed: Record<string, boolean>
+  createdAt: string
+}
+
 // Saved interview prep session: users/{uid}/interview-prep/{prepId}
 export interface SavedInterviewPrep {
   id: string
