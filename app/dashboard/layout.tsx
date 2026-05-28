@@ -120,6 +120,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           pathname !== '/dashboard/cover-letter/saved')
       )
     }
+    if (href === '/dashboard/strategy') return pathname === '/dashboard/strategy'
+    if (href === '/dashboard/strategy/saved') {
+      return (
+        pathname === '/dashboard/strategy/saved' ||
+        pathname.startsWith('/dashboard/strategy/saved/')
+      )
+    }
     return pathname.startsWith(href)
   }
 
