@@ -12,6 +12,7 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
 import CareerProfileDrawer from '@/components/shared/CareerProfileDrawer'
+import FeedbackModal from '@/components/shared/FeedbackModal'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -82,6 +83,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false)
   const [moreDrawerOpen, setMoreDrawerOpen] = useState(false)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
   const { user, loading } = useAuth()
   const { isSyncing, syncError, profile } = useCareerStore()
   const userIsPro = profile?.isPro === true
@@ -439,6 +441,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <CareerProfileDrawer
         open={profileDrawerOpen}
         onClose={() => setProfileDrawerOpen(false)}
+      />
+
+      {/* ── Floating Feedback Button ── */}
+      {user && (
+        <button
+          onClick={() => setFeedbackOpen(true)}
+          aria-label="Send feedback"
+          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50
+            flex items-center gap-2 px-3.5 py-2 rounded-full
+            bg-[#13131A] border border-white/[0.10] text-[#A0A0B8]
+            hover:text-white hover:border-[#6366F1]/50 hover:bg-[#1C1C26]
+            shadow-lg shadow-black/40 transition-all duration-200 text-sm font-medium"
+        >
+          <MessageSquare className="w-3.5 h-3.5 text-[#6366F1]" />
+          Feedback
+        </button>
+      )}
+
+      {/* ── Feedback Modal ── */}
+      <FeedbackModal
+        open={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
+        userEmail={user?.email ?? ''}
       />
     </div>
   )
