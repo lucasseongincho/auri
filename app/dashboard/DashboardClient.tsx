@@ -9,6 +9,7 @@ import {
   Map, Mail, MessageSquare, Settings, ChevronRight,
   Sparkles, User, Cloud, CloudOff, MoreHorizontal, X, Crown,
 } from 'lucide-react'
+import * as Sentry from '@sentry/nextjs'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
 import CareerProfileDrawer from '@/components/shared/CareerProfileDrawer'
@@ -88,6 +89,13 @@ export default function DashboardClient({ children }: { children: React.ReactNod
   const { user, loading } = useAuth()
   const { isSyncing, syncError, profile } = useCareerStore()
   const userIsPro = profile?.isPro === true
+
+  // Tag Sentry errors with the authenticated user
+  useEffect(() => {
+    if (user) {
+      Sentry.setUser({ id: user.uid, email: user.email ?? undefined })
+    }
+  }, [user])
 
   // Close More drawer on route change
   useEffect(() => { setMoreDrawerOpen(false) }, [pathname])

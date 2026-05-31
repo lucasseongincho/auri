@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from './providers'
+import SentryErrorBoundary from '@/components/SentryErrorBoundary'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.auri-resume.com'),
@@ -101,7 +102,9 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-text-primary font-body antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          <SentryErrorBoundary>{children}</SentryErrorBoundary>
+        </Providers>
       </body>
     </html>
   )

@@ -1,4 +1,5 @@
 const createMDX = require('@next/mdx')
+const { withSentryConfig } = require('@sentry/nextjs')
 
 const withMDX = createMDX({})
 
@@ -47,4 +48,10 @@ const nextConfig = {
   },
 }
 
-module.exports = withMDX(nextConfig)
+module.exports = withSentryConfig(withMDX(nextConfig), {
+  org: 'solin-inc',
+  project: 'auri',
+  silent: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+})

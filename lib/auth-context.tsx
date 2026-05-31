@@ -11,6 +11,7 @@ import {
   GoogleAuthProvider,
   User,
 } from 'firebase/auth'
+import * as Sentry from '@sentry/nextjs'
 import { auth, hasConfig } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { ensureUserProfileFields, migrateGuestToFirestore, migrateGuestInterviewPrepsToFirestore, migrateGuestCoverLettersToFirestore, migrateGuestStrategiesToFirestore } from '@/lib/firestore'
@@ -109,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       if (hasConfig) await signOut(auth)
     } finally {
+      Sentry.setUser(null)
       setUser(null)
       // Clear cached profile so the next user starts fresh with no stale isPro data
       if (typeof window !== 'undefined') {
