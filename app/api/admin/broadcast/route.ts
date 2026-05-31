@@ -80,14 +80,6 @@ async function runBroadcast() {
   return NextResponse.json({ sent, failed, errors });
 }
 
-export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get('secret');
-  if (!secret || secret !== process.env.BROADCAST_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  return runBroadcast();
-}
-
 export async function POST(req: NextRequest) {
   console.log('[broadcast] BROADCAST_SECRET:', process.env.BROADCAST_SECRET);
   const authHeader = req.headers.get('authorization');
