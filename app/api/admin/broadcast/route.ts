@@ -39,7 +39,9 @@ function sleep(ms: number) {
 export async function POST(req: NextRequest) {
   console.log('[broadcast] BROADCAST_SECRET:', process.env.BROADCAST_SECRET);
   const authHeader = req.headers.get('authorization');
-  if (!authHeader || authHeader !== `Bearer ${process.env.BROADCAST_SECRET}`) {
+  const token = authHeader?.replace(/^bearer\s+/i, '').trim();
+  console.log('[broadcast] extracted token:', JSON.stringify(token), '| expected:', JSON.stringify(process.env.BROADCAST_SECRET));
+  if (!token || token !== process.env.BROADCAST_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
