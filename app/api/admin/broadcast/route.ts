@@ -36,15 +36,7 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function POST(req: NextRequest) {
-  console.log('[broadcast] BROADCAST_SECRET:', process.env.BROADCAST_SECRET);
-  const authHeader = req.headers.get('authorization');
-  const token = authHeader?.replace(/^bearer\s+/i, '').trim();
-  console.log('[broadcast] extracted token:', JSON.stringify(token), '| expected:', JSON.stringify(process.env.BROADCAST_SECRET));
-  if (!token || token !== process.env.BROADCAST_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
+async function runBroadcast() {
   if (!adminAuth) {
     return NextResponse.json({ error: 'Firebase Admin not initialized' }, { status: 500 });
   }
@@ -86,4 +78,23 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ sent, failed, errors });
+}
+
+export async function GET(req: NextRequest) {
+  const secret = req.nextUrl.searchParams.get('secret');
+  if (!secret || secret !== process.env.BROADCAST_SECRET) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  return runBroadcast();
+}
+
+export async function POST(req: NextRequest) {
+  console.log('[broadcast] BROADCAST_SECRET:', process.env.BROADCAST_SECRET);
+  const authHeader = req.headers.get('authorization');
+  const token = authHeader?.replace(/^bearer\s+/i, '').trim();
+  console.log('[broadcast] extracted token:', JSON.stringify(token), '| expected:', JSON.stringify(process.env.BROADCAST_SECRET));
+  if (!token || token !== process.env.BROADCAST_SECRET) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  return runBroadcast();
 }
