@@ -49,8 +49,8 @@ const nextConfig = {
 }
 
 module.exports = withSentryConfig(withMDX(nextConfig), {
-  org: 'solin-inc',
-  project: 'auri',
+  org: 'auri-ri',
+  project: 'javascript-nextjs',
   silent: true,
   hideSourceMaps: true,
   disableLogger: true,
