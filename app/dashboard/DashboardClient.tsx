@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
 import CareerProfileDrawer from '@/components/shared/CareerProfileDrawer'
 import FeedbackModal from '@/components/shared/FeedbackModal'
+import OnboardingModal from '@/components/onboarding/OnboardingModal'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -465,6 +466,9 @@ export default function DashboardClient({ children }: { children: React.ReactNod
         onClose={() => setFeedbackOpen(false)}
         userEmail={user?.email ?? ''}
       />
+
+      {/* ── First-login onboarding modal ── */}
+      {!loading && user && !profile?.hasCompletedOnboarding && <OnboardingModal />}
     </div>
   )
 }
