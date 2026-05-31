@@ -34,6 +34,7 @@
     "react-dom": "^19.2.5",
     "remark-frontmatter": "^5.0.0",
     "remark-mdx-frontmatter": "^5.2.0",
+    "resend": "^6.12.4",
     "stripe": "^20.4.1",
     "tailwind-merge": "^2.5.4",
     "zustand": "^4.5.5"
