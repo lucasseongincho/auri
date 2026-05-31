@@ -7,7 +7,7 @@ export function getStartedRedirect(intent?: 'free' | 'pro'): string {
     if (intent === 'pro' && typeof window !== 'undefined') {
       sessionStorage.setItem('postAuthIntent', 'pro')
     }
-    return '/login'
+    return '/signup'
   }
 
   return '/dashboard'

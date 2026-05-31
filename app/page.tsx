@@ -216,7 +216,7 @@ export default function LandingPage() {
               transition={{ ...SPRING, delay: 0.4 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <MagneticButton href="/login"
+              <MagneticButton href="/signup"
                 className="px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-semibold text-white cursor-pointer
                   bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
                   shadow-lg shadow-[#6366F1]/30 hover:shadow-[#6366F1]/60
