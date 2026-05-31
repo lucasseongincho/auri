@@ -717,9 +717,13 @@ export default function LandingPage() {
           </div>
           <p className="text-sm text-[#60607A]">© 2026 AURI. Powered by AI.</p>
           <div className="flex gap-6">
-            {['Privacy', 'Terms', 'Contact'].map((link) => (
-              <a key={link} href="#" className="text-sm text-[#60607A] hover:text-white transition-colors duration-200">
-                {link}
+            {[
+              { label: 'Privacy', href: '#' },
+              { label: 'Terms', href: '#' },
+              { label: 'Contact', href: '/contact' },
+            ].map(({ label, href }) => (
+              <a key={label} href={href} className="text-sm text-[#60607A] hover:text-white transition-colors duration-200">
+                {label}
               </a>
             ))}
           </div>
