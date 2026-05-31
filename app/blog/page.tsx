@@ -3,12 +3,16 @@ import type { Metadata } from 'next'
 import { getAllPosts } from '@/lib/blog'
 
 export const metadata: Metadata = {
-  title: 'Blog — AURI',
-  description: 'Career advice, job search tips, ATS guidance, and product updates from the AURI team.',
+  title: { absolute: 'Blog — AURI' },
+  description: 'Career advice, resume tips, and job search strategies from the AURI team.',
   openGraph: {
     title: 'Blog — AURI',
-    description: 'Career advice, job search tips, ATS guidance, and product updates from the AURI team.',
+    description: 'Career advice, resume tips, and job search strategies from the AURI team.',
     type: 'website',
+    url: 'https://www.auri-resume.com/blog',
+  },
+  alternates: {
+    canonical: 'https://www.auri-resume.com/blog',
   },
 }
 

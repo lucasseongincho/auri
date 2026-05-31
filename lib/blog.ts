@@ -11,6 +11,7 @@ export interface PostMeta {
   slug: string
   tags: string[]
   published: boolean
+  author?: string
 }
 
 export interface PostWithContent extends PostMeta {

@@ -2,16 +2,14 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from './providers'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.auri-resume.com'
-
 export const metadata: Metadata = {
-  metadataBase: new URL(APP_URL),
+  metadataBase: new URL('https://www.auri-resume.com'),
   title: {
-    default: 'AURI — AI Resume Builder That Gets Past ATS Filters',
+    default: 'AURI — AI-Powered Career Toolkit',
     template: '%s | AURI',
   },
   description:
-    'Build ATS-optimized resumes tailored to every job. AURI rewrites your resume, LinkedIn profile, cover letter, and preps you for interviews — all powered by AI.',
+    'AURI is an AI-powered career toolkit that helps you tailor your resume to any job, beat ATS filters, and land more interviews — faster.',
   keywords: [
     'ATS resume builder',
     'AI resume optimizer',
@@ -40,7 +38,7 @@ export const metadata: Metadata = {
       'Build ATS-optimized resumes tailored to every job. Rewrite your LinkedIn, generate cover letters, and prep for interviews — all in one AI-powered system.',
     type: 'website',
     siteName: 'AURI',
-    url: APP_URL,
+    url: 'https://www.auri-resume.com',
     // og:image is auto-injected by app/opengraph-image.tsx (Next.js file-based OG)
   },
   twitter: {
@@ -51,7 +49,7 @@ export const metadata: Metadata = {
     // twitter:image is auto-injected by app/twitter-image.tsx (falls back to opengraph-image)
   },
   alternates: {
-    canonical: APP_URL,
+    canonical: 'https://www.auri-resume.com',
   },
   verification: {
     google: 'P2tadCAsvByF8yjAeb7ZVg2TH5OlXFajDfEAAoXjDlE',
@@ -66,7 +64,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   name: 'AURI',
-  url: APP_URL,
+  url: 'https://www.auri-resume.com',
   description:
     'AI-powered career toolkit for building ATS-optimized resumes, rewriting LinkedIn profiles, generating cover letters, and preparing for interviews.',
   applicationCategory: 'BusinessApplication',

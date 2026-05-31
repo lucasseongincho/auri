@@ -15,14 +15,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = getPostBySlug(slug)
   if (!post) return {}
+  const author = post.author ?? 'Lucas Cho'
   return {
-    title: `${post.title} — AURI Blog`,
+    title: { absolute: `${post.title} — AURI Blog` },
     description: post.description,
     openGraph: {
       title: post.title,
       description: post.description,
       type: 'article',
       publishedTime: post.date,
+      authors: [author],
+      images: [{ url: '/opengraph-image' }],
+      url: `https://www.auri-resume.com/blog/${slug}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.description,
+    },
+    alternates: {
+      canonical: `https://www.auri-resume.com/blog/${slug}`,
     },
   }
 }

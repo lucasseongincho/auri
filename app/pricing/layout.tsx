@@ -1,15 +1,12 @@
 import type { Metadata } from 'next'
+import { generatePageMetadata } from '@/lib/metadata'
 
-export const metadata: Metadata = {
-  title: 'Pricing',
+export const metadata: Metadata = generatePageMetadata({
+  title: 'Pricing — AURI',
   description:
-    'Start free — no sign-up required. Upgrade to AURI Pro for unlimited AI resume generations, LinkedIn rewrites, interview prep, and more.',
-  openGraph: {
-    title: 'AURI Pricing — Free & Pro Plans',
-    description:
-      'Start free with 3 resume generations per month. Upgrade to Pro for unlimited generations, LinkedIn rewriter, interview prep, and PDF export.',
-  },
-}
+    'Get full access to AURI\'s AI career tools for $19/month or $190/year. Less than half the price of Jobscan — with more features.',
+  path: '/pricing',
+})
 
 export default function PricingLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>
