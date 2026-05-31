@@ -39,13 +39,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
 
 function BlogPostContent({ post }: { post: PostWithContent }) {
   return (
@@ -67,27 +60,19 @@ function BlogPostContent({ post }: { post: PostWithContent }) {
             tracking-tight leading-tight mb-4">
             {post.title}
           </h1>
-          <div className="flex flex-wrap items-center gap-3">
-            <time dateTime={post.date} className="text-sm text-[#60607A]">
-              {formatDate(post.date)}
-            </time>
-            {post.tags?.length > 0 && (
-              <>
-                <span className="text-[#3A3A4A]">·</span>
-                <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2.5 py-0.5 rounded-full text-xs font-medium
-                        bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+          {post.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2.5 py-0.5 rounded-full text-xs font-medium
+                    bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </header>
 
         {/* MDX content */}
