@@ -99,9 +99,7 @@ export interface CareerProfile {
   updatedAt?: string
   /** Set to true after the user dismisses the AI-estimate disclaimer modal for the first time. */
   hasSeenEstimateDisclaimer?: boolean
-  /** Set to true after the user completes or skips the first-login onboarding modal. */
-  hasCompletedOnboarding?: boolean
-  /** Loaded from Firestore server side — never persisted to localStorage. */
+/** Loaded from Firestore server side — never persisted to localStorage. */
   isPro?: boolean
   stripeCustomerId?: string
 }
