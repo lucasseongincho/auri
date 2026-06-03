@@ -718,7 +718,7 @@ export default function LandingPage() {
           <p className="text-sm text-[#60607A]">© 2026 AURI. Powered by AI.</p>
           <div className="flex gap-6">
             {[
-              { label: 'Privacy', href: '#' },
+              { label: 'Privacy', href: '/privacy' },
               { label: 'Terms', href: '#' },
               { label: 'Contact', href: '/contact' },
             ].map(({ label, href }) => (

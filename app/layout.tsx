@@ -34,9 +34,9 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true },
   },
   openGraph: {
-    title: 'AURI — AI Resume Builder & Career Toolkit',
+    title: 'AURI — AI Career Toolkit',
     description:
-      'Build ATS-optimized resumes tailored to every job. Rewrite your LinkedIn, generate cover letters, and prep for interviews — all in one AI-powered system.',
+      'ATS scoring, resume rewriting, LinkedIn optimization, and interview prep — built for serious job seekers.',
     type: 'website',
     siteName: 'AURI',
     url: 'https://www.auri-resume.com',
@@ -44,9 +44,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AURI — AI Resume Builder & Career Toolkit',
+    title: 'AURI — AI Career Toolkit',
     description:
-      'Build ATS-optimized resumes tailored to every job. AI-powered career toolkit.',
+      'ATS scoring, resume rewriting, LinkedIn optimization, and interview prep — built for serious job seekers.',
     // twitter:image is auto-injected by app/twitter-image.tsx (falls back to opengraph-image)
   },
   alternates: {
