@@ -719,7 +719,7 @@ export default function LandingPage() {
           <div className="flex gap-6">
             {[
               { label: 'Privacy', href: '/privacy' },
-              { label: 'Terms', href: '#' },
+              { label: 'Terms', href: '/terms' },
               { label: 'Contact', href: '/contact' },
             ].map(({ label, href }) => (
               <a key={label} href={href} className="text-sm text-[#60607A] hover:text-white transition-colors duration-200">
