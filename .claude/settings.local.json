@@ -105,7 +105,8 @@
       "Bash(taskkill /PID 12188 /F)",
       "PowerShell(Stop-Process *)",
       "Bash(git checkout *)",
-      "Bash(npx tsx *)"
+      "Bash(npx tsx *)",
+      "Bash(Remove-Item *)"
     ]
   }
 }
