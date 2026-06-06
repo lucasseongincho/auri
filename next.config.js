@@ -51,7 +51,14 @@ const nextConfig = {
 module.exports = withSentryConfig(withMDX(nextConfig), {
   org: 'auri-ri',
   project: 'javascript-nextjs',
-  silent: true,
+  silent: !process.env.CI,
   hideSourceMaps: true,
-  disableLogger: true,
+  widenClientFileUpload: true,
+  tunnelRoute: '/monitoring',
+  webpack: {
+    automaticVercelMonitors: true,
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
 })
