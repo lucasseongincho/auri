@@ -6,6 +6,7 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  getAdditionalUserInfo,
   updateProfile,
   signOut,
   GoogleAuthProvider,
@@ -79,7 +80,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = useCallback(async () => {
     if (!hasConfig) throw new Error('Firebase is not configured.')
-    await signInWithPopup(auth, googleProvider)
+    const result = await signInWithPopup(auth, googleProvider)
+    const isNewUser = getAdditionalUserInfo(result)?.isNewUser ?? false
+    if (isNewUser && result.user.email) {
+      fetch('/api/email/welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: result.user.email, name: result.user.displayName ?? undefined }),
+      }).catch(() => {/* non-blocking */})
+    }
   }, [])
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
@@ -102,6 +111,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       displayName: options?.name?.trim() || firebaseUser.displayName,
       marketingConsent: options?.marketingConsent ?? false,
     })
+    // Send welcome email — non-blocking, never surfaces errors to the auth flow
+    if (firebaseUser.email) {
+      fetch('/api/email/welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: firebaseUser.email, name: options?.name?.trim() ?? undefined }),
+      }).catch(() => {/* non-blocking */})
+    }
     return firebaseUser
   }, [])
 
