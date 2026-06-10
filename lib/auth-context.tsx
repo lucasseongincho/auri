@@ -86,8 +86,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       fetch('/api/email/welcome', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: result.user.email, name: result.user.displayName ?? undefined }),
-      }).catch(() => {/* non-blocking */})
+        body: JSON.stringify({ email: result.user.email }),
+      })
+      .then(res => console.log('Welcome email response:', res.status, res.statusText))
+      .catch(err => console.error('Welcome email fetch error:', err))
     }
   }, [])
 
@@ -116,8 +118,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       fetch('/api/email/welcome', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: firebaseUser.email, name: options?.name?.trim() ?? undefined }),
-      }).catch(() => {/* non-blocking */})
+        body: JSON.stringify({ email: firebaseUser.email }),
+      })
+      .then(res => console.log('Welcome email response:', res.status, res.statusText))
+      .catch(err => console.error('Welcome email fetch error:', err))
     }
     return firebaseUser
   }, [])

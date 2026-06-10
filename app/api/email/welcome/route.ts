@@ -4,7 +4,9 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
-  const { email, name } = await req.json() as { email: string; name?: string };
+  const rawBody = await req.text()
+  console.log('Welcome email route hit with body:', rawBody)
+  const { email, name } = JSON.parse(rawBody) as { email: string; name?: string };
 
   if (!email) {
     return NextResponse.json({ error: 'Missing email' }, { status: 400 });
@@ -47,7 +49,7 @@ export async function POST(req: NextRequest) {
     </p>
 
     <p style="font-size:16px;line-height:1.6;color:#111111;margin:24px 0 0;">
-      Lucas<br>
+      Lucas,<br>
       <span style="color:#888888;">founder of AURI</span>
     </p>
 
@@ -79,8 +81,7 @@ Run a resume scan against a real job description. Paste in a job posting you act
 
 If you have questions or run into anything, just reply to this email — I read every one.
 
-Lucas
-founder of AURI
+Lucas, founder of AURI
 
 ---
 You received this because you created an AURI account.
