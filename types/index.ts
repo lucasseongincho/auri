@@ -133,6 +133,26 @@ export interface RequirementCoverage {
   // thresholds: >0.75 = strong, 0.5–0.75 = partial, <0.5 = missing
 }
 
+export interface ParseFailure {
+  type: 'column_merge' | 'missing_headers' | 'date_fragmented' |
+        'bullets_stripped' | 'encoding_artifact' | 'contact_garbled'
+  severity: 'high' | 'medium' | 'low'
+  description: string
+  affectedLines: number[]
+  affectedPlatforms: string[]
+}
+
+export interface ParsedResumeResult {
+  extractedText: string
+  lines: string[]
+  failures: ParseFailure[]
+  stats: {
+    totalLines: number
+    totalChars: number
+    detectedSections: string[]
+  }
+}
+
 export interface ResumeData {
   id?: string
   summary: string
