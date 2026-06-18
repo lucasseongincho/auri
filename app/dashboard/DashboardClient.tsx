@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, FileText, FolderOpen, RefreshCw, Target, Linkedin,
   Map, Mail, MessageSquare, Settings, ChevronRight,
-  Sparkles, User, Cloud, CloudOff, MoreHorizontal, X, Crown,
+  Sparkles, User, Cloud, CloudOff, MoreHorizontal, X, Crown, Scan,
 } from 'lucide-react'
 import * as Sentry from '@sentry/nextjs'
 import { useAuth } from '@/hooks/useAuth'
@@ -23,6 +23,7 @@ const PATH_LABELS: Record<string, string> = {
   '/dashboard/resume/saved': 'My Resumes',
   '/dashboard/rewriter': 'Resume Rewriter',
   '/dashboard/ats': 'ATS Optimizer',
+  '/dashboard/ats-scanner': 'Resume Parser',
   '/dashboard/linkedin': 'LinkedIn',
   '/dashboard/strategy': 'Job Strategy',
   '/dashboard/strategy/saved': 'My Strategies',
@@ -48,6 +49,7 @@ const NAV_ITEMS = [
   { id: 'my-resumes', label: 'My Resumes', icon: FolderOpen, href: '/dashboard/resume/saved', isPro: false },
   { id: 'rewriter', label: 'Resume Rewriter', icon: RefreshCw, href: '/dashboard/rewriter', isPro: true },
   { id: 'ats', label: 'ATS Optimizer', icon: Target, href: '/dashboard/ats', isPro: false },
+  { id: 'ats-scanner', label: 'Resume Parser', icon: Scan, href: '/dashboard/ats-scanner', isPro: true },
   { id: 'strategy', label: 'Job Strategy', icon: Map, href: '/dashboard/strategy', isPro: true },
   { id: 'my-strategies', label: 'My Strategies', icon: FolderOpen, href: '/dashboard/strategy/saved', isPro: false },
   { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin', isPro: true },
@@ -70,6 +72,7 @@ const MOBILE_PRIMARY_ITEMS = [
 const MOBILE_MORE_ITEMS = [
   { id: 'rewriter', label: 'Rewriter', icon: RefreshCw, href: '/dashboard/rewriter', isPro: true },
   { id: 'ats', label: 'ATS Score', icon: Target, href: '/dashboard/ats', isPro: false },
+  { id: 'ats-scanner', label: 'ATS Parser', icon: Scan, href: '/dashboard/ats-scanner', isPro: true },
   { id: 'strategy', label: 'Strategy', icon: Map, href: '/dashboard/strategy', isPro: true },
   { id: 'my-strategies', label: 'My Strategies', icon: FolderOpen, href: '/dashboard/strategy/saved', isPro: false },
   { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin', isPro: true },
