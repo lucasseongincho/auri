@@ -125,6 +125,14 @@ export interface ATSScore {
   strength_areas: string[]
 }
 
+export interface RequirementCoverage {
+  requirement: string
+  bestMatch: string | null
+  score: number            // 0–1 dot product of L2-normalized vectors
+  status: 'strong' | 'partial' | 'missing'
+  // thresholds: >0.75 = strong, 0.5–0.75 = partial, <0.5 = missing
+}
+
 export interface ResumeData {
   id?: string
   summary: string

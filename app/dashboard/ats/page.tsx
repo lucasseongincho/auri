@@ -9,7 +9,8 @@ import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
-import type { ATSScore } from '@/types'
+import RequirementCoveragePanel from '@/components/resume/RequirementCoveragePanel'
+import type { ATSScore, RequirementCoverage } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -32,6 +33,8 @@ export default function ATSPage() {
   const [originalScore, setOriginalScore] = useState<number | null>(null)
   const [improvedScore, setImprovedScore] = useState<number | null>(null)
   const [copied, setCopied] = useState(false)
+  const [coverage, setCoverage] = useState<RequirementCoverage[] | null>(null)
+  const [isCoverageLoading, setIsCoverageLoading] = useState(false)
   const improvedRef = useRef<HTMLDivElement>(null)
 
   const getIdTokenSafe = useCallback(async (): Promise<string | undefined> => {
@@ -39,6 +42,27 @@ export default function ATSPage() {
     if (!current) return undefined
     try { return await getIdToken(current) } catch { return undefined }
   }, [])
+
+  const runCoverageAnalysis = useCallback(
+    async (jd: string): Promise<RequirementCoverage[] | null> => {
+      if (!jd.trim()) return null
+      const idToken = await getIdTokenSafe()
+      if (!idToken) return null
+      const res = await fetch('/api/semantic-coverage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ jobDescription: jd }),
+      })
+      if (!res.ok) return null
+      const json = await res.json()
+      if (!json.success) return null
+      return json.data as RequirementCoverage[]
+    },
+    [getIdTokenSafe]
+  )
 
   const runAnalysis = useCallback(async (text: string, jd: string): Promise<ATSScore | null> => {
     if (!text.trim() || !jd.trim()) return null
@@ -71,6 +95,17 @@ export default function ATSPage() {
     setFixedResume(null)
     setOriginalScore(null)
     setImprovedScore(null)
+    setCoverage(null)
+
+    // Semantic coverage runs in parallel (authenticated users only — reads Firestore profile)
+    if (user) {
+      setIsCoverageLoading(true)
+      runCoverageAnalysis(jobDescription)
+        .then((result) => { if (result) setCoverage(result) })
+        .catch(() => { /* non-blocking: silently ignore coverage errors */ })
+        .finally(() => setIsCoverageLoading(false))
+    }
+
     try {
       const result = await runAnalysis(resumeText, jobDescription)
       if (result) {
@@ -82,7 +117,7 @@ export default function ATSPage() {
     } finally {
       setIsAnalyzing(false)
     }
-  }, [resumeText, jobDescription, runAnalysis, setATSScore])
+  }, [resumeText, jobDescription, runAnalysis, runCoverageAnalysis, setATSScore, user])
 
   const handleFixAll = useCallback(async () => {
     if (!resumeText.trim() || !score) return
@@ -314,6 +349,13 @@ export default function ATSPage() {
               </div>
             </div>
           )}
+
+          {/* Requirement Coverage Panel — semantic matching alongside keyword panel */}
+          {isCoverageLoading ? (
+            <RequirementCoveragePanel coverage={null} isLoading={true} />
+          ) : coverage ? (
+            <RequirementCoveragePanel coverage={coverage} isLoading={false} />
+          ) : null}
 
           {/* Improved Resume Panel — rendered after Fix All completes */}
           <AnimatePresence>
