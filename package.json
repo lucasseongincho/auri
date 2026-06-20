@@ -41,6 +41,8 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@fontsource/arimo": "^5.2.8",
+    "@fontsource/tinos": "^5.2.7",
     "@types/node": "^22.9.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",

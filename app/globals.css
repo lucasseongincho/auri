@@ -3,6 +3,39 @@
    the @import would land mid-file and violate the CSS @import-must-precede-rules spec. */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
+/* Resume template fonts — Tinos (≡ Times New Roman) and Arimo (≡ Arial),
+   both SIL OFL licensed and metrically compatible with their system-font
+   counterparts. Served from /public/fonts so Puppeteer can fetch them via
+   an absolute URL with no OS font dependency. */
+@font-face {
+  font-family: 'Tinos';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Tinos-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Tinos';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Tinos-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Arimo';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Arimo-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Arimo';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Arimo-Bold.woff2') format('woff2');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

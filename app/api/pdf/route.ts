@@ -47,13 +47,20 @@ export async function POST(req: Request) {
     const browser = await launchBrowser()
     const page = await browser.newPage()
 
-    // Set content and wait for fonts/images to load
+    // Match the Letter-page content width exactly so there is no re-layout
+    // between setContent (default 800px viewport) and the 8.5in PDF page.
+    // deviceScaleFactor: 2 gives retina-quality text rendering.
+    await page.setViewport({ width: 816, height: 1056, deviceScaleFactor: 2 })
+
+    // Set content and wait for fonts/images (including @font-face fetches) to load
     await page.setContent(html, { waitUntil: 'networkidle0' })
 
-    // Generate PDF — US Letter size, no margins (resume templates handle their own padding)
+    // Generate PDF — US Letter size, no margins (resume templates handle their own padding).
+    // preferCSSPageSize: true honours any @page rules in the template CSS.
     const pdf = await page.pdf({
       format: 'Letter',
       printBackground: true,
+      preferCSSPageSize: true,
       margin: { top: '0', right: '0', bottom: '0', left: '0' },
     })
 

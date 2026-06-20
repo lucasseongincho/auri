@@ -80,11 +80,48 @@ export function getResumeHTML(element: HTMLElement): string {
     })
     .join('\n')
 
+  // Embed metric-compatible web fonts so Puppeteer renders identical character
+  // widths regardless of which fonts are installed on the host OS (Linux on
+  // Vercel has no Times New Roman or Arial — without this, silent font
+  // substitution changes text metrics and pushes content to a second page).
+  // Tinos ≡ Times New Roman metrics, Arimo ≡ Arial metrics (SIL OFL licence).
+  const origin = window.location.origin
+  const embeddedFonts = `
+@font-face {
+  font-family: 'Tinos';
+  font-weight: 400;
+  font-style: normal;
+  src: url('${origin}/fonts/Tinos-Regular.woff2') format('woff2');
+  font-display: block;
+}
+@font-face {
+  font-family: 'Tinos';
+  font-weight: 700;
+  font-style: normal;
+  src: url('${origin}/fonts/Tinos-Bold.woff2') format('woff2');
+  font-display: block;
+}
+@font-face {
+  font-family: 'Arimo';
+  font-weight: 400;
+  font-style: normal;
+  src: url('${origin}/fonts/Arimo-Regular.woff2') format('woff2');
+  font-display: block;
+}
+@font-face {
+  font-family: 'Arimo';
+  font-weight: 700;
+  font-style: normal;
+  src: url('${origin}/fonts/Arimo-Bold.woff2') format('woff2');
+  font-display: block;
+}`
+
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <style>
+    ${embeddedFonts}
     ${styleSheets}
     body { margin: 0; padding: 0; background: white; }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }

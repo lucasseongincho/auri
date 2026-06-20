@@ -31,7 +31,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
     <>
       <style>{`
         .classic-pro {
-          font-family: 'Times New Roman', Times, serif;
+          font-family: 'Tinos', 'Times New Roman', Times, serif;
           color: #1a1a1a;
           background: white;
           width: 8.5in;
@@ -51,7 +51,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
           color: #444;
           text-align: center;
           margin-bottom: 10px;
-          font-family: Arial, sans-serif;
+          font-family: 'Arimo', Arial, sans-serif;
           letter-spacing: 0.02em;
         }
         .classic-pro .section-header {
@@ -63,7 +63,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
           border-bottom: 1.5px solid #1a1a1a;
           padding-bottom: 2px;
           margin: 11px 0 6px 0;
-          font-family: Arial, sans-serif;
+          font-family: 'Arimo', Arial, sans-serif;
         }
         .classic-pro .job-header {
           display: flex;
@@ -74,7 +74,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
         .classic-pro .job-title {
           font-size: 11px;
           font-weight: 700;
-          font-family: Arial, sans-serif;
+          font-family: 'Arimo', Arial, sans-serif;
         }
         .classic-pro .job-company {
           font-size: 11px;
@@ -83,7 +83,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
         .classic-pro .job-dates {
           font-size: 10px;
           color: #555;
-          font-family: Arial, sans-serif;
+          font-family: 'Arimo', Arial, sans-serif;
           white-space: nowrap;
           margin-left: 8px;
           flex-shrink: 0;
@@ -115,7 +115,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
         .classic-pro .edu-degree {
           font-size: 11px;
           font-weight: 700;
-          font-family: Arial, sans-serif;
+          font-family: 'Arimo', Arial, sans-serif;
         }
         .classic-pro .edu-school {
           font-size: 10.5px;
@@ -124,7 +124,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
         .classic-pro .edu-year {
           font-size: 10px;
           color: #555;
-          font-family: Arial, sans-serif;
+          font-family: 'Arimo', Arial, sans-serif;
           white-space: nowrap;
           flex-shrink: 0;
           margin-left: 8px;
@@ -132,7 +132,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
         .classic-pro .edu-minor {
           font-size: 10px;
           color: #555;
-          font-family: Arial, sans-serif;
+          font-family: 'Arimo', Arial, sans-serif;
           font-style: italic;
           margin-top: 1px;
         }
