@@ -361,12 +361,32 @@ export default function CoverLetterDetailPage() {
   async function handleDownloadPDF() {
     if (!letterDocRef.current || !letter) return
     setDownloading(true)
+    const slug = `${letter.company.replace(/\s+/g, '-').toLowerCase()}-${letter.position.replace(/\s+/g, '-').toLowerCase()}`
+    const filename = `cover-letter-${slug || 'download'}.pdf`
     try {
-      const { generatePDFFromElement } = await import('@/lib/pdf')
-      const slug = `${letter.company.replace(/\s+/g, '-').toLowerCase()}-${letter.position.replace(/\s+/g, '-').toLowerCase()}`
-      await generatePDFFromElement(letterDocRef.current, {
-        filename: `cover-letter-${slug || 'download'}.pdf`,
+      const { getResumeHTML } = await import('@/lib/pdf')
+      const html = getResumeHTML(letterDocRef.current)
+      const res = await fetch('/api/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html, filename }),
       })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(body.error ?? `Server responded ${res.status}`)
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('[pdf] Saved cover letter download failed:', err instanceof Error ? err.message : err)
+      setError('PDF generation is temporarily unavailable — please try again in a moment.')
     } finally {
       setDownloading(false)
     }

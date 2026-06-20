@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, Copy, CheckCircle, Loader2, Layout } from 'lucide-react'
+import { Download, Copy, CheckCircle, Loader2, Layout, AlertCircle, X } from 'lucide-react'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
 import { stripAllAITags } from '@/lib/resumeHighlight'
 import type { ResumeData, PersonalInfo } from '@/types'
@@ -268,6 +268,7 @@ export default function ResumePreview({
   const containerRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [pdfError, setPdfError] = useState<string | null>(null)
   const [msgIdx, setMsgIdx] = useState(0)
   const [containerWidth, setContainerWidth] = useState(LETTER_W)
 
@@ -299,16 +300,15 @@ export default function ResumePreview({
   const executePDFDownload = useCallback(async () => {
     if (!previewRef.current || !safeData) return
     setDownloading(true)
+    setPdfError(null)
 
     const el = previewRef.current
     const name = personal.name?.replace(/\s+/g, '-').toLowerCase() || 'resume'
     const filename = `${name}-resume.pdf`
 
     try {
-      // Add .printing class so amber highlights render as plain text
       el.classList.add('printing')
 
-      // Try server-side Puppeteer first
       const { getResumeHTML } = await import('@/lib/pdf')
       const html = getResumeHTML(el)
 
@@ -318,34 +318,26 @@ export default function ResumePreview({
         body: JSON.stringify({ html, filename }),
       })
 
-      if (res.ok) {
-        const blob = await res.blob()
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = filename
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-      } else {
-        // Fallback to client-side html2pdf.js if server fails
-        console.warn('Server PDF failed, falling back to html2pdf.js')
-        const { generatePDFFromElement } = await import('@/lib/pdf')
-        await generatePDFFromElement(el, { filename, imageQuality: 0.98 })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(body.error ?? `Server responded ${res.status}`)
       }
 
-      el.classList.remove('printing')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
     } catch (err) {
-      console.error('PDF download error:', err)
-      try {
-        const { generatePDFFromElement } = await import('@/lib/pdf')
-        await generatePDFFromElement(el, { filename, imageQuality: 0.98 })
-        el.classList.remove('printing')
-      } catch {
-        el.classList.remove('printing')
-      }
+      const msg = err instanceof Error ? err.message : 'Unknown error'
+      console.error('[pdf] Download failed:', msg)
+      setPdfError('PDF generation is temporarily unavailable — please try again in a moment.')
     } finally {
+      el.classList.remove('printing')
       setDownloading(false)
     }
   }, [safeData, personal])
@@ -369,7 +361,7 @@ export default function ResumePreview({
   if (!data && !isStreaming) return null
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       {/* Toolbar — no-print ensures it never appears in PDF export */}
       <div className="no-print flex items-center justify-end gap-2 mb-3">
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -534,6 +526,31 @@ export default function ResumePreview({
           </AnimatePresence>
         </div>
       </div>
+
+      {/* PDF error toast */}
+      <AnimatePresence>
+        {pdfError && (
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.95 }}
+            transition={SPRING}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50
+              flex items-center gap-3 px-4 py-3 rounded-xl border shadow-xl
+              bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444] max-w-sm w-full"
+          >
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span className="text-xs font-medium flex-1">{pdfError}</span>
+            <button
+              onClick={() => setPdfError(null)}
+              aria-label="Dismiss"
+              className="p-0.5 rounded opacity-60 hover:opacity-100 flex-shrink-0"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   )

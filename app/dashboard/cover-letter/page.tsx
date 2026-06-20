@@ -583,16 +583,36 @@ function CoverLetterContent() {
     setTimeout(() => setCopied(false), 2000)
   }, [result, paragraphs])
 
-  // Download PDF — only capture the letter content (no UI chrome)
+  // Download PDF — render through Puppeteer so the output has a real text layer
   const handleDownloadPDF = useCallback(async () => {
     if (!letterPrintRef.current) return
     setDownloading(true)
+    const slug = `${company.replace(/\s+/g, '-').toLowerCase()}-${position.replace(/\s+/g, '-').toLowerCase()}`
+    const filename = `cover-letter-${slug || 'download'}.pdf`
     try {
-      const { generatePDFFromElement } = await import('@/lib/pdf')
-      const slug = `${company.replace(/\s+/g, '-').toLowerCase()}-${position.replace(/\s+/g, '-').toLowerCase()}`
-      await generatePDFFromElement(letterPrintRef.current, {
-        filename: `cover-letter-${slug || 'download'}.pdf`,
+      const { getResumeHTML } = await import('@/lib/pdf')
+      const html = getResumeHTML(letterPrintRef.current)
+      const res = await fetch('/api/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html, filename }),
       })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(body.error ?? `Server responded ${res.status}`)
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('[pdf] Cover letter download failed:', err instanceof Error ? err.message : err)
+      setToast({ message: 'PDF generation is temporarily unavailable — please try again in a moment.', type: 'error' })
     } finally {
       setDownloading(false)
     }
