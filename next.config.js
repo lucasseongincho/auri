@@ -7,6 +7,11 @@ const withMDX = createMDX({})
 const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
 
+  // Prevent the bundler from trying to inline Puppeteer's Chromium binaries
+  // into the serverless function bundle. These packages are resolved from
+  // node_modules at runtime; they must never be webpack-bundled.
+  serverExternalPackages: ['puppeteer', 'puppeteer-core', '@sparticuz/chromium-min'],
+
   // ANTHROPIC_API_KEY has no NEXT_PUBLIC_ prefix so Next.js never exposes it
   // to the client bundle. No extra config needed — server-only by convention.
 

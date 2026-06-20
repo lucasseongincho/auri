@@ -1,15 +1,37 @@
-import chromium from '@sparticuz/chromium-min'
-import puppeteer from 'puppeteer-core'
+import type { Browser } from 'puppeteer-core'
 
 export const maxDuration = 30
 
-// chromium-min does not bundle the binary — it is fetched at request time from a
-// remote URL. CHROMIUM_REMOTE_EXEC_PATH can be set in Vercel env vars to override
-// the default (e.g. when a new chromium version is released without a code change).
-// For local development, set CHROMIUM_EXECUTABLE_PATH to your local Chrome path.
+// Remote URL for @sparticuz/chromium-min binary — only fetched in production.
+// Override via CHROMIUM_REMOTE_EXEC_PATH env var if a newer release is needed
+// without a code change.
 const CHROMIUM_REMOTE_URL =
   process.env.CHROMIUM_REMOTE_EXEC_PATH ??
   'https://github.com/Sparticuz/chromium/releases/download/v148.0.0/chromium-v148.0.0-pack.tar'
+
+// True on Vercel and in `next start` (post-build preview). False during `next dev`.
+const IS_PRODUCTION = !!process.env.VERCEL || process.env.NODE_ENV === 'production'
+
+// Launch Puppeteer with the correct Chromium source for the current environment:
+// - Production (Vercel): @sparticuz/chromium-min fetches a remote binary at
+//   request time — avoids bundling a 170 MB binary into the lambda.
+// - Local dev: full `puppeteer` package (devDependency) uses its own bundled
+//   Chromium — no remote fetch, works offline.
+// Explicitly typed as puppeteer-core's Browser so all downstream page.* calls
+// are validated against the production type definitions.
+async function launchBrowser(): Promise<Browser> {
+  if (IS_PRODUCTION) {
+    const chromium = (await import('@sparticuz/chromium-min')).default
+    const { launch } = await import('puppeteer-core')
+    const executablePath = await chromium.executablePath(CHROMIUM_REMOTE_URL)
+    return launch({ args: chromium.args, executablePath, headless: true })
+  }
+  // puppeteer@25 ships its own Browser class based on a newer puppeteer-core;
+  // it is structurally identical at runtime. Cast through unknown to satisfy the
+  // puppeteer-core@24 Browser type used by the rest of this function.
+  const { launch } = await import('puppeteer')
+  return launch({ headless: true }) as unknown as Browser
+}
 
 export async function POST(req: Request) {
   try {
@@ -22,16 +44,7 @@ export async function POST(req: Request) {
       return Response.json({ success: false, error: 'No HTML provided' }, { status: 400 })
     }
 
-    const executablePath = process.env.VERCEL
-      ? await chromium.executablePath(CHROMIUM_REMOTE_URL)
-      : (process.env.CHROMIUM_EXECUTABLE_PATH ?? await chromium.executablePath())
-
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      executablePath,
-      headless: true,
-    })
-
+    const browser = await launchBrowser()
     const page = await browser.newPage()
 
     // Set content and wait for fonts/images to load
