@@ -41,6 +41,14 @@ export function flattenResumeBullets(profile: CareerProfile): string[] {
     }
   }
 
+  for (const lang of profile.languages ?? []) {
+    const name = lang.name?.trim()
+    const proficiency = lang.proficiency?.trim()
+    if (name && proficiency) {
+      bullets.push(`${name} language proficiency: ${proficiency}`)
+    }
+  }
+
   return bullets
 }
 
