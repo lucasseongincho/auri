@@ -362,12 +362,23 @@ Return ONLY valid JSON:
       "section": "<one of: summary, experience, skills, projects, education, leadership>",
       "score": number between 0 and 100,
       "label": "<use exactly: Professional Summary | Work Experience | Skills | Projects | Education | Leadership>",
-      "strengths": ["<specific strength — name exact content>"],
-      "gaps": ["<specific gap relative to the JD>"],
-      "suggestions": ["<targeted fix for this section only>"]
+      "strengths": ["string"],
+      "gaps": ["string"],
+      "suggestions": ["string"]
     }
   ]
-}`
+}
+
+STRICT OUTPUT LIMITS — do not exceed these or the response will be truncated:
+- section_analysis: include only sections present in the resume (max 6)
+- strengths per section: MAXIMUM 3 items
+- gaps per section: MAXIMUM 3 items
+- suggestions per section: MAXIMUM 3 items
+- matched_keywords: MAXIMUM 15 items
+- missing_keywords: MAXIMUM 10 items
+- suggestions (global): MAXIMUM 5 items
+- strength_areas: MAXIMUM 5 items
+Keep every string under 25 words. Be specific and terse.`
 }
 
 // ── Feature 3 — Easy Tune (per-bullet AI Assist) ─────────────────────────────

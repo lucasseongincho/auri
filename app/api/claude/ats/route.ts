@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
     // Claude can detect cross-section gaps (e.g. skill listed in Skills but never
     // demonstrated in Experience bullets). Falls through to flat-text on any failure.
     let scoringPrompt = ''
+    let isStructuredPath = false
 
     if (verifiedUser?.isPro && adminDb) {
       try {
@@ -120,6 +121,7 @@ export async function POST(req: NextRequest) {
             },
             body.jobDescription
           )
+          isStructuredPath = true
         }
       } catch {
         // fall through to flat-text path
@@ -135,7 +137,10 @@ export async function POST(req: NextRequest) {
       scoringPrompt = buildATSScorePrompt(resumePlainText, body.jobDescription)
     }
 
-    const { data, inputTokens, outputTokens } = await callClaudeJSON<ATSScore>(scoringPrompt, MAX_TOKENS_ANALYSIS)
+    // Sectioned path returns 6 sections × (strengths + gaps + suggestions) arrays —
+    // significantly more tokens than the flat-text schema. 4000 gives safe headroom.
+    const scoringMaxTokens = isStructuredPath ? 4000 : MAX_TOKENS_ANALYSIS
+    const { data, inputTokens, outputTokens } = await callClaudeJSON<ATSScore>(scoringPrompt, scoringMaxTokens)
 
     return Response.json({
       success: true,
