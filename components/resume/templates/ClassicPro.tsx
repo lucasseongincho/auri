@@ -62,7 +62,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
           color: #1a1a1a;
           border-bottom: 1.5px solid #1a1a1a;
           padding-bottom: 2px;
-          margin: 11px 0 6px 0;
+          margin: 9px 0 6px 0;
           font-family: 'Arimo', Arial, sans-serif;
         }
         .classic-pro .job-header {
