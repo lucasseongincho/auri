@@ -222,6 +222,154 @@ NON-NEGOTIABLE CONSTRAINTS:
 - Return ONLY the improved resume text — no commentary, preamble, or explanation`
 }
 
+// ── ATS Sectioned Score (Pro path — structured sections) ─────────────────────
+
+/**
+ * Why sectioned layout vs flat text: Claude cannot detect cross-section gaps
+ * (e.g. a skill listed in Skills but never demonstrated in Experience) when the
+ * resume arrives as one undifferentiated blob. Labeling each section lets
+ * Claude reason about what belongs where and flag contradictions between sections.
+ *
+ * Why identical global schema: Keeps the frontend response-handling identical for
+ * both paths — section_analysis is additive, not a replacement schema.
+ *
+ * Do NOT merge this with buildATSScorePrompt. The flat-text path remains
+ * unchanged for guests and free users.
+ */
+export function buildATSSectionedScorePrompt(
+  sections: {
+    summary?: string
+    experience: Array<{
+      title: string
+      company: string
+      start: string
+      end: string
+      bullets: string[]
+    }>
+    skills: string[]
+    projects: Array<{
+      name: string
+      bullets: string[]
+    }>
+    education: Array<{
+      degree: string
+      institution: string
+      year: string
+    }>
+    leadership?: Array<{
+      role: string
+      organization: string
+      bullets: string[]
+    }>
+  },
+  jobDescription: string
+): string {
+  const lines: string[] = []
+
+  if (sections.summary) {
+    lines.push('=== PROFESSIONAL SUMMARY ===')
+    lines.push(sections.summary)
+    lines.push('')
+  }
+
+  if (sections.experience.length > 0) {
+    lines.push('=== WORK EXPERIENCE ===')
+    for (const exp of sections.experience) {
+      lines.push(`${exp.title} at ${exp.company} | ${exp.start} – ${exp.end}`)
+      for (const b of exp.bullets) lines.push(`- ${b}`)
+      lines.push('')
+    }
+  }
+
+  if (sections.skills.length > 0) {
+    lines.push('=== SKILLS ===')
+    lines.push(sections.skills.join(' · '))
+    lines.push('')
+  }
+
+  if (sections.projects.length > 0) {
+    lines.push('=== PROJECTS ===')
+    for (const proj of sections.projects) {
+      lines.push(proj.name)
+      for (const b of proj.bullets) lines.push(`- ${b}`)
+      lines.push('')
+    }
+  }
+
+  if (sections.education.length > 0) {
+    lines.push('=== EDUCATION ===')
+    for (const edu of sections.education) {
+      lines.push(`${edu.degree}, ${edu.institution} (${edu.year})`)
+    }
+    lines.push('')
+  }
+
+  if (sections.leadership && sections.leadership.length > 0) {
+    lines.push('=== LEADERSHIP ===')
+    for (const lead of sections.leadership) {
+      lines.push(`${lead.role} at ${lead.organization}`)
+      for (const b of lead.bullets) lines.push(`- ${b}`)
+      lines.push('')
+    }
+  }
+
+  const resumeText = lines.join('\n').trim()
+
+  return `You are an ATS system and senior recruiter combined.
+Analyze this resume against the job description with expert precision.
+
+Scoring criteria and maximum points:
+- Keyword match (max 40 pts): exact and semantic matches to JD terms, critical keywords present, density appropriate
+- Achievement orientation (max 25 pts): measurable results with metrics, action verbs, impact-driven bullets vs responsibility lists
+- Formatting compliance (max 20 pts): ATS-parseable structure, standard section headers, no tables/columns/graphics
+- Readability (max 15 pts): clarity, conciseness, consistent tense, appropriate length
+
+Job Description:
+${jobDescription}
+
+Resume (organized by section):
+${resumeText}
+
+SECTION-BY-SECTION ANALYSIS INSTRUCTIONS:
+Analyze each section in the resume independently against the job description.
+Specifically look for cross-section gaps that are invisible in a flat text view:
+- Skills listed in the Skills section but never demonstrated through specific examples in Experience or Projects bullets
+- Claims made in the Summary that are not supported by any evidence in Experience
+- JD requirements clearly addressed in one section but absent or contradicted in others
+
+For each section present in the resume above, provide:
+- score (0–100): how well this section alone demonstrates fit for the target role
+- strengths: 1–3 specific strengths (name exact content or phrases — not generic praise)
+- gaps: 1–3 specific gaps relative to the JD (name missing keywords, weak bullets, unsupported claims)
+- suggestions: 1–3 targeted, actionable fixes for THIS section only — not general advice
+
+Return ONLY valid JSON:
+{
+  "score": number (0-100, sum of all four dimension scores),
+  "dimension_scores": {
+    "keyword": number (0-40),
+    "achievement": number (0-25),
+    "formatting": number (0-20),
+    "readability": number (0-15)
+  },
+  "matched_keywords": ["string"],
+  "missing_keywords": ["string"],
+  "formatting_issues": ["string"],
+  "suggestions": ["string"],
+  "strength_areas": ["string"],
+  "section_analysis": [
+    {
+      "section": "<one of: summary, experience, skills, projects, education, leadership>",
+      "score": number between 0 and 100,
+      "label": "<use exactly: Professional Summary | Work Experience | Skills | Projects | Education | Leadership>",
+      "strengths": ["<specific strength — name exact content>"],
+      "gaps": ["<specific gap relative to the JD>"],
+      "suggestions": ["<targeted fix for this section only>"]
+    }
+  ]
+}`
+}
+
 // ── Feature 3 — Easy Tune (per-bullet AI Assist) ─────────────────────────────
 
 /**

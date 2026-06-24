@@ -10,6 +10,7 @@ import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import RequirementCoveragePanel from '@/components/resume/RequirementCoveragePanel'
+import SectionAnalysisPanel from '@/components/resume/SectionAnalysisPanel'
 import type { ATSScore, RequirementCoverage } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -348,6 +349,14 @@ export default function ATSPage() {
                 <p className="text-xs text-[#60607A] mt-1">Paste your resume and job description, then click Analyze</p>
               </div>
             </div>
+          )}
+
+          {/* Section Analysis Panel — Pro users only; invisible to guests and free users */}
+          {profile?.isPro && (
+            <SectionAnalysisPanel
+              sections={score?.section_analysis ?? null}
+              isLoading={isAnalyzing}
+            />
           )}
 
           {/* Requirement Coverage Panel — semantic matching alongside keyword panel */}

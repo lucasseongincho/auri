@@ -1,10 +1,11 @@
 import { NextRequest } from 'next/server'
 import { callClaude, callClaudeJSON, buildErrorResponse, MAX_TOKENS_ANALYSIS } from '@/lib/claude'
-import { buildATSScorePrompt, buildATSFixPrompt } from '@/lib/prompts'
+import { buildATSScorePrompt, buildATSFixPrompt, buildATSSectionedScorePrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
 import { checkAndIncrementFreeUsage } from '@/lib/freeTier'
-import type { ATSScore } from '@/types'
+import { adminDb } from '@/lib/firebaseAdmin'
+import type { ATSScore, CareerProfile } from '@/types'
 
 export const runtime = 'nodejs'
 
@@ -74,13 +75,67 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Score mode (default) ──────────────────────────────────────────────────
-    const resumePlainText = body.resumePlainText ?? body.resumeText ?? ''
-    if (!resumePlainText || !body.jobDescription) {
-      return buildErrorResponse('resumePlainText and jobDescription are required', 400)
+    if (!body.jobDescription) {
+      return buildErrorResponse('jobDescription is required', 400)
     }
 
-    const prompt = buildATSScorePrompt(resumePlainText, body.jobDescription)
-    const { data, inputTokens, outputTokens } = await callClaudeJSON<ATSScore>(prompt, MAX_TOKENS_ANALYSIS)
+    // STRUCTURED PATH: Pro user with a Firestore profile → send labeled sections so
+    // Claude can detect cross-section gaps (e.g. skill listed in Skills but never
+    // demonstrated in Experience bullets). Falls through to flat-text on any failure.
+    let scoringPrompt = ''
+
+    if (verifiedUser?.isPro && adminDb) {
+      try {
+        const snap = await adminDb.doc(`users/${verifiedUser.uid}/profile/data`).get()
+        if (snap.exists) {
+          const profile = snap.data() as CareerProfile
+          const firstParagraph = profile.generated?.resume_plain
+            ?.split(/\n\n+/)[0]
+            ?.trim()
+          scoringPrompt = buildATSSectionedScorePrompt(
+            {
+              summary: firstParagraph || undefined,
+              experience: profile.experience.map((exp) => ({
+                title: exp.title,
+                company: exp.company,
+                start: exp.start,
+                end: exp.end,
+                bullets: exp.bullets,
+              })),
+              skills: profile.skills,
+              projects: profile.projects.map((proj) => ({
+                name: proj.name,
+                bullets: proj.bullets,
+              })),
+              education: profile.education.map((edu) => ({
+                degree: `${edu.degree}${edu.field ? ` in ${edu.field}` : ''}`,
+                institution: edu.institution,
+                year: edu.year,
+              })),
+              leadership: profile.leadership?.map((lead) => ({
+                role: lead.role,
+                organization: lead.organization,
+                bullets: lead.bullets,
+              })),
+            },
+            body.jobDescription
+          )
+        }
+      } catch {
+        // fall through to flat-text path
+      }
+    }
+
+    // FLAT-TEXT PATH: guests, free users, or structured path fallback
+    if (!scoringPrompt) {
+      const resumePlainText = body.resumePlainText ?? body.resumeText ?? ''
+      if (!resumePlainText) {
+        return buildErrorResponse('resumePlainText and jobDescription are required', 400)
+      }
+      scoringPrompt = buildATSScorePrompt(resumePlainText, body.jobDescription)
+    }
+
+    const { data, inputTokens, outputTokens } = await callClaudeJSON<ATSScore>(scoringPrompt, MAX_TOKENS_ANALYSIS)
 
     return Response.json({
       success: true,

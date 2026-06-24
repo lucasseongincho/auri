@@ -115,6 +115,15 @@ export interface ATSDimensionScores {
   readability: number  // 0-15  (15% weight)
 }
 
+export interface SectionAnalysis {
+  section: 'summary' | 'experience' | 'skills' | 'projects' | 'education' | 'leadership'
+  score: number           // 0–100, Claude's assessment of this section vs the JD
+  label: string           // human-readable: "Work Experience", "Skills", etc.
+  strengths: string[]     // 1–3 specific strengths in this section
+  gaps: string[]          // 1–3 specific gaps relative to the JD
+  suggestions: string[]   // 1–3 targeted fixes for this section only
+}
+
 export interface ATSScore {
   score: number // 0-100
   dimension_scores?: ATSDimensionScores
@@ -123,6 +132,7 @@ export interface ATSScore {
   formatting_issues: string[]
   suggestions: string[]
   strength_areas: string[]
+  section_analysis?: SectionAnalysis[]  // present only when structured path is used (Pro + uid)
 }
 
 export interface RequirementCoverage {
