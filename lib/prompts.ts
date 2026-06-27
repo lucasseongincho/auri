@@ -804,3 +804,77 @@ export function buildExperienceSummary(
 
   return lines.join('\n')
 }
+
+// ── Import Resume (ATS page → Builder conversion funnel) ─────────────────────
+
+export function buildImportResumePrompt(
+  resumeText: string,
+  jobDescription: string
+): string {
+  return `You are a professional resume parser. Extract the structured information from the resume below and return it as a single JSON object matching the exact schema specified. Extract faithfully — never invent experience, education, or credentials not present in the source text.
+
+RESUME TEXT:
+${resumeText}
+${jobDescription.trim() ? `\nTARGET JOB DESCRIPTION (use for context when emphasising relevant experience, do not invent new bullets):
+${jobDescription}
+` : ''}
+OUTPUT SCHEMA — return ONLY valid JSON, no markdown, no explanation:
+{
+  "summary": "2–3 sentence professional summary drawn from the resume content",
+  "experience": [
+    {
+      "id": "REPLACE_WITH_UUID",
+      "company": "Company Name",
+      "title": "Job Title",
+      "start": "Jan 2022",
+      "end": "Present",
+      "bullets": ["Clean achievement or responsibility without leading bullet characters"]
+    }
+  ],
+  "education": [
+    {
+      "id": "REPLACE_WITH_UUID",
+      "institution": "University Name",
+      "degree": "Bachelor of Science",
+      "field": "Computer Science",
+      "year": "2020"
+    }
+  ],
+  "skills": ["Individual skill", "Another skill"],
+  "projects": [
+    {
+      "id": "REPLACE_WITH_UUID",
+      "name": "Project Name",
+      "description": "One-line description",
+      "bullets": ["What was built or achieved"]
+    }
+  ],
+  "leadership": [
+    {
+      "id": "REPLACE_WITH_UUID",
+      "role": "Role Title",
+      "organization": "Organization Name",
+      "start": "Sep 2021",
+      "end": "May 2022",
+      "bullets": ["Responsibility or achievement"]
+    }
+  ],
+  "languages": [
+    {
+      "id": "REPLACE_WITH_UUID",
+      "name": "Spanish",
+      "proficiency": "Fluent"
+    }
+  ],
+  "certifications": ["Certification name"],
+  "templateId": "classic-pro"
+}
+
+RULES:
+- skills: individual strings only — never comma-separated lists in a single string
+- bullets: no leading "•", "–", "-", or numbering — clean strings only
+- languages.proficiency: must be exactly one of "Native", "Fluent", "Intermediate", "Basic"
+- For any section absent from the resume, use an empty array []
+- summary: synthesise from what is present; do not fabricate achievements
+- Return ONLY the JSON object`
+}

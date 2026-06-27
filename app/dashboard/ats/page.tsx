@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   Target, Sparkles, Loader2, AlertCircle, FileText,
-  ClipboardList, CheckCircle, Zap, Upload,
+  ClipboardList, CheckCircle, Zap, Upload, X,
 } from 'lucide-react'
 import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
@@ -80,7 +80,7 @@ function convertResumeToPlainText(data: ResumeData): string {
 
 export default function ATSPage() {
   const { user } = useAuth()
-  const { profile, setATSScore, atsScore, currentResume, setResume } = useCareerStore()
+  const { profile, setATSScore, atsScore, currentResume, setResume, pushToHistory } = useCareerStore()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -107,6 +107,9 @@ export default function ATSPage() {
   const [isLoadingResumes, setIsLoadingResumes] = useState(false)
   const [resumeSource, setResumeSource] = useState<'auri' | 'upload' | null>(null)
   const [isUploadingResume, setIsUploadingResume] = useState(false)
+  const [parsedResult, setParsedResult] = useState<ParsedResumeResult | null>(null)
+  const [shouldShowImportCTA, setShouldShowImportCTA] = useState(false)
+  const [isImportingToBuilder, setIsImportingToBuilder] = useState(false)
 
   const getIdTokenSafe = useCallback(async (): Promise<string | undefined> => {
     const current = auth.currentUser
@@ -168,6 +171,8 @@ export default function ATSPage() {
       setSelectedResume(null)
       setResumeSource('upload')
       setResumeText(json.data.extractedText)
+      setParsedResult(json.data)
+      setShouldShowImportCTA(false)
     } catch {
       setError('Failed to parse resume PDF. Please try again.')
     } finally {
@@ -230,6 +235,8 @@ export default function ATSPage() {
     setSuggestions(null)
     setCheckedIds(new Set())
     setSuggestionsError('')
+    setParsedResult(null)
+    setShouldShowImportCTA(false)
 
     if (user) {
       setIsCoverageLoading(true)
@@ -245,13 +252,14 @@ export default function ATSPage() {
         setScore(result)
         setATSScore(result)
         setAnalysisTimestamp(new Date().toISOString())
+        if (resumeSource === 'upload') setShouldShowImportCTA(true)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed')
     } finally {
       setIsAnalyzing(false)
     }
-  }, [resumeText, jobDescription, runAnalysis, runCoverageAnalysis, setATSScore, user])
+  }, [resumeText, jobDescription, runAnalysis, runCoverageAnalysis, setATSScore, user, resumeSource])
 
   const handleOutcome = useCallback(async (outcome: ATSOutcome['outcome']) => {
     if (!score || !analysisTimestamp) return
@@ -392,6 +400,40 @@ export default function ATSPage() {
     }
   }, [suggestions, selectedResume, currentResume, user, checkedIds, setResume, router])
 
+  const handleImportToBuilder = useCallback(async () => {
+    if (!resumeText || !user) return
+    setIsImportingToBuilder(true)
+    try {
+      const idToken = await getIdTokenSafe()
+      if (!idToken) {
+        setSuggestionsError('Please sign in to import your resume.')
+        return
+      }
+      const res = await fetch('/api/import-resume', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ resumeText, jobDescription }),
+      })
+      const data = await res.json() as
+        | { success: true; resumeData: ResumeData }
+        | { success: false; error: string }
+      if (!data.success) {
+        setSuggestionsError('Failed to import resume. Please try again.')
+        return
+      }
+      setResume(data.resumeData)
+      pushToHistory(data.resumeData)
+      router.push('/dashboard/resume')
+    } catch {
+      setSuggestionsError('Failed to import resume. Please try again.')
+    } finally {
+      setIsImportingToBuilder(false)
+    }
+  }, [resumeText, jobDescription, user, getIdTokenSafe, setResume, pushToHistory, router])
+
   return (
     <div className="space-y-6 pb-20 md:pb-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
@@ -478,7 +520,7 @@ export default function ATSPage() {
 
               {/* Section B — PDF Upload (Pro only) */}
               {profile?.isPro && (
-                <div>
+                <div className="space-y-3">
                   <label className={LABEL_CLASS}>Upload a PDF Resume</label>
                   <input
                     ref={fileInputRef}
@@ -514,6 +556,55 @@ export default function ATSPage() {
                           : 'Click to upload PDF (max 5 MB)'}
                     </span>
                   </button>
+
+                  {/* Extraction results */}
+                  {resumeSource === 'upload' && parsedResult && (
+                    <div className="rounded-xl border border-[#22C55E]/20 bg-[#22C55E]/[0.04] p-3.5 space-y-2.5">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-[#22C55E] flex-shrink-0" />
+                        <p className="text-xs font-semibold text-white">Resume Extracted</p>
+                      </div>
+                      <p className="text-[11px] text-[#A0A0B8] leading-relaxed">
+                        {parsedResult.stats.totalLines} lines · {parsedResult.stats.totalChars.toLocaleString()} characters · Sections found:{' '}
+                        <span className="text-white">
+                          {parsedResult.stats.detectedSections.join(', ') || 'none detected'}
+                        </span>
+                      </p>
+                      {parsedResult.failures.length === 0 ? (
+                        <p className="text-[11px] text-[#22C55E]">✓ No major parsing issues detected</p>
+                      ) : (
+                        <div className="space-y-1.5">
+                          <p className="text-[11px] font-medium text-[#F59E0B]">
+                            ⚠ {parsedResult.failures.length} parsing issue{parsedResult.failures.length > 1 ? 's' : ''} detected
+                          </p>
+                          {parsedResult.failures.slice(0, 3).map((failure, i) => (
+                            <div key={i} className="flex items-start gap-2">
+                              <span className={`text-[9px] font-bold px-1 py-0.5 rounded uppercase tracking-wide flex-shrink-0 mt-0.5
+                                ${failure.severity === 'high'
+                                  ? 'bg-[#EF4444]/15 text-[#EF4444]'
+                                  : failure.severity === 'medium'
+                                  ? 'bg-[#F59E0B]/15 text-[#F59E0B]'
+                                  : 'bg-white/[0.06] text-[#60607A]'
+                                }`}>
+                                {failure.severity}
+                              </span>
+                              <p className="text-[11px] text-[#A0A0B8] leading-snug">
+                                {failure.description}
+                                {failure.affectedPlatforms.length > 0 && (
+                                  <span className="text-[#60607A]"> — {failure.affectedPlatforms.join(' · ')}</span>
+                                )}
+                              </p>
+                            </div>
+                          ))}
+                          {parsedResult.failures.length > 3 && (
+                            <p className="text-[10px] text-[#60607A]">
+                              + {parsedResult.failures.length - 3} more issue{parsedResult.failures.length - 3 > 1 ? 's' : ''}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -686,6 +777,47 @@ export default function ATSPage() {
                     </button>
                   ))}
                 </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Import to Builder CTA */}
+          {resumeSource === 'upload' && score && shouldShowImportCTA && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={SPRING}
+              className="rounded-2xl border border-[#6366F1]/30 bg-[#13131A] p-1"
+            >
+              <div className="rounded-xl border border-[#6366F1]/20 bg-gradient-to-br from-[#6366F1]/[0.06] to-[#8B5CF6]/[0.06] p-5 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="space-y-1 min-w-0">
+                    <p className="text-sm font-semibold text-white">Build a Better Version in AURI</p>
+                    <p className="text-xs text-[#A0A0B8] leading-relaxed">
+                      Import this resume into AURI&apos;s structured editor. We&apos;ll parse your experience, education, and skills — then you can rewrite, tune, and export an ATS-optimized version.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => void handleImportToBuilder()}
+                  disabled={isImportingToBuilder}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-sm font-semibold shadow-lg shadow-[#6366F1]/25 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isImportingToBuilder ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Importing…
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      Import to Builder
+                    </>
+                  )}
+                </button>
               </div>
             </motion.div>
           )}
