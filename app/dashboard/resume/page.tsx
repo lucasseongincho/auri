@@ -1403,7 +1403,6 @@ export default function ResumePage() {
   const [showSignUpModal, setShowSignUpModal] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [isATSLoading, setIsATSLoading] = useState(false)
-  const [isFixingATS, setIsFixingATS] = useState(false)
   const [editedResume, setEditedResume] = useState<ResumeData | null>(null)
   // Gate right-side display — false until a resume is generated in this session.
   // Prevents the previous session's persisted resume and ATS score from appearing on load.
@@ -1511,80 +1510,6 @@ export default function ResumePage() {
     },
     [setATSScore]
   )
-
-  // ── Fix All ATS Issues ───────────────────────────────────────────────────────
-  // Bug fix: previously called stream('/api/claude/resume', mode:'rewrite') which:
-  // (a) hijacked isStreaming → showed loading overlay instead of button spinner,
-  // (b) never rebuilt `plain` from new data → runATSScore re-scored OLD text → score unchanged.
-  // Now calls /api/claude/ats mode:'fix' directly (aggressive keyword-injection prompt)
-  // and rebuilds plain text from the result so re-scoring reflects the improvements.
-
-  const handleFixAll = useCallback(async () => {
-    if (!profile || !activeResume || !atsScore) return
-    setIsFixingATS(true)
-    try {
-      let idToken: string | undefined
-      if (auth.currentUser) {
-        try { idToken = await getIdToken(auth.currentUser) } catch { /* guest fallback */ }
-      }
-
-      const jd = profile.target.job_description ?? ''
-      const currentPlain = activeResume.plain ?? buildPlainText(activeResume, profile.personal)
-
-      const res = await fetch('/api/claude/ats', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
-        },
-        body: JSON.stringify({
-          mode: 'fix',
-          resumeText: currentPlain,
-          jobDescription: jd,
-          missingKeywords: atsScore.missing_keywords ?? [],
-          formattingIssues: atsScore.formatting_issues ?? [],
-          suggestions: atsScore.suggestions ?? [],
-        }),
-      })
-
-      if (res.status === 429) {
-        const j = await res.json()
-        throw new Error(`Rate limit reached. Try again in ${j.retryAfter}s.`)
-      }
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({ error: 'Fix failed' }))
-        throw new Error(j.error ?? 'Fix All failed')
-      }
-
-      const data = await res.json()
-      if (!data.success || !data.improvedResume) throw new Error('No improved resume returned')
-
-      const improvedPlain = data.improvedResume as string
-
-      // Update resume with improved plain text so ATS copy-for-portal is improved
-      const updated: ResumeData = {
-        ...activeResume,
-        plain: improvedPlain,
-        updatedAt: new Date().toISOString(),
-      }
-      setResume(updated)
-      setEditedResume(updated)
-
-      // Re-score with the improved plain text → score updates
-      if (jd) {
-        await runATSScore(improvedPlain, jd)
-      }
-
-      setToast({ message: 'Keywords injected — ATS score updated!', type: 'success' })
-    } catch (err) {
-      setToast({
-        message: err instanceof Error ? err.message : 'Failed to fix ATS issues. Please try again.',
-        type: 'error',
-      })
-    } finally {
-      setIsFixingATS(false)
-    }
-  }, [profile, activeResume, atsScore, setResume, runATSScore])
 
   // ── Generate Resume ──────────────────────────────────────────────────────────
 
