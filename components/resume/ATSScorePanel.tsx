@@ -10,6 +10,7 @@ const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 interface ATSScorePanelProps {
   score: ATSScore | null
   isLoading: boolean
+  uploadMode?: boolean
 }
 
 function ScoreMeter({ score, prevScore }: { score: number; prevScore?: number }) {
@@ -129,7 +130,7 @@ function DimensionBreakdown({ dims }: DimensionBreakdownProps) {
   )
 }
 
-export default function ATSScorePanel({ score, isLoading }: ATSScorePanelProps) {
+export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScorePanelProps) {
   const [prevScore, setPrevScore] = useState<number | undefined>()
 
   useEffect(() => {
@@ -182,6 +183,16 @@ export default function ATSScorePanel({ score, isLoading }: ATSScorePanelProps) 
             </p>
           </div>
         </div>
+
+        {/* Upload-path disclaimer */}
+        {uploadMode && (
+          <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[#F59E0B]/[0.08] border border-[#F59E0B]/20">
+            <span className="text-[#F59E0B] text-xs flex-shrink-0 mt-px">⚠</span>
+            <p className="text-xs text-[#F59E0B]">
+              Score based on extracted text — may be lower than your actual ATS performance
+            </p>
+          </div>
+        )}
 
         {/* Dimension breakdown — only shown when sub-scores are present */}
         {score.dimension_scores && (

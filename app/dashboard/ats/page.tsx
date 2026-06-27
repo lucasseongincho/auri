@@ -570,6 +570,9 @@ export default function ATSPage() {
                           {parsedResult.stats.detectedSections.join(', ') || 'none detected'}
                         </span>
                       </p>
+                      <p className="text-xs italic text-[#60607A]">
+                        Note: This extraction uses a generic PDF parser. Real ATS systems are more sophisticated and may handle your formatting better.
+                      </p>
                       {parsedResult.failures.length === 0 ? (
                         <p className="text-[11px] text-[#22C55E]">✓ No major parsing issues detected</p>
                       ) : (
@@ -668,9 +671,9 @@ export default function ATSPage() {
         >
           {/* ATS Score Panel */}
           {isAnalyzing ? (
-            <ATSScorePanel score={null} isLoading={true} />
+            <ATSScorePanel score={null} isLoading={true} uploadMode={resumeSource === 'upload'} />
           ) : score ? (
-            <ATSScorePanel score={score} isLoading={false} />
+            <ATSScorePanel score={score} isLoading={false} uploadMode={resumeSource === 'upload'} />
           ) : (
             <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
               <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-16 flex flex-col items-center text-center">
@@ -797,7 +800,7 @@ export default function ATSPage() {
                   <div className="space-y-1 min-w-0">
                     <p className="text-sm font-semibold text-white">Build a Better Version in AURI</p>
                     <p className="text-xs text-[#A0A0B8] leading-relaxed">
-                      Import this resume into AURI&apos;s structured editor. We&apos;ll parse your experience, education, and skills — then you can rewrite, tune, and export an ATS-optimized version.
+                      Your resume scored {score.score}/100 based on extracted text — real ATS systems may score it higher. But AURI can rebuild it as a fully structured resume with targeted keyword optimization, so you know exactly where you stand.
                     </p>
                   </div>
                 </div>
