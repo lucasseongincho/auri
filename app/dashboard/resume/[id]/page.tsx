@@ -317,6 +317,7 @@ export default function SavedResumePage() {
   // Ref stays in sync synchronously so handleSaveEdits always reads the latest
   // data even when the blur→setState hasn't re-rendered yet at click time.
   const editedResumeDataRef = useRef<ResumeData | null>(null)
+  const appliedFromATS = useRef(false)
   const [saving, setSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
@@ -361,6 +362,7 @@ export default function SavedResumePage() {
       editedResumeDataRef.current = currentResume
       setEditedResumeData(currentResume)
       setLoadingResume(false)
+      appliedFromATS.current = true
     }
 
     // Load the specific resume
@@ -375,11 +377,16 @@ export default function SavedResumePage() {
         const data = await getSavedResume(uid, params.id)
         if (!data) {
           setNotFound(true)
+        } else if (appliedFromATS.current) {
+          // Keep the pre-seeded resumeData (which has the applied changes) but update
+          // metadata fields from Firestore (name, personalInfo, atsScore, etc.).
+          // Zustand already has the correct resumeData from handleApplySuggestions.
+          setResumeData((prev) => prev ? { ...data, resumeData: prev.resumeData } : data)
+          appliedFromATS.current = false
         } else {
           setResumeData(data)
           editedResumeDataRef.current = data.resumeData
           setEditedResumeData(data.resumeData)
-          // Sync to global store
           setResume(data.resumeData)
         }
       } catch (err) {
