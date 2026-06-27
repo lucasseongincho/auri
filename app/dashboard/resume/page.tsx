@@ -1590,11 +1590,12 @@ export default function ResumePage() {
         setEditedResume(resume)
         setHasSessionResume(true)
         setIsEditing(false) // start in preview mode; user clicks Edit to enter inline editing
+        setATSScore(null)
       } catch {
         setGenerateError('Failed to parse AI response. Please try again.')
       }
     }
-  }, [profile, validateStep, stream, resetStream, setResume])
+  }, [profile, validateStep, stream, resetStream, setResume, setATSScore])
 
   // ── Save Resume ──────────────────────────────────────────────────────────────
 

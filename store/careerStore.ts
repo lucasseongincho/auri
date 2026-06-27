@@ -41,7 +41,7 @@ interface CareerStore {
   updateProfile: (partial: Partial<CareerProfile>) => void
   setProfile: (profile: CareerProfile) => void
   setResume: (resume: ResumeData) => void
-  setATSScore: (score: ATSScore) => void
+  setATSScore: (score: ATSScore | null) => void
   setIsGenerating: (val: boolean) => void
   setActiveFeature: (id: FeatureId) => void
   resetProfile: () => void
