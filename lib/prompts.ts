@@ -1,4 +1,4 @@
-import type { CareerProfile, TargetJob } from '@/types'
+import type { CareerProfile, TargetJob, SectionAnalysis } from '@/types'
 
 // ============================================================
 // PROMPTS — All AI prompts centralized here per CLAUDE.md §15
@@ -379,6 +379,146 @@ STRICT OUTPUT LIMITS — do not exceed these or the response will be truncated:
 - suggestions (global): MAXIMUM 5 items
 - strength_areas: MAXIMUM 5 items
 Keep every string under 25 words. Be specific and terse.`
+}
+
+// ── Structured Suggestions (Apply to Editor — Pro path) ─────────────────────
+
+/**
+ * Why IDs in the prompt: Claude must reference exact entry IDs from the
+ * CareerProfile so the client can patch the correct field in Zustand.
+ * Without IDs, suggestions are ambiguous when multiple entries share a title.
+ *
+ * Why JSON array output (not object): Easier to iterate and validate on the
+ * client; no schema keys to forget; array length is the natural suggestion count.
+ *
+ * Why max 12 suggestions: Enough to cover real gaps without overwhelming the
+ * user. The review panel becomes unmanageable above ~15 items.
+ */
+export function buildStructuredSuggestionsPrompt(
+  sections: {
+    summary?: string
+    experience: Array<{
+      id: string
+      title: string
+      company: string
+      bullets: string[]
+    }>
+    skills: string[]
+    projects: Array<{
+      id: string
+      name: string
+      bullets: string[]
+    }>
+    leadership?: Array<{
+      id: string
+      role: string
+      organization: string
+      bullets: string[]
+    }>
+  },
+  jobDescription: string,
+  missingKeywords: string[],
+  sectionAnalysis: SectionAnalysis[]
+): string {
+  const lines: string[] = []
+
+  if (sections.summary) {
+    lines.push('=== SUMMARY ===')
+    lines.push(sections.summary)
+    lines.push('')
+  }
+
+  if (sections.experience.length > 0) {
+    lines.push('=== WORK EXPERIENCE ===')
+    for (const exp of sections.experience) {
+      lines.push(`[id: ${exp.id}] ${exp.title} at ${exp.company}`)
+      exp.bullets.forEach((b, i) => lines.push(`Bullet ${i}: ${b}`))
+      lines.push('')
+    }
+  }
+
+  if (sections.skills.length > 0) {
+    lines.push('=== SKILLS ===')
+    lines.push(sections.skills.join(' · '))
+    lines.push('')
+  }
+
+  if (sections.projects.length > 0) {
+    lines.push('=== PROJECTS ===')
+    for (const proj of sections.projects) {
+      lines.push(`[id: ${proj.id}] ${proj.name}`)
+      proj.bullets.forEach((b, i) => lines.push(`Bullet ${i}: ${b}`))
+      lines.push('')
+    }
+  }
+
+  if (sections.leadership && sections.leadership.length > 0) {
+    lines.push('=== LEADERSHIP ===')
+    for (const lead of sections.leadership) {
+      lines.push(`[id: ${lead.id}] ${lead.role} at ${lead.organization}`)
+      lead.bullets.forEach((b, i) => lines.push(`Bullet ${i}: ${b}`))
+      lines.push('')
+    }
+  }
+
+  const resumeText = lines.join('\n').trim()
+  const keywordsStr = missingKeywords.length
+    ? missingKeywords.join(', ')
+    : '(none identified)'
+  const scoresStr = sectionAnalysis.length
+    ? sectionAnalysis.map((s) => `${s.label}: ${s.score}/100`).join(', ')
+    : '(section scores not available)'
+
+  return `You are a resume optimization expert. Generate specific, field-level edits that will improve this resume's ATS keyword match score against the target job description.
+
+RESUME (organized by section, with IDs for targeting):
+${resumeText}
+
+JOB DESCRIPTION:
+${jobDescription}
+
+CONTEXT:
+MISSING KEYWORDS: ${keywordsStr}
+SECTION SCORES: ${scoresStr}
+
+Return ONLY a JSON array — no prose, no markdown fences, no code blocks. Use exactly this structure:
+[
+  {
+    "target": { "section": "experience", "entryId": "<id shown above>", "bulletIndex": 0 },
+    "suggested": "Rewritten bullet text with keyword injected naturally",
+    "reason": "Adds 'network design' keyword missing from JD match"
+  },
+  {
+    "target": { "section": "skills", "action": "add", "skill": "Project Management" },
+    "suggested": "Project Management",
+    "reason": "Directly matches JD requirement listed 3 times"
+  },
+  {
+    "target": { "section": "skills", "action": "replace", "oldSkill": "MS Office" },
+    "suggested": "Microsoft Office Suite",
+    "reason": "Exact JD phrasing improves ATS keyword match"
+  },
+  {
+    "target": { "section": "summary" },
+    "suggested": "Full rewritten summary text here",
+    "reason": "Adds missing 'cross-functional' keyword from JD"
+  },
+  {
+    "target": { "section": "experience_title", "entryId": "<id shown above>" },
+    "suggested": "New Job Title",
+    "reason": "Aligns title terminology with JD's preferred phrasing"
+  }
+]
+
+CONSTRAINTS — violating any of these disqualifies the entire response:
+- Return a maximum of 12 suggestions total
+- NEVER invent companies, job titles, degrees, dates, or metrics not present in the original
+- NEVER change factual information — only rephrase to incorporate keywords or improve clarity
+- Prefer experience bullet rewrites over summary rewrites
+- For skills with action "add": only suggest skills explicitly mentioned in the job description
+- Each suggestion must target one specific field — no global advice
+- Use the exact IDs shown in brackets [id: ...] in the entryId field
+- Return ONLY the JSON array, nothing else`
 }
 
 // ── Feature 3 — Easy Tune (per-bullet AI Assist) ─────────────────────────────

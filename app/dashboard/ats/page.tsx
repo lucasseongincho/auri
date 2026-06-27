@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Target, Sparkles, Loader2, AlertCircle, FileText, ClipboardList, Copy, CheckCircle, RefreshCw, Zap } from 'lucide-react'
@@ -11,7 +12,8 @@ import { useAuth } from '@/hooks/useAuth'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import RequirementCoveragePanel from '@/components/resume/RequirementCoveragePanel'
 import SectionAnalysisPanel from '@/components/resume/SectionAnalysisPanel'
-import type { ATSScore, RequirementCoverage, ATSOutcome } from '@/types'
+import SuggestionsPanel from '@/components/resume/SuggestionsPanel'
+import type { ATSScore, RequirementCoverage, ATSOutcome, StructuredSuggestion, ResumeData } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -28,7 +30,8 @@ const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
 
 export default function ATSPage() {
   const { user } = useAuth()
-  const { profile, setATSScore, atsScore } = useCareerStore()
+  const { profile, setATSScore, atsScore, currentResume, pushToHistory } = useCareerStore()
+  const router = useRouter()
 
   const [resumeText, setResumeText] = useState(profile?.generated?.resume_plain ?? '')
   const [jobDescription, setJobDescription] = useState(profile?.target?.job_description ?? '')
@@ -47,6 +50,11 @@ export default function ATSPage() {
   const [outcomeId, setOutcomeId] = useState<string | null>(null)
   const [selectedOutcome, setSelectedOutcome] = useState<ATSOutcome['outcome'] | null>(null)
   const [isSavingOutcome, setIsSavingOutcome] = useState(false)
+  const [suggestions, setSuggestions] = useState<StructuredSuggestion[] | null>(null)
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set())
+  const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false)
+  const [isApplyingSuggestions, setIsApplyingSuggestions] = useState(false)
+  const [suggestionsError, setSuggestionsError] = useState<string>('')
   const improvedRef = useRef<HTMLDivElement>(null)
 
   const getIdTokenSafe = useCallback(async (): Promise<string | undefined> => {
@@ -110,6 +118,9 @@ export default function ATSPage() {
     setCoverage(null)
     setOutcomeId(null)
     setSelectedOutcome(null)
+    setSuggestions(null)
+    setCheckedIds(new Set())
+    setSuggestionsError('')
 
     // Semantic coverage runs in parallel (authenticated users only — reads Firestore profile)
     if (user) {
@@ -273,6 +284,88 @@ export default function ATSPage() {
     }
   }, [score, analysisTimestamp, outcomeId, jobDescription, getIdTokenSafe])
 
+  const handleGenerateSuggestions = useCallback(async () => {
+    if (!score || !user) return
+    setIsGeneratingSuggestions(true)
+    setSuggestionsError('')
+    try {
+      const idToken = await getIdTokenSafe()
+      if (!idToken) {
+        setSuggestionsError('Please sign in to use this feature.')
+        return
+      }
+      const res = await fetch('/api/structured-suggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({
+          jobDescription,
+          missingKeywords: score.missing_keywords,
+          sectionAnalysis: score.section_analysis ?? [],
+        }),
+      })
+      const data = await res.json() as
+        | { success: true; suggestions: StructuredSuggestion[] }
+        | { success: false; error: string }
+      if (!data.success) {
+        setSuggestionsError(data.error)
+        return
+      }
+      setSuggestions(data.suggestions)
+      setCheckedIds(new Set(data.suggestions.map((s) => s.id)))
+    } catch {
+      setSuggestionsError('Failed to generate suggestions')
+    } finally {
+      setIsGeneratingSuggestions(false)
+    }
+  }, [score, user, jobDescription, getIdTokenSafe])
+
+  const handleApplySuggestions = useCallback(() => {
+    if (!suggestions || !currentResume) return
+    setIsApplyingSuggestions(true)
+
+    const updated: ResumeData = JSON.parse(JSON.stringify(currentResume)) as ResumeData
+    const checked = suggestions.filter((s) => checkedIds.has(s.id))
+
+    for (const s of checked) {
+      const t = s.target
+      if (t.section === 'summary') {
+        updated.summary = s.suggested
+      } else if (t.section === 'experience') {
+        const entry = updated.experience.find((e) => e.id === t.entryId)
+        if (entry && entry.bullets[t.bulletIndex] !== undefined) {
+          entry.bullets[t.bulletIndex] = s.suggested
+        }
+      } else if (t.section === 'experience_title') {
+        const entry = updated.experience.find((e) => e.id === t.entryId)
+        if (entry) {
+          entry.title = s.suggested
+        }
+      } else if (t.section === 'skills') {
+        if (t.action === 'add') {
+          if (!updated.skills.includes(s.suggested)) {
+            updated.skills.push(s.suggested)
+          }
+        } else {
+          const idx = updated.skills.indexOf(t.oldSkill)
+          if (idx !== -1) updated.skills[idx] = s.suggested
+        }
+      } else if (t.section === 'projects') {
+        const proj = (updated.projects ?? []).find((p) => p.id === t.entryId)
+        if (proj && proj.bullets[t.bulletIndex] !== undefined) {
+          proj.bullets[t.bulletIndex] = s.suggested
+        }
+      } else if (t.section === 'leadership') {
+        const lead = updated.leadership?.find((l) => l.id === t.entryId)
+        if (lead && lead.bullets[t.bulletIndex] !== undefined) {
+          lead.bullets[t.bulletIndex] = s.suggested
+        }
+      }
+    }
+
+    pushToHistory(updated)
+    router.push('/dashboard/resume')
+  }, [suggestions, currentResume, checkedIds, pushToHistory, router])
+
   return (
     <div className="space-y-6 pb-20 md:pb-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
@@ -400,6 +493,47 @@ export default function ATSPage() {
                 <p className="text-xs text-[#60607A] mt-1">Paste your resume and job description, then click Analyze</p>
               </div>
             </div>
+          )}
+
+          {/* Apply to Editor — Pro users only, appears after analysis */}
+          {score && profile?.isPro && user && (
+            <div className="space-y-2">
+              <button
+                onClick={handleGenerateSuggestions}
+                disabled={isGeneratingSuggestions || isAnalyzing}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl
+                  border border-[#6366F1]/30 text-[#818CF8] text-sm font-medium
+                  hover:bg-[#6366F1]/10 hover:border-[#6366F1]/50 hover:text-white
+                  transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isGeneratingSuggestions
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating suggestions…</>
+                  : <><Sparkles className="w-4 h-4" /> Apply to Editor</>
+                }
+              </button>
+              {suggestionsError && (
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/20">
+                  <AlertCircle className="w-3.5 h-3.5 text-[#EF4444] flex-shrink-0" />
+                  <p className="text-xs text-[#EF4444]">{suggestionsError}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Suggestions Panel — rendered after "Apply to Editor" generates results */}
+          {suggestions && (
+            <SuggestionsPanel
+              suggestions={suggestions}
+              checkedIds={checkedIds}
+              onToggle={(id) => setCheckedIds((prev) => {
+                const next = new Set(prev)
+                next.has(id) ? next.delete(id) : next.add(id)
+                return next
+              })}
+              onApply={handleApplySuggestions}
+              isApplying={isApplyingSuggestions}
+              onDiscard={() => setSuggestions(null)}
+            />
           )}
 
           {/* Section Analysis Panel — Pro users only; invisible to guests and free users */}

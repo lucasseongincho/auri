@@ -145,6 +145,24 @@ export interface ATSOutcome {
   feedbackDelayDays?: number                // days between analysis and feedback recorded
 }
 
+export type SuggestionTarget =
+  | { section: 'summary' }
+  | { section: 'experience'; entryId: string; bulletIndex: number }
+  | { section: 'experience_title'; entryId: string }
+  | { section: 'skills'; action: 'add'; skill: string }
+  | { section: 'skills'; action: 'replace'; oldSkill: string }
+  | { section: 'projects'; entryId: string; bulletIndex: number }
+  | { section: 'leadership'; entryId: string; bulletIndex: number }
+
+export interface StructuredSuggestion {
+  id: string
+  target: SuggestionTarget
+  label: string               // human-readable: "IT Help Desk — Bullet 2"
+  original: string            // current text (empty string for skills 'add')
+  suggested: string           // replacement text
+  reason: string              // one sentence: why this change helps
+}
+
 export interface RequirementCoverage {
   requirement: string
   bestMatch: string | null
