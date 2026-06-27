@@ -185,14 +185,14 @@ export default function ATSPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${idToken}`,
         },
-        body: JSON.stringify({ jobDescription: jd }),
+        body: JSON.stringify({ jobDescription: jd, resumeId: selectedResume?.id }),
       })
       if (!res.ok) return null
       const json = await res.json()
       if (!json.success) return null
       return json.data as RequirementCoverage[]
     },
-    [getIdTokenSafe]
+    [getIdTokenSafe, selectedResume?.id]
   )
 
   const runAnalysis = useCallback(async (text: string, jd: string): Promise<ATSScore | null> => {
@@ -204,7 +204,7 @@ export default function ATSPage() {
         'Content-Type': 'application/json',
         ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
       },
-      body: JSON.stringify({ resumePlainText: text, jobDescription: jd, uid: user?.uid }),
+      body: JSON.stringify({ resumePlainText: text, jobDescription: jd, uid: user?.uid, resumeId: selectedResume?.id }),
     })
     if (res.status === 429) {
       const j = await res.json()
@@ -217,7 +217,7 @@ export default function ATSPage() {
     const json = await res.json()
     if (!json.success) throw new Error(json.error ?? 'Analysis failed')
     return json.data as ATSScore
-  }, [user?.uid, getIdTokenSafe])
+  }, [user?.uid, selectedResume?.id, getIdTokenSafe])
 
   const handleAnalyze = useCallback(async () => {
     if (!resumeText.trim() || !jobDescription.trim()) return
