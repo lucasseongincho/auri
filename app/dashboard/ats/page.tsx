@@ -12,7 +12,7 @@ import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
-import { getSavedResumes, updateSavedResume } from '@/lib/firestore'
+import { getSavedResume, getSavedResumes, updateSavedResume } from '@/lib/firestore'
 import { formatResumeDate } from '@/lib/utils'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import RequirementCoveragePanel from '@/components/resume/RequirementCoveragePanel'
@@ -123,10 +123,23 @@ export default function ATSPage() {
   }, [user])
 
   const handleSelectResume = useCallback((resume: SavedResume) => {
-    setSelectedResume(resume)
-    setResumeSource('auri')
-    setResumeText(convertResumeToPlainText(resume.resumeData))
-  }, [])
+    if (!user) return
+    setIsLoadingResumes(true)
+    getSavedResume(user.uid, resume.id)
+      .then((fresh) => {
+        const resolved = fresh ?? resume
+        setSelectedResume(resolved)
+        setResumeText(convertResumeToPlainText(resolved.resumeData))
+      })
+      .catch(() => {
+        setSelectedResume(resume)
+        setResumeText(convertResumeToPlainText(resume.resumeData))
+      })
+      .finally(() => {
+        setResumeSource('auri')
+        setIsLoadingResumes(false)
+      })
+  }, [user])
 
   const handleFileUpload = useCallback(async (file: File) => {
     setIsUploadingResume(true)
