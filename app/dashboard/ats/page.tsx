@@ -11,9 +11,16 @@ import { useAuth } from '@/hooks/useAuth'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import RequirementCoveragePanel from '@/components/resume/RequirementCoveragePanel'
 import SectionAnalysisPanel from '@/components/resume/SectionAnalysisPanel'
-import type { ATSScore, RequirementCoverage } from '@/types'
+import type { ATSScore, RequirementCoverage, ATSOutcome } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
+
+const OUTCOME_OPTIONS: Array<{ value: ATSOutcome['outcome']; label: string }> = [
+  { value: 'interview', label: 'Got an interview' },
+  { value: 'rejected', label: 'Got rejected' },
+  { value: 'no_response', label: 'No response yet' },
+  { value: 'pending', label: 'Still pending' },
+]
 
 const INPUT_CLASS =
   'w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-[#60607A] focus:outline-none focus:border-[#6366F1]/50 focus:ring-1 focus:ring-[#6366F1]/30 transition-all resize-none'
@@ -36,6 +43,10 @@ export default function ATSPage() {
   const [copied, setCopied] = useState(false)
   const [coverage, setCoverage] = useState<RequirementCoverage[] | null>(null)
   const [isCoverageLoading, setIsCoverageLoading] = useState(false)
+  const [analysisTimestamp, setAnalysisTimestamp] = useState<string | null>(null)
+  const [outcomeId, setOutcomeId] = useState<string | null>(null)
+  const [selectedOutcome, setSelectedOutcome] = useState<ATSOutcome['outcome'] | null>(null)
+  const [isSavingOutcome, setIsSavingOutcome] = useState(false)
   const improvedRef = useRef<HTMLDivElement>(null)
 
   const getIdTokenSafe = useCallback(async (): Promise<string | undefined> => {
@@ -112,6 +123,9 @@ export default function ATSPage() {
       if (result) {
         setScore(result)
         setATSScore(result)
+        setAnalysisTimestamp(new Date().toISOString())
+        setOutcomeId(null)
+        setSelectedOutcome(null)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed')
@@ -221,6 +235,43 @@ export default function ATSPage() {
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }, [fixedResume])
+
+  const handleOutcome = useCallback(async (outcome: ATSOutcome['outcome']) => {
+    if (!score || !analysisTimestamp) return
+    setSelectedOutcome(outcome)
+    setIsSavingOutcome(true)
+    const idToken = await getIdTokenSafe()
+    if (!idToken) {
+      setIsSavingOutcome(false)
+      return
+    }
+    try {
+      const res = await fetch('/api/ats-outcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({
+          outcomeId: outcomeId ?? undefined,
+          jobDescription,
+          score: score.score,
+          sectionScores: score.section_analysis
+            ? Object.fromEntries(score.section_analysis.map((s) => [s.label, s.score]))
+            : undefined,
+          outcome,
+          createdAt: analysisTimestamp,
+        }),
+      })
+      if (res.ok) {
+        const json = await res.json() as { success: boolean; outcomeId?: string }
+        if (json.success && json.outcomeId) {
+          setOutcomeId(json.outcomeId)
+        }
+      }
+    } catch {
+      // silently fail — outcome tracking is non-blocking
+    } finally {
+      setIsSavingOutcome(false)
+    }
+  }, [score, analysisTimestamp, outcomeId, jobDescription, getIdTokenSafe])
 
   return (
     <div className="space-y-6 pb-20 md:pb-0">
@@ -365,6 +416,48 @@ export default function ATSPage() {
           ) : coverage ? (
             <RequirementCoveragePanel coverage={coverage} isLoading={false} />
           ) : null}
+
+          {/* Outcome Tracker — authenticated users only, appears after first analysis */}
+          {user && score && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={SPRING}
+              className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+            >
+              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-medium text-[#60607A] uppercase tracking-wide">
+                    Track your application outcome
+                  </p>
+                  {isSavingOutcome ? (
+                    <Loader2 className="w-3.5 h-3.5 text-[#6366F1] animate-spin" />
+                  ) : selectedOutcome ? (
+                    <CheckCircle className="w-3.5 h-3.5 text-[#22C55E]" />
+                  ) : null}
+                </div>
+                <p className="text-sm font-semibold text-white">
+                  Did this application lead to an interview?
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {OUTCOME_OPTIONS.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => handleOutcome(value)}
+                      disabled={isSavingOutcome}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150
+                        ${selectedOutcome === value
+                          ? 'bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white shadow-lg shadow-[#6366F1]/25'
+                          : 'border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:border-white/[0.2] bg-transparent'
+                        } disabled:cursor-not-allowed disabled:opacity-60`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Improved Resume Panel — rendered after Fix All completes */}
           <AnimatePresence>

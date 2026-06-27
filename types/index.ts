@@ -135,6 +135,16 @@ export interface ATSScore {
   section_analysis?: SectionAnalysis[]  // present only when structured path is used (Pro + uid)
 }
 
+export interface ATSOutcome {
+  id: string
+  createdAt: string                         // ISO timestamp of the analysis
+  jobDescription: string                    // JD text used (truncated to 2000 chars)
+  score: number                             // composite ATS score 0–100
+  sectionScores?: Record<string, number>    // section label → score from section_analysis
+  outcome: 'interview' | 'rejected' | 'no_response' | 'pending'
+  feedbackDelayDays?: number                // days between analysis and feedback recorded
+}
+
 export interface RequirementCoverage {
   requirement: string
   bestMatch: string | null
