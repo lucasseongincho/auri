@@ -361,11 +361,15 @@ export default function ATSPage() {
     }
 
     try {
+      // Strip the internal ResumeData.id field so Firestore only holds the doc-path ID.
+      // Keeping it causes confusion: resumeData.id !== Firestore doc ID, which breaks
+      // the isFromApply check on the [id] page and pollutes stored documents.
+      const { id: _id, ...resumeDataToWrite } = updated
       await updateSavedResume(user.uid, selectedResume.id, {
-        resumeData: updated,
+        resumeData: resumeDataToWrite,
         updatedAt: new Date().toISOString(),
       })
-      setResume({ ...updated, id: selectedResume.id })
+      setResume({ ...resumeDataToWrite, id: selectedResume.id })
       router.push(`/dashboard/resume/${selectedResume.id}`)
     } catch {
       setSuggestionsError('Failed to save changes. Please try again.')
