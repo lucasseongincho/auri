@@ -2159,8 +2159,6 @@ export default function ResumePage() {
                 <ATSScorePanel
                   score={atsScore}
                   isLoading={isATSLoading}
-                  onFixAll={handleFixAll}
-                  isFixing={isFixingATS}
                 />
               </motion.div>
             )}

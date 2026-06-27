@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Target, CheckCircle, XCircle, AlertTriangle, Lightbulb, Zap, Loader2, TrendingUp } from 'lucide-react'
+import { Target, CheckCircle, XCircle, AlertTriangle, Lightbulb, Loader2, TrendingUp } from 'lucide-react'
 import type { ATSScore, ATSDimensionScores } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -10,9 +10,6 @@ const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 interface ATSScorePanelProps {
   score: ATSScore | null
   isLoading: boolean
-  onFixAll: () => void
-  isFixing: boolean
-  fixingLabel?: string
 }
 
 function ScoreMeter({ score, prevScore }: { score: number; prevScore?: number }) {
@@ -132,7 +129,7 @@ function DimensionBreakdown({ dims }: DimensionBreakdownProps) {
   )
 }
 
-export default function ATSScorePanel({ score, isLoading, onFixAll, isFixing, fixingLabel = 'Fixing...' }: ATSScorePanelProps) {
+export default function ATSScorePanel({ score, isLoading }: ATSScorePanelProps) {
   const [prevScore, setPrevScore] = useState<number | undefined>()
 
   useEffect(() => {
@@ -183,19 +180,6 @@ export default function ATSScorePanel({ score, isLoading, onFixAll, isFixing, fi
             <p className="text-xs text-[#60607A] mt-1">
               {score.matched_keywords.length} keywords matched · {score.missing_keywords.length} missing
             </p>
-            <button
-              onClick={onFixAll}
-              disabled={isFixing}
-              aria-label="Fix all ATS issues automatically"
-              className="mt-3 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold
-                bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                hover:scale-[1.02] transition-all duration-200
-                disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              {isFixing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
-              {isFixing ? fixingLabel : 'Fix All Issues'}
-            </button>
           </div>
         </div>
 

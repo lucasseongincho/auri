@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Target, Sparkles, Loader2, AlertCircle, FileText, ClipboardList, Copy, CheckCircle, RefreshCw, Zap } from 'lucide-react'
+import { Target, Sparkles, Loader2, AlertCircle, FileText, ClipboardList, CheckCircle, Zap } from 'lucide-react'
 import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
@@ -37,13 +37,7 @@ export default function ATSPage() {
   const [jobDescription, setJobDescription] = useState(profile?.target?.job_description ?? '')
   const [score, setScore] = useState<ATSScore | null>(atsScore)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [isFixing, setIsFixing] = useState(false)
-  const [isReanalyzing, setIsReanalyzing] = useState(false)
   const [error, setError] = useState('')
-  const [fixedResume, setFixedResume] = useState<string | null>(null)
-  const [originalScore, setOriginalScore] = useState<number | null>(null)
-  const [improvedScore, setImprovedScore] = useState<number | null>(null)
-  const [copied, setCopied] = useState(false)
   const [coverage, setCoverage] = useState<RequirementCoverage[] | null>(null)
   const [isCoverageLoading, setIsCoverageLoading] = useState(false)
   const [analysisTimestamp, setAnalysisTimestamp] = useState<string | null>(null)
@@ -55,8 +49,6 @@ export default function ATSPage() {
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false)
   const [isApplyingSuggestions, setIsApplyingSuggestions] = useState(false)
   const [suggestionsError, setSuggestionsError] = useState<string>('')
-  const improvedRef = useRef<HTMLDivElement>(null)
-
   const getIdTokenSafe = useCallback(async (): Promise<string | undefined> => {
     const current = auth.currentUser
     if (!current) return undefined
@@ -112,9 +104,6 @@ export default function ATSPage() {
     if (!resumeText.trim() || !jobDescription.trim()) return
     setIsAnalyzing(true)
     setError('')
-    setFixedResume(null)
-    setOriginalScore(null)
-    setImprovedScore(null)
     setCoverage(null)
     setOutcomeId(null)
     setSelectedOutcome(null)
@@ -144,108 +133,6 @@ export default function ATSPage() {
       setIsAnalyzing(false)
     }
   }, [resumeText, jobDescription, runAnalysis, runCoverageAnalysis, setATSScore, user])
-
-  const handleFixAll = useCallback(async () => {
-    if (!resumeText.trim() || !score) return
-    setIsFixing(true)
-    setError('')
-    setFixedResume(null)
-    setImprovedScore(null)
-
-    try {
-      const idToken = await getIdTokenSafe()
-      if (!idToken) {
-        setError('Please sign in to use Fix All.')
-        return
-      }
-
-      const callFix = async (text: string, atsData: ATSScore): Promise<string> => {
-        const res = await fetch('/api/claude/ats', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
-          body: JSON.stringify({
-            mode: 'fix',
-            resumeText: text,
-            jobDescription,
-            missingKeywords: atsData.missing_keywords ?? [],
-            formattingIssues: atsData.formatting_issues ?? [],
-            suggestions: atsData.suggestions ?? [],
-          }),
-        })
-        if (res.status === 429) {
-          const j = await res.json()
-          throw new Error(`Rate limit reached. Try again in ${j.retryAfter}s.`)
-        }
-        if (!res.ok) {
-          const j = await res.json().catch(() => ({ error: 'Fix failed' }))
-          throw new Error(j.error ?? 'Fix failed')
-        }
-        const data = await res.json()
-        if (!data.success || !data.improvedResume) throw new Error('No improved resume returned')
-        return data.improvedResume as string
-      }
-
-      const originalScoreVal = score.score
-
-      // First pass
-      const fixed1 = await callFix(resumeText, score)
-      setOriginalScore(originalScoreVal)
-      setFixedResume(fixed1)
-      setTimeout(() => improvedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300)
-
-      // Auto re-analyze after first pass
-      const result1 = await runAnalysis(fixed1, jobDescription)
-      if (result1) {
-        setScore(result1)
-        setATSScore(result1)
-
-        // Auto-retry if improvement is less than 5 points
-        if (result1.score - originalScoreVal < 5) {
-          const fixed2 = await callFix(fixed1, result1)
-          setFixedResume(fixed2)
-          const result2 = await runAnalysis(fixed2, jobDescription)
-          if (result2) {
-            setImprovedScore(result2.score)
-            setScore(result2)
-            setATSScore(result2)
-          } else {
-            setImprovedScore(result1.score)
-          }
-        } else {
-          setImprovedScore(result1.score)
-        }
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fix All failed — please try again')
-    } finally {
-      setIsFixing(false)
-    }
-  }, [resumeText, jobDescription, score, getIdTokenSafe, runAnalysis, setATSScore])
-
-  const handleReanalyze = useCallback(async () => {
-    if (!fixedResume || !jobDescription.trim()) return
-    setIsReanalyzing(true)
-    setError('')
-    try {
-      const result = await runAnalysis(fixedResume, jobDescription)
-      if (result) {
-        setImprovedScore(result.score)
-        setScore(result)
-        setATSScore(result)
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Re-analysis failed')
-    } finally {
-      setIsReanalyzing(false)
-    }
-  }, [fixedResume, jobDescription, runAnalysis, setATSScore])
-
-  const handleCopy = useCallback(async () => {
-    if (!fixedResume) return
-    await navigator.clipboard.writeText(fixedResume)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }, [fixedResume])
 
   const handleOutcome = useCallback(async (outcome: ATSOutcome['outcome']) => {
     if (!score || !analysisTimestamp) return
@@ -474,14 +361,11 @@ export default function ATSPage() {
         >
           {/* ATS Score Panel */}
           {isAnalyzing ? (
-            <ATSScorePanel score={null} isLoading={true} onFixAll={handleFixAll} isFixing={false} />
+            <ATSScorePanel score={null} isLoading={true} />
           ) : score ? (
             <ATSScorePanel
               score={score}
               isLoading={false}
-              onFixAll={handleFixAll}
-              isFixing={isFixing}
-              fixingLabel="Rewriting resume…"
             />
           ) : (
             <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
@@ -593,117 +477,6 @@ export default function ATSPage() {
             </motion.div>
           )}
 
-          {/* Improved Resume Panel — rendered after Fix All completes */}
-          <AnimatePresence>
-            {fixedResume && (
-              <motion.div
-                ref={improvedRef}
-                id="improved-resume"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={SPRING}
-              >
-                <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-4">
-
-                    {/* Score comparison */}
-                    <AnimatePresence>
-                      {originalScore !== null && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.97 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={SPRING}
-                          className={`flex items-center gap-3 p-4 rounded-xl ${
-                            improvedScore !== null
-                              ? 'bg-[#22C55E]/10 border border-[#22C55E]/20'
-                              : 'bg-[#6366F1]/10 border border-[#6366F1]/20'
-                          }`}
-                        >
-                          {improvedScore !== null ? (
-                            <CheckCircle className="w-5 h-5 text-[#22C55E] flex-shrink-0" />
-                          ) : (
-                            <Loader2 className="w-5 h-5 text-[#6366F1] animate-spin flex-shrink-0" />
-                          )}
-                          <div>
-                            {improvedScore !== null ? (
-                              <>
-                                <p className="text-sm font-semibold text-[#22C55E]">
-                                  Score improved: {originalScore} → {improvedScore}
-                                  {' '}({improvedScore >= originalScore ? '+' : ''}{improvedScore - originalScore} points)
-                                </p>
-                                <p className="text-xs text-[#22C55E]/70 mt-0.5">
-                                  Keywords injected — copy the improved resume below
-                                </p>
-                              </>
-                            ) : (
-                              <p className="text-sm font-medium text-[#818CF8]">
-                                Re-analyzing score…
-                              </p>
-                            )}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* Header */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Sparkles className="w-4 h-4 text-[#6366F1]" />
-                        <h3 className="text-white font-semibold text-base">Improved Resume</h3>
-                      </div>
-                      <p className="text-xs text-[#60607A]">
-                        Review changes below. Edit if needed, then copy and use in your applications.
-                      </p>
-                    </div>
-
-                    {/* Editable improved resume */}
-                    <textarea
-                      value={fixedResume}
-                      onChange={(e) => setFixedResume(e.target.value)}
-                      rows={20}
-                      className="w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3
-                        text-[#A0A0B8] text-sm font-mono resize-y
-                        focus:outline-none focus:border-[#6366F1]/50 focus:ring-1 focus:ring-[#6366F1]/30
-                        transition-all"
-                      aria-label="Improved resume text"
-                    />
-
-                    {/* Action buttons */}
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleCopy}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
-                          bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white font-semibold text-sm
-                          shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50 hover:scale-[1.01]
-                          transition-all duration-200"
-                      >
-                        {copied
-                          ? <><CheckCircle className="w-4 h-4" /> Copied!</>
-                          : <><Copy className="w-4 h-4" /> Copy Improved Resume</>
-                        }
-                      </button>
-                      <button
-                        onClick={handleReanalyze}
-                        disabled={isReanalyzing}
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
-                          border border-white/[0.08] text-[#A0A0B8] text-sm font-medium
-                          hover:text-white hover:bg-white/5 transition-all duration-200
-                          disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Re-run ATS analysis on the improved resume"
-                      >
-                        {isReanalyzing
-                          ? <Loader2 className="w-4 h-4 animate-spin" />
-                          : <RefreshCw className="w-4 h-4" />
-                        }
-                        {isReanalyzing ? 'Analyzing…' : 'Re-run Analysis'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </motion.div>
       </div>
     </div>

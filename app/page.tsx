@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, useInView } from 'framer-motion'
 import {
-  FileText, Edit3, RefreshCw, Linkedin,
+  FileText, Edit3, Linkedin,
   Map, Mail, MessageSquare, CheckCircle, ArrowRight,
   Sparkles, Target, ChevronRight,
 } from 'lucide-react'
@@ -106,7 +106,6 @@ const FEATURES = [
   { icon: FileText, label: 'Smart Resume Builder', desc: 'AI-generated, ATS-optimized resumes tailored to every job', href: '/dashboard/resume', color: 'from-[#6366F1] to-[#4F46E5]' },
   { icon: Target, label: 'ATS Score & Optimizer', desc: 'Real-time match score with one-click fix suggestions', href: '/dashboard/ats', color: 'from-[#8B5CF6] to-[#6366F1]' },
   { icon: Edit3, label: 'Easy Tune Editor', desc: 'Inline editing with per-bullet AI rewrites', href: '/dashboard/resume', color: 'from-[#A78BFA] to-[#8B5CF6]' },
-  { icon: RefreshCw, label: 'Resume Rewriter', desc: 'Transform your existing resume for any new role', href: '/dashboard/rewriter', color: 'from-[#4F46E5] to-[#6366F1]' },
   { icon: Linkedin, label: 'LinkedIn Rewriter', desc: 'Attract recruiters with an optimized profile', href: '/dashboard/linkedin', color: 'from-[#0EA5E9] to-[#6366F1]' },
   { icon: Map, label: '7-Day Job Strategy', desc: 'A personalized, day-by-day job search action plan', href: '/dashboard/strategy', color: 'from-[#22C55E] to-[#16A34A]' },
   { icon: Mail, label: 'Cover Letter Generator', desc: '280-300 word letters that open doors', href: '/dashboard/cover-letter', color: 'from-[#F59E0B] to-[#D97706]' },
