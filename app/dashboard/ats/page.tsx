@@ -1,19 +1,27 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Target, Sparkles, Loader2, AlertCircle, FileText, ClipboardList, CheckCircle, Zap } from 'lucide-react'
+import { motion } from 'framer-motion'
+import {
+  Target, Sparkles, Loader2, AlertCircle, FileText,
+  ClipboardList, CheckCircle, Zap, Upload,
+} from 'lucide-react'
 import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
+import { getSavedResumes, updateSavedResume } from '@/lib/firestore'
+import { formatResumeDate } from '@/lib/utils'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import RequirementCoveragePanel from '@/components/resume/RequirementCoveragePanel'
 import SectionAnalysisPanel from '@/components/resume/SectionAnalysisPanel'
 import SuggestionsPanel from '@/components/resume/SuggestionsPanel'
-import type { ATSScore, RequirementCoverage, ATSOutcome, StructuredSuggestion, ResumeData } from '@/types'
+import type {
+  ATSScore, RequirementCoverage, ATSOutcome, StructuredSuggestion,
+  ResumeData, SavedResume, ParsedResumeResult,
+} from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
@@ -28,12 +36,54 @@ const INPUT_CLASS =
   'w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-[#60607A] focus:outline-none focus:border-[#6366F1]/50 focus:ring-1 focus:ring-[#6366F1]/30 transition-all resize-none'
 const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
 
+function convertResumeToPlainText(data: ResumeData): string {
+  const lines: string[] = []
+  if (data.summary) lines.push(data.summary, '')
+  if (data.experience.length > 0) {
+    lines.push('EXPERIENCE')
+    for (const exp of data.experience) {
+      lines.push(`${exp.title} at ${exp.company} | ${exp.start} – ${exp.end}`)
+      for (const bullet of exp.bullets) lines.push(`• ${bullet}`)
+      lines.push('')
+    }
+  }
+  if (data.education.length > 0) {
+    lines.push('EDUCATION')
+    for (const edu of data.education) {
+      lines.push(`${edu.degree} in ${edu.field} — ${edu.institution} (${edu.year})`)
+    }
+    lines.push('')
+  }
+  if (data.skills.length > 0) {
+    lines.push('SKILLS')
+    lines.push(data.skills.join(', '), '')
+  }
+  if (data.projects.length > 0) {
+    lines.push('PROJECTS')
+    for (const proj of data.projects) {
+      lines.push(proj.name)
+      for (const bullet of proj.bullets) lines.push(`• ${bullet}`)
+      lines.push('')
+    }
+  }
+  if (data.leadership && data.leadership.length > 0) {
+    lines.push('LEADERSHIP')
+    for (const lead of data.leadership) {
+      lines.push(`${lead.role} at ${lead.organization}`)
+      for (const bullet of lead.bullets) lines.push(`• ${bullet}`)
+      lines.push('')
+    }
+  }
+  return lines.join('\n').trim()
+}
+
 export default function ATSPage() {
   const { user } = useAuth()
-  const { profile, setATSScore, atsScore, currentResume, pushToHistory } = useCareerStore()
+  const { profile, setATSScore, atsScore, currentResume, setResume } = useCareerStore()
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [resumeText, setResumeText] = useState(profile?.generated?.resume_plain ?? '')
+  const [resumeText, setResumeText] = useState('')
   const [jobDescription, setJobDescription] = useState(profile?.target?.job_description ?? '')
   const [score, setScore] = useState<ATSScore | null>(atsScore)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -49,11 +99,67 @@ export default function ATSPage() {
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false)
   const [isApplyingSuggestions, setIsApplyingSuggestions] = useState(false)
   const [suggestionsError, setSuggestionsError] = useState<string>('')
+
+  // Resume selector state
+  const [savedResumes, setSavedResumes] = useState<SavedResume[]>([])
+  const [selectedResume, setSelectedResume] = useState<SavedResume | null>(null)
+  const [isLoadingResumes, setIsLoadingResumes] = useState(false)
+  const [resumeSource, setResumeSource] = useState<'auri' | 'upload' | null>(null)
+  const [isUploadingResume, setIsUploadingResume] = useState(false)
+
   const getIdTokenSafe = useCallback(async (): Promise<string | undefined> => {
     const current = auth.currentUser
     if (!current) return undefined
     try { return await getIdToken(current) } catch { return undefined }
   }, [])
+
+  useEffect(() => {
+    if (!user) return
+    setIsLoadingResumes(true)
+    getSavedResumes(user.uid)
+      .then((resumes) => setSavedResumes(resumes))
+      .catch(() => { /* non-blocking */ })
+      .finally(() => setIsLoadingResumes(false))
+  }, [user])
+
+  const handleSelectResume = useCallback((resume: SavedResume) => {
+    setSelectedResume(resume)
+    setResumeSource('auri')
+    setResumeText(convertResumeToPlainText(resume.resumeData))
+  }, [])
+
+  const handleFileUpload = useCallback(async (file: File) => {
+    setIsUploadingResume(true)
+    setError('')
+    try {
+      const idToken = await getIdTokenSafe()
+      if (!idToken) {
+        setError('Please sign in to upload a resume.')
+        return
+      }
+      const formData = new FormData()
+      formData.append('resume', file)
+      const res = await fetch('/api/parse-resume', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${idToken}` },
+        body: formData,
+      })
+      const json = await res.json() as
+        | { success: true; data: ParsedResumeResult }
+        | { success: false; error: string }
+      if (!json.success) {
+        setError(json.error)
+        return
+      }
+      setSelectedResume(null)
+      setResumeSource('upload')
+      setResumeText(json.data.extractedText)
+    } catch {
+      setError('Failed to parse resume PDF. Please try again.')
+    } finally {
+      setIsUploadingResume(false)
+    }
+  }, [getIdTokenSafe])
 
   const runCoverageAnalysis = useCallback(
     async (jd: string): Promise<RequirementCoverage[] | null> => {
@@ -111,12 +217,11 @@ export default function ATSPage() {
     setCheckedIds(new Set())
     setSuggestionsError('')
 
-    // Semantic coverage runs in parallel (authenticated users only — reads Firestore profile)
     if (user) {
       setIsCoverageLoading(true)
       runCoverageAnalysis(jobDescription)
         .then((result) => { if (result) setCoverage(result) })
-        .catch(() => { /* non-blocking: silently ignore coverage errors */ })
+        .catch(() => { /* non-blocking */ })
         .finally(() => setIsCoverageLoading(false))
     }
 
@@ -188,6 +293,7 @@ export default function ATSPage() {
           jobDescription,
           missingKeywords: score.missing_keywords,
           sectionAnalysis: score.section_analysis ?? [],
+          resumeId: selectedResume?.id ?? undefined,
         }),
       })
       const data = await res.json() as
@@ -204,13 +310,18 @@ export default function ATSPage() {
     } finally {
       setIsGeneratingSuggestions(false)
     }
-  }, [score, user, jobDescription, getIdTokenSafe])
+  }, [score, user, jobDescription, selectedResume, getIdTokenSafe])
 
-  const handleApplySuggestions = useCallback(() => {
-    if (!suggestions || !currentResume) return
+  const handleApplySuggestions = useCallback(async () => {
+    if (!suggestions || (!selectedResume && !currentResume)) return
+    if (!selectedResume) {
+      setSuggestionsError('Apply to Editor is only available for AURI-generated resumes.')
+      return
+    }
+    if (!user) return
     setIsApplyingSuggestions(true)
 
-    const updated: ResumeData = JSON.parse(JSON.stringify(currentResume)) as ResumeData
+    const updated: ResumeData = JSON.parse(JSON.stringify(selectedResume.resumeData)) as ResumeData
     const checked = suggestions.filter((s) => checkedIds.has(s.id))
 
     for (const s of checked) {
@@ -249,9 +360,18 @@ export default function ATSPage() {
       }
     }
 
-    pushToHistory(updated)
-    router.push('/dashboard/resume')
-  }, [suggestions, currentResume, checkedIds, pushToHistory, router])
+    try {
+      await updateSavedResume(user.uid, selectedResume.id, {
+        resumeData: updated,
+        updatedAt: new Date().toISOString(),
+      })
+      setResume(updated)
+      router.push(`/dashboard/resume/${selectedResume.id}`)
+    } catch {
+      setSuggestionsError('Failed to save changes. Please try again.')
+      setIsApplyingSuggestions(false)
+    }
+  }, [suggestions, selectedResume, currentResume, user, checkedIds, setResume, router])
 
   return (
     <div className="space-y-6 pb-20 md:pb-0">
@@ -263,7 +383,7 @@ export default function ATSPage() {
           <h1 className="font-heading text-2xl font-bold text-white">ATS Optimizer</h1>
         </div>
         <p className="text-[#A0A0B8] text-sm ml-12">
-          Paste your resume and job description to get a real-time ATS match score with keyword analysis.
+          Select a resume and paste a job description to get a real-time ATS match score with keyword analysis.
         </p>
       </motion.div>
 
@@ -278,28 +398,105 @@ export default function ATSPage() {
           <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
             <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-4">
 
-              {profile?.generated?.resume_plain && (
-                <div className="flex items-start gap-2 p-3 rounded-xl bg-[#6366F1]/10 border border-[#6366F1]/20">
-                  <FileText className="w-4 h-4 text-[#6366F1] flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-[#818CF8]">
-                    Resume text auto-loaded from your last generated resume.
-                  </p>
+              {/* Section A — AURI Saved Resumes */}
+              <div>
+                <label className={LABEL_CLASS}>
+                  Your AURI Resumes <span className="text-[#EF4444]">*</span>
+                </label>
+                {isLoadingResumes ? (
+                  <div className="flex items-center justify-center h-20">
+                    <Loader2 className="w-5 h-5 text-[#6366F1] animate-spin" />
+                  </div>
+                ) : savedResumes.length === 0 ? (
+                  <div className="flex flex-col items-center gap-2 py-6 rounded-xl border border-dashed border-white/[0.08] text-center">
+                    <FileText className="w-5 h-5 text-[#60607A]" />
+                    <p className="text-xs text-[#60607A]">No saved resumes yet.</p>
+                    <Link
+                      href="/dashboard/resume"
+                      className="text-xs text-[#818CF8] hover:text-white transition-colors"
+                    >
+                      Build your first resume →
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
+                    {savedResumes.map((resume) => {
+                      const isSelected = selectedResume?.id === resume.id
+                      return (
+                        <button
+                          key={resume.id}
+                          onClick={() => handleSelectResume(resume)}
+                          className={`w-full text-left rounded-xl border px-4 py-3 transition-all duration-150
+                            ${isSelected
+                              ? 'border-[#6366F1]/50 bg-[#6366F1]/5 ring-1 ring-[#6366F1]/20'
+                              : 'border-white/[0.06] bg-[#0A0A0F]/50 hover:border-white/[0.12] hover:bg-[#0A0A0F]'
+                            }`}
+                        >
+                          <p className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-[#E0E0F0]'}`}>
+                            {resume.name}
+                          </p>
+                          <p className="text-xs text-[#60607A] truncate mt-0.5">
+                            {resume.targetPosition}{resume.targetCompany ? ` · ${resume.targetCompany}` : ''}
+                          </p>
+                          <p className="text-[10px] text-[#4A4A6A] mt-1">
+                            {formatResumeDate(resume.updatedAt, 'Updated')}
+                          </p>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* OR Divider */}
+              {profile?.isPro && (
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-white/[0.06]" />
+                  <span className="text-[10px] font-medium text-[#4A4A6A] uppercase tracking-widest">or</span>
+                  <div className="flex-1 h-px bg-white/[0.06]" />
                 </div>
               )}
 
-              <div>
-                <label className={LABEL_CLASS}>
-                  Resume Text <span className="text-[#EF4444]">*</span>
-                </label>
-                <textarea
-                  className={INPUT_CLASS}
-                  rows={10}
-                  placeholder="Paste your plain-text resume here…"
-                  value={resumeText}
-                  onChange={(e) => setResumeText(e.target.value)}
-                  aria-label="Resume text"
-                />
-              </div>
+              {/* Section B — PDF Upload (Pro only) */}
+              {profile?.isPro && (
+                <div>
+                  <label className={LABEL_CLASS}>Upload a PDF Resume</label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    className="sr-only"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) void handleFileUpload(file)
+                      e.target.value = ''
+                    }}
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingResume}
+                    className={`w-full flex flex-col items-center gap-2 py-5 rounded-xl border border-dashed
+                      transition-all duration-150 disabled:cursor-not-allowed
+                      ${resumeSource === 'upload'
+                        ? 'border-[#6366F1]/50 bg-[#6366F1]/5'
+                        : 'border-white/[0.10] hover:border-white/[0.20] hover:bg-white/[0.02]'
+                      }`}
+                  >
+                    {isUploadingResume ? (
+                      <Loader2 className="w-5 h-5 text-[#6366F1] animate-spin" />
+                    ) : (
+                      <Upload className={`w-5 h-5 ${resumeSource === 'upload' ? 'text-[#818CF8]' : 'text-[#60607A]'}`} />
+                    )}
+                    <span className={`text-xs ${resumeSource === 'upload' ? 'text-[#818CF8]' : 'text-[#60607A]'}`}>
+                      {isUploadingResume
+                        ? 'Parsing PDF…'
+                        : resumeSource === 'upload'
+                          ? 'PDF loaded — click to replace'
+                          : 'Click to upload PDF (max 5 MB)'}
+                    </span>
+                  </button>
+                </div>
+              )}
 
               <div>
                 <label className={LABEL_CLASS}>
@@ -352,7 +549,7 @@ export default function ATSPage() {
           </div>
         </motion.div>
 
-        {/* ── Right: Score Panel + Improved Resume ─────────────────────────── */}
+        {/* ── Right: Score Panel + Results ─────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -363,10 +560,7 @@ export default function ATSPage() {
           {isAnalyzing ? (
             <ATSScorePanel score={null} isLoading={true} />
           ) : score ? (
-            <ATSScorePanel
-              score={score}
-              isLoading={false}
-            />
+            <ATSScorePanel score={score} isLoading={false} />
           ) : (
             <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
               <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-16 flex flex-col items-center text-center">
@@ -374,7 +568,7 @@ export default function ATSPage() {
                   <ClipboardList className="w-6 h-6 text-[#8B5CF6]" />
                 </div>
                 <p className="text-sm font-medium text-[#A0A0B8]">Your ATS score will appear here</p>
-                <p className="text-xs text-[#60607A] mt-1">Paste your resume and job description, then click Analyze</p>
+                <p className="text-xs text-[#60607A] mt-1">Select a resume and job description, then click Analyze</p>
               </div>
             </div>
           )}
@@ -383,7 +577,7 @@ export default function ATSPage() {
           {score && profile?.isPro && user && (
             <div className="space-y-2">
               <button
-                onClick={handleGenerateSuggestions}
+                onClick={() => void handleGenerateSuggestions()}
                 disabled={isGeneratingSuggestions || isAnalyzing}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl
                   border border-[#6366F1]/30 text-[#818CF8] text-sm font-medium
@@ -404,7 +598,7 @@ export default function ATSPage() {
             </div>
           )}
 
-          {/* Suggestions Panel — rendered after "Apply to Editor" generates results */}
+          {/* Suggestions Panel */}
           {suggestions && (
             <SuggestionsPanel
               suggestions={suggestions}
@@ -414,13 +608,13 @@ export default function ATSPage() {
                 next.has(id) ? next.delete(id) : next.add(id)
                 return next
               })}
-              onApply={handleApplySuggestions}
+              onApply={() => void handleApplySuggestions()}
               isApplying={isApplyingSuggestions}
               onDiscard={() => setSuggestions(null)}
             />
           )}
 
-          {/* Section Analysis Panel — Pro users only; invisible to guests and free users */}
+          {/* Section Analysis Panel — Pro users only */}
           {profile?.isPro && (
             <SectionAnalysisPanel
               sections={score?.section_analysis ?? null}
@@ -428,14 +622,14 @@ export default function ATSPage() {
             />
           )}
 
-          {/* Requirement Coverage Panel — semantic matching alongside keyword panel */}
+          {/* Requirement Coverage Panel */}
           {isCoverageLoading ? (
             <RequirementCoveragePanel coverage={null} isLoading={true} />
           ) : coverage ? (
             <RequirementCoveragePanel coverage={coverage} isLoading={false} />
           ) : null}
 
-          {/* Outcome Tracker — authenticated users only, appears after first analysis */}
+          {/* Outcome Tracker */}
           {user && score && (
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -461,7 +655,7 @@ export default function ATSPage() {
                   {OUTCOME_OPTIONS.map(({ value, label }) => (
                     <button
                       key={value}
-                      onClick={() => handleOutcome(value)}
+                      onClick={() => void handleOutcome(value)}
                       disabled={isSavingOutcome || isAnalyzing}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150
                         ${selectedOutcome === value
@@ -479,6 +673,7 @@ export default function ATSPage() {
 
         </motion.div>
       </div>
+
     </div>
   )
 }

@@ -6,6 +6,8 @@ import { callClaudeJSON } from '@/lib/claude'
 import { buildStructuredSuggestionsPrompt } from '@/lib/prompts'
 import type {
   CareerProfile,
+  ResumeData,
+  SavedResume,
   SectionAnalysis,
   StructuredSuggestion,
   SuggestionTarget,
@@ -15,15 +17,24 @@ export const runtime = 'nodejs'
 
 type RawSuggestion = Omit<StructuredSuggestion, 'id' | 'label' | 'original'>
 
-function generateLabel(target: SuggestionTarget, profile: CareerProfile): string {
+// Minimal shape needed by generateLabel / lookupOriginal — satisfied by both
+// CareerProfile and ResumeData so either source can be used without casts.
+type ResumeForSuggestions = {
+  experience: CareerProfile['experience']
+  skills: CareerProfile['skills']
+  projects: CareerProfile['projects']
+  leadership: CareerProfile['leadership']
+}
+
+function generateLabel(target: SuggestionTarget, resume: ResumeForSuggestions): string {
   if (target.section === 'summary') return 'Professional Summary'
   if (target.section === 'experience') {
-    const exp = profile.experience.find((e) => e.id === target.entryId)
+    const exp = resume.experience.find((e) => e.id === target.entryId)
     const name = exp ? `${exp.title} at ${exp.company}` : 'Experience'
     return `${name} — Bullet ${target.bulletIndex + 1}`
   }
   if (target.section === 'experience_title') {
-    const exp = profile.experience.find((e) => e.id === target.entryId)
+    const exp = resume.experience.find((e) => e.id === target.entryId)
     const name = exp ? `${exp.title} at ${exp.company}` : 'Experience'
     return `${name} — Job Title`
   }
@@ -33,11 +44,11 @@ function generateLabel(target: SuggestionTarget, profile: CareerProfile): string
       : `Skills — Replace "${target.oldSkill}"`
   }
   if (target.section === 'projects') {
-    const proj = profile.projects.find((p) => p.id === target.entryId)
+    const proj = resume.projects.find((p) => p.id === target.entryId)
     return `${proj?.name ?? 'Project'} — Bullet ${target.bulletIndex + 1}`
   }
   if (target.section === 'leadership') {
-    const lead = profile.leadership?.find((l) => l.id === target.entryId)
+    const lead = resume.leadership?.find((l) => l.id === target.entryId)
     const name = lead ? `${lead.role} at ${lead.organization}` : 'Leadership'
     return `${name} — Bullet ${target.bulletIndex + 1}`
   }
@@ -46,26 +57,50 @@ function generateLabel(target: SuggestionTarget, profile: CareerProfile): string
 
 function lookupOriginal(
   target: SuggestionTarget,
-  profile: CareerProfile,
+  resume: ResumeForSuggestions,
   summaryText: string
 ): string {
   if (target.section === 'summary') return summaryText
   if (target.section === 'experience') {
-    return profile.experience.find((e) => e.id === target.entryId)?.bullets[target.bulletIndex] ?? ''
+    return resume.experience.find((e) => e.id === target.entryId)?.bullets[target.bulletIndex] ?? ''
   }
   if (target.section === 'experience_title') {
-    return profile.experience.find((e) => e.id === target.entryId)?.title ?? ''
+    return resume.experience.find((e) => e.id === target.entryId)?.title ?? ''
   }
   if (target.section === 'skills') {
     return target.action === 'add' ? '' : target.oldSkill
   }
   if (target.section === 'projects') {
-    return profile.projects.find((p) => p.id === target.entryId)?.bullets[target.bulletIndex] ?? ''
+    return resume.projects.find((p) => p.id === target.entryId)?.bullets[target.bulletIndex] ?? ''
   }
   if (target.section === 'leadership') {
-    return profile.leadership?.find((l) => l.id === target.entryId)?.bullets[target.bulletIndex] ?? ''
+    return resume.leadership?.find((l) => l.id === target.entryId)?.bullets[target.bulletIndex] ?? ''
   }
   return ''
+}
+
+function buildSections(summary: string | undefined, resume: ResumeForSuggestions) {
+  return {
+    summary: summary || undefined,
+    experience: resume.experience.map((exp) => ({
+      id: exp.id,
+      title: exp.title,
+      company: exp.company,
+      bullets: exp.bullets,
+    })),
+    skills: resume.skills,
+    projects: resume.projects.map((proj) => ({
+      id: proj.id,
+      name: proj.name,
+      bullets: proj.bullets,
+    })),
+    leadership: resume.leadership?.map((lead) => ({
+      id: lead.id,
+      role: lead.role,
+      organization: lead.organization,
+      bullets: lead.bullets,
+    })),
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -79,6 +114,7 @@ export async function POST(req: NextRequest) {
       jobDescription?: string
       missingKeywords?: string[]
       sectionAnalysis?: SectionAnalysis[]
+      resumeId?: string
     }
 
     if (!body.jobDescription?.trim()) {
@@ -101,39 +137,48 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Server configuration error' }, { status: 500 })
     }
 
-    const snap = await adminDb.doc(`users/${verifiedUser.uid}/profile/data`).get()
-    if (!snap.exists) {
-      return Response.json(
-        { error: 'No profile found — build your resume first' },
-        { status: 404 }
-      )
-    }
-    const profile = snap.data() as CareerProfile
+    let resumeForSuggestions: ResumeForSuggestions
+    let summaryText: string
 
-    const summaryText =
-      profile.generated?.resume_plain?.split(/\n\n+/)[0]?.trim() ?? ''
-
-    const sections = {
-      summary: summaryText || undefined,
-      experience: profile.experience.map((exp) => ({
-        id: exp.id,
-        title: exp.title,
-        company: exp.company,
-        bullets: exp.bullets,
-      })),
-      skills: profile.skills,
-      projects: profile.projects.map((proj) => ({
-        id: proj.id,
-        name: proj.name,
-        bullets: proj.bullets,
-      })),
-      leadership: profile.leadership?.map((lead) => ({
-        id: lead.id,
-        role: lead.role,
-        organization: lead.organization,
-        bullets: lead.bullets,
-      })),
+    if (body.resumeId) {
+      // Saved resume path — read from users/{uid}/resumes/{resumeId}
+      const snap = await adminDb.doc(`users/${verifiedUser.uid}/resumes/${body.resumeId}`).get()
+      if (!snap.exists) {
+        return Response.json(
+          { error: 'Saved resume not found — it may have been deleted' },
+          { status: 404 }
+        )
+      }
+      const savedResume = snap.data() as Omit<SavedResume, 'id'>
+      const resumeData: ResumeData = savedResume.resumeData
+      resumeForSuggestions = {
+        experience: resumeData.experience,
+        skills: resumeData.skills,
+        projects: resumeData.projects,
+        leadership: resumeData.leadership,
+      }
+      summaryText = resumeData.summary ?? ''
+    } else {
+      // Career profile path — read from users/{uid}/profile/data
+      const snap = await adminDb.doc(`users/${verifiedUser.uid}/profile/data`).get()
+      if (!snap.exists) {
+        return Response.json(
+          { error: 'No profile found — build your resume first' },
+          { status: 404 }
+        )
+      }
+      const profile = snap.data() as CareerProfile
+      resumeForSuggestions = {
+        experience: profile.experience,
+        skills: profile.skills,
+        projects: profile.projects,
+        leadership: profile.leadership,
+      }
+      summaryText =
+        profile.generated?.resume_plain?.split(/\n\n+/)[0]?.trim() ?? ''
     }
+
+    const sections = buildSections(summaryText, resumeForSuggestions)
 
     const prompt = buildStructuredSuggestionsPrompt(
       sections,
@@ -154,8 +199,8 @@ export async function POST(req: NextRequest) {
     const suggestions: StructuredSuggestion[] = data.map((raw) => ({
       id: crypto.randomUUID(),
       target: raw.target,
-      label: generateLabel(raw.target, profile),
-      original: lookupOriginal(raw.target, profile, summaryText),
+      label: generateLabel(raw.target, resumeForSuggestions),
+      original: lookupOriginal(raw.target, resumeForSuggestions, summaryText),
       suggested: raw.suggested,
       reason: raw.reason,
     }))
