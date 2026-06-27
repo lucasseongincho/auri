@@ -228,6 +228,7 @@ export default function ATSPage() {
   const handleAnalyze = useCallback(async () => {
     if (!resumeText.trim() || !jobDescription.trim()) return
     setIsAnalyzing(true)
+    if (user) setIsCoverageLoading(true)
     setError('')
     setCoverage(null)
     setOutcomeId(null)
@@ -238,26 +239,27 @@ export default function ATSPage() {
     setParsedResult(null)
     setShouldShowImportCTA(false)
 
-    if (user) {
-      setIsCoverageLoading(true)
-      runCoverageAnalysis(jobDescription)
-        .then((result) => { if (result) setCoverage(result) })
-        .catch(() => { /* non-blocking */ })
-        .finally(() => setIsCoverageLoading(false))
-    }
-
     try {
-      const result = await runAnalysis(resumeText, jobDescription)
-      if (result) {
-        setScore(result)
-        setATSScore(result)
+      const [atsResult, coverageResult] = await Promise.allSettled([
+        runAnalysis(resumeText, jobDescription),
+        user ? runCoverageAnalysis(jobDescription) : Promise.resolve(null),
+      ])
+
+      if (atsResult.status === 'fulfilled' && atsResult.value) {
+        setScore(atsResult.value)
+        setATSScore(atsResult.value)
         setAnalysisTimestamp(new Date().toISOString())
         if (resumeSource === 'upload') setShouldShowImportCTA(true)
+      } else if (atsResult.status === 'rejected') {
+        setError(atsResult.reason instanceof Error ? atsResult.reason.message : 'Analysis failed. Please try again.')
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Analysis failed')
+
+      if (coverageResult.status === 'fulfilled' && coverageResult.value) {
+        setCoverage(coverageResult.value)
+      }
     } finally {
       setIsAnalyzing(false)
+      setIsCoverageLoading(false)
     }
   }, [resumeText, jobDescription, runAnalysis, runCoverageAnalysis, setATSScore, user, resumeSource])
 
