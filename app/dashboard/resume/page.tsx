@@ -1420,6 +1420,15 @@ export default function ResumePage() {
     }
   }, [profile, isAuthenticated, user?.uid, syncToFirestore])
 
+  // Show resume immediately if one already exists in Zustand on mount (e.g. after Apply to Editor).
+  // Empty dep array is intentional — mount-only, must not re-run on currentResume changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (currentResume && !hasSessionResume) {
+      setHasSessionResume(true)
+    }
+  }, [])
+
   // ── Validation ──────────────────────────────────────────────────────────────
 
   const validateStep = useCallback(
