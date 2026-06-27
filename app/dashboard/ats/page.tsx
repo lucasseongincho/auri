@@ -13,6 +13,7 @@ import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { getSavedResume, getSavedResumes, updateSavedResume } from '@/lib/firestore'
+import { stripAllAITags } from '@/lib/resumeHighlight'
 import { formatResumeDate } from '@/lib/utils'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import RequirementCoveragePanel from '@/components/resume/RequirementCoveragePanel'
@@ -377,7 +378,8 @@ export default function ATSPage() {
       // Strip the internal ResumeData.id field so Firestore only holds the doc-path ID.
       // Keeping it causes confusion: resumeData.id !== Firestore doc ID, which breaks
       // the isFromApply check on the [id] page and pollutes stored documents.
-      const { id: _id, ...resumeDataToWrite } = updated
+      const { id: _id, ...rawResumeData } = updated
+      const resumeDataToWrite = stripAllAITags(rawResumeData)
       await updateSavedResume(user.uid, selectedResume.id, {
         resumeData: resumeDataToWrite,
         updatedAt: new Date().toISOString(),

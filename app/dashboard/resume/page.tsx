@@ -36,6 +36,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
 import { useLetterScale } from '@/hooks/useLetterScale'
 import { saveResume } from '@/lib/firestore'
+import { stripAllAITags } from '@/lib/resumeHighlight'
 import ResumePreview from '@/components/resume/ResumePreview'
 import ResumeEditor from '@/components/resume/ResumeEditor'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
@@ -1620,7 +1621,7 @@ export default function ResumePage() {
         targetCompany: profile?.target.company ?? '',
         templateId: 'classic-pro' as const,
         atsScore: atsScore?.score,
-        resumeData: activeResume,
+        resumeData: stripAllAITags(activeResume),
         personalInfo: profile?.personal ?? {
           name: '',
           email: '',
