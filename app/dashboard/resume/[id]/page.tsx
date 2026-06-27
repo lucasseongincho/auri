@@ -296,7 +296,7 @@ export default function SavedResumePage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
   const { user, loading: authLoading, isAuthenticated } = useAuth()
-  const { setResume } = useCareerStore()
+  const { setResume, currentResume, profile } = useCareerStore()
   // Measure the shared wrapper that holds both view and edit modes.
   // innerPadding=8 accounts for the p-1 card (4px × 2 sides) sitting between
   // this container and the actual template, so the scale is identical in both modes.
@@ -339,9 +339,36 @@ export default function SavedResumePage() {
 
     const uid = user.uid
 
+    // Pre-seed the preview from Zustand when arriving from Apply to Editor.
+    // handleApplySuggestions sets id: selectedResume.id on currentResume before navigating here,
+    // so this condition is only true for the exact resume that was just applied to.
+    const isFromApply = currentResume !== null && currentResume.id === params.id && resume === null
+    if (isFromApply) {
+      const seed: SavedResume = {
+        id: params.id,
+        name: '',
+        targetPosition: '',
+        targetCompany: '',
+        templateId: currentResume.templateId,
+        resumeData: currentResume,
+        personalInfo: profile?.personal ?? {
+          name: '', email: '', phone: '', location: '', linkedin_url: '', website: '',
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      setResumeData(seed)
+      editedResumeDataRef.current = currentResume
+      setEditedResumeData(currentResume)
+      setLoadingResume(false)
+    }
+
     // Load the specific resume
     const loadResume = async () => {
-      setLoadingResume(true)
+      // Skip the loading skeleton if we pre-seeded from Zustand — the preview is already visible.
+      if (!isFromApply) {
+        setLoadingResume(true)
+      }
       setNotFound(false)
       setError(null)
       try {

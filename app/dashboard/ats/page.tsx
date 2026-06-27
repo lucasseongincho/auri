@@ -365,7 +365,7 @@ export default function ATSPage() {
         resumeData: updated,
         updatedAt: new Date().toISOString(),
       })
-      setResume(updated)
+      setResume({ ...updated, id: selectedResume.id })
       router.push(`/dashboard/resume/${selectedResume.id}`)
     } catch {
       setSuggestionsError('Failed to save changes. Please try again.')
