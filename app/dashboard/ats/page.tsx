@@ -108,6 +108,8 @@ export default function ATSPage() {
     setOriginalScore(null)
     setImprovedScore(null)
     setCoverage(null)
+    setOutcomeId(null)
+    setSelectedOutcome(null)
 
     // Semantic coverage runs in parallel (authenticated users only — reads Firestore profile)
     if (user) {
@@ -124,8 +126,6 @@ export default function ATSPage() {
         setScore(result)
         setATSScore(result)
         setAnalysisTimestamp(new Date().toISOString())
-        setOutcomeId(null)
-        setSelectedOutcome(null)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed')
@@ -444,7 +444,7 @@ export default function ATSPage() {
                     <button
                       key={value}
                       onClick={() => handleOutcome(value)}
-                      disabled={isSavingOutcome}
+                      disabled={isSavingOutcome || isAnalyzing}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150
                         ${selectedOutcome === value
                           ? 'bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white shadow-lg shadow-[#6366F1]/25'
