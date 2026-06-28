@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -1371,7 +1372,7 @@ function Toast({ message, type, onDismiss }: ToastProps) {
 
 // ─── Main Page Component ──────────────────────────────────────────────────────
 
-export default function ResumePage() {
+function ResumePageContent() {
   const {
     profile,
     currentResume,
@@ -1421,14 +1422,17 @@ export default function ResumePage() {
     }
   }, [profile, isAuthenticated, user?.uid, syncToFirestore])
 
-  // Show resume immediately if one already exists in Zustand on mount (e.g. after Apply to Editor).
-  // Empty dep array is intentional — mount-only, must not re-run on currentResume changes.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const searchParams = useSearchParams()
+
+  // Only show the resume immediately if the user navigated here from the ATS page
+  // (?from=ats). Without this guard, currentResume (persisted in Zustand/localStorage)
+  // would cause the previous session's resume to appear on every fresh visit.
   useEffect(() => {
-    if (currentResume && !hasSessionResume) {
+    const fromATS = searchParams.get('from') === 'ats'
+    if (fromATS && currentResume && !hasSessionResume) {
       setHasSessionResume(true)
     }
-  }, [])
+  }, [searchParams])
 
   // ── Validation ──────────────────────────────────────────────────────────────
 
@@ -2143,5 +2147,13 @@ export default function ResumePage() {
       </AnimatePresence>
 
     </div>
+  )
+}
+
+export default function ResumePage() {
+  return (
+    <Suspense fallback={null}>
+      <ResumePageContent />
+    </Suspense>
   )
 }

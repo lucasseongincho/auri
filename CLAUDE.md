@@ -45,6 +45,19 @@ Read the relevant context file before starting any task in that domain:
 
 ---
 
+## Resume Page Display Behavior
+
+The resume preview on /dashboard/resume is intentionally blank on first load (`hasSessionResume` starts `false`).
+The preview only shows when:
+1. The user clicks "Generate Resume" — `handleGenerate` sets `hasSessionResume(true)` on success.
+2. The user navigates from the ATS page after applying suggestions or importing — `handleApplySuggestions` and `handleImportToBuilder` pass `?from=ats` as a query param, and a `useEffect` on the resume page reads this and sets `hasSessionResume(true)`.
+
+DO NOT add a `useEffect` that sets `hasSessionResume(true)` based on `currentResume` alone — `currentResume` persists in Zustand/localStorage between sessions and would cause the previous session's resume to show on every page load, breaking the blank-slate intent.
+
+The `?from=ats` query param is the ONLY correct signal that the user intentionally navigated here with a resume to display.
+
+---
+
 ## gstack
 
 Use /browse skill from gstack for all web browsing. Never use mcp__claude-in-chrome__* tools.

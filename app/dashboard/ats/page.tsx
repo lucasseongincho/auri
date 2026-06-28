@@ -395,7 +395,7 @@ export default function ATSPage() {
         updatedAt: new Date().toISOString(),
       })
       setResume({ ...resumeDataToWrite, id: selectedResume.id })
-      router.push(`/dashboard/resume/${selectedResume.id}`)
+      router.push(`/dashboard/resume/${selectedResume.id}?from=ats`)
     } catch {
       setSuggestionsError('Failed to save changes. Please try again.')
       setIsApplyingSuggestions(false)
@@ -428,7 +428,7 @@ export default function ATSPage() {
       }
       setResume(data.resumeData)
       pushToHistory(data.resumeData)
-      router.push('/dashboard/resume')
+      router.push('/dashboard/resume?from=ats')
     } catch {
       setSuggestionsError('Failed to import resume. Please try again.')
     } finally {
