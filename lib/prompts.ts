@@ -43,6 +43,8 @@ export function buildResumePrompt(
       skills: profile.skills,
       certifications: profile.certifications,
       projects: profile.projects,
+      leadership: profile.leadership ?? [],
+      languages: profile.languages ?? [],
     },
     null,
     2
@@ -91,7 +93,16 @@ ATS RULES YOU MUST ENFORCE:
 ANTI-HALLUCINATION RULES (NON-NEGOTIABLE):
 - ONLY include certifications from the user's CAREER PROFILE certifications array. If it is empty, return "certifications": []. NEVER invent certifications.
 - ONLY include projects from the user's CAREER PROFILE projects array. If it is empty, return "projects": []. NEVER invent projects.
+- ONLY include leadership from the user's CAREER PROFILE leadership array. NEVER invent leadership.
+- ONLY include languages from the user's CAREER PROFILE languages array. NEVER invent languages.
 - NEVER add any content (certifications, projects, jobs, skills, etc.) that the user did not explicitly provide.
+
+EXPERIENCE BULLET GROUNDING (NON-NEGOTIABLE):
+- Every bullet point must be grounded in a responsibility, tool, or achievement the user explicitly listed in their CAREER PROFILE experience entries.
+- You may rephrase, strengthen, and add a tagged metric to a user-provided fact. You may NOT introduce a responsibility the user never mentioned.
+- If a user's bullet says "helped with deployments" you may write "Executed <ai-estimate>15+</ai-estimate> server deployments following standard procedures" — the fact (deployments) came from the user.
+- If a user's bullet says "managed social media" you may NOT write "Led a team of <ai-estimate>5</ai-estimate> engineers" — the team management fact was never in the input.
+- When input is thin, write fewer strong bullets rather than more invented ones.
 
 ONE-PAGE CONSTRAINT (CRITICAL — do NOT exceed these limits):
 - summary: exactly 2 sentences, max 45 words total
@@ -100,6 +111,8 @@ ONE-PAGE CONSTRAINT (CRITICAL — do NOT exceed these limits):
 - skills: MAXIMUM 12 items as a flat list
 - certifications: rewrite up to 3 items from user's certifications — only if certifications were provided
 - projects: rewrite up to 2 projects from user's projects — only if projects were provided, max 2 bullets each
+- leadership: maximum 1 entry, max 2 bullets
+- languages: include all provided
 - Every bullet must be one line (under 120 characters). The entire resume MUST fit on one A4 page.
 
 ${originalResumeText ? `ORIGINAL RESUME TEXT:\n${originalResumeText}\n` : ''}
@@ -113,7 +126,9 @@ Return ONLY valid JSON with this exact shape:
   "education": [{ "id": "string", "institution": "string", "degree": "string", "field": "string", "additionalMajors": ["string"], "minors": ["string"], "year": "string" }],
   "skills": ["string"],
   "certifications": ["string"],
-  "projects": [{ "id": "string", "name": "string", "description": "string", "bullets": ["string"] }]
+  "projects": [{ "id": "string", "name": "string", "description": "string", "bullets": ["string"] }],
+  "leadership": [{ "id": "string", "role": "string", "organization": "string", "start": "string", "end": "string", "bullets": ["string"] }],
+  "languages": [{ "id": "string", "name": "string", "proficiency": "string" }]
 }`
 }
 

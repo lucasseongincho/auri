@@ -23,9 +23,9 @@ interface ResumeRequestBody {
   isPro?: boolean
 }
 
-async function attemptStream(prompt: string, retryCount = 0): Promise<ReadableStream<Uint8Array>> {
+async function attemptStream(prompt: string, retryCount = 0, temperature = 1.0): Promise<ReadableStream<Uint8Array>> {
   try {
-    const claudeStream = await streamClaude(prompt, MAX_TOKENS_RESUME)
+    const claudeStream = await streamClaude(prompt, MAX_TOKENS_RESUME, temperature)
 
     return new ReadableStream<Uint8Array>({
       async start(controller) {
@@ -49,7 +49,7 @@ async function attemptStream(prompt: string, retryCount = 0): Promise<ReadableSt
     const status = (err as { status?: number }).status
     if (status === 529 && retryCount < 1) {
       await new Promise((r) => setTimeout(r, 2000))
-      return attemptStream(prompt, retryCount + 1)
+      return attemptStream(prompt, retryCount + 1, temperature)
     }
     throw err
   }
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
     }
 
     const prompt = buildResumePrompt(careerProfile, targetJob)
-    const stream = await attemptStream(prompt)
+    const stream = await attemptStream(prompt, 0, 0.3)
 
     return new Response(stream, {
       headers: {

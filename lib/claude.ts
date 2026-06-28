@@ -49,11 +49,13 @@ export async function callClaude(
 
 export async function streamClaude(
   prompt: string,
-  maxTokens: number = MAX_TOKENS_RESUME
+  maxTokens: number = MAX_TOKENS_RESUME,
+  temperature = 1.0
 ) {
   return client.messages.stream({
     model: CLAUDE_MODEL,
     max_tokens: maxTokens,
+    temperature,
     messages: [{ role: 'user', content: prompt }],
   })
 }
