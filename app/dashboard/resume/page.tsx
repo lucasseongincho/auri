@@ -41,6 +41,8 @@ import { stripAllAITags } from '@/lib/resumeHighlight'
 import ResumePreview from '@/components/resume/ResumePreview'
 import ResumeEditor from '@/components/resume/ResumeEditor'
 import ATSScorePanel from '@/components/resume/ATSScorePanel'
+import SectionAnalysisPanel from '@/components/resume/SectionAnalysisPanel'
+import RequirementCoveragePanel from '@/components/resume/RequirementCoveragePanel'
 import type {
   Experience,
   Education,
@@ -50,6 +52,7 @@ import type {
   Project,
   ResumeData,
   ATSScore,
+  RequirementCoverage,
 } from '@/types'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
@@ -1405,6 +1408,8 @@ function ResumePageContent() {
   const [showSignUpModal, setShowSignUpModal] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [isATSLoading, setIsATSLoading] = useState(false)
+  const [coverage, setCoverage] = useState<RequirementCoverage[] | null>(null)
+  const [isCoverageLoading, setIsCoverageLoading] = useState(false)
   const [editedResume, setEditedResume] = useState<ResumeData | null>(null)
   // Gate right-side display — false until a resume is generated in this session.
   // Prevents the previous session's persisted resume and ATS score from appearing on load.
@@ -1493,33 +1498,78 @@ function ResumePageContent() {
   // ── ATS Scoring ─────────────────────────────────────────────────────────────
 
   const runATSScore = useCallback(
-    async (plainText: string, jobDescription: string) => {
+    async (plainText: string, jobDescription: string, resume: ResumeData | null) => {
       if (!plainText || !jobDescription) return
       setIsATSLoading(true)
+      setIsCoverageLoading(true)
+      setCoverage(null)
+
+      const bullets: string[] = []
+      if (resume) {
+        for (const exp of resume.experience ?? []) {
+          for (const b of exp.bullets ?? []) {
+            const t = b.trim()
+            if (t.length >= 10) bullets.push(t)
+          }
+        }
+        for (const skill of resume.skills ?? []) {
+          const t = skill.trim()
+          if (t.length >= 10) bullets.push(t)
+        }
+        for (const proj of resume.projects ?? []) {
+          for (const b of proj.bullets ?? []) {
+            const t = b.trim()
+            if (t.length >= 10) bullets.push(t)
+          }
+        }
+        for (const lead of resume.leadership ?? []) {
+          for (const b of lead.bullets ?? []) {
+            const t = b.trim()
+            if (t.length >= 10) bullets.push(t)
+          }
+        }
+        for (const lang of resume.languages ?? []) {
+          const name = lang.name?.trim()
+          const proficiency = lang.proficiency?.trim()
+          if (name && proficiency) {
+            bullets.push(`${name} language proficiency: ${proficiency}`)
+          }
+        }
+      }
+
       try {
         let idToken: string | undefined
         if (auth.currentUser) {
           try { idToken = await getIdToken(auth.currentUser) } catch { /* guest */ }
         }
-        const res = await fetch('/api/claude/ats', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
-          },
-          body: JSON.stringify({
-            resumePlainText: plainText,
-            jobDescription,
-          }),
-        })
-        const json = (await res.json()) as { success: boolean; data: ATSScore }
-        if (json.success) {
-          setATSScore(json.data)
+        const authHeaders: Record<string, string> = idToken ? { Authorization: `Bearer ${idToken}` } : {}
+
+        const [atsResult, coverageResult] = await Promise.allSettled([
+          fetch('/api/claude/ats', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
+            body: JSON.stringify({ resumePlainText: plainText, resumeData: resume, jobDescription }),
+          }).then(r => r.json() as Promise<{ success: boolean; data: ATSScore }>),
+          idToken && bullets.length > 0
+            ? fetch('/api/semantic-coverage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+                body: JSON.stringify({ jobDescription, bullets }),
+              }).then(r => r.json() as Promise<{ success: boolean; data: RequirementCoverage[] }>)
+            : Promise.resolve(null),
+        ])
+
+        if (atsResult.status === 'fulfilled' && atsResult.value.success) {
+          setATSScore(atsResult.value.data)
+        }
+        if (coverageResult.status === 'fulfilled' && coverageResult.value?.success) {
+          setCoverage(coverageResult.value.data)
         }
       } catch {
         // Non-blocking — ATS score failure shouldn't break resume flow
       } finally {
         setIsATSLoading(false)
+        setIsCoverageLoading(false)
       }
     },
     [setATSScore]
@@ -2068,7 +2118,7 @@ function ResumePageContent() {
                     const jd = profile?.target.job_description
                     if (!jd) return
                     const plainText = displayResume.plain ?? buildPlainText(displayResume, profile?.personal ?? {})
-                    runATSScore(plainText, jd)
+                    runATSScore(plainText, jd, displayResume)
                   }}
                   disabled={!profile?.target.job_description}
                   aria-label="Run ATS compatibility score"
@@ -2103,6 +2153,22 @@ function ResumePageContent() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Section Analysis Panel (Pro) */}
+          {hasSessionResume && profile?.isPro && (
+            <SectionAnalysisPanel
+              sections={atsScore?.section_analysis ?? null}
+              isLoading={isATSLoading}
+            />
+          )}
+
+          {/* Requirement Coverage Panel */}
+          {(isCoverageLoading || coverage) && (
+            <RequirementCoveragePanel
+              coverage={coverage}
+              isLoading={isCoverageLoading}
+            />
+          )}
 
           {/* Empty state — no resume yet in this session */}
           {!displayResume && !isStreaming && (

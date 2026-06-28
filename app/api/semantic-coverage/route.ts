@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Request too large', code: 'PAYLOAD_TOO_LARGE' }, { status: 413 })
     }
 
-    const body = (await req.json()) as { jobDescription: string; resumeId?: string }
+    const body = (await req.json()) as { jobDescription: string; resumeId?: string; bullets?: string[] }
     if (!body.jobDescription?.trim()) {
       return Response.json({ error: 'jobDescription is required' }, { status: 400 })
     }
@@ -72,13 +72,14 @@ export async function POST(req: NextRequest) {
     const { allowed, retryAfter } = await checkRateLimit(identifier, verifiedUser.isPro)
     if (!allowed) return rateLimitResponse(retryAfter)
 
-    if (!adminDb) {
-      return Response.json({ error: 'Server configuration error' }, { status: 500 })
-    }
-
     let resumeBullets: string[]
 
-    if (body.resumeId) {
+    if (body.bullets && body.bullets.length > 0) {
+      resumeBullets = body.bullets
+    } else if (body.resumeId) {
+      if (!adminDb) {
+        return Response.json({ error: 'Server configuration error' }, { status: 500 })
+      }
       const snap = await adminDb
         .doc(`users/${verifiedUser.uid}/resumes/${body.resumeId}`)
         .get()
@@ -91,6 +92,9 @@ export async function POST(req: NextRequest) {
       const savedResume = snap.data() as Omit<SavedResume, 'id'>
       resumeBullets = flattenResumeDataBullets(savedResume.resumeData)
     } else {
+      if (!adminDb) {
+        return Response.json({ error: 'Server configuration error' }, { status: 500 })
+      }
       const snap = await adminDb.doc(`users/${verifiedUser.uid}/profile/data`).get()
       if (!snap.exists) {
         return Response.json(

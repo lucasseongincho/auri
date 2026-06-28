@@ -80,6 +80,7 @@ export async function POST(req: NextRequest) {
       uid?: string
       isPro?: boolean
       resumeId?: string
+      resumeData?: ResumeData
     }
 
     // Server-side auth + rate limiting (guests allowed — fall back to IP rate limit)
@@ -116,7 +117,9 @@ export async function POST(req: NextRequest) {
       try {
         let sections: ScoringSection | null = null
 
-        if (body.resumeId) {
+        if (body.resumeData) {
+          sections = extractSectionsFromResumeData(body.resumeData)
+        } else if (body.resumeId) {
           const snap = await adminDb
             .doc(`users/${verifiedUser.uid}/resumes/${body.resumeId}`)
             .get()
