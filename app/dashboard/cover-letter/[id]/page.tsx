@@ -31,7 +31,9 @@ import type { SavedCoverLetter } from '@/types'
 
 const LETTER_W = 816
 const LETTER_H = 1056
-const PAGE_PADDING = 96
+const PAGE_PADDING_TOP = 45
+const PAGE_PADDING_SIDE = 76
+const PAGE_PADDING_BOTTOM = 38
 
 // ── EditableParagraph ─────────────────────────────────────────────────────────
 // Verbatim copy from app/dashboard/cover-letter/page.tsx.
@@ -124,7 +126,7 @@ function LetterShell({ company, name, email, phone, location, children, signerNa
       lineHeight: '1.6',
       color: '#1a1a1a',
       background: 'white',
-      padding: `${PAGE_PADDING}px`,
+      padding: `${PAGE_PADDING_TOP}px ${PAGE_PADDING_SIDE}px ${PAGE_PADDING_BOTTOM}px`,
       minHeight: `${LETTER_H}px`,
       width: `${LETTER_W}px`,
       boxSizing: 'border-box',

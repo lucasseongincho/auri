@@ -48,7 +48,9 @@ const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
 const LETTER_W = 816   // 8.5" at 96 dpi
 const LETTER_H = 1056  // 11" at 96 dpi
-const PAGE_PADDING = 96 // 1 inch margins
+const PAGE_PADDING_TOP = 45    // 12mm
+const PAGE_PADDING_SIDE = 76   // 20mm
+const PAGE_PADDING_BOTTOM = 38 // 10mm
 
 const MIN_WORDS = 280
 const MAX_WORDS = 300
@@ -131,7 +133,7 @@ function CoverLetterLoadingState() {
         background: 'white',
         width: `${LETTER_W}px`,
         minHeight: `${LETTER_H}px`,
-        padding: `${PAGE_PADDING}px`,
+        padding: `${PAGE_PADDING_TOP}px ${PAGE_PADDING_SIDE}px ${PAGE_PADDING_BOTTOM}px`,
         boxSizing: 'border-box',
       }}
       className="flex flex-col items-center justify-center gap-8"
@@ -312,7 +314,7 @@ function LetterDocument({
         lineHeight: '1.6',
         color: '#1a1a1a',
         background: 'white',
-        padding: `${PAGE_PADDING}px`,
+        padding: `${PAGE_PADDING_TOP}px ${PAGE_PADDING_SIDE}px ${PAGE_PADDING_BOTTOM}px`,
         minHeight: `${LETTER_H}px`,
         width: `${LETTER_W}px`,
         boxSizing: 'border-box',
