@@ -7,7 +7,7 @@ export const maxDuration = 30
 // without a code change.
 const CHROMIUM_REMOTE_URL =
   process.env.CHROMIUM_REMOTE_EXEC_PATH ??
-  'https://github.com/Sparticuz/chromium/releases/download/v148.0.0/chromium-v148.0.0-pack.tar'
+  'https://github.com/Sparticuz/chromium/releases/download/v148.0.0/chromium-v148.0.0-pack.x64.tar'
 
 // True on Vercel and in `next start` (post-build preview). False during `next dev`.
 const IS_PRODUCTION = !!process.env.VERCEL || process.env.NODE_ENV === 'production'
