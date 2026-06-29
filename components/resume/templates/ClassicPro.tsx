@@ -37,7 +37,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
           width: 8.5in;
           min-height: 11in;
           box-sizing: border-box;
-          padding: 18mm 20mm 16mm;
+          padding: 12mm 20mm 10mm;
         }
         .classic-pro h1 {
           font-size: 22px;
@@ -138,7 +138,7 @@ export default function ClassicPro({ data, personal, isEditing: _isEditing, rend
         }
         .classic-pro .resume-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
         @media print {
-          .classic-pro { padding: 18mm 20mm 16mm !important; }
+          .classic-pro { padding: 12mm 20mm 10mm !important; }
           .classic-pro * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .classic-pro .resume-link { color: inherit !important; text-decoration: underline !important; }
         }
