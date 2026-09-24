@@ -22,8 +22,8 @@ IMPORTANT: Never push broken builds — run npm run build before every commit
 - Absolute imports with @/ alias
 - Commit format: feat: / fix: / chore: / refactor:
 - Push to main after every completed task
-- Double-bezel card pattern for all UI cards (see context/design/design-system.md)
-- SPRING = { type: 'spring', stiffness: 300, damping: 30 } for all animations
+- Paper/ink/pine design system, single-border cards, no gradients (see context/design/design-system.md)
+- SPRING = { type: 'spring', stiffness: 300, damping: 30 } when an animation is needed; respect reduced motion
 
 ## Routing Table
 Read the relevant context file before starting any task in that domain:

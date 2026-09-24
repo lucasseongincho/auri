@@ -22,7 +22,7 @@ export default function VerificationBanner({
   if (remaining === 0) {
     return (
       <div className="flex items-center gap-2 px-4 py-2.5
-        bg-green-500/10 border border-green-500/20 rounded-xl mb-3">
+        bg-green-500/10 border border-green-500/20 rounded-[4px] mb-3">
         <span className="text-green-400 text-sm">✓</span>
         <p className="text-green-400 text-sm font-medium">
           All numbers verified — your resume is ready to download
@@ -36,7 +36,7 @@ export default function VerificationBanner({
     : 0
 
   return (
-    <div className="px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-xl mb-3">
+    <div className="px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-[4px] mb-3">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-amber-300 text-sm font-semibold">
@@ -50,7 +50,7 @@ export default function VerificationBanner({
         <button
           onClick={onReviewClick}
           className="shrink-0 text-xs text-amber-300 border border-amber-500/30
-            rounded-lg px-3 py-1.5 hover:bg-amber-500/10 transition-colors whitespace-nowrap"
+            rounded-[4px] px-3 py-1.5 hover:bg-amber-500/10 transition-colors whitespace-nowrap"
           aria-label="Jump to first unverified estimate"
         >
           Review all
@@ -58,7 +58,7 @@ export default function VerificationBanner({
       </div>
 
       {/* Progress bar */}
-      <div className="mt-2.5 bg-white/5 rounded-full h-1.5">
+      <div className="mt-2.5 bg-lp-ink/5 rounded-full h-1.5">
         <div
           className="bg-amber-400 h-1.5 rounded-full transition-all duration-300"
           style={{ width: `${progressPct}%` }}

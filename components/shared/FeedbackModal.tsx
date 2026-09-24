@@ -82,7 +82,7 @@ export default function FeedbackModal({ open, onClose, userEmail }: FeedbackModa
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] bg-black/60 "
           />
 
           {/* Modal */}
@@ -94,16 +94,16 @@ export default function FeedbackModal({ open, onClose, userEmail }: FeedbackModa
             className="fixed z-[61] bottom-20 right-6 md:bottom-20 md:right-6
               w-[calc(100vw-48px)] max-w-sm"
           >
-            <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 shadow-2xl shadow-black/50">
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5">
+            <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 ">
+              <div className="rounded-[10px]  bg-[#FFFFFF] p-5">
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-sm font-semibold text-white">Send Feedback</h2>
+                  <h2 className="text-sm font-semibold text-lp-ink">Send Feedback</h2>
                   <button
                     onClick={handleClose}
                     aria-label="Close feedback"
-                    className="p-1 rounded-lg text-[#60607A] hover:text-white hover:bg-white/[0.06] transition-colors"
+                    className="p-1 rounded-[4px] text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/6 transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -116,9 +116,9 @@ export default function FeedbackModal({ open, onClose, userEmail }: FeedbackModa
                     transition={SPRING}
                     className="flex flex-col items-center gap-2 py-6 text-center"
                   >
-                    <CheckCircle className="w-8 h-8 text-[#22C55E]" />
-                    <p className="text-white font-semibold text-sm">Thanks — we'll look into it</p>
-                    <p className="text-[#60607A] text-xs">Closing in a moment…</p>
+                    <CheckCircle className="w-8 h-8 text-[#1F7A4D]" />
+                    <p className="text-lp-ink font-semibold text-sm">Thanks — we'll look into it</p>
+                    <p className="text-[#5A5F5C] text-xs">Closing in a moment…</p>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -129,10 +129,10 @@ export default function FeedbackModal({ open, onClose, userEmail }: FeedbackModa
                           key={c}
                           type="button"
                           onClick={() => setCategory(c)}
-                          className={`flex-1 py-1.5 px-2 rounded-lg text-[10px] font-medium transition-all duration-150 leading-tight text-center
+                          className={`flex-1 py-1.5 px-2 rounded-[4px] text-[10px] font-medium transition-all duration-150 leading-tight text-center
                             ${category === c
-                              ? 'bg-[#6366F1]/20 text-[#818CF8] border border-[#6366F1]/40'
-                              : 'text-[#60607A] border border-white/[0.06] hover:text-[#A0A0B8] hover:border-white/[0.12]'
+                              ? 'bg-[#1F5C4A]/20 text-[#1F5C4A] border border-[#1F5C4A]/40'
+                              : 'text-[#5A5F5C] border border-lp-hairline hover:text-[#3C403E] hover:border-lp-rule'
                             }`}
                         >
                           {c}
@@ -148,12 +148,12 @@ export default function FeedbackModal({ open, onClose, userEmail }: FeedbackModa
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         placeholder="Describe the issue or idea… (min 20 characters)"
-                        className="w-full px-3 py-2.5 rounded-xl bg-[#13131A] border border-white/[0.08] text-white
-                          placeholder-[#60607A] text-sm focus:outline-none focus:border-[#6366F1]/50
+                        className="w-full px-3 py-2.5 rounded-[4px] bg-[#FFFFFF] border border-lp-rule text-lp-ink
+                          placeholder-[#5A5F5C] text-sm focus:outline-none focus:border-[#1F5C4A]/50
                           transition-colors resize-none"
                       />
                       <p className={`text-[10px] mt-1 text-right transition-colors
-                        ${message.length < 20 && message.length > 0 ? 'text-[#F59E0B]' : 'text-[#60607A]'}`}>
+                        ${message.length < 20 && message.length > 0 ? 'text-[#8A5A00]' : 'text-[#5A5F5C]'}`}>
                         {message.length} / 20 min
                       </p>
                     </div>
@@ -170,11 +170,11 @@ export default function FeedbackModal({ open, onClose, userEmail }: FeedbackModa
                       <button
                         type="button"
                         onClick={() => fileRef.current?.click()}
-                        className="flex items-center gap-2 text-xs text-[#60607A] hover:text-[#A0A0B8] transition-colors"
+                        className="flex items-center gap-2 text-xs text-[#5A5F5C] hover:text-[#3C403E] transition-colors"
                       >
                         <Paperclip className="w-3.5 h-3.5 flex-shrink-0" />
                         {file ? (
-                          <span className="text-[#A0A0B8] truncate max-w-[200px]">{file.name}</span>
+                          <span className="text-[#3C403E] truncate max-w-[200px]">{file.name}</span>
                         ) : (
                           <span>Attach image or PDF (optional, max 5MB)</span>
                         )}
@@ -182,21 +182,20 @@ export default function FeedbackModal({ open, onClose, userEmail }: FeedbackModa
                     </div>
 
                     {error && (
-                      <p className="text-xs text-[#EF4444]">{error}</p>
+                      <p className="text-xs text-[#B42318]">{error}</p>
                     )}
 
                     {/* Submit */}
                     <button
                       type="submit"
                       disabled={loading}
-                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl font-semibold text-white text-sm
-                        bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-                        shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                        hover:scale-[1.02] transition-all duration-200
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[10px] font-semibold text-white text-sm
+                        bg-[#1F5C4A]
+                         transition-all duration-200
                         disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
                       {loading ? (
-                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span className="w-4 h-4 border-2 border-lp-rule border-t-lp-rule rounded-full animate-spin" />
                       ) : (
                         <Send className="w-3.5 h-3.5" />
                       )}

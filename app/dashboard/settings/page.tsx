@@ -61,27 +61,27 @@ export default function SettingsPage() {
     <div className="space-y-6 pb-20 md:pb-0 max-w-2xl">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#60607A] to-[#A0A0B8] flex items-center justify-center">
-            <Settings className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-[10px] bg-[#5A5F5C]/10 flex items-center justify-center">
+            <Settings className="w-5 h-5 text-lp-ink" />
           </div>
-          <h1 className="font-heading text-2xl font-bold text-white">Settings</h1>
+          <h1 className="font-heading text-2xl font-bold text-lp-ink">Settings</h1>
         </div>
       </motion.div>
 
       {/* Account card */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING, delay: 0.1 }}
-        className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-        <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 space-y-4">
-          <h2 className="font-heading font-semibold text-white">Account</h2>
-          <div className="flex items-center justify-between py-3 border-b border-white/[0.06]">
+        className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+        <div className="rounded-[10px]  bg-[#FFFFFF] p-6 space-y-4">
+          <h2 className="font-heading font-semibold text-lp-ink">Account</h2>
+          <div className="flex items-center justify-between py-3 border-b border-lp-hairline">
             <div>
-              <p className="text-sm text-white">{user?.displayName ?? ''}</p>
-              <p className="text-xs text-[#60607A]">{user?.email ?? ''}</p>
+              <p className="text-sm text-lp-ink">{user?.displayName ?? ''}</p>
+              <p className="text-xs text-[#5A5F5C]">{user?.email ?? ''}</p>
             </div>
           </div>
           <button type="button" onClick={handleSignOut}
-            className="px-4 py-2 rounded-xl border border-[#EF4444]/30 text-[#EF4444]
-              hover:bg-[#EF4444]/10 transition-all duration-200 text-sm font-medium">
+            className="px-4 py-2 rounded-[4px] border border-[#B42318]/30 text-[#B42318]
+              hover:bg-[#B42318]/10 transition-all duration-200 text-sm font-medium">
             Sign Out
           </button>
         </div>
@@ -89,28 +89,28 @@ export default function SettingsPage() {
 
       {/* Billing card */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING, delay: 0.15 }}
-        className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-        <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 space-y-4">
-          <h2 className="font-heading font-semibold text-white">Billing</h2>
+        className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+        <div className="rounded-[10px]  bg-[#FFFFFF] p-6 space-y-4">
+          <h2 className="font-heading font-semibold text-lp-ink">Billing</h2>
 
-          <div className="flex items-center justify-between py-3 border-b border-white/[0.06]">
+          <div className="flex items-center justify-between py-3 border-b border-lp-hairline">
             <div className="flex items-center gap-3">
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+              <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center ${
                 isPro
-                  ? 'bg-gradient-to-br from-[#6366F1] to-[#8B5CF6]'
-                  : 'bg-white/[0.06]'
+                  ? 'bg-[#1F5C4A] '
+                  : 'bg-lp-ink/6'
               }`}>
                 {isPro ? (
-                  <Crown className="w-5 h-5 text-white" />
+                  <Crown className="w-5 h-5 text-lp-ink" />
                 ) : (
-                  <Zap className="w-5 h-5 text-[#60607A]" />
+                  <Zap className="w-5 h-5 text-[#5A5F5C]" />
                 )}
               </div>
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium text-lp-ink">
                   {isPro === null ? 'Loading…' : isPro ? 'AURI Pro' : 'Free Plan'}
                 </p>
-                <p className="text-xs text-[#60607A]">
+                <p className="text-xs text-[#5A5F5C]">
                   {isPro ? 'Unlimited AI generations' : '3 AI generations/month'}
                 </p>
               </div>
@@ -122,8 +122,8 @@ export default function SettingsPage() {
               type="button"
               onClick={handleManageBilling}
               disabled={billingLoading}
-              className="px-4 py-2 rounded-xl border border-white/15 text-[#A0A0B8]
-                hover:text-white hover:bg-white/5 transition-all duration-200 text-sm font-medium
+              className="px-4 py-2 rounded-[4px] border border-lp-rule text-[#3C403E]
+                hover:text-lp-ink hover:bg-lp-ink/5 transition-all duration-200 text-sm font-medium
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {billingLoading ? 'Loading…' : 'Manage Billing'}
@@ -132,11 +132,10 @@ export default function SettingsPage() {
           {isPro === false && (
             <Link
               href="/pricing"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-[4px]
                 font-semibold text-white text-sm
-                bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-                shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/40
-                hover:scale-[1.02] transition-all duration-200"
+                bg-[#1F5C4A]
+                 transition-all duration-200"
             >
               <Crown className="w-3.5 h-3.5" />
               View Plans

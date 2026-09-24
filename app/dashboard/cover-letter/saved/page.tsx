@@ -34,9 +34,9 @@ function formatDate(val: unknown) {
 
 function WordBadge({ count }: { count: number }) {
   const color =
-    count > 300 ? 'text-[#EF4444] bg-[#EF4444]/10 border-[#EF4444]/20'
-    : count >= 280 ? 'text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/20'
-    : 'text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/20'
+    count > 300 ? 'text-[#B42318] bg-[#B42318]/10 border-[#B42318]/20'
+    : count >= 280 ? 'text-[#1F7A4D] bg-[#1F7A4D]/10 border-[#1F7A4D]/20'
+    : 'text-[#1F5C4A] bg-[#1F5C4A]/10 border-[#1F5C4A]/20'
   return (
     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${color}`}>
       {count}w
@@ -127,23 +127,22 @@ export default function SavedCoverLettersPage() {
         className="flex-shrink-0 flex items-center justify-between gap-4 mb-6"
       >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706]
+          <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10
             flex items-center justify-center flex-shrink-0">
-            <Mail className="w-5 h-5 text-white" />
+            <Mail className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
-            <h1 className="font-heading text-xl font-bold text-white leading-tight">Saved Cover Letters</h1>
-            <p className="text-xs text-[#60607A]">
+            <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">Saved Cover Letters</h1>
+            <p className="text-xs text-[#5A5F5C]">
               {loading ? 'Loading…' : `${letters.length} saved letter${letters.length !== 1 ? 's' : ''}`}
             </p>
           </div>
         </div>
         <Link
           href="/dashboard/cover-letter"
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
-            bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
-            shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50
-            hover:scale-[1.02] transition-all duration-200"
+          className="flex items-center gap-2 px-4 py-2 rounded-[4px] text-sm font-semibold
+            bg-[#1F5C4A] text-white
+             transition-all duration-200"
         >
           <Plus className="w-4 h-4" />
           New Letter
@@ -157,8 +156,8 @@ export default function SavedCoverLettersPage() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex-shrink-0 flex items-center gap-2 mb-4 p-3 rounded-xl
-              bg-[#EF4444]/10 border border-[#EF4444]/20 text-[#EF4444] text-sm"
+            className="flex-shrink-0 flex items-center gap-2 mb-4 p-3 rounded-[10px]
+              bg-[#B42318]/10 border border-[#B42318]/20 text-[#B42318] text-sm"
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}
@@ -174,24 +173,24 @@ export default function SavedCoverLettersPage() {
           className="flex-shrink-0 flex flex-col sm:flex-row gap-3 mb-5"
         >
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#60607A]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A5F5C]" />
             <input
               type="text"
               placeholder="Search by company or position…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl text-sm
-                bg-[#13131A] border border-white/[0.08] text-white placeholder-[#60607A]
-                focus:outline-none focus:border-[#F59E0B]/50 transition-colors"
+              className="w-full pl-9 pr-4 py-2 rounded-[10px] text-sm
+                bg-[#FFFFFF] border border-lp-rule text-lp-ink placeholder-[#5A5F5C]
+                focus:outline-none focus:border-[#1F5C4A]/50 transition-colors"
             />
           </div>
           <div className="flex items-center gap-2">
-            <SortAsc className="w-4 h-4 text-[#60607A] flex-shrink-0" />
+            <SortAsc className="w-4 h-4 text-[#5A5F5C] flex-shrink-0" />
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortOption)}
-              className="px-3 py-2 rounded-xl text-sm bg-[#13131A] border border-white/[0.08]
-                text-[#A0A0B8] focus:outline-none focus:border-[#F59E0B]/50 transition-colors"
+              className="px-3 py-2 rounded-[4px] text-sm bg-[#FFFFFF] border border-lp-rule
+                text-[#3C403E] focus:outline-none focus:border-[#1F5C4A]/50 transition-colors"
             >
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
@@ -207,7 +206,7 @@ export default function SavedCoverLettersPage() {
 
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-6 h-6 text-[#F59E0B] animate-spin" />
+            <Loader2 className="w-6 h-6 text-[#1F5C4A] animate-spin" />
           </div>
         )}
 
@@ -217,19 +216,19 @@ export default function SavedCoverLettersPage() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-20 text-center px-6"
           >
-            <div className="w-16 h-16 rounded-2xl bg-[#F59E0B]/10 border border-[#F59E0B]/20
+            <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
               flex items-center justify-center mb-4">
-              <Mail className="w-8 h-8 text-[#F59E0B]" />
+              <Mail className="w-8 h-8 text-[#1F5C4A]" />
             </div>
-            <h3 className="font-heading text-base font-semibold text-white mb-2">No saved cover letters yet</h3>
-            <p className="text-sm text-[#60607A] mb-5 max-w-sm">
+            <h3 className="font-heading text-base font-semibold text-lp-ink mb-2">No saved cover letters yet</h3>
+            <p className="text-sm text-[#5A5F5C] mb-5 max-w-sm">
               Generate a cover letter and click Save to access it here.
             </p>
             <Link
               href="/dashboard/cover-letter"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
-                bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
-                shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.02] transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-[4px] text-sm font-semibold
+                bg-[#1F5C4A] text-white
+                    transition-all"
             >
               <Plus className="w-4 h-4" />
               Generate your first letter
@@ -243,9 +242,9 @@ export default function SavedCoverLettersPage() {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center justify-center py-16 text-center"
           >
-            <Search className="w-8 h-8 text-[#60607A] mb-3" />
-            <p className="text-sm text-[#A0A0B8]">No letters match &ldquo;{search}&rdquo;</p>
-            <button onClick={() => setSearch('')} className="mt-2 text-xs text-[#F59E0B] hover:underline">
+            <Search className="w-8 h-8 text-[#5A5F5C] mb-3" />
+            <p className="text-sm text-[#3C403E]">No letters match &ldquo;{search}&rdquo;</p>
+            <button onClick={() => setSearch('')} className="mt-2 text-xs text-[#1F5C4A] hover:underline">
               Clear search
             </button>
           </motion.div>
@@ -263,18 +262,18 @@ export default function SavedCoverLettersPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...SPRING, delay: i * 0.04 }}
-                className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 group"
+                className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 group"
               >
-                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 flex flex-col gap-3 h-full">
+                <div className="rounded-[10px]  bg-[#FFFFFF] p-4 flex flex-col gap-3 h-full">
 
                   {/* Company + word badge */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#F59E0B]/20 to-[#D97706]/20
-                        border border-[#F59E0B]/30 flex items-center justify-center flex-shrink-0">
-                        <Mail className="w-3.5 h-3.5 text-[#F59E0B]" />
+                      <div className="w-8 h-8 rounded-[4px] bg-[#1F5C4A]/20
+                        border border-[#1F5C4A]/30 flex items-center justify-center flex-shrink-0">
+                        <Mail className="w-3.5 h-3.5 text-[#1F5C4A]" />
                       </div>
-                      <p className="text-sm font-bold text-white truncate">{letter.company}</p>
+                      <p className="text-sm font-bold text-lp-ink truncate">{letter.company}</p>
                     </div>
                     <WordBadge count={letter.wordCount} />
                   </div>
@@ -282,38 +281,38 @@ export default function SavedCoverLettersPage() {
                   {/* Meta */}
                   <div className="space-y-1.5">
                     {letter.position && (
-                      <div className="flex items-center gap-1.5 text-xs text-[#A0A0B8]">
-                        <Target className="w-3.5 h-3.5 text-[#60607A] flex-shrink-0" />
+                      <div className="flex items-center gap-1.5 text-xs text-[#3C403E]">
+                        <Target className="w-3.5 h-3.5 text-[#5A5F5C] flex-shrink-0" />
                         <span className="truncate">{letter.position}</span>
                       </div>
                     )}
                     {letter.openingHook && (
-                      <div className="flex items-start gap-1.5 text-xs text-[#60607A]">
+                      <div className="flex items-start gap-1.5 text-xs text-[#5A5F5C]">
                         <Building2 className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
                         <span className="line-clamp-2 italic">&ldquo;{letter.openingHook}&rdquo;</span>
                       </div>
                     )}
-                    <div className="flex items-center gap-1.5 text-xs text-[#60607A]">
+                    <div className="flex items-center gap-1.5 text-xs text-[#5A5F5C]">
                       <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                       <span>{formatDate(letter.updatedAt)}</span>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="mt-auto flex items-center gap-2 pt-2 border-t border-white/[0.05]">
+                  <div className="mt-auto flex items-center gap-2 pt-2 border-t border-lp-hairline">
                     <Link
                       href={`/dashboard/cover-letter/${letter.id}`}
                       className="flex-1 flex items-center justify-center px-3 py-2
-                        rounded-lg text-xs font-semibold bg-[#F59E0B] text-white
-                        hover:bg-[#D97706] transition-colors"
+                        rounded-[4px] text-xs font-semibold bg-[#1F5C4A] text-white
+                        hover:bg-[#15443A] transition-colors"
                     >
                       Open
                     </Link>
                     <button
                       onClick={() => setDeleteTarget(letter.id)}
                       aria-label={`Delete letter for ${letter.company}`}
-                      className="p-2 rounded-lg text-[#60607A] hover:text-[#EF4444]
-                        hover:bg-[#EF4444]/10 transition-all duration-200"
+                      className="p-2 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318]
+                        hover:bg-[#B42318]/10 transition-all duration-200"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -332,7 +331,7 @@ export default function SavedCoverLettersPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 "
             onClick={(e) => { if (e.target === e.currentTarget) setDeleteTarget(null) }}
           >
             <motion.div
@@ -340,34 +339,34 @@ export default function SavedCoverLettersPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 16 }}
               transition={SPRING}
-              className="w-full max-w-sm rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+              className="w-full max-w-sm rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
             >
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
+              <div className="rounded-[10px]  bg-[#FFFFFF] p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20
+                  <div className="w-10 h-10 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20
                     flex items-center justify-center">
-                    <Trash2 className="w-5 h-5 text-[#EF4444]" />
+                    <Trash2 className="w-5 h-5 text-[#B42318]" />
                   </div>
                   <button onClick={() => setDeleteTarget(null)}
-                    className="p-1.5 rounded-lg text-[#60607A] hover:text-white hover:bg-white/5 transition-all">
+                    className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5 transition-all">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                <h3 className="font-heading text-base font-semibold text-white mb-1">Delete cover letter?</h3>
-                <p className="text-sm text-[#60607A] mb-6">
+                <h3 className="font-heading text-base font-semibold text-lp-ink mb-1">Delete cover letter?</h3>
+                <p className="text-sm text-[#5A5F5C] mb-6">
                   This will be permanently deleted. This action cannot be undone.
                 </p>
                 <div className="flex gap-3">
                   <button onClick={() => setDeleteTarget(null)}
-                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium
-                      border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all">
+                    className="flex-1 px-4 py-2.5 rounded-[4px] text-sm font-medium
+                      border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all">
                     Cancel
                   </button>
                   <button
                     onClick={() => handleDelete(deleteTarget)}
                     disabled={deleting}
-                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold
-                      bg-[#EF4444] text-white hover:bg-[#DC2626] transition-colors
+                    className="flex-1 px-4 py-2.5 rounded-[4px] text-sm font-semibold
+                      bg-[#B42318] text-white hover:bg-[#912018] transition-colors
                       disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Delete'}

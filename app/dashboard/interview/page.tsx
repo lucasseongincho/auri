@@ -46,17 +46,17 @@ function STARAnswer({ text }: { text: string }) {
     .filter(Boolean) as { label: string; content: string }[]
 
   if (parsed.length < 2) {
-    return <p className="text-[0.95rem] text-[#A0A0B8] leading-[1.7]">{text}</p>
+    return <p className="text-[0.95rem] text-[#3C403E] leading-[1.7]">{text}</p>
   }
 
   return (
     <div>
       {parsed.map((s, i) => (
         <div key={i} className="mb-5">
-          <span className="block text-[0.75rem] font-bold uppercase tracking-[0.1em] text-[#6366F1] mb-1">
+          <span className="block text-[0.75rem] font-bold uppercase tracking-[0.1em] text-[#1F5C4A] mb-1">
             {s.label}
           </span>
-          <p className="text-[0.95rem] leading-[1.6] pl-3 border-l-2 border-[#6366F1] text-[#F8F8FF] mb-4">
+          <p className="text-[0.95rem] leading-[1.6] pl-3 border-l-2 border-[#1F5C4A] text-[#1B1D1C] mb-4">
             {s.content}
           </p>
         </div>
@@ -66,8 +66,8 @@ function STARAnswer({ text }: { text: string }) {
 }
 const CARD_SPRING = { type: 'spring' as const, stiffness: 200, damping: 25 }
 const INPUT_CLASS =
-  'w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-[#60607A] focus:outline-none focus:border-[#EF4444]/50 focus:ring-1 focus:ring-[#EF4444]/30 transition-all'
-const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
+  'w-full bg-[#F4F2EC] border border-lp-rule rounded-[4px] px-4 py-3 text-lp-ink text-sm placeholder-[#5A5F5C] focus:outline-none focus:border-[#B42318]/50 focus:ring-1 focus:ring-[#B42318]/30 transition-all'
+const LABEL_CLASS = 'block text-xs font-medium text-[#3C403E] mb-1.5'
 const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
 interface PracticeFeedback {
@@ -131,7 +131,7 @@ function FlipCard({
     }
   }
 
-  const scoreColor = (n: number) => n >= 8 ? '#22C55E' : n >= 6 ? '#F59E0B' : '#EF4444'
+  const scoreColor = (n: number) => n >= 8 ? '#1F7A4D' : n >= 6 ? '#8A5A00' : '#B42318'
 
   // ── CSS grid overlay: both front and back share the same grid cell.
   // Grid cell height = max(front height, back height) → no overflow, no absolute positioning.
@@ -144,22 +144,22 @@ function FlipCard({
       >
         {/* ── Front: Question ─────────────────────────────── */}
         <div
-          className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 cursor-pointer"
+          className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 cursor-pointer"
           style={{ gridArea: '1/1', backfaceVisibility: 'hidden' }}
           onClick={() => !isPracticeMode && setFlipped(true)}
         >
-          <div className="rounded-xl border border-white/[0.05] bg-gradient-to-br from-[#1C1C26] to-[#0F0F1A] p-6 flex flex-col gap-4">
+          <div className="rounded-[10px]  bg-[#FFFFFF] p-6 flex flex-col gap-4">
             <div className="flex items-start justify-between">
-              <span className="px-2.5 py-1 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/20 text-xs font-semibold text-[#F87171] uppercase tracking-wide">
+              <span className="px-2.5 py-1 rounded-[4px] bg-[#B42318]/10 border border-[#B42318]/20 text-xs font-semibold text-[#B42318] uppercase tracking-wide">
                 Q{index + 1}
               </span>
               {!isPracticeMode && (
-                <span className="text-xs text-[#60607A] flex items-center gap-1">
+                <span className="text-xs text-[#5A5F5C] flex items-center gap-1">
                   <RotateCcw className="w-3 h-3" /> Tap to reveal
                 </span>
               )}
             </div>
-            <p className="text-white font-semibold text-lg leading-relaxed">{question.question}</p>
+            <p className="text-lp-ink font-semibold text-lg leading-relaxed">{question.question}</p>
             {isPracticeMode && (
               <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                 <textarea
@@ -171,7 +171,7 @@ function FlipCard({
                   aria-label="Your answer"
                 />
                 {scoreError && (
-                  <p className="text-xs text-[#EF4444] flex items-center gap-1">
+                  <p className="text-xs text-[#B42318] flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" /> {scoreError}
                   </p>
                 )}
@@ -179,29 +179,29 @@ function FlipCard({
                   <div className="space-y-3">
                     <div className="flex gap-2 flex-wrap">
                       {Object.entries(feedback.scores).map(([key, val]) => (
-                        <div key={key} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 border border-white/[0.08]">
-                          <span className="text-xs text-[#A0A0B8] capitalize">{key}</span>
+                        <div key={key} className="flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-lp-ink/5 border border-lp-rule">
+                          <span className="text-xs text-[#3C403E] capitalize">{key}</span>
                           <span className="text-xs font-bold" style={{ color: scoreColor(val) }}>{val}/10</span>
                         </div>
                       ))}
-                      <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#6366F1]/10 border border-[#6366F1]/20">
-                        <Star className="w-3 h-3 text-[#6366F1]" />
-                        <span className="text-xs font-bold text-[#6366F1]">Overall: {feedback.overall}/10</span>
+                      <div className="flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
+                        <Star className="w-3 h-3 text-[#1F5C4A]" />
+                        <span className="text-xs font-bold text-[#1F5C4A]">Overall: {feedback.overall}/10</span>
                       </div>
                     </div>
                     {feedback.strengths.length > 0 && (
                       <div>
-                        <p className="text-xs font-semibold text-[#22C55E] mb-1">Strengths</p>
-                        {feedback.strengths.map((s, i) => <p key={i} className="text-xs text-[#A0A0B8]">✓ {s}</p>)}
+                        <p className="text-xs font-semibold text-[#1F7A4D] mb-1">Strengths</p>
+                        {feedback.strengths.map((s, i) => <p key={i} className="text-xs text-[#3C403E]">✓ {s}</p>)}
                       </div>
                     )}
                     {feedback.improvements.length > 0 && (
                       <div>
-                        <p className="text-xs font-semibold text-[#F59E0B] mb-1">Improvements</p>
-                        {feedback.improvements.map((s, i) => <p key={i} className="text-xs text-[#A0A0B8]">→ {s}</p>)}
+                        <p className="text-xs font-semibold text-[#8A5A00] mb-1">Improvements</p>
+                        {feedback.improvements.map((s, i) => <p key={i} className="text-xs text-[#3C403E]">→ {s}</p>)}
                       </div>
                     )}
-                    <button onClick={() => { setFeedback(null); setUserAnswer('') }} className="text-xs text-[#6366F1] underline">
+                    <button onClick={() => { setFeedback(null); setUserAnswer('') }} className="text-xs text-[#1F5C4A] underline">
                       Try again
                     </button>
                   </div>
@@ -209,7 +209,7 @@ function FlipCard({
                   <button
                     onClick={handleScore}
                     disabled={!userAnswer.trim() || isScoring}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#EF4444] to-[#DC2626] text-white shadow-lg shadow-[#EF4444]/25 hover:shadow-[#EF4444]/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2 rounded-[4px] text-sm font-semibold bg-[#B42318] text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isScoring
                       ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Scoring…</>
@@ -224,23 +224,23 @@ function FlipCard({
 
         {/* ── Back: STAR Framework ─────────────────────────── */}
         <div
-          className="rounded-2xl border border-[#6366F1]/20 bg-[#13131A] p-1 cursor-pointer"
+          className="rounded-[10px] border border-[#1F5C4A]/20 bg-[#FFFFFF] p-1 cursor-pointer"
           style={{ gridArea: '1/1', backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           onClick={() => setFlipped(false)}
         >
-          <div className="rounded-xl border border-[#6366F1]/10 bg-gradient-to-br from-[#1C1C26] to-[#0F0F1A] p-6 flex flex-col gap-3">
+          <div className="rounded-[10px] border border-[#1F5C4A]/10 bg-[#FFFFFF] p-6 flex flex-col gap-3">
             <div className="flex items-start justify-between">
-              <span className="px-2.5 py-1 rounded-lg bg-[#6366F1]/10 border border-[#6366F1]/20 text-xs font-semibold text-[#818CF8] uppercase tracking-wide">
+              <span className="px-2.5 py-1 rounded-[4px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">
                 STAR Framework
               </span>
-              <span className="text-xs text-[#60607A] flex items-center gap-1">
+              <span className="text-xs text-[#5A5F5C] flex items-center gap-1">
                 <RotateCcw className="w-3 h-3" /> Tap to flip back
               </span>
             </div>
-            <p className="text-[0.95rem] text-[#A0A0B8] leading-[1.7] mb-3">{question.answer_framework}</p>
+            <p className="text-[0.95rem] text-[#3C403E] leading-[1.7] mb-3">{question.answer_framework}</p>
             {question.star_example && (
-              <div className="p-3 rounded-xl bg-[#6366F1]/5 border border-[#6366F1]/15">
-                <p className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide mb-3">Example</p>
+              <div className="p-3 rounded-[10px] bg-[#1F5C4A]/5 border border-[#1F5C4A]/15">
+                <p className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide mb-3">Example</p>
                 <STARAnswer text={question.star_example} />
               </div>
             )}
@@ -256,11 +256,11 @@ function FlipCard({
 function QuestionsToAsk({ questions }: { questions: string[] }) {
   const [copied, setCopied] = useState<number | null>(null)
   return (
-    <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-      <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5">
+    <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+      <div className="rounded-[10px]  bg-[#FFFFFF] p-5">
         <div className="flex items-center gap-2 mb-4">
-          <BookOpen className="w-4 h-4 text-[#6366F1]" />
-          <h3 className="text-sm font-semibold text-white">Questions to Ask the Interviewer</h3>
+          <BookOpen className="w-4 h-4 text-[#1F5C4A]" />
+          <h3 className="text-sm font-semibold text-lp-ink">Questions to Ask the Interviewer</h3>
         </div>
         <div className="space-y-3">
           {questions.map((q, i) => (
@@ -269,18 +269,18 @@ function QuestionsToAsk({ questions }: { questions: string[] }) {
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ ...SPRING, delay: i * 0.06 }}
-              className="flex items-start gap-3 p-4 rounded-xl bg-[#0A0A0F]/60 border border-white/[0.06]"
+              className="flex items-start gap-3 p-4 rounded-[10px] bg-[#F4F2EC]/60 "
             >
-              <div className="w-6 h-6 rounded-full bg-[#6366F1]/20 border border-[#6366F1]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-bold text-[#818CF8]">{i + 1}</span>
+              <div className="w-6 h-6 rounded-full bg-[#1F5C4A]/20 border border-[#1F5C4A]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-xs font-bold text-[#1F5C4A]">{i + 1}</span>
               </div>
-              <p className="flex-1 text-[0.95rem] text-[#E8E8F0] leading-[1.6] italic">&ldquo;{q}&rdquo;</p>
+              <p className="flex-1 text-[0.95rem] text-[#1B1D1C] leading-[1.6] italic">&ldquo;{q}&rdquo;</p>
               <button
                 onClick={async () => { await navigator.clipboard.writeText(q); setCopied(i); setTimeout(() => setCopied(null), 1500) }}
                 aria-label={`Copy question ${i + 1}`}
-                className="flex-shrink-0 p-1.5 rounded-lg text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/5 transition-all"
+                className="flex-shrink-0 p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/5 transition-all"
               >
-                {copied === i ? <CheckCircle className="w-3.5 h-3.5 text-[#22C55E]" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied === i ? <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" /> : <Copy className="w-3.5 h-3.5" />}
               </button>
             </motion.div>
           ))}
@@ -447,7 +447,7 @@ export default function InterviewPage() {
     <ProGate
       featureName="Interview Prep System"
       featureDescription="Generate the 8 most likely interview questions with STAR frameworks, plus 3 strategic questions to ask. Practice mode with AI feedback included."
-      icon={<MessageSquare className="w-6 h-6 text-[#6366F1]" />}
+      icon={<MessageSquare className="w-6 h-6 text-[#1F5C4A]" />}
     >
     <div className="space-y-6 pb-20 md:pb-0">
       {/* ── Toast ─────────────────────────────────────────── */}
@@ -458,10 +458,10 @@ export default function InterviewPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
-            className={`fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[9999] flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border
+            className={`fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[9999] flex items-center gap-3 px-4 py-3 rounded-[4px] border
               ${toast.type === 'success'
-                ? 'bg-[#22C55E]/20 border-[#22C55E]/30 text-[#22C55E]'
-                : 'bg-[#EF4444]/20 border-[#EF4444]/30 text-[#EF4444]'
+                ? 'bg-[#1F7A4D]/20 border-[#1F7A4D]/30 text-[#1F7A4D]'
+                : 'bg-[#B42318]/20 border-[#B42318]/30 text-[#B42318]'
               }`}
           >
             {toast.type === 'success' ? <CheckCircle className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
@@ -479,10 +479,10 @@ export default function InterviewPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#EF4444] to-[#DC2626] flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-[10px] bg-[#B42318]/10 flex items-center justify-center">
+              <MessageSquare className="w-5 h-5 text-lp-ink" />
             </div>
-            <h1 className="font-heading text-2xl font-bold text-white">Interview Prep</h1>
+            <h1 className="font-heading text-2xl font-bold text-lp-ink">Interview Prep</h1>
           </div>
           <div className="flex items-center gap-2">
             {/* Save — only show when prep results exist */}
@@ -491,10 +491,9 @@ export default function InterviewPage() {
                 onClick={handleSaveToStudyList}
                 disabled={savedToStudyList || isSaving}
                 aria-label="Save to study list"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                  bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                  shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                  hover:scale-[1.02] transition-all duration-200
+                className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
+                  bg-[#1F5C4A] text-white
+                   transition-all duration-200
                   disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isSaving
@@ -508,8 +507,8 @@ export default function InterviewPage() {
             )}
             <Link
               href="/dashboard/interview/saved"
-              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-                border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium
+                border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
                 transition-all duration-200"
             >
               <BookMarked className="w-3.5 h-3.5" />
@@ -517,7 +516,7 @@ export default function InterviewPage() {
             </Link>
           </div>
         </div>
-        <p className="text-[#A0A0B8] text-sm ml-12">
+        <p className="text-[#3C403E] text-sm ml-12">
           8 likely questions with STAR frameworks, plus 3 strategic questions to ask.
         </p>
       </motion.div>
@@ -530,39 +529,39 @@ export default function InterviewPage() {
           transition={{ ...SPRING, delay: 0.05 }}
           className="space-y-4"
         >
-          <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-            <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-4">
+          <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+            <div className="rounded-[10px]  bg-[#FFFFFF] p-5 space-y-4">
               {profile && profile.experience.length > 0 && (
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/20">
-                  <CheckCircle className="w-4 h-4 text-[#22C55E] flex-shrink-0" />
-                  <p className="text-xs text-[#22C55E]">Experience auto-loaded from Career Profile.</p>
+                <div className="flex items-center gap-2 p-3 rounded-[10px] bg-[#1F7A4D]/10 border border-[#1F7A4D]/20">
+                  <CheckCircle className="w-4 h-4 text-[#1F7A4D] flex-shrink-0" />
+                  <p className="text-xs text-[#1F7A4D]">Experience auto-loaded from Career Profile.</p>
                 </div>
               )}
               <div>
-                <label className={LABEL_CLASS}>Position <span className="text-[#EF4444]">*</span></label>
+                <label className={LABEL_CLASS}>Position <span className="text-[#B42318]">*</span></label>
                 <input type="text" value={position} onChange={(e) => setPosition(e.target.value)} placeholder="Senior Backend Engineer" className={INPUT_CLASS} aria-label="Position" style={{ fontSize: '16px' }} />
               </div>
               <div>
-                <label className={LABEL_CLASS}>Company Name <span className="text-[#EF4444]">*</span></label>
+                <label className={LABEL_CLASS}>Company Name <span className="text-[#B42318]">*</span></label>
                 <CompanyAutocomplete value={company} onChange={setCompany} placeholder="Stripe" className={INPUT_CLASS} aria-label="Company" />
               </div>
 
               {generateError && (
                 generateError === 'FREE_TIER_LIMIT_REACHED' ? (
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-[#6366F1]/10 border border-[#6366F1]/20">
-                    <Zap className="w-4 h-4 text-[#6366F1] flex-shrink-0" />
+                  <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
+                    <Zap className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-white">Monthly limit reached</p>
-                      <p className="text-xs text-[#A0A0B8]">You&apos;ve used all 3 free generations this month.</p>
+                      <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
+                      <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
                     </div>
-                    <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#818CF8] hover:text-white transition-colors">
+                    <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
                       Upgrade →
                     </Link>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20">
-                    <AlertCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0" />
-                    <p className="text-xs text-[#EF4444]">{generateError}</p>
+                  <div className="flex items-center gap-2 p-3 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20">
+                    <AlertCircle className="w-4 h-4 text-[#B42318] flex-shrink-0" />
+                    <p className="text-xs text-[#B42318]">{generateError}</p>
                   </div>
                 )
               )}
@@ -570,9 +569,8 @@ export default function InterviewPage() {
               <button
                 onClick={handleGenerate}
                 disabled={!position.trim() || !company.trim() || isStreaming}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-                  bg-gradient-to-r from-[#EF4444] to-[#DC2626] text-white font-semibold text-sm
-                  shadow-lg shadow-[#EF4444]/25 hover:shadow-[#EF4444]/50 hover:scale-[1.01]
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
+                  bg-[#B42318] text-white font-semibold text-sm
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isStreaming
@@ -585,37 +583,37 @@ export default function InterviewPage() {
 
           {prep && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}
-              className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
+              className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+              <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
 
                 {/* Practice Mode toggle — fixed overflow */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[#A0A0B8] uppercase tracking-wide">Practice Mode</span>
+                  <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">Practice Mode</span>
                   <button
                     onClick={() => setIsPracticeMode(!isPracticeMode)}
                     className={`relative inline-flex items-center w-12 h-6 rounded-full
                       transition-colors duration-200 focus:outline-none
-                      ${isPracticeMode ? 'bg-[#EF4444]' : 'bg-white/10'}`}
+                      ${isPracticeMode ? 'bg-[#B42318]' : 'bg-lp-ink/10'}`}
                     role="switch"
                     aria-checked={isPracticeMode}
                     aria-label="Toggle practice mode"
                   >
                     <span
-                      className={`inline-block w-5 h-5 bg-white rounded-full shadow-md
+                      className={`inline-block w-5 h-5 bg-white rounded-full
                         transform transition-transform duration-200
                         ${isPracticeMode ? 'translate-x-6' : 'translate-x-1'}`}
                     />
                   </button>
                 </div>
 
-                <div className="border-t border-white/[0.06] pt-3">
-                  <p className="text-xs text-[#60607A] mb-2">Card {currentCard + 1} of {prep.questions.length}</p>
+                <div className="border-t border-lp-hairline pt-3">
+                  <p className="text-xs text-[#5A5F5C] mb-2">Card {currentCard + 1} of {prep.questions.length}</p>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setCurrentCard(Math.max(0, currentCard - 1))}
                       disabled={currentCard === 0}
                       aria-label="Previous question"
-                      className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-white/[0.08] text-[#A0A0B8] text-sm hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="flex-1 flex items-center justify-center gap-1 py-2 rounded-[4px] border border-lp-rule text-[#3C403E] text-sm hover:text-lp-ink hover:bg-lp-ink/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" /> Prev
                     </button>
@@ -623,7 +621,7 @@ export default function InterviewPage() {
                       onClick={() => setCurrentCard(Math.min(prep.questions.length - 1, currentCard + 1))}
                       disabled={currentCard === prep.questions.length - 1}
                       aria-label="Next question"
-                      className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-white/[0.08] text-[#A0A0B8] text-sm hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="flex-1 flex items-center justify-center gap-1 py-2 rounded-[4px] border border-lp-rule text-[#3C403E] text-sm hover:text-lp-ink hover:bg-lp-ink/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       Next <ChevronRight className="w-4 h-4" />
                     </button>
@@ -645,16 +643,16 @@ export default function InterviewPage() {
           <AnimatePresence mode="wait">
             {isStreaming ? (
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-                <div className="rounded-2xl border border-[#EF4444]/20 bg-[#EF4444]/5 p-4 flex items-center gap-3">
-                  <Loader2 className="w-4 h-4 text-[#EF4444] animate-spin" />
-                  <span className="text-sm text-[#EF4444] font-medium">AURI is preparing your interview questions…</span>
+                <div className="rounded-[10px] border border-[#B42318]/20 bg-[#B42318]/5 p-4 flex items-center gap-3">
+                  <Loader2 className="w-4 h-4 text-[#B42318] animate-spin" />
+                  <span className="text-sm text-[#B42318] font-medium">AURI is preparing your interview questions…</span>
                 </div>
                 {Array.from({ length: 2 }).map((_, i) => (
-                  <div key={i} className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                    <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 min-h-[140px] space-y-3">
-                      <div className="h-4 w-20 rounded bg-white/[0.06] animate-pulse" />
-                      <div className="h-4 w-3/4 rounded bg-white/[0.04] animate-pulse" />
-                      <div className="h-3 w-2/3 rounded bg-white/[0.03] animate-pulse" />
+                  <div key={i} className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+                    <div className="rounded-[10px]  bg-[#FFFFFF] p-6 min-h-[140px] space-y-3">
+                      <div className="h-4 w-20 rounded bg-lp-ink/6 animate-pulse" />
+                      <div className="h-4 w-3/4 rounded bg-lp-ink/[0.04] animate-pulse" />
+                      <div className="h-3 w-2/3 rounded bg-lp-ink/[0.03] animate-pulse" />
                     </div>
                   </div>
                 ))}
@@ -664,14 +662,14 @@ export default function InterviewPage() {
                 {/* Mode indicator */}
                 <div className="flex items-center gap-2">
                   {isPracticeMode ? (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#EF4444]/10 border border-[#EF4444]/20">
-                      <span className="w-2 h-2 rounded-full bg-[#EF4444]" />
-                      <span className="text-xs font-medium text-[#EF4444]">Practice Mode Active — Type your answers below</span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#B42318]/10 border border-[#B42318]/20">
+                      <span className="w-2 h-2 rounded-full bg-[#B42318]" />
+                      <span className="text-xs font-medium text-[#B42318]">Practice Mode Active — Type your answers below</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/[0.08]">
-                      <BookOpen className="w-3.5 h-3.5 text-[#A0A0B8]" />
-                      <span className="text-xs text-[#A0A0B8]">Tap any card to reveal the STAR framework</span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-lp-ink/5 border border-lp-rule">
+                      <BookOpen className="w-3.5 h-3.5 text-[#3C403E]" />
+                      <span className="text-xs text-[#3C403E]">Tap any card to reveal the STAR framework</span>
                     </div>
                   )}
                 </div>
@@ -703,7 +701,7 @@ export default function InterviewPage() {
                       onClick={() => setCurrentCard(i)}
                       aria-label={`Go to question ${i + 1}`}
                       className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                        i === currentCard ? 'bg-[#EF4444]' : 'bg-white/20 hover:bg-white/40'
+                        i === currentCard ? 'bg-[#B42318]' : 'bg-lp-ink/20 hover:bg-lp-ink/40'
                       }`}
                     />
                   ))}
@@ -718,13 +716,13 @@ export default function InterviewPage() {
               </motion.div>
             ) : (
               <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-16 flex flex-col items-center text-center">
-                  <div className="w-14 h-14 rounded-2xl bg-[#EF4444]/10 border border-[#EF4444]/20 flex items-center justify-center mb-4">
-                    <MessageSquare className="w-6 h-6 text-[#EF4444]" />
+                className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+                <div className="rounded-[10px]  bg-[#FFFFFF] p-16 flex flex-col items-center text-center">
+                  <div className="w-14 h-14 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mb-4">
+                    <MessageSquare className="w-6 h-6 text-[#B42318]" />
                   </div>
-                  <p className="text-sm font-medium text-[#A0A0B8]">Your interview prep will appear here</p>
-                  <p className="text-xs text-[#60607A] mt-1">Enter the position and company, then click Generate</p>
+                  <p className="text-sm font-medium text-[#3C403E]">Your interview prep will appear here</p>
+                  <p className="text-xs text-[#5A5F5C] mt-1">Enter the position and company, then click Generate</p>
                 </div>
               </motion.div>
             )}

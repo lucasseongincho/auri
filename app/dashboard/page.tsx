@@ -23,16 +23,16 @@ function UpgradedToast({ onDismiss }: { onDismiss: () => void }) {
       transition={SPRING}
       className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4"
     >
-      <div className="rounded-2xl border border-[#6366F1]/40 bg-[#13131A] p-1 shadow-2xl shadow-[#6366F1]/20">
-        <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] px-5 py-4 flex items-start gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-4 h-4 text-white" />
+      <div className="rounded-[10px] border border-[#1F5C4A]/40 bg-[#FFFFFF] p-1 ">
+        <div className="rounded-[4px] border border-[#1F5C4A]/20 bg-[#FFFFFF] px-5 py-4 flex items-start gap-3">
+          <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-4 h-4 text-lp-ink" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-heading font-bold text-white text-sm">Welcome to AURI Pro! 🎉</p>
-            <p className="text-xs text-[#A0A0B8] mt-0.5">Unlimited generations unlocked. You&apos;re ready to land the job.</p>
+            <p className="font-heading font-bold text-lp-ink text-sm">Welcome to AURI Pro! 🎉</p>
+            <p className="text-xs text-[#3C403E] mt-0.5">Unlimited generations unlocked. You&apos;re ready to land the job.</p>
           </div>
-          <button onClick={onDismiss} aria-label="Dismiss" className="text-[#60607A] hover:text-white transition-colors flex-shrink-0">
+          <button onClick={onDismiss} aria-label="Dismiss" className="text-[#5A5F5C] hover:text-lp-ink transition-colors flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -72,12 +72,12 @@ function UpgradeSuccessHandler() {
 }
 
 const QUICK_ACTIONS = [
-  { label: 'Build Resume', desc: 'Generate ATS-optimized resume', icon: FileText, href: '/dashboard/resume', color: 'from-[#6366F1] to-[#4F46E5]' },
-  { label: 'ATS Score', desc: 'Check your resume match score', icon: Target, href: '/dashboard/ats', color: 'from-[#8B5CF6] to-[#6366F1]' },
-  { label: 'Cover Letter', desc: 'Generate in under a minute', icon: Mail, href: '/dashboard/cover-letter', color: 'from-[#F59E0B] to-[#D97706]' },
-  { label: 'Interview Prep', desc: 'Practice likely questions', icon: MessageSquare, href: '/dashboard/interview', color: 'from-[#EF4444] to-[#DC2626]' },
-  { label: 'LinkedIn', desc: 'Optimize your profile', icon: Linkedin, href: '/dashboard/linkedin', color: 'from-[#0EA5E9] to-[#6366F1]' },
-  { label: 'Job Strategy', desc: '7-day action plan', icon: Map, href: '/dashboard/strategy', color: 'from-[#22C55E] to-[#16A34A]' },
+  { label: 'Build Resume', desc: 'Generate ATS-optimized resume', icon: FileText, href: '/dashboard/resume', color: ' ' },
+  { label: 'ATS Score', desc: 'Check your resume match score', icon: Target, href: '/dashboard/ats', color: ' ' },
+  { label: 'Cover Letter', desc: 'Generate in under a minute', icon: Mail, href: '/dashboard/cover-letter', color: ' ' },
+  { label: 'Interview Prep', desc: 'Practice likely questions', icon: MessageSquare, href: '/dashboard/interview', color: ' ' },
+  { label: 'LinkedIn', desc: 'Optimize your profile', icon: Linkedin, href: '/dashboard/linkedin', color: ' ' },
+  { label: 'Job Strategy', desc: '7-day action plan', icon: Map, href: '/dashboard/strategy', color: ' ' },
 ]
 
 function UpgradeBanner() {
@@ -106,24 +106,23 @@ function UpgradeBanner() {
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={SPRING}
-      className="rounded-2xl border border-[#6366F1]/30 bg-[#13131A] p-1"
+      className="rounded-[10px] border border-[#1F5C4A]/30 bg-[#FFFFFF] p-1"
     >
-      <div className="rounded-xl border border-[#6366F1]/15 bg-gradient-to-r from-[#6366F1]/10 to-[#8B5CF6]/10 p-4 flex items-center justify-between gap-4">
+      <div className="rounded-[10px] border border-[#1F5C4A]/15 bg-[#1F5C4A]/10 p-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center flex-shrink-0">
-            <Zap className="w-4 h-4 text-white" />
+          <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center flex-shrink-0">
+            <Zap className="w-4 h-4 text-lp-ink" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">3 free generations/month</p>
-            <p className="text-xs text-[#A0A0B8]">Upgrade to Pro for unlimited access to all AI tools.</p>
+            <p className="text-sm font-semibold text-lp-ink">3 free generations/month</p>
+            <p className="text-xs text-[#3C403E]">Upgrade to Pro for unlimited access to all AI tools.</p>
           </div>
         </div>
         <Link
           href="/pricing"
-          className="flex-shrink-0 px-4 py-2 rounded-xl font-semibold text-white text-sm
-            bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-            shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/40
-            hover:scale-[1.02] transition-all duration-200 whitespace-nowrap"
+          className="flex-shrink-0 px-4 py-2 rounded-[4px] font-semibold text-white text-sm
+            bg-[#1F5C4A]
+             transition-all duration-200 whitespace-nowrap"
         >
           Upgrade to Pro
         </Link>
@@ -172,10 +171,10 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={SPRING}
       >
-        <h1 className="font-heading text-3xl font-bold text-white mb-1">
+        <h1 className="font-heading text-3xl font-bold text-lp-ink mb-1">
           {greeting()}{user?.displayName ? `, ${user.displayName.split(' ')[0]}` : ''}
         </h1>
-        <p className="text-[#A0A0B8]">
+        <p className="text-[#3C403E]">
           {completeness < 50
             ? 'Complete your career profile to unlock full AI personalization.'
             : 'Your career toolkit is ready. What would you like to work on?'}
@@ -187,43 +186,43 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ...SPRING, delay: 0.1 }}
-        className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+        className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
       >
-        <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
+        <div className="rounded-[10px]  bg-[#FFFFFF] p-6">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-[#6366F1]" />
-              <span className="text-sm font-medium text-[#A0A0B8]">Profile Completeness</span>
+              <TrendingUp className="w-4 h-4 text-[#1F5C4A]" />
+              <span className="text-sm font-medium text-[#3C403E]">Profile Completeness</span>
             </div>
-            <span className="font-heading font-bold text-white">{completeness}%</span>
+            <span className="font-heading font-bold text-lp-ink">{completeness}%</span>
           </div>
-          <div className="w-full h-2 rounded-full bg-white/[0.06] overflow-hidden">
+          <div className="w-full h-2 rounded-full bg-lp-ink/6 overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${completeness}%` }}
               transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
-              className="h-full rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]"
+              className="h-full rounded-full bg-[#1F5C4A] "
             />
           </div>
           <div className="flex items-center justify-between mt-3">
-            <div className="flex items-center gap-4 text-xs text-[#60607A]">
+            <div className="flex items-center gap-4 text-xs text-[#5A5F5C]">
               {profile?.personal.name ? (
-                <span className="flex items-center gap-1 text-[#22C55E]"><CheckCircle className="w-3 h-3" /> Personal info</span>
+                <span className="flex items-center gap-1 text-[#1F7A4D]"><CheckCircle className="w-3 h-3" /> Personal info</span>
               ) : (
-                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#F59E0B]" /> Personal info</span>
+                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#8A5A00]" /> Personal info</span>
               )}
               {profile?.experience && profile.experience.length > 0 ? (
-                <span className="flex items-center gap-1 text-[#22C55E]"><CheckCircle className="w-3 h-3" /> Experience</span>
+                <span className="flex items-center gap-1 text-[#1F7A4D]"><CheckCircle className="w-3 h-3" /> Experience</span>
               ) : (
-                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#F59E0B]" /> Experience</span>
+                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#8A5A00]" /> Experience</span>
               )}
               {profile?.target.position ? (
-                <span className="flex items-center gap-1 text-[#22C55E]"><CheckCircle className="w-3 h-3" /> Target role</span>
+                <span className="flex items-center gap-1 text-[#1F7A4D]"><CheckCircle className="w-3 h-3" /> Target role</span>
               ) : (
-                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#F59E0B]" /> Target role</span>
+                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#8A5A00]" /> Target role</span>
               )}
             </div>
-            <Link href="/dashboard/resume" className="text-xs text-[#6366F1] hover:text-[#818CF8] transition-colors flex items-center gap-1">
+            <Link href="/dashboard/resume" className="text-xs text-[#1F5C4A] hover:text-[#1F5C4A] transition-colors flex items-center gap-1">
               Complete profile <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
@@ -236,19 +235,19 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...SPRING, delay: 0.15 }}
-          className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+          className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
         >
-          <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
+          <div className="rounded-[10px]  bg-[#FFFFFF] p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[#A0A0B8] mb-1">Last ATS Score</p>
-                <p className="font-heading text-4xl font-bold text-white">{atsScore.score}<span className="text-xl text-[#60607A]">/100</span></p>
+                <p className="text-sm text-[#3C403E] mb-1">Last ATS Score</p>
+                <p className="font-heading text-4xl font-bold text-lp-ink">{atsScore.score}<span className="text-xl text-[#5A5F5C]">/100</span></p>
               </div>
               <div className="text-right">
-                <Link href="/dashboard/ats" className="text-sm text-[#6366F1] hover:text-[#818CF8] transition-colors flex items-center gap-1 justify-end">
+                <Link href="/dashboard/ats" className="text-sm text-[#1F5C4A] hover:text-[#1F5C4A] transition-colors flex items-center gap-1 justify-end">
                   View report <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
-                <p className="text-xs text-[#60607A] mt-1">{atsScore.missing_keywords.length} keywords missing</p>
+                <p className="text-xs text-[#5A5F5C] mt-1">{atsScore.missing_keywords.length} keywords missing</p>
               </div>
             </div>
           </div>
@@ -257,7 +256,7 @@ export default function DashboardPage() {
 
       {/* Quick actions grid */}
       <div>
-        <h2 className="font-heading font-semibold text-[#A0A0B8] text-sm mb-4 uppercase tracking-widest">
+        <h2 className="font-heading font-semibold text-[#3C403E] text-sm mb-4 uppercase tracking-widest">
           Quick Actions
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -272,16 +271,16 @@ export default function DashboardPage() {
                 <motion.div
                   whileHover={{ scale: 1.02, y: -2 }}
                   transition={SPRING}
-                  className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 cursor-pointer group"
+                  className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 cursor-pointer group"
                 >
-                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5">
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.color}
+                  <div className="rounded-[10px]  bg-[#FFFFFF] p-5">
+                    <div className={`w-10 h-10 rounded-[10px] ${action.color}
                       flex items-center justify-center mb-3
-                      group-hover:shadow-lg group-hover:shadow-[#6366F1]/20 transition-shadow duration-300`}>
-                      <action.icon className="w-5 h-5 text-white" />
+                        transition-shadow duration-300`}>
+                      <action.icon className="w-5 h-5 text-lp-ink" />
                     </div>
-                    <p className="font-heading font-semibold text-white text-sm mb-1">{action.label}</p>
-                    <p className="text-xs text-[#60607A]">{action.desc}</p>
+                    <p className="font-heading font-semibold text-lp-ink text-sm mb-1">{action.label}</p>
+                    <p className="text-xs text-[#5A5F5C]">{action.desc}</p>
                   </div>
                 </motion.div>
               </Link>

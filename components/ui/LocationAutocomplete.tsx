@@ -250,7 +250,7 @@ export default function LocationAutocomplete({
     ? createPortal(
         <div
           style={{ ...dropdownStyle, maxHeight: 280, overflowY: 'auto' }}
-          className="rounded-xl border border-white/[0.12] bg-[#1C1C26] shadow-xl shadow-black/30 overflow-hidden"
+          className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] overflow-hidden"
           role="listbox"
         >
           {suggestions.map((suggestion, index) => (
@@ -265,8 +265,8 @@ export default function LocationAutocomplete({
               }}
               className={`w-full text-left px-4 text-sm transition-colors flex items-center gap-2 ${
                 index === selectedIndex
-                  ? 'bg-indigo-500/20 text-white'
-                  : 'text-[#E8E8F0] hover:bg-white/[0.05]'
+                  ? 'bg-indigo-500/20 text-lp-ink'
+                  : 'text-[#1B1D1C] hover:bg-lp-ink/5'
               } ${ALWAYS_SHOW.includes(suggestion) ? 'text-indigo-300' : ''}`}
               style={{ minHeight: '44px' }}
             >
@@ -297,6 +297,7 @@ export default function LocationAutocomplete({
         onFocus={() => value.length >= 2 && getSuggestions(value)}
         placeholder={placeholder}
         aria-label={ariaLabel}
+        role="combobox"
         aria-autocomplete="list"
         aria-expanded={isOpen}
         className={className}

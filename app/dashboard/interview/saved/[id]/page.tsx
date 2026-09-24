@@ -22,17 +22,17 @@ function STARAnswer({ text }: { text: string }) {
     .filter(Boolean) as { label: string; content: string }[]
 
   if (parsed.length < 2) {
-    return <p className="text-[0.95rem] text-[#A0A0B8] leading-[1.7]">{text}</p>
+    return <p className="text-[0.95rem] text-[#3C403E] leading-[1.7]">{text}</p>
   }
 
   return (
     <div>
       {parsed.map((s, i) => (
         <div key={i} className="mb-5">
-          <span className="block text-[0.75rem] font-bold uppercase tracking-[0.1em] text-[#6366F1] mb-1">
+          <span className="block text-[0.75rem] font-bold uppercase tracking-[0.1em] text-[#1F5C4A] mb-1">
             {s.label}
           </span>
-          <p className="text-[0.95rem] leading-[1.6] pl-3 border-l-2 border-[#6366F1] text-[#F8F8FF] mb-4">
+          <p className="text-[0.95rem] leading-[1.6] pl-3 border-l-2 border-[#1F5C4A] text-[#1B1D1C] mb-4">
             {s.content}
           </p>
         </div>
@@ -93,15 +93,15 @@ function ProgressBar({ value, total }: { value: number; total: number }) {
   const pct = total === 0 ? 0 : Math.round((value / total) * 100)
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+      <div className="flex-1 h-2 rounded-full bg-lp-ink/5 overflow-hidden">
         <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]"
+          className="h-full rounded-full bg-[#1F5C4A] "
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         />
       </div>
-      <span className="text-xs text-[#A0A0B8] tabular-nums w-16 text-right">
+      <span className="text-xs text-[#3C403E] tabular-nums w-16 text-right">
         {value}/{total} reviewed
       </span>
     </div>
@@ -110,12 +110,12 @@ function ProgressBar({ value, total }: { value: number; total: number }) {
 
 function ScoreMeter({ score }: { score: number }) {
   const color =
-    score >= 80 ? '#22C55E' : score >= 60 ? '#F59E0B' : score >= 40 ? '#6366F1' : '#EF4444'
+    score >= 80 ? '#1F7A4D' : score >= 60 ? '#8A5A00' : score >= 40 ? '#1F5C4A' : '#B42318'
   return (
     <div className="flex items-center gap-2">
       <div className="relative w-10 h-10">
         <svg className="w-10 h-10 -rotate-90" viewBox="0 0 40 40">
-          <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="4" />
+          <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(27,29,28,0.05)" strokeWidth="4" />
           <motion.circle
             cx="20" cy="20" r="16"
             fill="none" stroke={color} strokeWidth="4"
@@ -134,7 +134,7 @@ function ScoreMeter({ score }: { score: number }) {
         <p className="text-xs font-semibold" style={{ color }}>
           {score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : score >= 40 ? 'Developing' : 'Needs Work'}
         </p>
-        <p className="text-[10px] text-[#60607A]">STAR score</p>
+        <p className="text-[10px] text-[#5A5F5C]">STAR score</p>
       </div>
     </div>
   )
@@ -285,10 +285,10 @@ export default function StudyViewPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F4F2EC] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[#A0A0B8] text-sm">Loading session…</p>
+          <div className="w-10 h-10 border-2 border-[#1F5C4A] border-t-transparent rounded-full animate-spin" />
+          <p className="text-[#3C403E] text-sm">Loading session…</p>
         </div>
       </div>
     )
@@ -296,17 +296,17 @@ export default function StudyViewPage() {
 
   if (notFound || !prep) {
     return (
-      <div className="min-h-screen bg-[#0A0A0F] flex flex-col items-center justify-center gap-4 text-center px-4">
-        <div className="w-14 h-14 rounded-2xl bg-[#EF4444]/10 border border-[#EF4444]/20 flex items-center justify-center mb-2">
-          <svg className="w-7 h-7 text-[#EF4444]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="min-h-screen bg-[#F4F2EC] flex flex-col items-center justify-center gap-4 text-center px-4">
+        <div className="w-14 h-14 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mb-2">
+          <svg className="w-7 h-7 text-[#B42318]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h2 className="text-lg font-semibold text-[#F8F8FF]">Session not found</h2>
-        <p className="text-[#60607A] text-sm">This prep session may have been deleted.</p>
+        <h2 className="text-lg font-semibold text-[#1B1D1C]">Session not found</h2>
+        <p className="text-[#5A5F5C] text-sm">This prep session may have been deleted.</p>
         <button
           onClick={() => router.push('/dashboard/interview/saved')}
-          className="mt-2 px-5 py-2.5 rounded-xl bg-[#6366F1] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          className="mt-2 px-5 py-2.5 rounded-[4px] bg-[#1F5C4A] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
         >
           Back to sessions
         </button>
@@ -338,9 +338,9 @@ export default function StudyViewPage() {
         <button
           onClick={() => { setCurrentCard((c) => Math.max(0, c - 1)); setFlipped(false) }}
           disabled={currentCard === 0}
-          className="p-2 rounded-lg bg-white/5 hover:bg-white/8 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-[4px] bg-lp-ink/5 hover:bg-lp-ink/8 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
-          <svg className="w-4 h-4 text-[#A0A0B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-4 h-4 text-[#3C403E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -351,10 +351,10 @@ export default function StudyViewPage() {
               onClick={() => { setCurrentCard(i); setFlipped(false) }}
               className={`rounded-full transition-all duration-200 ${
                 i === currentCard
-                  ? 'w-5 h-2 bg-[#6366F1]'
+                  ? 'w-5 h-2 bg-[#1F5C4A]'
                   : reviewed.has(i)
-                  ? 'w-2 h-2 bg-[#22C55E]'
-                  : 'w-2 h-2 bg-white/15 hover:bg-white/25'
+                  ? 'w-2 h-2 bg-[#1F7A4D]'
+                  : 'w-2 h-2 bg-lp-ink/15 hover:bg-lp-ink/25'
               }`}
               aria-label={`Go to question ${i + 1}`}
             />
@@ -363,9 +363,9 @@ export default function StudyViewPage() {
         <button
           onClick={() => { setCurrentCard((c) => Math.min(questions.length - 1, c + 1)); setFlipped(false) }}
           disabled={currentCard === questions.length - 1}
-          className="p-2 rounded-lg bg-white/5 hover:bg-white/8 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-[4px] bg-lp-ink/5 hover:bg-lp-ink/8 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
-          <svg className="w-4 h-4 text-[#A0A0B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-4 h-4 text-[#3C403E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -391,26 +391,26 @@ export default function StudyViewPage() {
             {/* Front — Question */}
             <div
               style={{ gridArea: '1/1', backfaceVisibility: 'hidden' }}
-              className="rounded-2xl border border-white/8 bg-[#13131A] p-6 sm:p-8 min-h-[200px] flex flex-col justify-between"
+              className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-6 sm:p-8 min-h-[200px] flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xs font-semibold text-[#6366F1] bg-[#6366F1]/10 px-2.5 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-[#1F5C4A] bg-[#1F5C4A]/10 px-2.5 py-1 rounded-full">
                     Q{currentCard + 1} of {questions.length}
                   </span>
-                  <span className="text-xs text-[#60607A]">Tap to reveal answer</span>
+                  <span className="text-xs text-[#5A5F5C]">Tap to reveal answer</span>
                 </div>
-                <p className="text-lg font-semibold text-[#F8F8FF] leading-snug">
+                <p className="text-lg font-semibold text-[#1B1D1C] leading-snug">
                   {questions[currentCard].question}
                 </p>
               </div>
               <div className="flex items-center justify-between mt-6">
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleReviewed(currentCard) }}
-                  className={`flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                  className={`flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-[4px] transition-colors ${
                     reviewed.has(currentCard)
-                      ? 'bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20'
-                      : 'bg-white/5 text-[#A0A0B8] hover:bg-white/8'
+                      ? 'bg-[#1F7A4D]/10 text-[#1F7A4D] border border-[#1F7A4D]/20'
+                      : 'bg-lp-ink/5 text-[#3C403E] hover:bg-lp-ink/8'
                   }`}
                 >
                   <svg className="w-4 h-4" fill={reviewed.has(currentCard) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -418,7 +418,7 @@ export default function StudyViewPage() {
                   </svg>
                   {reviewed.has(currentCard) ? 'Reviewed' : 'Mark reviewed'}
                 </button>
-                <svg className="w-5 h-5 text-[#60607A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-5 h-5 text-[#5A5F5C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 3M21 7.5H7.5" />
                 </svg>
               </div>
@@ -431,19 +431,19 @@ export default function StudyViewPage() {
                 backfaceVisibility: 'hidden',
                 transform: 'rotateY(180deg)',
               }}
-              className="rounded-2xl border border-[#6366F1]/30 bg-[#13131A] p-6 sm:p-8 min-h-[200px] flex flex-col justify-between"
+              className="rounded-[10px] border border-[#1F5C4A]/30 bg-[#FFFFFF] p-6 sm:p-8 min-h-[200px] flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xs font-semibold text-[#8B5CF6] bg-[#8B5CF6]/10 px-2.5 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-[#1F5C4A] bg-[#1F5C4A]/10 px-2.5 py-1 rounded-full">
                     Answer Framework
                   </span>
                 </div>
-                <p className="text-[1.05rem] font-semibold text-[#F8F8FF] mb-3 leading-snug">{questions[currentCard].question}</p>
-                <p className="text-[0.95rem] text-[#A0A0B8] leading-[1.7] mb-3">{questions[currentCard].answer_framework}</p>
+                <p className="text-[1.05rem] font-semibold text-[#1B1D1C] mb-3 leading-snug">{questions[currentCard].question}</p>
+                <p className="text-[0.95rem] text-[#3C403E] leading-[1.7] mb-3">{questions[currentCard].answer_framework}</p>
                 {questions[currentCard].star_example && (
-                  <div className="mt-4 p-3 rounded-xl bg-[#6366F1]/8 border border-[#6366F1]/15">
-                    <p className="text-xs font-semibold text-[#6366F1] mb-3">STAR Example</p>
+                  <div className="mt-4 p-3 rounded-[10px] bg-[#1F5C4A]/8 border border-[#1F5C4A]/15">
+                    <p className="text-xs font-semibold text-[#1F5C4A] mb-3">STAR Example</p>
                     <STARAnswer text={questions[currentCard].star_example} />
                   </div>
                 )}
@@ -451,10 +451,10 @@ export default function StudyViewPage() {
               <div className="flex items-center justify-between mt-6">
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleReviewed(currentCard) }}
-                  className={`flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                  className={`flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-[4px] transition-colors ${
                     reviewed.has(currentCard)
-                      ? 'bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20'
-                      : 'bg-white/5 text-[#A0A0B8] hover:bg-white/8'
+                      ? 'bg-[#1F7A4D]/10 text-[#1F7A4D] border border-[#1F7A4D]/20'
+                      : 'bg-lp-ink/5 text-[#3C403E] hover:bg-lp-ink/8'
                   }`}
                 >
                   <svg className="w-4 h-4" fill={reviewed.has(currentCard) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -462,7 +462,7 @@ export default function StudyViewPage() {
                   </svg>
                   {reviewed.has(currentCard) ? 'Reviewed' : 'Mark reviewed'}
                 </button>
-                <svg className="w-5 h-5 text-[#60607A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-5 h-5 text-[#5A5F5C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 3M21 7.5H7.5" />
                 </svg>
               </div>
@@ -479,13 +479,13 @@ export default function StudyViewPage() {
     <div>
       {/* Stats bar */}
       <div className="flex items-center justify-between mb-5">
-        <div className="text-sm text-[#A0A0B8]">
-          Question <span className="font-semibold text-[#F8F8FF]">{practiceIndex + 1}</span> of {questions.length}
+        <div className="text-sm text-[#3C403E]">
+          Question <span className="font-semibold text-[#1B1D1C]">{practiceIndex + 1}</span> of {questions.length}
         </div>
         {avgScore !== null && (
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-[#60607A]">Avg score:</span>
-            <span className="font-bold" style={{ color: avgScore >= 70 ? '#22C55E' : avgScore >= 50 ? '#F59E0B' : '#EF4444' }}>
+            <span className="text-[#5A5F5C]">Avg score:</span>
+            <span className="font-bold" style={{ color: avgScore >= 70 ? '#1F7A4D' : avgScore >= 50 ? '#8A5A00' : '#B42318' }}>
               {avgScore}
             </span>
           </div>
@@ -493,19 +493,19 @@ export default function StudyViewPage() {
       </div>
 
       {/* Question */}
-      <div className="rounded-2xl border border-white/8 bg-[#13131A] p-5 sm:p-6 mb-4">
+      <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-5 sm:p-6 mb-4">
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-xs font-semibold text-[#6366F1] bg-[#6366F1]/10 px-2.5 py-1 rounded-full">
+          <span className="text-xs font-semibold text-[#1F5C4A] bg-[#1F5C4A]/10 px-2.5 py-1 rounded-full">
             Practice
           </span>
           {practiceEntry && <ScoreMeter score={practiceEntry.score} />}
         </div>
-        <p className="text-[1.1rem] font-semibold text-[#F8F8FF] leading-snug mb-4">
+        <p className="text-[1.1rem] font-semibold text-[#1B1D1C] leading-snug mb-4">
           {practiceQuestion.question}
         </p>
-        <div className="p-3 rounded-xl bg-[#6366F1]/8 border border-[#6366F1]/15 mb-4">
-          <p className="text-xs font-semibold text-[#6366F1] mb-1">Framework hint</p>
-          <p className="text-[0.95rem] text-[#A0A0B8] leading-relaxed">{practiceQuestion.answer_framework}</p>
+        <div className="p-3 rounded-[10px] bg-[#1F5C4A]/8 border border-[#1F5C4A]/15 mb-4">
+          <p className="text-xs font-semibold text-[#1F5C4A] mb-1">Framework hint</p>
+          <p className="text-[0.95rem] text-[#3C403E] leading-relaxed">{practiceQuestion.answer_framework}</p>
         </div>
 
         <textarea
@@ -513,7 +513,7 @@ export default function StudyViewPage() {
           onChange={(e) => { setCurrentAnswer(e.target.value); setScored(false) }}
           placeholder="Type your answer here… Use the STAR method: Situation → Task → Action → Result"
           rows={5}
-          className="w-full px-4 py-3 rounded-xl bg-[#0A0A0F] border border-white/8 text-[#F8F8FF] placeholder-[#60607A] text-sm resize-none focus:outline-none focus:border-[#6366F1]/50 transition-colors"
+          className="w-full px-4 py-3 rounded-[4px] bg-[#F4F2EC] border border-lp-rule text-[#1B1D1C] placeholder-[#5A5F5C] text-sm resize-none focus:outline-none focus:border-[#1F5C4A]/50 transition-colors"
         />
 
         {/* Feedback */}
@@ -522,12 +522,12 @@ export default function StudyViewPage() {
             <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`mt-3 p-3 rounded-xl border text-[0.95rem] ${
+              className={`mt-3 p-3 rounded-[10px] border text-[0.95rem] ${
                 practiceEntry.score >= 80
-                  ? 'bg-[#22C55E]/8 border-[#22C55E]/20 text-[#22C55E]'
+                  ? 'bg-[#1F7A4D]/8 border-[#1F7A4D]/20 text-[#1F7A4D]'
                   : practiceEntry.score >= 60
-                  ? 'bg-[#F59E0B]/8 border-[#F59E0B]/20 text-[#F59E0B]'
-                  : 'bg-[#EF4444]/8 border-[#EF4444]/20 text-[#EF4444]'
+                  ? 'bg-[#8A5A00]/8 border-[#8A5A00]/20 text-[#8A5A00]'
+                  : 'bg-[#B42318]/8 border-[#B42318]/20 text-[#B42318]'
               }`}
             >
               {practiceEntry.feedback}
@@ -540,14 +540,14 @@ export default function StudyViewPage() {
             <button
               onClick={() => handlePracticeSubmit(practiceQuestion)}
               disabled={!currentAnswer.trim()}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+              className="px-5 py-2.5 rounded-[4px] bg-[#1F5C4A] text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
             >
               Get Feedback
             </button>
           ) : (
             <button
               onClick={() => { setCurrentAnswer(''); setScored(false) }}
-              className="px-5 py-2.5 rounded-xl bg-white/8 hover:bg-white/12 text-[#A0A0B8] text-sm font-medium transition-colors"
+              className="px-5 py-2.5 rounded-[4px] bg-lp-ink/8 hover:bg-lp-ink/12 text-[#3C403E] text-sm font-medium transition-colors"
             >
               Try again
             </button>
@@ -556,18 +556,18 @@ export default function StudyViewPage() {
             <button
               onClick={handlePracticePrev}
               disabled={practiceIndex === 0}
-              className="p-2 rounded-lg bg-white/5 hover:bg-white/8 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-2 rounded-[4px] bg-lp-ink/5 hover:bg-lp-ink/8 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
-              <svg className="w-4 h-4 text-[#A0A0B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-4 h-4 text-[#3C403E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <button
               onClick={handlePracticeNext}
               disabled={practiceIndex === questions.length - 1}
-              className="p-2 rounded-lg bg-white/5 hover:bg-white/8 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-2 rounded-[4px] bg-lp-ink/5 hover:bg-lp-ink/8 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
-              <svg className="w-4 h-4 text-[#A0A0B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-4 h-4 text-[#3C403E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -587,10 +587,10 @@ export default function StudyViewPage() {
             }}
             className={`rounded-full transition-all duration-200 ${
               i === practiceIndex
-                ? 'w-5 h-2 bg-[#6366F1]'
+                ? 'w-5 h-2 bg-[#1F5C4A]'
                 : answers[i]
-                ? 'w-2 h-2 bg-[#22C55E]'
-                : 'w-2 h-2 bg-white/15 hover:bg-white/25'
+                ? 'w-2 h-2 bg-[#1F7A4D]'
+                : 'w-2 h-2 bg-lp-ink/15 hover:bg-lp-ink/25'
             }`}
             aria-label={`Practice question ${i + 1}`}
           />
@@ -602,7 +602,7 @@ export default function StudyViewPage() {
   // ── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-[#F8F8FF]">
+    <div className="min-h-screen bg-[#F4F2EC] text-[#1B1D1C]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
 
         {/* Header */}
@@ -610,24 +610,24 @@ export default function StudyViewPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/dashboard/interview/saved')}
-              className="flex items-center gap-1.5 text-[#A0A0B8] hover:text-[#F8F8FF] transition-colors text-sm flex-shrink-0"
+              className="flex items-center gap-1.5 text-[#3C403E] hover:text-[#1B1D1C] transition-colors text-sm flex-shrink-0"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
               Back
             </button>
-            <div className="w-px h-5 bg-white/10" />
+            <div className="w-px h-5 bg-lp-ink/10" />
             <div>
-              <h1 className="text-xl font-bold text-[#F8F8FF] leading-tight">{prep.company}</h1>
-              <p className="text-[#8B5CF6] text-sm font-medium">{prep.position}</p>
-              <p className="text-[#60607A] text-xs mt-0.5">{formatDate(prep.createdAt)}</p>
+              <h1 className="text-xl font-bold text-[#1B1D1C] leading-tight">{prep.company}</h1>
+              <p className="text-[#1F5C4A] text-sm font-medium">{prep.position}</p>
+              <p className="text-[#5A5F5C] text-xs mt-0.5">{formatDate(prep.createdAt)}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={handleExportPDF}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/8 text-[#A0A0B8] text-xs font-medium transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] bg-lp-ink/5 hover:bg-lp-ink/8 text-[#3C403E] text-xs font-medium transition-colors"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -636,7 +636,7 @@ export default function StudyViewPage() {
             </button>
             <button
               onClick={() => setShowDelete(true)}
-              className="p-2 rounded-lg bg-white/5 hover:bg-[#EF4444]/10 hover:text-[#EF4444] text-[#60607A] transition-colors"
+              className="p-2 rounded-[4px] bg-lp-ink/5 hover:bg-[#B42318]/10 hover:text-[#B42318] text-[#5A5F5C] transition-colors"
               aria-label="Delete session"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -647,28 +647,28 @@ export default function StudyViewPage() {
         </div>
 
         {/* Mode toggle */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#13131A] border border-white/8 mb-6 w-fit">
+        <div className="flex items-center gap-1 p-0 rounded-[10px] bg-[#FFFFFF] border border-lp-rule mb-6 w-fit">
           <button
             onClick={() => setPracticeMode(false)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`px-4 py-2 rounded-[4px] text-sm font-medium transition-all duration-200 ${
               !practiceMode
-                ? 'bg-[#6366F1] text-white shadow-md'
-                : 'text-[#60607A] hover:text-[#A0A0B8]'
+                ? 'bg-[#1F5C4A] text-white '
+                : 'text-[#5A5F5C] hover:text-[#3C403E]'
             }`}
           >
             Study Cards
           </button>
           <button
             onClick={() => setPracticeMode(true)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-[4px] text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
               practiceMode
-                ? 'bg-[#EF4444] text-white shadow-md'
-                : 'text-[#60607A] hover:text-[#A0A0B8]'
+                ? 'bg-[#B42318] text-white '
+                : 'text-[#5A5F5C] hover:text-[#3C403E]'
             }`}
           >
             Practice Mode
             {practicedCount > 0 && (
-              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${practiceMode ? 'bg-white/20' : 'bg-[#22C55E]/20 text-[#22C55E]'}`}>
+              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${practiceMode ? 'bg-lp-ink/20' : 'bg-[#1F7A4D]/20 text-[#1F7A4D]'}`}>
                 {practicedCount}/{questions.length}
               </span>
             )}
@@ -692,26 +692,26 @@ export default function StudyViewPage() {
         {questionsToAsk.length > 0 && (
           <div className="mt-8">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-1 h-5 rounded-full bg-gradient-to-b from-[#22C55E] to-[#16A34A]" />
-              <h2 className="text-base font-semibold text-[#F8F8FF]">Questions to Ask the Interviewer</h2>
+              <div className="w-1 h-5 rounded-full bg-[#1F7A4D] " />
+              <h2 className="text-base font-semibold text-[#1B1D1C]">Questions to Ask the Interviewer</h2>
             </div>
             <div className="space-y-3">
               {questionsToAsk.map((q, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-3 rounded-xl border border-white/8 bg-[#13131A] px-4 py-3.5"
+                  className="flex items-start gap-3 rounded-[4px] border border-lp-rule bg-[#FFFFFF] px-4 py-3.5"
                 >
-                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#22C55E]/15 border border-[#22C55E]/25 flex items-center justify-center text-[10px] font-bold text-[#22C55E] mt-0.5">
+                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#1F7A4D]/15 border border-[#1F7A4D]/25 flex items-center justify-center text-[10px] font-bold text-[#1F7A4D] mt-0.5">
                     {i + 1}
                   </span>
-                  <p className="flex-1 text-sm text-[#A0A0B8] leading-relaxed">{q}</p>
+                  <p className="flex-1 text-sm text-[#3C403E] leading-relaxed">{q}</p>
                   <button
                     onClick={() => handleCopy(q, i)}
-                    className="flex-shrink-0 p-1.5 rounded-lg hover:bg-white/8 text-[#60607A] hover:text-[#A0A0B8] transition-colors"
+                    className="flex-shrink-0 p-1.5 rounded-[4px] hover:bg-lp-ink/8 text-[#5A5F5C] hover:text-[#3C403E] transition-colors"
                     aria-label="Copy question"
                   >
                     {copiedIdx === i ? (
-                      <svg className="w-3.5 h-3.5 text-[#22C55E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <svg className="w-3.5 h-3.5 text-[#1F7A4D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
@@ -781,7 +781,7 @@ export default function StudyViewPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-black/60 z-50"
               onClick={() => !deleting && setShowDelete(false)}
             />
             <motion.div
@@ -790,31 +790,31 @@ export default function StudyViewPage() {
               exit={{ opacity: 0, scale: 0.92 }}
               className="fixed inset-0 flex items-center justify-center z-50 p-4"
             >
-              <div className="rounded-2xl border border-white/10 bg-[#1C1C26] p-6 max-w-sm w-full shadow-2xl">
-                <div className="w-12 h-12 rounded-2xl bg-[#EF4444]/10 border border-[#EF4444]/20 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-[#EF4444]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-6 max-w-sm w-full ">
+                <div className="w-12 h-12 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-6 h-6 text-[#B42318]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-[#F8F8FF] text-center mb-2">Delete Session?</h3>
-                <p className="text-[#A0A0B8] text-sm text-center mb-6">
+                <h3 className="text-lg font-semibold text-[#1B1D1C] text-center mb-2">Delete Session?</h3>
+                <p className="text-[#3C403E] text-sm text-center mb-6">
                   This prep session will be permanently deleted.
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowDelete(false)}
                     disabled={deleting}
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/8 text-[#A0A0B8] text-sm font-medium transition-colors disabled:opacity-50"
+                    className="flex-1 px-4 py-2.5 rounded-[4px] bg-lp-ink/5 hover:bg-lp-ink/8 text-[#3C403E] text-sm font-medium transition-colors disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleDelete}
                     disabled={deleting}
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-[#EF4444] hover:bg-[#DC2626] text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-2.5 rounded-[4px] bg-[#B42318] hover:bg-[#912018] text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {deleting ? (
-                      <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Deleting…</>
+                      <><div className="w-4 h-4 border-2 border-lp-rule border-t-lp-rule rounded-full animate-spin" />Deleting…</>
                     ) : 'Delete'}
                   </button>
                 </div>

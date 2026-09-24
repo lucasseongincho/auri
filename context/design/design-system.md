@@ -1,45 +1,58 @@
 # Design System
 
-## Color Palette (Dark Mode First)
-background:       #0A0A0F
-surface:          #13131A  (card backgrounds)
-surface-elevated: #1C1C26  (elevated panels)
-border:           rgba(255,255,255,0.08)
-border-strong:    rgba(255,255,255,0.15)
-accent-primary:   #6366F1  (indigo — main brand)
-accent-secondary: #8B5CF6  (violet — gradient partner)
-text-primary:     #F8F8FF
-text-secondary:   #A0A0B8
-text-muted:       #60607A
-success:          #22C55E
-warning:          #F59E0B  (also cover letter feature color)
-error:            #EF4444
+Light, paper-and-ink system shared by the landing page and the app.
+Tokens live in tailwind.config.ts (`lp-*`, plus `background`, `brand`,
+`surface`, `text-*`). One brand color, neutrals, one highlight.
 
-## Feature Color Coding
-- Resume / general features: indigo #6366F1
-- Cover letter feature: amber #F59E0B
-- Interview prep: indigo #6366F1
+## Color Palette
+background (paper):  #F4F2EC   bg-lp-paper / bg-background
+surface (card):      #FFFFFF   bg-white / bg-surface
+sheet (sunk panel):  #FAF9F5   bg-lp-sheet;  #E9E6DD bg-lp-sunk
+border:              #D9D5CC   border-lp-rule;  hairline #E6E2D9
+text-primary (ink):  #1B1D1C   text-lp-ink
+text-secondary:      #3C403E   text-lp-body
+text-muted:          #5A5F5C   text-lp-muted  (4.5:1+ on paper and white)
+brand (pine):        #1F5C4A   hover #15443A, tint #EEF3F0
+highlight:           #F2D45C   ONLY for matched keywords (<mark>)
+success:             #1F7A4D
+warning:             #8A5A00   (warnings, Pro crown)
+error:               #B42318
+
+All features use pine. No per-feature colors, no gradients, no glass,
+no glow shadows.
 
 ## Typography
-- Headings: Inter (font-heading class)
-- Body: DM Sans (font-body class)
+- Headings: Newsreader (font-heading / font-lp-serif), weight 500–600
+- Body: IBM Plex Sans (font-body / font-lp-sans)
+- Numbers, labels: IBM Plex Mono (font-lp-mono)
+- Self-hosted via @fontsource, imported in app/layout.tsx
 
-## Double-Bezel Card Pattern (use everywhere)
-<div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
-    {children}
-  </div>
+## Radius, depth
+- Controls (buttons, inputs, chips): 4px  rounded-[4px] / rounded-lp-control
+- Panels, cards: 10px  rounded-[10px] / rounded-lp-panel
+- Pills, avatars, progress bars: rounded-full
+- One border per card. No double bezel. Shadow only for things that float
+  (popovers, the hero sample): shadow-lp-lift
+
+## Card
+<div className="rounded-[10px] border border-lp-rule bg-white p-6">
+  {children}
 </div>
 
-## Animation
-- SPRING = { type: 'spring', stiffness: 300, damping: 30 }
-- Use framer-motion with SPRING for all transitions
-- Never use linear or ease — always spring physics
+## Primary / secondary button
+<button className="min-h-[44px] px-6 rounded-[4px] bg-[#1F5C4A] text-white font-medium hover:bg-[#15443A]">
+<button className="min-h-[44px] px-6 rounded-[4px] border border-[#1F5C4A] text-[#1F5C4A]">
 
-## Primary CTA Button
-<button className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-  text-white font-semibold shadow-lg shadow-[#6366F1]/25
-  hover:shadow-[#6366F1]/50 hover:scale-[1.02] transition-all duration-200">
+## Animation
+- Only when it explains state (loading, panels opening). No decorative motion.
+- framer-motion: SPRING = { type: 'spring', stiffness: 300, damping: 30 }
+- MotionConfig reducedMotion="user" is set in app/providers.tsx; globals.css
+  also disables CSS animation under prefers-reduced-motion.
+
+## Accessibility
+- Inline links are underlined, not color-only.
+- Touch targets >= 44px on mobile.
+- Focus ring: 2px pine outline (globals.css :focus-visible).
 
 ## Mobile Layout
 - Bottom tab bar: 4 primary items + More drawer (slide-up, 3-column grid)

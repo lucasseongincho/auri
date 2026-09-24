@@ -22,13 +22,13 @@ import {
 import type { SavedStrategy, JobStrategyAction, JobStrategyDay } from '@/types'
 
 const DAY_COLORS = [
-  { bg: 'bg-[#6366F1]/10', border: 'border-[#6366F1]/20', text: 'text-[#818CF8]' },
-  { bg: 'bg-[#8B5CF6]/10', border: 'border-[#8B5CF6]/20', text: 'text-[#A78BFA]' },
-  { bg: 'bg-[#0EA5E9]/10', border: 'border-[#0EA5E9]/20', text: 'text-[#38BDF8]' },
-  { bg: 'bg-[#22C55E]/10', border: 'border-[#22C55E]/20', text: 'text-[#4ADE80]' },
-  { bg: 'bg-[#F59E0B]/10', border: 'border-[#F59E0B]/20', text: 'text-[#FCD34D]' },
-  { bg: 'bg-[#EF4444]/10', border: 'border-[#EF4444]/20', text: 'text-[#F87171]' },
-  { bg: 'bg-[#EC4899]/10', border: 'border-[#EC4899]/20', text: 'text-[#F472B6]' },
+  { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
+  { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
+  { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
+  { bg: 'bg-[#1F7A4D]/10', border: 'border-[#1F7A4D]/20', text: 'text-[#1F7A4D]' },
+  { bg: 'bg-[#8A5A00]/10', border: 'border-[#8A5A00]/20', text: 'text-[#F2D45C]' },
+  { bg: 'bg-[#B42318]/10', border: 'border-[#B42318]/20', text: 'text-[#B42318]' },
+  { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
 ]
 
 function ActionItem({ action, completed, onToggle }: {
@@ -37,29 +37,29 @@ function ActionItem({ action, completed, onToggle }: {
   onToggle: () => void
 }) {
   return (
-    <div className={`flex items-start gap-3 p-3 rounded-xl border transition-all duration-200 ${
-      completed ? 'border-[#22C55E]/20 bg-[#22C55E]/5' : 'border-white/[0.06] bg-[#0A0A0F]/40'
+    <div className={`flex items-start gap-3 p-3 rounded-[10px] border transition-all duration-200 ${
+      completed ? 'border-[#1F7A4D]/20 bg-[#1F7A4D]/5' : 'border-lp-hairline bg-[#F4F2EC]/40'
     }`}>
       <div
         onClick={onToggle}
         className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center cursor-pointer transition-all duration-200 mt-0.5 ${
-          completed ? 'border-[#22C55E] bg-[#22C55E]' : 'border-white/20 hover:border-[#6366F1]'
+          completed ? 'border-[#1F7A4D] bg-[#1F7A4D]' : 'border-lp-rule hover:border-[#1F5C4A]'
         }`}
       >
-        {completed && <CheckCircle className="w-3 h-3 text-white" />}
+        {completed && <CheckCircle className="w-3 h-3 text-lp-ink" />}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <Clock className="w-3 h-3 text-[#60607A] flex-shrink-0" />
-          <span className="text-xs text-[#60607A]">{action.time}</span>
+          <Clock className="w-3 h-3 text-[#5A5F5C] flex-shrink-0" />
+          <span className="text-xs text-[#5A5F5C]">{action.time}</span>
         </div>
-        <p className={`text-sm leading-relaxed ${completed ? 'line-through text-[#60607A]' : 'text-[#E8E8F0]'}`}>
+        <p className={`text-sm leading-relaxed ${completed ? 'line-through text-[#5A5F5C]' : 'text-[#1B1D1C]'}`}>
           {action.action}
         </p>
         {action.resource && (
           <div className="flex items-center gap-1.5 mt-1.5">
-            <Globe className="w-3 h-3 text-[#6366F1] flex-shrink-0" />
-            <span className="text-xs text-[#6366F1] break-all">{action.resource}</span>
+            <Globe className="w-3 h-3 text-[#1F5C4A] flex-shrink-0" />
+            <span className="text-xs text-[#1F5C4A] break-all">{action.resource}</span>
           </div>
         )}
       </div>
@@ -78,27 +78,27 @@ function DayCard({ day, dayIndex, completed, onToggle }: {
   const completedCount = day.actions.filter((_, ai) => completed[`${day.day}-${ai}`]).length
 
   return (
-    <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-      <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] overflow-hidden">
+    <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+      <div className="rounded-[10px]  bg-[#FFFFFF] overflow-hidden">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center justify-between p-4 text-left hover:bg-white/[0.02] transition-colors"
+          className="w-full flex items-center justify-between p-4 text-left hover:bg-lp-ink/[0.02] transition-colors"
           aria-expanded={expanded}
         >
           <div className="flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-xl ${color.bg} border ${color.border} flex items-center justify-center flex-shrink-0`}>
+            <div className={`w-9 h-9 rounded-[10px] ${color.bg} border ${color.border} flex items-center justify-center flex-shrink-0`}>
               <span className={`text-sm font-bold ${color.text}`}>{day.day}</span>
             </div>
             <div>
-              <p className="text-sm font-semibold text-white leading-tight">{day.theme}</p>
-              <p className="text-xs text-[#60607A] mt-0.5">{completedCount}/{day.actions.length} actions complete</p>
+              <p className="text-sm font-semibold text-lp-ink leading-tight">{day.theme}</p>
+              <p className="text-xs text-[#5A5F5C] mt-0.5">{completedCount}/{day.actions.length} actions complete</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {completedCount === day.actions.length && day.actions.length > 0 && (
-              <CheckCircle className="w-4 h-4 text-[#22C55E]" />
+              <CheckCircle className="w-4 h-4 text-[#1F7A4D]" />
             )}
-            {expanded ? <ChevronUp className="w-4 h-4 text-[#60607A]" /> : <ChevronDown className="w-4 h-4 text-[#60607A]" />}
+            {expanded ? <ChevronUp className="w-4 h-4 text-[#5A5F5C]" /> : <ChevronDown className="w-4 h-4 text-[#5A5F5C]" />}
           </div>
         </button>
         <AnimatePresence>
@@ -110,7 +110,7 @@ function DayCard({ day, dayIndex, completed, onToggle }: {
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="px-4 pb-4 space-y-2 border-t border-white/[0.06] pt-3">
+              <div className="px-4 pb-4 space-y-2 border-t border-lp-hairline pt-3">
                 {day.actions.map((action, ai) => (
                   <ActionItem
                     key={ai}
@@ -206,10 +206,10 @@ export default function SavedStrategyDetailPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F4F2EC] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[#A0A0B8] text-sm">Loading strategy…</p>
+          <div className="w-10 h-10 border-2 border-[#1F5C4A] border-t-transparent rounded-full animate-spin" />
+          <p className="text-[#3C403E] text-sm">Loading strategy…</p>
         </div>
       </div>
     )
@@ -217,15 +217,15 @@ export default function SavedStrategyDetailPage() {
 
   if (notFound || !saved) {
     return (
-      <div className="min-h-screen bg-[#0A0A0F] flex flex-col items-center justify-center gap-4 text-center px-4">
-        <div className="w-14 h-14 rounded-2xl bg-[#EF4444]/10 border border-[#EF4444]/20 flex items-center justify-center mb-2">
-          <Map className="w-7 h-7 text-[#EF4444]" />
+      <div className="min-h-screen bg-[#F4F2EC] flex flex-col items-center justify-center gap-4 text-center px-4">
+        <div className="w-14 h-14 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mb-2">
+          <Map className="w-7 h-7 text-[#B42318]" />
         </div>
-        <h2 className="text-lg font-semibold text-[#F8F8FF]">Strategy not found</h2>
-        <p className="text-[#60607A] text-sm">This strategy may have been deleted.</p>
+        <h2 className="text-lg font-semibold text-[#1B1D1C]">Strategy not found</h2>
+        <p className="text-[#5A5F5C] text-sm">This strategy may have been deleted.</p>
         <button
           onClick={() => router.push('/dashboard/strategy/saved')}
-          className="mt-2 px-5 py-2.5 rounded-xl bg-[#6366F1] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          className="mt-2 px-5 py-2.5 rounded-[4px] bg-[#1F5C4A] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
         >
           Back to strategies
         </button>
@@ -237,7 +237,7 @@ export default function SavedStrategyDetailPage() {
   const completedCount = Object.values(completed).filter(Boolean).length
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-[#F8F8FF]">
+    <div className="min-h-screen bg-[#F4F2EC] text-[#1B1D1C]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
 
         {/* Header */}
@@ -245,27 +245,27 @@ export default function SavedStrategyDetailPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/dashboard/strategy/saved')}
-              className="flex items-center gap-1.5 text-[#A0A0B8] hover:text-[#F8F8FF] transition-colors text-sm flex-shrink-0"
+              className="flex items-center gap-1.5 text-[#3C403E] hover:text-[#1B1D1C] transition-colors text-sm flex-shrink-0"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
               Back
             </button>
-            <div className="w-px h-5 bg-white/10" />
+            <div className="w-px h-5 bg-lp-ink/10" />
             <div>
-              <h1 className="text-xl font-bold text-[#F8F8FF] leading-tight">{saved.position}</h1>
-              <p className="text-[#6366F1] text-sm font-medium">
+              <h1 className="text-xl font-bold text-[#1B1D1C] leading-tight">{saved.position}</h1>
+              <p className="text-[#1F5C4A] text-sm font-medium">
                 {[saved.industry, saved.city].filter(Boolean).join(' · ')}
               </p>
-              <p className="text-[#60607A] text-xs mt-0.5">
+              <p className="text-[#5A5F5C] text-xs mt-0.5">
                 {typeof saved.createdAt === 'string' ? formatDate(saved.createdAt) : ''}
               </p>
             </div>
           </div>
           <button
             onClick={() => setShowDelete(true)}
-            className="p-2 rounded-lg bg-white/5 hover:bg-[#EF4444]/10 hover:text-[#EF4444] text-[#60607A] transition-colors flex-shrink-0"
+            className="p-2 rounded-[4px] bg-lp-ink/5 hover:bg-[#B42318]/10 hover:text-[#B42318] text-[#5A5F5C] transition-colors flex-shrink-0"
             aria-label="Delete strategy"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -275,20 +275,20 @@ export default function SavedStrategyDetailPage() {
         </div>
 
         {/* Progress bar */}
-        <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 mb-6">
-          <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4">
+        <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 mb-6">
+          <div className="rounded-[10px]  bg-[#FFFFFF] p-4">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-sm font-semibold text-white">{completedCount} / {totalActions} actions completed</p>
-                <p className="text-xs text-[#60607A] mt-0.5">7-day plan · saved snapshot</p>
+                <p className="text-sm font-semibold text-lp-ink">{completedCount} / {totalActions} actions completed</p>
+                <p className="text-xs text-[#5A5F5C] mt-0.5">7-day plan · saved snapshot</p>
               </div>
-              <span className="text-sm font-bold text-[#6366F1]">
+              <span className="text-sm font-bold text-[#1F5C4A]">
                 {totalActions > 0 ? Math.round((completedCount / totalActions) * 100) : 0}%
               </span>
             </div>
-            <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden">
+            <div className="h-2 rounded-full bg-lp-ink/6 overflow-hidden">
               <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]"
+                className="h-full rounded-full bg-[#1F5C4A] "
                 initial={{ width: 0 }}
                 animate={{ width: totalActions > 0 ? `${(completedCount / totalActions) * 100}%` : '0%' }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -321,7 +321,7 @@ export default function SavedStrategyDetailPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-black/60 z-50"
               onClick={() => !deleting && setShowDelete(false)}
             />
             <motion.div
@@ -330,31 +330,31 @@ export default function SavedStrategyDetailPage() {
               exit={{ opacity: 0, scale: 0.92 }}
               className="fixed inset-0 flex items-center justify-center z-50 p-4"
             >
-              <div className="rounded-2xl border border-white/10 bg-[#1C1C26] p-6 max-w-sm w-full shadow-2xl">
-                <div className="w-12 h-12 rounded-2xl bg-[#EF4444]/10 border border-[#EF4444]/20 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-[#EF4444]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-6 max-w-sm w-full ">
+                <div className="w-12 h-12 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-6 h-6 text-[#B42318]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-[#F8F8FF] text-center mb-2">Delete Strategy?</h3>
-                <p className="text-[#A0A0B8] text-sm text-center mb-6">
+                <h3 className="text-lg font-semibold text-[#1B1D1C] text-center mb-2">Delete Strategy?</h3>
+                <p className="text-[#3C403E] text-sm text-center mb-6">
                   This strategy plan will be permanently deleted.
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowDelete(false)}
                     disabled={deleting}
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/8 text-[#A0A0B8] text-sm font-medium transition-colors disabled:opacity-50"
+                    className="flex-1 px-4 py-2.5 rounded-[4px] bg-lp-ink/5 hover:bg-lp-ink/8 text-[#3C403E] text-sm font-medium transition-colors disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleDelete}
                     disabled={deleting}
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-[#EF4444] hover:bg-[#DC2626] text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-2.5 rounded-[4px] bg-[#B42318] hover:bg-[#912018] text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {deleting ? (
-                      <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Deleting…</>
+                      <><div className="w-4 h-4 border-2 border-lp-rule border-t-lp-rule rounded-full animate-spin" />Deleting…</>
                     ) : 'Delete'}
                   </button>
                 </div>

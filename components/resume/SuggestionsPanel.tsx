@@ -58,21 +58,21 @@ export default function SuggestionsPanel({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={SPRING}
-      className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+      className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
     >
-      <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-4">
+      <div className="rounded-[10px]  bg-[#FFFFFF] p-5 space-y-4">
 
         {/* Header */}
         <div className="flex items-center gap-2">
-          <Wand2 className="w-4 h-4 text-[#6366F1]" />
-          <span className="text-sm font-semibold text-white">Suggested Edits</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8]">
+          <Wand2 className="w-4 h-4 text-[#1F5C4A]" />
+          <span className="text-sm font-semibold text-lp-ink">Suggested Edits</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]">
             {suggestions.length}
           </span>
-          <span className="text-[10px] text-[#60607A] ml-auto uppercase tracking-wide">pro</span>
+          <span className="text-[10px] text-[#5A5F5C] ml-auto uppercase tracking-wide">pro</span>
           <button
             onClick={handleToggleAll}
-            className="text-xs text-[#60607A] hover:text-[#A0A0B8] transition-colors"
+            className="text-xs text-[#5A5F5C] hover:text-[#3C403E] transition-colors"
           >
             {allChecked ? 'Deselect all' : 'Select all'}
           </button>
@@ -89,10 +89,10 @@ export default function SuggestionsPanel({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ ...SPRING, delay: i * 0.03 }}
                 onClick={() => onToggle(s.id)}
-                className={`rounded-xl border p-3 cursor-pointer transition-all duration-150 ${
+                className={`rounded-[10px] border p-3 cursor-pointer transition-all duration-150 ${
                   checked
-                    ? 'border-[#6366F1]/30 bg-[#6366F1]/5'
-                    : 'border-white/[0.05] bg-[#0A0A0F]/60 hover:border-white/[0.1]'
+                    ? 'border-[#1F5C4A]/30 bg-[#1F5C4A]/5'
+                    : 'border-lp-hairline bg-[#F4F2EC]/60 hover:border-lp-rule'
                 }`}
               >
                 <div className="flex items-start gap-2.5">
@@ -101,8 +101,8 @@ export default function SuggestionsPanel({
                     className={`mt-0.5 flex-shrink-0 w-4 h-4 rounded border-2 transition-all duration-150
                       flex items-center justify-center ${
                       checked
-                        ? 'bg-[#6366F1] border-[#6366F1]'
-                        : 'bg-transparent border-white/20'
+                        ? 'bg-[#1F5C4A] border-[#1F5C4A]'
+                        : 'bg-transparent border-lp-rule'
                     }`}
                   >
                     {checked && (
@@ -121,10 +121,10 @@ export default function SuggestionsPanel({
                   <div className="flex-1 min-w-0 space-y-1.5">
                     {/* Label + reason */}
                     <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="text-xs font-semibold text-white leading-snug">
+                      <span className="text-xs font-semibold text-lp-ink leading-snug">
                         {s.label}
                       </span>
-                      <span className="text-[10px] text-[#60607A] leading-snug">
+                      <span className="text-[10px] text-[#5A5F5C] leading-snug">
                         {s.reason}
                       </span>
                     </div>
@@ -134,7 +134,7 @@ export default function SuggestionsPanel({
                       <p
                         title={s.original}
                         className={`text-xs leading-snug truncate ${
-                          checked ? 'line-through text-[#60607A]' : 'text-[#60607A]'
+                          checked ? 'line-through text-[#5A5F5C]' : 'text-[#5A5F5C]'
                         }`}
                       >
                         {truncate(s.original)}
@@ -144,7 +144,7 @@ export default function SuggestionsPanel({
                     {/* Suggested */}
                     <p
                       title={s.suggested}
-                      className="text-xs text-white leading-snug"
+                      className="text-xs text-lp-ink leading-snug"
                     >
                       → {truncate(s.suggested)}
                     </p>
@@ -156,13 +156,12 @@ export default function SuggestionsPanel({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-3 pt-1 border-t border-white/[0.05]">
+        <div className="flex items-center gap-3 pt-1 border-t border-lp-hairline">
           <button
             onClick={onApply}
             disabled={checkedIds.size === 0 || isApplying}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl
-              bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white font-semibold text-sm
-              shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50 hover:scale-[1.01]
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-[10px]
+              bg-[#1F5C4A] text-white font-semibold text-sm
               transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isApplying
@@ -172,7 +171,7 @@ export default function SuggestionsPanel({
           </button>
           <button
             onClick={onDiscard}
-            className="text-sm text-[#60607A] hover:text-[#A0A0B8] transition-colors"
+            className="text-sm text-[#5A5F5C] hover:text-[#3C403E] transition-colors"
           >
             Discard
           </button>

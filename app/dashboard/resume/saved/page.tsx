@@ -36,9 +36,9 @@ function formatDate(val: unknown) {
 function ATSBadge({ score }: { score?: number }) {
   if (score == null) return null
   const color =
-    score >= 85 ? 'text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/20' :
-    score >= 70 ? 'text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/20' :
-                  'text-[#EF4444] bg-[#EF4444]/10 border-[#EF4444]/20'
+    score >= 85 ? 'text-[#1F7A4D] bg-[#1F7A4D]/10 border-[#1F7A4D]/20' :
+    score >= 70 ? 'text-[#8A5A00] bg-[#8A5A00]/10 border-[#8A5A00]/20' :
+                  'text-[#B42318] bg-[#B42318]/10 border-[#B42318]/20'
   return (
     <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${color}`}>
       <Star className="w-3 h-3" />
@@ -154,23 +154,22 @@ export default function SavedResumesPage() {
         className="flex-shrink-0 flex items-center justify-between gap-4 mb-6"
       >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6366F1] to-[#4F46E5]
+          <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10
             flex items-center justify-center flex-shrink-0">
-            <FileText className="w-5 h-5 text-white" />
+            <FileText className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
-            <h1 className="font-heading text-xl font-bold text-white leading-tight">My Resumes</h1>
-            <p className="text-xs text-[#60607A]">
+            <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">My Resumes</h1>
+            <p className="text-xs text-[#5A5F5C]">
               {loading ? 'Loading…' : `${resumes.length} saved resume${resumes.length !== 1 ? 's' : ''}`}
             </p>
           </div>
         </div>
         <Link
           href="/dashboard/resume"
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
-            bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-            shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-            hover:scale-[1.02] transition-all duration-200"
+          className="flex items-center gap-2 px-4 py-2 rounded-[4px] text-sm font-semibold
+            bg-[#1F5C4A] text-white
+             transition-all duration-200"
         >
           <Plus className="w-4 h-4" />
           New Resume
@@ -184,8 +183,8 @@ export default function SavedResumesPage() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex-shrink-0 flex items-center gap-2 mb-4 p-3 rounded-xl
-              bg-[#EF4444]/10 border border-[#EF4444]/20 text-[#EF4444] text-sm"
+            className="flex-shrink-0 flex items-center gap-2 mb-4 p-3 rounded-[10px]
+              bg-[#B42318]/10 border border-[#B42318]/20 text-[#B42318] text-sm"
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}
@@ -201,24 +200,24 @@ export default function SavedResumesPage() {
           className="flex-shrink-0 flex flex-col sm:flex-row gap-3 mb-5"
         >
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#60607A]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A5F5C]" />
             <input
               type="text"
               placeholder="Search by position, company, or name…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl text-sm
-                bg-[#13131A] border border-white/[0.08] text-white placeholder-[#60607A]
-                focus:outline-none focus:border-[#6366F1]/50 transition-colors"
+              className="w-full pl-9 pr-4 py-2 rounded-[10px] text-sm
+                bg-[#FFFFFF] border border-lp-rule text-lp-ink placeholder-[#5A5F5C]
+                focus:outline-none focus:border-[#1F5C4A]/50 transition-colors"
             />
           </div>
           <div className="flex items-center gap-2">
-            <SortAsc className="w-4 h-4 text-[#60607A] flex-shrink-0" />
+            <SortAsc className="w-4 h-4 text-[#5A5F5C] flex-shrink-0" />
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortOption)}
-              className="px-3 py-2 rounded-xl text-sm bg-[#13131A] border border-white/[0.08]
-                text-[#A0A0B8] focus:outline-none focus:border-[#6366F1]/50 transition-colors"
+              className="px-3 py-2 rounded-[4px] text-sm bg-[#FFFFFF] border border-lp-rule
+                text-[#3C403E] focus:outline-none focus:border-[#1F5C4A]/50 transition-colors"
             >
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
@@ -235,7 +234,7 @@ export default function SavedResumesPage() {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-6 h-6 text-[#6366F1] animate-spin" />
+            <Loader2 className="w-6 h-6 text-[#1F5C4A] animate-spin" />
           </div>
         )}
 
@@ -246,19 +245,19 @@ export default function SavedResumesPage() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-20 text-center px-6"
           >
-            <div className="w-16 h-16 rounded-2xl bg-[#6366F1]/10 border border-[#6366F1]/20
+            <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
               flex items-center justify-center mb-4">
-              <FileText className="w-8 h-8 text-[#6366F1]" />
+              <FileText className="w-8 h-8 text-[#1F5C4A]" />
             </div>
-            <h3 className="font-heading text-base font-semibold text-white mb-2">No saved resumes yet</h3>
-            <p className="text-sm text-[#60607A] mb-5 max-w-sm">
+            <h3 className="font-heading text-base font-semibold text-lp-ink mb-2">No saved resumes yet</h3>
+            <p className="text-sm text-[#5A5F5C] mb-5 max-w-sm">
               Build your first AI-powered resume and hit Save to see it here.
             </p>
             <Link
               href="/dashboard/resume"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
-                bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50 hover:scale-[1.02] transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-[4px] text-sm font-semibold
+                bg-[#1F5C4A] text-white
+                    transition-all"
             >
               <Plus className="w-4 h-4" />
               Build your first resume
@@ -273,9 +272,9 @@ export default function SavedResumesPage() {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center justify-center py-16 text-center"
           >
-            <Search className="w-8 h-8 text-[#60607A] mb-3" />
-            <p className="text-sm text-[#A0A0B8]">No resumes match &ldquo;{search}&rdquo;</p>
-            <button onClick={() => setSearch('')} className="mt-2 text-xs text-[#6366F1] hover:underline">
+            <Search className="w-8 h-8 text-[#5A5F5C] mb-3" />
+            <p className="text-sm text-[#3C403E]">No resumes match &ldquo;{search}&rdquo;</p>
+            <button onClick={() => setSearch('')} className="mt-2 text-xs text-[#1F5C4A] hover:underline">
               Clear search
             </button>
           </motion.div>
@@ -294,16 +293,16 @@ export default function SavedResumesPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...SPRING, delay: i * 0.04 }}
-                className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 group"
+                className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 group"
               >
-                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 flex flex-col gap-3 h-full">
+                <div className="rounded-[10px]  bg-[#FFFFFF] p-4 flex flex-col gap-3 h-full">
 
                   {/* Top: name + ATS badge */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366F1]/20 to-[#8B5CF6]/20
-                        border border-[#6366F1]/30 flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-3.5 h-3.5 text-[#6366F1]" />
+                      <div className="w-8 h-8 rounded-[4px] bg-[#1F5C4A]/20
+                        border border-[#1F5C4A]/30 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-3.5 h-3.5 text-[#1F5C4A]" />
                       </div>
                       {renamingId === resume.id ? (
                         <div className="flex items-center gap-1 flex-1 min-w-0">
@@ -316,31 +315,31 @@ export default function SavedResumesPage() {
                               if (e.key === 'Enter') handleSaveRename(resume.id)
                               if (e.key === 'Escape') handleCancelRename()
                             }}
-                            className="flex-1 min-w-0 bg-transparent border border-[#6366F1]/50 rounded-lg
-                              px-2 py-0.5 text-sm font-semibold text-white outline-none
-                              focus:border-[#6366F1] transition-colors"
+                            className="flex-1 min-w-0 bg-transparent border border-[#1F5C4A]/50 rounded-[4px]
+                              px-2 py-0.5 text-sm font-semibold text-lp-ink outline-none
+                              focus:border-[#1F5C4A] transition-colors"
                           />
                           <button
                             onClick={() => handleSaveRename(resume.id)}
                             disabled={renameSaving}
                             aria-label="Save rename"
-                            className="p-1 rounded-lg text-[#22C55E] hover:bg-[#22C55E]/10 transition-colors flex-shrink-0"
+                            className="p-1 rounded-[4px] text-[#1F7A4D] hover:bg-[#1F7A4D]/10 transition-colors flex-shrink-0"
                           >
                             {renameSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                           </button>
                           <button
                             onClick={handleCancelRename}
                             aria-label="Cancel rename"
-                            className="p-1 rounded-lg text-[#60607A] hover:bg-white/5 transition-colors flex-shrink-0"
+                            className="p-1 rounded-[4px] text-[#5A5F5C] hover:bg-lp-ink/5 transition-colors flex-shrink-0"
                           >
                             <X className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1 min-w-0">
-                          <p className="text-sm font-semibold text-white truncate">
+                          <p className="text-sm font-semibold text-lp-ink truncate">
                             {renameSuccessId === resume.id ? (
-                              <span className="text-[#22C55E]">Renamed ✓</span>
+                              <span className="text-[#1F7A4D]">Renamed ✓</span>
                             ) : (
                               resume.name || resume.targetPosition || 'Untitled'
                             )}
@@ -348,7 +347,7 @@ export default function SavedResumesPage() {
                           <button
                             onClick={() => handleStartRename(resume)}
                             aria-label="Rename resume"
-                            className="p-1 rounded-lg text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/5
+                            className="p-1 rounded-[4px] text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/5
                               transition-all duration-200 flex-shrink-0 opacity-0 group-hover:opacity-100"
                           >
                             <Pencil className="w-3 h-3" />
@@ -362,42 +361,42 @@ export default function SavedResumesPage() {
                   {/* Meta */}
                   <div className="space-y-1.5">
                     {resume.targetPosition && (
-                      <div className="flex items-center gap-1.5 text-xs text-[#A0A0B8]">
-                        <Target className="w-3.5 h-3.5 text-[#60607A] flex-shrink-0" />
+                      <div className="flex items-center gap-1.5 text-xs text-[#3C403E]">
+                        <Target className="w-3.5 h-3.5 text-[#5A5F5C] flex-shrink-0" />
                         <span className="truncate">{resume.targetPosition}</span>
                       </div>
                     )}
                     {resume.targetCompany && (
-                      <div className="flex items-center gap-1.5 text-xs text-[#A0A0B8]">
-                        <Building2 className="w-3.5 h-3.5 text-[#60607A] flex-shrink-0" />
+                      <div className="flex items-center gap-1.5 text-xs text-[#3C403E]">
+                        <Building2 className="w-3.5 h-3.5 text-[#5A5F5C] flex-shrink-0" />
                         <span className="truncate">{resume.targetCompany}</span>
                       </div>
                     )}
-                    <div className="flex items-center gap-1.5 text-xs text-[#60607A]">
+                    <div className="flex items-center gap-1.5 text-xs text-[#5A5F5C]">
                       <Layout className="w-3.5 h-3.5 flex-shrink-0" />
                       <span>{TEMPLATE_LABELS[resume.templateId] ?? resume.templateId}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs text-[#60607A]">
+                    <div className="flex items-center gap-1.5 text-xs text-[#5A5F5C]">
                       <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                       <span>Updated {formatDate(resume.updatedAt)}</span>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="mt-auto flex items-center gap-2 pt-2 border-t border-white/[0.05]">
+                  <div className="mt-auto flex items-center gap-2 pt-2 border-t border-lp-hairline">
                     <Link
                       href={`/dashboard/resume/${resume.id}`}
                       className="flex-1 flex items-center justify-center px-3 py-2
-                        rounded-lg text-xs font-semibold bg-[#6366F1] text-white
-                        hover:bg-[#4F46E5] transition-colors"
+                        rounded-[4px] text-xs font-semibold bg-[#1F5C4A] text-white
+                        hover:bg-[#15443A] transition-colors"
                     >
                       Open
                     </Link>
                     <button
                       onClick={() => setDeleteTarget(resume.id)}
                       aria-label={`Delete resume ${resume.name}`}
-                      className="p-2 rounded-lg text-[#60607A] hover:text-[#EF4444]
-                        hover:bg-[#EF4444]/10 transition-all duration-200"
+                      className="p-2 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318]
+                        hover:bg-[#B42318]/10 transition-all duration-200"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -416,7 +415,7 @@ export default function SavedResumesPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 "
             onClick={(e) => { if (e.target === e.currentTarget) setDeleteTarget(null) }}
           >
             <motion.div
@@ -424,39 +423,39 @@ export default function SavedResumesPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 16 }}
               transition={SPRING}
-              className="w-full max-w-sm rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+              className="w-full max-w-sm rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
             >
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
+              <div className="rounded-[10px]  bg-[#FFFFFF] p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20
+                  <div className="w-10 h-10 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20
                     flex items-center justify-center">
-                    <Trash2 className="w-5 h-5 text-[#EF4444]" />
+                    <Trash2 className="w-5 h-5 text-[#B42318]" />
                   </div>
                   <button
                     onClick={() => setDeleteTarget(null)}
-                    className="p-1.5 rounded-lg text-[#60607A] hover:text-white hover:bg-white/5 transition-all"
+                    className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                <h3 className="font-heading text-base font-semibold text-white mb-1">Delete resume?</h3>
-                <p className="text-sm text-[#60607A] mb-6">
+                <h3 className="font-heading text-base font-semibold text-lp-ink mb-1">Delete resume?</h3>
+                <p className="text-sm text-[#5A5F5C] mb-6">
                   This resume will be permanently deleted. This action cannot be undone.
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setDeleteTarget(null)}
-                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium
-                      border border-white/[0.08] text-[#A0A0B8]
-                      hover:text-white hover:bg-white/5 transition-all"
+                    className="flex-1 px-4 py-2.5 rounded-[4px] text-sm font-medium
+                      border border-lp-rule text-[#3C403E]
+                      hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => handleDelete(deleteTarget)}
                     disabled={deleting}
-                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold
-                      bg-[#EF4444] text-white hover:bg-[#DC2626] transition-colors
+                    className="flex-1 px-4 py-2.5 rounded-[4px] text-sm font-semibold
+                      bg-[#B42318] text-white hover:bg-[#912018] transition-colors
                       disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Delete'}

@@ -153,8 +153,8 @@ interface MobileResumeCardProps {
 function MobileResumeCard({ data, personal }: MobileResumeCardProps) {
   const safe = sanitizeResumeData(data)
   return (
-    <div className="md:hidden w-full rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-      <div className="rounded-xl border border-white/[0.05] bg-white p-5 space-y-4 text-gray-900">
+    <div className="md:hidden w-full rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+      <div className="rounded-[10px]  bg-white p-5 space-y-4 text-gray-900">
 
         {/* Header */}
         <div className="border-b border-gray-100 pb-3">
@@ -369,21 +369,20 @@ export default function ResumePreview({
             onClick={handleCopyATS}
             disabled={!safeData || isStreaming}
             aria-label="Copy plain text for ATS portals"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-              border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium
+              border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
               transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#22C55E]" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" /> : <Copy className="w-3.5 h-3.5" />}
             {copied ? 'Copied!' : 'Copy for ATS'}
           </button>
           <button
             onClick={handleDownloadPDF}
             disabled={!safeData || isStreaming || downloading}
             aria-label="Download resume as PDF"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold
-              bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-              shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-              hover:scale-[1.02] transition-all duration-200
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-semibold
+              bg-[#1F5C4A] text-white
+               transition-all duration-200
               disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {downloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
@@ -393,10 +392,10 @@ export default function ResumePreview({
       </div>
 
       {/* Preview area */}
-      <div className="flex-1 rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden">
+      <div className="flex-1 rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 overflow-hidden">
         <div
           ref={containerRef}
-          className="rounded-xl border border-white/[0.05] bg-white overflow-y-auto overflow-x-hidden h-full relative"
+          className="rounded-[10px]  bg-white overflow-y-auto overflow-x-hidden h-full relative"
           style={{ minHeight: '600px' }}
         >
           {/* Global CSS: hide amber highlight styling when .printing class is active (html2pdf capture) */}
@@ -426,9 +425,9 @@ export default function ResumePreview({
                 className="p-8 flex flex-col items-center justify-center min-h-[480px]"
               >
                 {/* Spinner */}
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#6366F1]/15 to-[#8B5CF6]/15
-                  border border-[#6366F1]/25 flex items-center justify-center mb-5">
-                  <Loader2 className="w-7 h-7 text-[#6366F1] animate-spin" />
+                <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/15
+                  border border-[#1F5C4A]/25 flex items-center justify-center mb-5">
+                  <Loader2 className="w-7 h-7 text-[#1F5C4A] animate-spin" />
                 </div>
 
                 {/* Cycling message */}
@@ -439,7 +438,7 @@ export default function ResumePreview({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.3 }}
-                    className="text-sm font-medium text-[#6366F1] mb-2 text-center"
+                    className="text-sm font-medium text-[#1F5C4A] mb-2 text-center"
                   >
                     {LOADING_MESSAGES[msgIdx]}
                   </motion.p>
@@ -452,7 +451,7 @@ export default function ResumePreview({
                 {/* Progress bar */}
                 <div className="w-48 h-1 rounded-full bg-gray-100 overflow-hidden">
                   <motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]"
+                    className="h-full rounded-full bg-[#1F5C4A] "
                     animate={{ width: `${((msgIdx + 1) / LOADING_MESSAGES.length) * 100}%` }}
                     transition={{ duration: 0.4, ease: 'easeInOut' }}
                   />
@@ -503,7 +502,7 @@ export default function ResumePreview({
                     </div>
                   ) : (
                     <div className="w-full h-64 flex items-center justify-center">
-                      <div className="w-6 h-6 rounded-full border-2 border-[#6366F1] border-t-transparent animate-spin" />
+                      <div className="w-6 h-6 rounded-full border-2 border-[#1F5C4A] border-t-transparent animate-spin" />
                     </div>
                   )}
                 </div>
@@ -516,7 +515,7 @@ export default function ResumePreview({
                 className="flex flex-col items-center justify-center h-full py-20 px-8 text-center"
                 style={{ minHeight: '400px' }}
               >
-                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+                <div className="w-16 h-16 rounded-[10px] bg-gray-100 flex items-center justify-center mb-4">
                   <Layout className="w-8 h-8 text-gray-300" />
                 </div>
                 <p className="text-sm font-medium text-gray-400">Your resume preview will appear here</p>
@@ -536,8 +535,8 @@ export default function ResumePreview({
             exit={{ opacity: 0, y: 16, scale: 0.95 }}
             transition={SPRING}
             className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50
-              flex items-center gap-3 px-4 py-3 rounded-xl border shadow-xl
-              bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444] max-w-sm w-full"
+              flex items-center gap-3 px-4 py-3 rounded-[4px] border
+              bg-[#B42318]/10 border-[#B42318]/30 text-[#B42318] max-w-sm w-full"
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span className="text-xs font-medium flex-1">{pdfError}</span>

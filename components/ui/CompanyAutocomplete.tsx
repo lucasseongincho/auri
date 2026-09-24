@@ -78,7 +78,7 @@ export default function CompanyAutocomplete({
     return (
       <>
         {text.slice(0, idx)}
-        <span className="text-[#818CF8] font-semibold">{text.slice(idx, idx + query.length)}</span>
+        <span className="text-[#1F5C4A] font-semibold">{text.slice(idx, idx + query.length)}</span>
         {text.slice(idx + query.length)}
       </>
     )
@@ -95,6 +95,7 @@ export default function CompanyAutocomplete({
         placeholder={placeholder}
         className={className}
         aria-label={ariaLabel}
+        role="combobox"
         aria-autocomplete="list"
         aria-expanded={isOpen}
         style={{ fontSize: '16px' }}
@@ -102,7 +103,7 @@ export default function CompanyAutocomplete({
       />
       {isOpen && filtered.length > 0 && (
         <div
-          className="absolute z-50 w-full mt-1 rounded-xl border border-white/[0.12] bg-[#1C1C26] shadow-xl overflow-hidden"
+          className="absolute z-50 w-full mt-1 rounded-[10px] border border-lp-rule bg-[#FFFFFF] overflow-hidden"
           style={{ maxHeight: 240, overflowY: 'auto' }}
           role="listbox"
         >
@@ -118,8 +119,8 @@ export default function CompanyAutocomplete({
                 setIsOpen(false)
               }}
               onMouseEnter={() => {}}
-              className={`w-full text-left px-4 text-sm text-[#E8E8F0] transition-colors ${
-                i === selectedIndex ? 'bg-white/[0.08]' : 'hover:bg-white/[0.05]'
+              className={`w-full text-left px-4 text-sm text-[#1B1D1C] transition-colors ${
+                i === selectedIndex ? 'bg-lp-ink/8' : 'hover:bg-lp-ink/5'
               }`}
               style={{ minHeight: 44, display: 'flex', alignItems: 'center' }}
             >

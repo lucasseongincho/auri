@@ -30,7 +30,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/60 "
           />
 
           {/* Drawer */}
@@ -40,21 +40,21 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="fixed right-0 top-0 h-full w-[400px] max-w-full z-50
-              border-l border-white/[0.08] bg-[#13131A] overflow-y-auto"
+              border-l border-lp-rule bg-[#FFFFFF] overflow-y-auto"
             aria-label="Career profile drawer"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/[0.06]">
+            <div className="flex items-center justify-between p-6 border-b border-lp-hairline">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6]
+                <div className="w-9 h-9 rounded-full bg-[#1F5C4A]/10
                   flex items-center justify-center">
-                  <User className="w-4 h-4 text-white" />
+                  <User className="w-4 h-4 text-lp-ink" />
                 </div>
                 <div>
-                  <p className="font-semibold text-white text-sm">
+                  <p className="font-semibold text-lp-ink text-sm">
                     {user?.displayName ?? user?.email ?? 'Guest User'}
                   </p>
-                  <p className="text-xs text-[#60607A]">
+                  <p className="text-xs text-[#5A5F5C]">
                     {user?.email ?? ''}
                   </p>
                 </div>
@@ -62,8 +62,8 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               <button
                 onClick={onClose}
                 aria-label="Close profile drawer"
-                className="w-8 h-8 rounded-lg flex items-center justify-center
-                  text-[#60607A] hover:text-white hover:bg-white/5 transition-all duration-200"
+                className="w-8 h-8 rounded-[4px] flex items-center justify-center
+                  text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5 transition-all duration-200"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -76,24 +76,24 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Target className="w-4 h-4 text-[#6366F1]" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-[#60607A]">Target Role</span>
+                    <Target className="w-4 h-4 text-[#1F5C4A]" />
+                    <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">Target Role</span>
                   </div>
                   <Link href="/dashboard/resume" onClick={onClose}
-                    className="text-xs text-[#6366F1] hover:text-[#818CF8] transition-colors flex items-center gap-0.5">
+                    className="text-xs text-[#1F5C4A] hover:text-[#1F5C4A] transition-colors flex items-center gap-0.5">
                     Edit <ChevronRight className="w-3 h-3" />
                   </Link>
                 </div>
                 {profile?.target.position ? (
-                  <div className="rounded-xl bg-[#1C1C26] border border-white/[0.05] p-4">
-                    <p className="font-semibold text-white text-sm">{profile.target.position}</p>
-                    {profile.target.company && <p className="text-xs text-[#A0A0B8] mt-0.5">@ {profile.target.company}</p>}
-                    {profile.target.industry && <p className="text-xs text-[#60607A]">{profile.target.industry}</p>}
+                  <div className="rounded-[10px] bg-[#FFFFFF]  p-4">
+                    <p className="font-semibold text-lp-ink text-sm">{profile.target.position}</p>
+                    {profile.target.company && <p className="text-xs text-[#3C403E] mt-0.5">@ {profile.target.company}</p>}
+                    {profile.target.industry && <p className="text-xs text-[#5A5F5C]">{profile.target.industry}</p>}
                   </div>
                 ) : (
                   <Link href="/dashboard/resume" onClick={onClose}>
-                    <div className="rounded-xl bg-[#1C1C26] border border-dashed border-white/[0.1] p-4
-                      flex items-center gap-2 text-[#60607A] hover:text-[#A0A0B8] hover:border-[#6366F1]/30 transition-all duration-200 cursor-pointer">
+                    <div className="rounded-[10px] bg-[#FFFFFF] border border-dashed border-lp-rule p-4
+                      flex items-center gap-2 text-[#5A5F5C] hover:text-[#3C403E] hover:border-[#1F5C4A]/30 transition-all duration-200 cursor-pointer">
                       <Plus className="w-4 h-4" />
                       <span className="text-sm">Set your target role</span>
                     </div>
@@ -105,28 +105,28 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-[#8B5CF6]" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-[#60607A]">Experience</span>
+                    <Briefcase className="w-4 h-4 text-[#1F5C4A]" />
+                    <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">Experience</span>
                   </div>
-                  <span className="text-xs text-[#60607A]">{profile?.experience.length ?? 0} entries</span>
+                  <span className="text-xs text-[#5A5F5C]">{profile?.experience.length ?? 0} entries</span>
                 </div>
                 {profile?.experience && profile.experience.length > 0 ? (
                   <div className="space-y-2">
                     {profile.experience.slice(0, 3).map((exp) => (
-                      <div key={exp.id} className="rounded-xl bg-[#1C1C26] border border-white/[0.05] p-3">
-                        <p className="text-sm font-medium text-white">{exp.title}</p>
-                        <p className="text-xs text-[#A0A0B8]">{exp.company}</p>
-                        <p className="text-xs text-[#60607A]">{exp.start} – {exp.end}</p>
+                      <div key={exp.id} className="rounded-[10px] bg-[#FFFFFF]  p-3">
+                        <p className="text-sm font-medium text-lp-ink">{exp.title}</p>
+                        <p className="text-xs text-[#3C403E]">{exp.company}</p>
+                        <p className="text-xs text-[#5A5F5C]">{exp.start} – {exp.end}</p>
                       </div>
                     ))}
                     {profile.experience.length > 3 && (
-                      <p className="text-xs text-[#60607A] pl-1">+{profile.experience.length - 3} more</p>
+                      <p className="text-xs text-[#5A5F5C] pl-1">+{profile.experience.length - 3} more</p>
                     )}
                   </div>
                 ) : (
                   <Link href="/dashboard/resume" onClick={onClose}>
-                    <div className="rounded-xl bg-[#1C1C26] border border-dashed border-white/[0.1] p-4
-                      flex items-center gap-2 text-[#60607A] hover:text-[#A0A0B8] hover:border-[#8B5CF6]/30 transition-all duration-200 cursor-pointer">
+                    <div className="rounded-[10px] bg-[#FFFFFF] border border-dashed border-lp-rule p-4
+                      flex items-center gap-2 text-[#5A5F5C] hover:text-[#3C403E] hover:border-[#1F5C4A]/30 transition-all duration-200 cursor-pointer">
                       <Plus className="w-4 h-4" />
                       <span className="text-sm">Add work experience</span>
                     </div>
@@ -138,22 +138,22 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <GraduationCap className="w-4 h-4 text-[#A78BFA]" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-[#60607A]">Education</span>
+                    <GraduationCap className="w-4 h-4 text-[#1F5C4A]" />
+                    <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">Education</span>
                   </div>
                 </div>
                 {profile?.education && profile.education.length > 0 ? (
                   <div className="space-y-2">
                     {profile.education.map((edu) => (
-                      <div key={edu.id} className="rounded-xl bg-[#1C1C26] border border-white/[0.05] p-3">
-                        <p className="text-sm font-medium text-white">{edu.degree} in {edu.field}</p>
-                        <p className="text-xs text-[#A0A0B8]">{edu.institution}</p>
-                        <p className="text-xs text-[#60607A]">{edu.year}</p>
+                      <div key={edu.id} className="rounded-[10px] bg-[#FFFFFF]  p-3">
+                        <p className="text-sm font-medium text-lp-ink">{edu.degree} in {edu.field}</p>
+                        <p className="text-xs text-[#3C403E]">{edu.institution}</p>
+                        <p className="text-xs text-[#5A5F5C]">{edu.year}</p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="rounded-xl bg-[#1C1C26] border border-dashed border-white/[0.1] p-3 text-[#60607A] text-sm">
+                  <div className="rounded-[10px] bg-[#FFFFFF] border border-dashed border-lp-rule p-3 text-[#5A5F5C] text-sm">
                     No education added yet
                   </div>
                 )}
@@ -162,25 +162,25 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               {/* Skills */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <Wrench className="w-4 h-4 text-[#22C55E]" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#60607A]">Skills</span>
+                  <Wrench className="w-4 h-4 text-[#1F7A4D]" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">Skills</span>
                 </div>
                 {profile?.skills && profile.skills.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {profile.skills.slice(0, 12).map((skill) => (
                       <span key={skill} className="px-2.5 py-1 rounded-full text-xs font-medium
-                        bg-[#6366F1]/15 text-[#818CF8] border border-[#6366F1]/20">
+                        bg-[#1F5C4A]/15 text-[#1F5C4A] border border-[#1F5C4A]/20">
                         {skill}
                       </span>
                     ))}
                     {profile.skills.length > 12 && (
-                      <span className="px-2.5 py-1 rounded-full text-xs text-[#60607A]">
+                      <span className="px-2.5 py-1 rounded-full text-xs text-[#5A5F5C]">
                         +{profile.skills.length - 12}
                       </span>
                     )}
                   </div>
                 ) : (
-                  <div className="rounded-xl bg-[#1C1C26] border border-dashed border-white/[0.1] p-3 text-[#60607A] text-sm">
+                  <div className="rounded-[10px] bg-[#FFFFFF] border border-dashed border-lp-rule p-3 text-[#5A5F5C] text-sm">
                     No skills added yet
                   </div>
                 )}
@@ -188,12 +188,12 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-white/[0.06]">
+            <div className="p-6 border-t border-lp-hairline">
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-                  border border-white/10 text-[#60607A] hover:text-[#EF4444] hover:border-[#EF4444]/30
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
+                  border border-lp-rule text-[#5A5F5C] hover:text-[#B42318] hover:border-[#B42318]/30
                   transition-all duration-200 text-sm font-medium"
               >
                 <LogOut className="w-4 h-4" />

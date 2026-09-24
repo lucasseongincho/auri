@@ -21,13 +21,13 @@ export default function BlogIndexPage() {
   const posts = getAllPosts()
 
   return (
-    <main className="min-h-screen bg-[#0A0A0F] text-[#F8F8FF] px-6 py-16">
+    <main className="min-h-screen bg-[#F4F2EC] text-[#1B1D1C] px-6 py-16">
       <div className="max-w-3xl mx-auto">
 
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-[#60607A]
-            hover:text-[#A0A0B8] transition-colors duration-200 mb-8"
+          className="inline-flex items-center gap-1.5 text-sm text-[#5A5F5C]
+            hover:text-[#3C403E] transition-colors duration-200 mb-8"
         >
           ← Back to Home
         </Link>
@@ -35,34 +35,34 @@ export default function BlogIndexPage() {
         {/* Header */}
         <div className="mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full
-            bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8] text-xs font-medium mb-4">
+            bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A] text-xs font-medium mb-4">
             AURI Blog
           </div>
-          <h1 className="font-heading text-4xl font-bold text-white tracking-tight mb-3">
+          <h1 className="font-heading text-4xl font-bold text-lp-ink tracking-tight mb-3">
             Career Resources
           </h1>
-          <p className="text-[#A0A0B8] text-lg leading-relaxed">
+          <p className="text-[#3C403E] text-lg leading-relaxed">
             Career advice, job search tips, and product updates from the AURI team.
           </p>
         </div>
 
         {/* Post list */}
         {posts.length === 0 ? (
-          <p className="text-[#60607A] text-sm">No posts yet. Check back soon.</p>
+          <p className="text-[#5A5F5C] text-sm">No posts yet. Check back soon.</p>
         ) : (
           <ul className="space-y-5">
             {posts.map((post) => (
               <li key={post.slug}>
                 <Link href={`/blog/${post.slug}`} className="group block">
-                  <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1
-                    hover:border-white/[0.15] transition-colors duration-200">
-                    <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
+                  <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0
+                    hover:border-lp-rule transition-colors duration-200">
+                    <div className="rounded-[10px]  bg-[#FFFFFF] p-6">
                       <div>
-                        <h2 className="font-heading text-xl font-semibold text-white
-                          group-hover:text-[#818CF8] transition-colors duration-200 mb-2 leading-snug">
+                        <h2 className="font-heading text-xl font-semibold text-lp-ink
+                          group-hover:text-[#1F5C4A] transition-colors duration-200 mb-2 leading-snug">
                           {post.title}
                         </h2>
-                        <p className="text-[#A0A0B8] text-sm leading-relaxed mb-4">
+                        <p className="text-[#3C403E] text-sm leading-relaxed mb-4">
                           {post.description}
                         </p>
                         {/* Tags */}
@@ -72,7 +72,7 @@ export default function BlogIndexPage() {
                               <span
                                 key={tag}
                                 className="px-2.5 py-0.5 rounded-full text-xs font-medium
-                                  bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8]"
+                                  bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]"
                               >
                                 {tag}
                               </span>

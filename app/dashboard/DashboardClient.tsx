@@ -138,7 +138,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex">
+    <div className="min-h-screen bg-[#F4F2EC] flex">
 
       {/* ── Desktop Sidebar ── */}
       <motion.aside
@@ -147,13 +147,13 @@ export default function DashboardClient({ children }: { children: React.ReactNod
         onMouseEnter={() => setSidebarExpanded(true)}
         onMouseLeave={() => setSidebarExpanded(false)}
         className="hidden md:flex flex-col fixed left-0 top-0 h-full z-40
-          border-r border-white/[0.06] bg-[#13131A] overflow-hidden"
+          border-r border-lp-hairline bg-[#FFFFFF] overflow-hidden"
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 py-5 border-b border-white/[0.06]">
-          <div className="w-9 h-9 flex-shrink-0 rounded-xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6]
-            flex items-center justify-center shadow-lg shadow-[#6366F1]/25">
-            <Sparkles className="w-4 h-4 text-white" />
+        <div className="flex items-center gap-3 px-4 py-5 border-b border-lp-hairline">
+          <div className="w-9 h-9 flex-shrink-0 rounded-[10px] bg-[#1F5C4A]/10
+            flex items-center justify-center ">
+            <Sparkles className="w-4 h-4 text-lp-ink" />
           </div>
           <AnimatePresence>
             {sidebarExpanded && (
@@ -162,7 +162,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.15 }}
-                className="font-heading font-bold text-white text-base whitespace-nowrap"
+                className="font-heading font-bold text-lp-ink text-base whitespace-nowrap"
               >
                 AURI
               </motion.span>
@@ -179,14 +179,14 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                 <motion.div
                   whileHover={{ x: 2 }}
                   transition={SPRING}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-[4px] cursor-pointer
                     transition-colors duration-200 group
                     ${active
-                      ? 'bg-[#6366F1]/20 text-white'
-                      : 'text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/[0.04]'
+                      ? 'bg-[#1F5C4A]/20 text-lp-ink'
+                      : 'text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/[0.04]'
                     }`}
                 >
-                  <item.icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-[#818CF8]' : ''}`} />
+                  <item.icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-[#1F5C4A]' : ''}`} />
                   <AnimatePresence>
                     {sidebarExpanded && (
                       <motion.span
@@ -201,10 +201,10 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                     )}
                   </AnimatePresence>
                   {sidebarExpanded && item.isPro && !userIsPro && !active && (
-                    <Crown className="w-3 h-3 text-[#F59E0B] flex-shrink-0 ml-auto" />
+                    <Crown className="w-3 h-3 text-[#8A5A00] flex-shrink-0 ml-auto" />
                   )}
                   {active && (
-                    <div className="ml-auto w-1 h-4 rounded-full bg-[#6366F1] flex-shrink-0" />
+                    <div className="ml-auto w-1 h-4 rounded-full bg-[#1F5C4A] flex-shrink-0" />
                   )}
                 </motion.div>
               </Link>
@@ -213,7 +213,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
         </nav>
 
         {/* Bottom: sync status + settings + user */}
-        <div className="py-4 px-2 border-t border-white/[0.06] space-y-1">
+        <div className="py-4 px-2 border-t border-lp-hairline space-y-1">
           {/* Sync indicator */}
           <AnimatePresence>
             {sidebarExpanded && (isSyncing || syncError) && (
@@ -221,8 +221,8 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs
-                  ${syncError ? 'text-[#EF4444]' : 'text-[#60607A]'}`}
+                className={`flex items-center gap-2 px-3 py-2 rounded-[4px] text-xs
+                  ${syncError ? 'text-[#B42318]' : 'text-[#5A5F5C]'}`}
               >
                 {syncError ? <CloudOff className="w-3.5 h-3.5" /> : <Cloud className="w-3.5 h-3.5 animate-pulse" />}
                 {syncError ? 'Sync failed' : 'Syncing...'}
@@ -232,9 +232,9 @@ export default function DashboardClient({ children }: { children: React.ReactNod
 
           {BOTTOM_ITEMS.map((item) => (
             <Link key={item.id} href={item.href} aria-label={item.label}>
-              <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer
+              <div className={`flex items-center gap-3 px-3 py-2.5 rounded-[4px] cursor-pointer
                 transition-colors duration-200
-                ${isActive(item.href) ? 'bg-[#6366F1]/20 text-white' : 'text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/[0.04]'}`}
+                ${isActive(item.href) ? 'bg-[#1F5C4A]/20 text-lp-ink' : 'text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/[0.04]'}`}
               >
                 <item.icon className="w-5 h-5 flex-shrink-0" />
                 <AnimatePresence>
@@ -257,12 +257,12 @@ export default function DashboardClient({ children }: { children: React.ReactNod
           <button
             onClick={() => setProfileDrawerOpen(true)}
             aria-label="Open career profile"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[4px]
               cursor-pointer transition-colors duration-200
-              text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/[0.04]"
+              text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/[0.04]"
           >
-            <div className="w-5 h-5 flex-shrink-0 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
-              <User className="w-3 h-3 text-white" />
+            <div className="w-5 h-5 flex-shrink-0 rounded-full bg-[#1F5C4A]/10 flex items-center justify-center">
+              <User className="w-3 h-3 text-lp-ink" />
             </div>
             <AnimatePresence>
               {sidebarExpanded && (
@@ -272,10 +272,10 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                   exit={{ opacity: 0 }}
                   className="flex-1 text-left min-w-0"
                 >
-                  <p className="text-xs font-medium text-[#A0A0B8] truncate">
+                  <p className="text-xs font-medium text-[#3C403E] truncate">
                     {user?.displayName ?? user?.email ?? 'Guest'}
                   </p>
-                  <p className="text-[10px] text-[#60607A]">Pro</p>
+                  <p className="text-[10px] text-[#5A5F5C]">Pro</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -286,28 +286,28 @@ export default function DashboardClient({ children }: { children: React.ReactNod
       {/* ── Main content ── */}
       <div className="flex-1 md:ml-[72px] flex flex-col h-screen overflow-x-hidden">
         {/* Top header */}
-        <header className="flex-shrink-0 border-b border-white/[0.06] bg-[#0A0A0F]/80 backdrop-blur-xl px-6 py-4
+        <header className="flex-shrink-0 border-b border-lp-hairline bg-[#F4F2EC]/80 px-6 py-4
           flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Mobile menu - handled by bottom nav, this is a breadcrumb area */}
             <div className="hidden md:flex items-center gap-2 text-sm">
-              <ChevronRight className="w-4 h-4 text-[#60607A]" />
-              <span className="text-[#A0A0B8] capitalize">
+              <ChevronRight className="w-4 h-4 text-[#5A5F5C]" />
+              <span className="text-[#3C403E] capitalize">
                 {getBreadcrumbLabel(pathname)}
               </span>
             </div>
             {/* Mobile: show logo */}
             <div className="md:hidden flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5 text-white" />
+              <div className="w-7 h-7 rounded-[4px] bg-[#1F5C4A]/10 flex items-center justify-center">
+                <Sparkles className="w-3.5 h-3.5 text-lp-ink" />
               </div>
-              <span className="font-heading font-bold text-white">AURI</span>
+              <span className="font-heading font-bold text-lp-ink">AURI</span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             {isSyncing && (
-              <div className="hidden md:flex items-center gap-1.5 text-xs text-[#60607A]">
+              <div className="hidden md:flex items-center gap-1.5 text-xs text-[#5A5F5C]">
                 <Cloud className="w-3.5 h-3.5 animate-pulse" />
                 Saving...
               </div>
@@ -315,13 +315,13 @@ export default function DashboardClient({ children }: { children: React.ReactNod
             <button
               onClick={() => setProfileDrawerOpen(true)}
               aria-label="Open career profile drawer"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/10
-                hover:bg-white/5 transition-all duration-200"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-[4px] border border-lp-rule
+                hover:bg-lp-ink/5 transition-all duration-200"
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
-                <User className="w-3 h-3 text-white" />
+              <div className="w-6 h-6 rounded-full bg-[#1F5C4A]/10 flex items-center justify-center">
+                <User className="w-3 h-3 text-lp-ink" />
               </div>
-              <span className="text-sm text-[#A0A0B8] hidden sm:block">
+              <span className="text-sm text-[#3C403E] hidden sm:block">
                 {user?.displayName ?? 'Profile'}
               </span>
             </button>
@@ -336,7 +336,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
 
       {/* ── Mobile bottom tab bar ── */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40
-        border-t border-white/[0.06] bg-[#13131A]/95 backdrop-blur-xl
+        border-t border-lp-hairline bg-[#FFFFFF]/95
         flex items-center justify-around px-2 pt-2"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}
         aria-label="Mobile navigation"
@@ -345,10 +345,10 @@ export default function DashboardClient({ children }: { children: React.ReactNod
           const active = isActive(item.href)
           return (
             <Link key={item.id} href={item.href} aria-label={item.label}
-              className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl
+              className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-[4px]
                 transition-colors duration-200 min-w-0 min-h-[44px] justify-center">
-              <item.icon className={`w-5 h-5 ${active ? 'text-[#818CF8]' : 'text-[#60607A]'}`} />
-              <span className={`text-[9px] font-medium truncate ${active ? 'text-[#818CF8]' : 'text-[#60607A]'}`}>
+              <item.icon className={`w-5 h-5 ${active ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`} />
+              <span className={`text-[9px] font-medium truncate ${active ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`}>
                 {item.label}
               </span>
             </Link>
@@ -357,11 +357,11 @@ export default function DashboardClient({ children }: { children: React.ReactNod
         <button
           onClick={() => setMoreDrawerOpen(true)}
           aria-label="More navigation options"
-          className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl
+          className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-[4px]
             transition-colors duration-200 min-w-0 min-h-[44px] justify-center"
         >
-          <MoreHorizontal className={`w-5 h-5 ${moreDrawerOpen ? 'text-[#818CF8]' : 'text-[#60607A]'}`} />
-          <span className={`text-[9px] font-medium ${moreDrawerOpen ? 'text-[#818CF8]' : 'text-[#60607A]'}`}>More</span>
+          <MoreHorizontal className={`w-5 h-5 ${moreDrawerOpen ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`} />
+          <span className={`text-[9px] font-medium ${moreDrawerOpen ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`}>More</span>
         </button>
       </nav>
 
@@ -374,7 +374,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMoreDrawerOpen(false)}
-              className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+              className="md:hidden fixed inset-0 z-50 bg-black/60 "
             />
             <motion.div
               initial={{ y: '100%' }}
@@ -382,18 +382,18 @@ export default function DashboardClient({ children }: { children: React.ReactNod
               exit={{ y: '100%' }}
               transition={SPRING}
               className="md:hidden fixed bottom-0 left-0 right-0 z-50
-                bg-[#13131A] border-t border-white/[0.08] rounded-t-2xl"
+                bg-[#FFFFFF] border-t border-lp-rule rounded-t-2xl"
               style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 16px)' }}
             >
               {/* Handle bar */}
               <div className="flex justify-center pt-3 pb-4">
-                <div className="w-10 h-1 rounded-full bg-white/20" />
+                <div className="w-10 h-1 rounded-full bg-lp-ink/20" />
               </div>
               {/* Close button */}
               <button
                 onClick={() => setMoreDrawerOpen(false)}
                 aria-label="Close menu"
-                className="absolute top-3 right-4 p-1.5 rounded-lg text-[#60607A] hover:text-white transition-colors"
+                className="absolute top-3 right-4 p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-lp-ink transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -403,16 +403,16 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                   const active = isActive(item.href)
                   return (
                     <Link key={item.id} href={item.href} aria-label={item.label}
-                      className={`flex flex-col items-center gap-2 p-3 rounded-xl
+                      className={`flex flex-col items-center gap-2 p-3 rounded-[10px]
                         transition-colors duration-200 text-center
                         ${active
-                          ? 'bg-[#6366F1]/20 text-white'
-                          : 'text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/[0.04]'
+                          ? 'bg-[#1F5C4A]/20 text-lp-ink'
+                          : 'text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/[0.04]'
                         }`}
                     >
-                      <item.icon className={`w-5 h-5 ${active ? 'text-[#818CF8]' : ''}`} />
+                      <item.icon className={`w-5 h-5 ${active ? 'text-[#1F5C4A]' : ''}`} />
                       {item.isPro && !userIsPro && (
-                        <Crown className="w-3 h-3 text-[#F59E0B]" />
+                        <Crown className="w-3 h-3 text-[#8A5A00]" />
                       )}
                       <span className="text-[10px] font-medium leading-tight">{item.label}</span>
                     </Link>
@@ -420,20 +420,20 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                 })}
               </div>
               {/* User section */}
-              <div className="border-t border-white/[0.06] mx-4 pt-4 pb-2">
+              <div className="border-t border-lp-hairline mx-4 pt-4 pb-2">
                 <button
                   onClick={() => { setMoreDrawerOpen(false); setProfileDrawerOpen(true) }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
-                    text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/[0.04] transition-colors duration-200"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[4px]
+                    text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/[0.04] transition-colors duration-200"
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
-                    <User className="w-3.5 h-3.5 text-white" />
+                  <div className="w-7 h-7 rounded-full bg-[#1F5C4A]/10 flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-lp-ink" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-[#A0A0B8]">
+                    <p className="text-sm font-medium text-[#3C403E]">
                       {user?.displayName ?? user?.email ?? 'Guest'}
                     </p>
-                    <p className="text-xs text-[#60607A]">View Profile</p>
+                    <p className="text-xs text-[#5A5F5C]">View Profile</p>
                   </div>
                 </button>
               </div>
@@ -455,11 +455,11 @@ export default function DashboardClient({ children }: { children: React.ReactNod
           aria-label="Send feedback"
           className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50
             flex items-center gap-2 px-3.5 py-2 rounded-full
-            bg-[#13131A] border border-white/[0.10] text-[#A0A0B8]
-            hover:text-white hover:border-[#6366F1]/50 hover:bg-[#1C1C26]
-            shadow-lg shadow-black/40 transition-all duration-200 text-sm font-medium"
+            bg-[#FFFFFF] border border-lp-rule text-[#3C403E]
+            hover:text-lp-ink hover:border-[#1F5C4A]/50 hover:bg-[#FFFFFF]
+              transition-all duration-200 text-sm font-medium"
         >
-          <MessageSquare className="w-3.5 h-3.5 text-[#6366F1]" />
+          <MessageSquare className="w-3.5 h-3.5 text-[#1F5C4A]" />
           Feedback
         </button>
       )}

@@ -8,13 +8,13 @@ import { stripAITags } from '@/lib/resumeHighlight'
 import type { Education, Experience, Language, Leadership, PersonalInfo, Project, ResumeData } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
-const SECTION_CARD = 'rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 mb-4'
-const SECTION_INNER = 'rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5'
-const SECTION_TITLE = 'text-xs font-bold uppercase tracking-widest text-[#6366F1] mb-4'
-const INPUT_CLASS = 'w-full bg-[#0A0A0F] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#60607A] focus:outline-none focus:border-[#6366F1]/50 transition-colors resize-none'
-const LABEL_CLASS = 'text-xs text-[#A0A0B8] mb-1 block'
-const ADD_BTN = 'flex items-center gap-1.5 text-xs text-[#6366F1] hover:text-[#818CF8] transition-colors mt-2'
-const DELETE_BTN = 'p-1 rounded-md text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all'
+const SECTION_CARD = 'rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 mb-4'
+const SECTION_INNER = 'rounded-[10px]  bg-[#FFFFFF] p-5'
+const SECTION_TITLE = 'text-xs font-bold uppercase tracking-widest text-[#1F5C4A] mb-4'
+const INPUT_CLASS = 'w-full bg-[#F4F2EC] border border-lp-rule rounded-[4px] px-3 py-2 text-sm text-lp-ink placeholder-[#5A5F5C] focus:outline-none focus:border-[#1F5C4A]/50 transition-colors resize-none'
+const LABEL_CLASS = 'text-xs text-[#3C403E] mb-1 block'
+const ADD_BTN = 'flex items-center gap-1.5 text-xs text-[#1F5C4A] hover:text-[#1F5C4A] transition-colors mt-2'
+const DELETE_BTN = 'p-1 rounded-md text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all'
 
 interface BulletRowProps {
   value: string
@@ -34,7 +34,7 @@ function BulletRow({ value, onChange, onDelete, placeholder }: BulletRowProps) {
 
   return (
     <div className="flex gap-2 items-start">
-      <span className="text-[#60607A] mt-2.5 text-xs flex-shrink-0">·</span>
+      <span className="text-[#5A5F5C] mt-2.5 text-xs flex-shrink-0">·</span>
       <textarea
         ref={ref}
         rows={1}
@@ -162,13 +162,13 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
     <div className="p-4 overflow-y-auto">
       {/* Toolbar */}
       <div className="flex items-center gap-2 mb-4 flex-wrap">
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-[#13131A] border border-white/[0.08]">
+        <div className="flex items-center gap-1 p-0 rounded-[4px] bg-[#FFFFFF] border border-lp-rule">
           <button
             onClick={handleUndo}
             disabled={!canUndo()}
             aria-label="Undo (Ctrl+Z)"
             title="Undo (Ctrl+Z)"
-            className="p-1.5 rounded-md text-[#60607A] hover:text-white hover:bg-white/5
+            className="p-1.5 rounded-md text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5
               disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
           >
             <Undo2 className="w-3.5 h-3.5" />
@@ -178,13 +178,13 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
             disabled={!canRedo()}
             aria-label="Redo (Ctrl+Y)"
             title="Redo (Ctrl+Y)"
-            className="p-1.5 rounded-md text-[#60607A] hover:text-white hover:bg-white/5
+            className="p-1.5 rounded-md text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5
               disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
           >
             <Redo2 className="w-3.5 h-3.5" />
           </button>
         </div>
-        <span className="text-xs text-[#60607A]">Structured editor · Changes update the preview instantly</span>
+        <span className="text-xs text-[#5A5F5C]">Structured editor · Changes update the preview instantly</span>
       </div>
 
       {/* ── Summary ── */}
@@ -223,7 +223,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                       experience: resumeData.experience.filter((_, idx) => idx !== i),
                     })
                   }}
-                  className="text-xs text-[#EF4444]/60 hover:text-[#EF4444] transition-colors"
+                  className="text-xs text-[#B42318]/60 hover:text-[#B42318] transition-colors"
                 >
                   Remove position
                 </button>
@@ -282,7 +282,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
       </AnimatePresence>
 
       <button
-        className={`${ADD_BTN} w-full justify-center py-3 rounded-xl border border-dashed border-white/[0.08] hover:border-[#6366F1]/40 mb-4`}
+        className={`${ADD_BTN} w-full justify-center py-3 rounded-[10px] border border-dashed border-lp-rule hover:border-[#1F5C4A]/40 mb-4`}
         onClick={() => {
           pushToHistory(resumeData)
           onDataChange({
@@ -319,7 +319,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                       education: resumeData.education.filter((_, idx) => idx !== i),
                     })
                   }}
-                  className="text-xs text-[#EF4444]/60 hover:text-[#EF4444] transition-colors"
+                  className="text-xs text-[#B42318]/60 hover:text-[#B42318] transition-colors"
                 >
                   Remove
                 </button>
@@ -359,7 +359,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
       </AnimatePresence>
 
       <button
-        className={`${ADD_BTN} w-full justify-center py-3 rounded-xl border border-dashed border-white/[0.08] hover:border-[#6366F1]/40 mb-4`}
+        className={`${ADD_BTN} w-full justify-center py-3 rounded-[10px] border border-dashed border-lp-rule hover:border-[#1F5C4A]/40 mb-4`}
         onClick={() => {
           pushToHistory(resumeData)
           onDataChange({
@@ -381,14 +381,14 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
           <div className="flex flex-wrap gap-2 mb-3">
             {(resumeData.skills ?? []).map((skill, i) => (
               <span key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-full
-                bg-[#6366F1]/10 border border-[#6366F1]/20 text-xs text-[#A5B4FC]">
+                bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-xs text-[#1F5C4A]">
                 {skill}
                 <button
                   onClick={() => {
                     pushToHistory(resumeData)
                     onDataChange({ ...resumeData, skills: resumeData.skills.filter((_, idx) => idx !== i) })
                   }}
-                  className="hover:text-[#EF4444] transition-colors"
+                  className="hover:text-[#B42318] transition-colors"
                   aria-label={`Remove skill ${skill}`}
                 >
                   <X className="w-2.5 h-2.5" />
@@ -412,7 +412,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
             <div className="flex flex-wrap gap-2 mb-3">
               {(resumeData.certifications ?? []).map((cert, i) => (
                 <span key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-full
-                  bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-xs text-[#FCD34D]">
+                  bg-[#8A5A00]/10 border border-[#8A5A00]/20 text-xs text-[#F2D45C]">
                   {cert}
                   <button
                     onClick={() => {
@@ -422,7 +422,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                         certifications: (resumeData.certifications ?? []).filter((_, idx) => idx !== i),
                       })
                     }}
-                    className="hover:text-[#EF4444] transition-colors"
+                    className="hover:text-[#B42318] transition-colors"
                     aria-label={`Remove certification ${cert}`}
                   >
                     <X className="w-2.5 h-2.5" />
@@ -464,7 +464,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                           projects: (resumeData.projects ?? []).filter((_, idx) => idx !== i),
                         })
                       }}
-                      className="text-xs text-[#EF4444]/60 hover:text-[#EF4444] transition-colors"
+                      className="text-xs text-[#B42318]/60 hover:text-[#B42318] transition-colors"
                     >
                       Remove project
                     </button>
@@ -507,7 +507,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
             ))}
           </AnimatePresence>
           <button
-            className={`${ADD_BTN} w-full justify-center py-3 rounded-xl border border-dashed border-white/[0.08] hover:border-[#6366F1]/40 mb-4`}
+            className={`${ADD_BTN} w-full justify-center py-3 rounded-[10px] border border-dashed border-lp-rule hover:border-[#1F5C4A]/40 mb-4`}
             onClick={() => {
               pushToHistory(resumeData)
               onDataChange({
@@ -548,7 +548,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                           leadership: (resumeData.leadership ?? []).filter((_, idx) => idx !== i),
                         })
                       }}
-                      className="text-xs text-[#EF4444]/60 hover:text-[#EF4444] transition-colors"
+                      className="text-xs text-[#B42318]/60 hover:text-[#B42318] transition-colors"
                     >
                       Remove
                     </button>
@@ -600,7 +600,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
             ))}
           </AnimatePresence>
           <button
-            className={`${ADD_BTN} w-full justify-center py-3 rounded-xl border border-dashed border-white/[0.08] hover:border-[#6366F1]/40 mb-4`}
+            className={`${ADD_BTN} w-full justify-center py-3 rounded-[10px] border border-dashed border-lp-rule hover:border-[#1F5C4A]/40 mb-4`}
             onClick={() => {
               pushToHistory(resumeData)
               onDataChange({
@@ -646,8 +646,8 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                         : l
                     ),
                   })}
-                  className="bg-[#0A0A0F] border border-white/[0.08] rounded-lg px-2 py-2
-                    text-sm text-white focus:outline-none focus:border-[#6366F1]/50
+                  className="bg-[#F4F2EC] border border-lp-rule rounded-[4px] px-2 py-2
+                    text-sm text-lp-ink focus:outline-none focus:border-[#1F5C4A]/50
                     transition-colors flex-shrink-0"
                 >
                   <option value="Native">Native</option>

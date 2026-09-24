@@ -42,21 +42,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 function BlogPostContent({ post }: { post: PostWithContent }) {
   return (
-    <main className="min-h-screen bg-[#0A0A0F] text-[#F8F8FF] px-6 py-16">
+    <main className="min-h-screen bg-[#F4F2EC] text-[#1B1D1C] px-6 py-16">
       <div className="max-w-3xl mx-auto">
 
         {/* Back link */}
         <a
           href="/blog"
-          className="inline-flex items-center gap-1.5 text-sm text-[#60607A]
-            hover:text-[#A0A0B8] transition-colors mb-10"
+          className="inline-flex items-center gap-1.5 text-sm text-[#5A5F5C]
+            hover:text-[#3C403E] transition-colors mb-10"
         >
           ← All posts
         </a>
 
         {/* Post header */}
         <header className="mb-10">
-          <h1 className="font-heading text-3xl sm:text-4xl font-bold text-white
+          <h1 className="font-heading text-3xl sm:text-4xl font-bold text-lp-ink
             tracking-tight leading-tight mb-4">
             {post.title}
           </h1>
@@ -66,7 +66,7 @@ function BlogPostContent({ post }: { post: PostWithContent }) {
                 <span
                   key={tag}
                   className="px-2.5 py-0.5 rounded-full text-xs font-medium
-                    bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8]"
+                    bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]"
                 >
                   {tag}
                 </span>
@@ -78,35 +78,34 @@ function BlogPostContent({ post }: { post: PostWithContent }) {
         {/* MDX content */}
         <div className="prose prose-invert prose-headings:font-heading prose-headings:font-bold
           prose-h2:text-xl prose-h3:text-lg
-          prose-p:text-[#A0A0B8] prose-p:leading-relaxed
-          prose-a:text-[#818CF8] prose-a:no-underline hover:prose-a:underline
-          prose-strong:text-white prose-strong:font-semibold
-          prose-li:text-[#A0A0B8]
+          prose-p:text-[#3C403E] prose-p:leading-relaxed
+          prose-a:text-[#1F5C4A] prose-a:no-underline hover:prose-a:underline
+          prose-strong:text-lp-ink prose-strong:font-semibold
+          prose-li:text-[#3C403E]
           prose-ul:my-4 prose-ol:my-4
-          prose-hr:border-white/10
-          prose-code:text-[#818CF8] prose-code:bg-[#1C1C26] prose-code:px-1.5
+          prose-hr:border-lp-rule
+          prose-code:text-[#1F5C4A] prose-code:bg-[#FFFFFF] prose-code:px-1.5
           prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
-          prose-pre:bg-[#13131A] prose-pre:border prose-pre:border-white/[0.08]
+          prose-pre:bg-[#FFFFFF] prose-pre:border prose-pre:border-lp-rule
           prose-pre:rounded-xl
           max-w-none">
           <MDXRemote source={post.content} />
         </div>
 
         {/* Footer CTA */}
-        <div className="mt-16 rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-          <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-8 text-center">
-            <h3 className="font-heading text-lg font-semibold text-white mb-2">
+        <div className="mt-16 rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+          <div className="rounded-[10px]  bg-[#FFFFFF] p-8 text-center">
+            <h3 className="font-heading text-lg font-semibold text-lp-ink mb-2">
               Ready to fix your resume?
             </h3>
-            <p className="text-[#A0A0B8] text-sm mb-5">
+            <p className="text-[#3C403E] text-sm mb-5">
               AURI rewrites your resume with AI, optimizes it for ATS, and helps you land more interviews.
             </p>
             <a
               href="/dashboard/resume"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl
-                bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white font-semibold text-sm
-                shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                hover:scale-[1.02] transition-all duration-200"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-[4px]
+                bg-[#1F5C4A] text-white font-semibold text-sm
+                 transition-all duration-200"
             >
               Build my resume — free
             </a>

@@ -28,17 +28,17 @@ import type { JobStrategy, JobStrategyAction, JobStrategyDay } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 const INPUT_CLASS =
-  'w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-[#60607A] focus:outline-none focus:border-[#22C55E]/50 focus:ring-1 focus:ring-[#22C55E]/30 transition-all'
-const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
+  'w-full bg-[#F4F2EC] border border-lp-rule rounded-[4px] px-4 py-3 text-lp-ink text-sm placeholder-[#5A5F5C] focus:outline-none focus:border-[#1F7A4D]/50 focus:ring-1 focus:ring-[#1F7A4D]/30 transition-all'
+const LABEL_CLASS = 'block text-xs font-medium text-[#3C403E] mb-1.5'
 
 const DAY_COLORS = [
-  { bg: 'bg-[#6366F1]/10', border: 'border-[#6366F1]/20', text: 'text-[#818CF8]' },
-  { bg: 'bg-[#8B5CF6]/10', border: 'border-[#8B5CF6]/20', text: 'text-[#A78BFA]' },
-  { bg: 'bg-[#0EA5E9]/10', border: 'border-[#0EA5E9]/20', text: 'text-[#38BDF8]' },
-  { bg: 'bg-[#22C55E]/10', border: 'border-[#22C55E]/20', text: 'text-[#4ADE80]' },
-  { bg: 'bg-[#F59E0B]/10', border: 'border-[#F59E0B]/20', text: 'text-[#FCD34D]' },
-  { bg: 'bg-[#EF4444]/10', border: 'border-[#EF4444]/20', text: 'text-[#F87171]' },
-  { bg: 'bg-[#EC4899]/10', border: 'border-[#EC4899]/20', text: 'text-[#F472B6]' },
+  { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
+  { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
+  { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
+  { bg: 'bg-[#1F7A4D]/10', border: 'border-[#1F7A4D]/20', text: 'text-[#1F7A4D]' },
+  { bg: 'bg-[#8A5A00]/10', border: 'border-[#8A5A00]/20', text: 'text-[#F2D45C]' },
+  { bg: 'bg-[#B42318]/10', border: 'border-[#B42318]/20', text: 'text-[#B42318]' },
+  { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
 ]
 
 type CompletedMap = Record<string, boolean>
@@ -60,28 +60,28 @@ function ActionItem({ action, actionKey, completed, onToggle }: {
   onToggle: (key: string) => void
 }) {
   return (
-    <motion.div layout className={`flex items-start gap-3 p-3 rounded-xl border transition-all duration-200 ${
-      completed ? 'border-[#22C55E]/20 bg-[#22C55E]/5' : 'border-white/[0.06] bg-[#0A0A0F]/40 hover:border-white/[0.10]'
+    <motion.div layout className={`flex items-start gap-3 p-3 rounded-[10px] border transition-all duration-200 ${
+      completed ? 'border-[#1F7A4D]/20 bg-[#1F7A4D]/5' : 'border-lp-hairline bg-[#F4F2EC]/40 hover:border-lp-rule'
     }`}>
       <button
         onClick={() => onToggle(actionKey)}
         aria-label={completed ? 'Mark incomplete' : 'Mark complete'}
         className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 transition-all ${
-          completed ? 'border-[#22C55E] bg-[#22C55E]' : 'border-white/20 hover:border-[#22C55E]/60'
+          completed ? 'border-[#1F7A4D] bg-[#1F7A4D]' : 'border-lp-rule hover:border-[#1F7A4D]/60'
         }`}
       >
-        {completed && <CheckCircle className="w-3 h-3 text-white" />}
+        {completed && <CheckCircle className="w-3 h-3 text-lp-ink" />}
       </button>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <Clock className="w-3 h-3 text-[#60607A] flex-shrink-0" />
-          <span className="text-xs text-[#60607A]">{action.time}</span>
+          <Clock className="w-3 h-3 text-[#5A5F5C] flex-shrink-0" />
+          <span className="text-xs text-[#5A5F5C]">{action.time}</span>
         </div>
-        <p className={`text-sm leading-relaxed ${completed ? 'line-through text-[#60607A]' : 'text-[#E8E8F0]'}`}>{action.action}</p>
+        <p className={`text-sm leading-relaxed ${completed ? 'line-through text-[#5A5F5C]' : 'text-[#1B1D1C]'}`}>{action.action}</p>
         {action.resource && (
           <div className="flex items-center gap-1.5 mt-1.5">
-            <Globe className="w-3 h-3 text-[#6366F1] flex-shrink-0" />
-            <span className="text-xs text-[#6366F1] break-all">{action.resource}</span>
+            <Globe className="w-3 h-3 text-[#1F5C4A] flex-shrink-0" />
+            <span className="text-xs text-[#1F5C4A] break-all">{action.resource}</span>
           </div>
         )}
       </div>
@@ -100,25 +100,25 @@ function DayCard({ day, dayIndex, completed, onToggle }: {
   const completedCount = day.actions.filter((_, ai) => completed[`${day.day}-${ai}`]).length
 
   return (
-    <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-      <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] overflow-hidden">
+    <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+      <div className="rounded-[10px]  bg-[#FFFFFF] overflow-hidden">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center justify-between p-4 text-left hover:bg-white/[0.02] transition-colors"
+          className="w-full flex items-center justify-between p-4 text-left hover:bg-lp-ink/[0.02] transition-colors"
           aria-expanded={expanded}
         >
           <div className="flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-xl ${color.bg} border ${color.border} flex items-center justify-center flex-shrink-0`}>
+            <div className={`w-9 h-9 rounded-[10px] ${color.bg} border ${color.border} flex items-center justify-center flex-shrink-0`}>
               <span className={`text-sm font-bold ${color.text}`}>{day.day}</span>
             </div>
             <div>
-              <p className="text-sm font-semibold text-white leading-tight">{day.theme}</p>
-              <p className="text-xs text-[#60607A] mt-0.5">{completedCount}/{day.actions.length} actions complete</p>
+              <p className="text-sm font-semibold text-lp-ink leading-tight">{day.theme}</p>
+              <p className="text-xs text-[#5A5F5C] mt-0.5">{completedCount}/{day.actions.length} actions complete</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {completedCount === day.actions.length && day.actions.length > 0 && <CheckCircle className="w-4 h-4 text-[#22C55E]" />}
-            {expanded ? <ChevronUp className="w-4 h-4 text-[#60607A]" /> : <ChevronDown className="w-4 h-4 text-[#60607A]" />}
+            {completedCount === day.actions.length && day.actions.length > 0 && <CheckCircle className="w-4 h-4 text-[#1F7A4D]" />}
+            {expanded ? <ChevronUp className="w-4 h-4 text-[#5A5F5C]" /> : <ChevronDown className="w-4 h-4 text-[#5A5F5C]" />}
           </div>
         </button>
         <AnimatePresence>
@@ -130,7 +130,7 @@ function DayCard({ day, dayIndex, completed, onToggle }: {
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="px-4 pb-4 space-y-2 border-t border-white/[0.06] pt-3">
+              <div className="px-4 pb-4 space-y-2 border-t border-lp-hairline pt-3">
                 {day.actions.map((action, ai) => (
                   <ActionItem key={ai} action={action} actionKey={`${day.day}-${ai}`} completed={completed[`${day.day}-${ai}`] ?? false} onToggle={onToggle} />
                 ))}
@@ -266,16 +266,16 @@ export default function StrategyPage() {
     <ProGate
       featureName="7-Day Job Search Strategy"
       featureDescription="Get a personalized, immediately executable 7-day action plan for your target role — with specific job sites, search terms, and daily actions."
-      icon={<Map className="w-6 h-6 text-[#6366F1]" />}
+      icon={<Map className="w-6 h-6 text-[#1F5C4A]" />}
     >
     <div className="space-y-6 pb-20 md:pb-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#22C55E] to-[#16A34A] flex items-center justify-center">
-              <Map className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-[10px] bg-[#1F7A4D]/10 flex items-center justify-center">
+              <Map className="w-5 h-5 text-lp-ink" />
             </div>
-            <h1 className="font-heading text-2xl font-bold text-white">7-Day Job Strategy</h1>
+            <h1 className="font-heading text-2xl font-bold text-lp-ink">7-Day Job Strategy</h1>
           </div>
           <div className="flex items-center gap-2">
             {strategy && (
@@ -283,10 +283,9 @@ export default function StrategyPage() {
                 onClick={handleSave}
                 disabled={saving || !!savedId}
                 aria-label="Save strategy"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                  bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                  shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                  hover:scale-[1.02] transition-all duration-200
+                className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
+                  bg-[#1F5C4A] text-white
+                   transition-all duration-200
                   disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {saving
@@ -300,8 +299,8 @@ export default function StrategyPage() {
             )}
             <Link
               href="/dashboard/strategy/saved"
-              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-                border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium
+                border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
                 transition-all duration-200"
             >
               <FolderOpen className="w-3.5 h-3.5" />
@@ -309,7 +308,7 @@ export default function StrategyPage() {
             </Link>
           </div>
         </div>
-        <p className="text-[#A0A0B8] text-sm ml-12">
+        <p className="text-[#3C403E] text-sm ml-12">
           A personalized, immediately executable day-by-day job search plan with specific sites, search terms, and daily actions.
         </p>
       </motion.div>
@@ -320,11 +319,11 @@ export default function StrategyPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...SPRING, delay: 0.05 }}
-          className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-fit"
+          className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 h-fit"
         >
-          <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-4">
+          <div className="rounded-[10px]  bg-[#FFFFFF] p-5 space-y-4">
             <div>
-              <label className={LABEL_CLASS}>Target Position <span className="text-[#EF4444]">*</span></label>
+              <label className={LABEL_CLASS}>Target Position <span className="text-[#B42318]">*</span></label>
               <input type="text" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} placeholder="Growth Marketing Manager" className={INPUT_CLASS} aria-label="Target position" style={{ fontSize: '16px' }} />
             </div>
             <div>
@@ -334,8 +333,8 @@ export default function StrategyPage() {
             <div>
               <label className={LABEL_CLASS}>Location</label>
               <div className="flex items-center gap-2 mb-2">
-                <button onClick={() => setIsRemote(false)} className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-all ${!isRemote ? 'border-[#22C55E]/40 bg-[#22C55E]/10 text-[#22C55E]' : 'border-white/[0.08] text-[#60607A] hover:text-[#A0A0B8]'}`}>City</button>
-                <button onClick={() => setIsRemote(true)} className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-all ${isRemote ? 'border-[#22C55E]/40 bg-[#22C55E]/10 text-[#22C55E]' : 'border-white/[0.08] text-[#60607A] hover:text-[#A0A0B8]'}`}>Remote</button>
+                <button onClick={() => setIsRemote(false)} className={`flex-1 py-2 rounded-[4px] text-xs font-medium border transition-all ${!isRemote ? 'border-[#1F7A4D]/40 bg-[#1F7A4D]/10 text-[#1F7A4D]' : 'border-lp-rule text-[#5A5F5C] hover:text-[#3C403E]'}`}>City</button>
+                <button onClick={() => setIsRemote(true)} className={`flex-1 py-2 rounded-[4px] text-xs font-medium border transition-all ${isRemote ? 'border-[#1F7A4D]/40 bg-[#1F7A4D]/10 text-[#1F7A4D]' : 'border-lp-rule text-[#5A5F5C] hover:text-[#3C403E]'}`}>Remote</button>
               </div>
               {!isRemote && <LocationAutocomplete value={city} onChange={setCity} placeholder="New York, NY" className={INPUT_CLASS} aria-label="City" />}
             </div>
@@ -346,20 +345,20 @@ export default function StrategyPage() {
 
             {generateError && (
               generateError === 'FREE_TIER_LIMIT_REACHED' ? (
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-[#6366F1]/10 border border-[#6366F1]/20">
-                  <Zap className="w-4 h-4 text-[#6366F1] flex-shrink-0" />
+                <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
+                  <Zap className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-white">Monthly limit reached</p>
-                    <p className="text-xs text-[#A0A0B8]">You&apos;ve used all 3 free generations this month.</p>
+                    <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
+                    <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
                   </div>
-                  <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#818CF8] hover:text-white transition-colors">
+                  <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
                     Upgrade →
                   </Link>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20">
-                  <AlertCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0" />
-                  <p className="text-xs text-[#EF4444]">{generateError}</p>
+                <div className="flex items-center gap-2 p-3 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20">
+                  <AlertCircle className="w-4 h-4 text-[#B42318] flex-shrink-0" />
+                  <p className="text-xs text-[#B42318]">{generateError}</p>
                 </div>
               )
             )}
@@ -367,9 +366,8 @@ export default function StrategyPage() {
             <button
               onClick={handleGenerate}
               disabled={!targetPosition.trim() || isStreaming}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-                bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-white font-semibold text-sm
-                shadow-lg shadow-[#22C55E]/25 hover:shadow-[#22C55E]/50 hover:scale-[1.01]
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
+                bg-[#1F7A4D] text-white font-semibold text-sm
                 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isStreaming ? <><Loader2 className="w-4 h-4 animate-spin" /> Building Plan…</> : <><Sparkles className="w-4 h-4" /> Build 7-Day Plan</>}
@@ -387,15 +385,15 @@ export default function StrategyPage() {
           <AnimatePresence mode="wait">
             {isStreaming ? (
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
-                <div className="rounded-2xl border border-[#22C55E]/20 bg-[#22C55E]/5 p-4 flex items-center gap-3">
-                  <Loader2 className="w-4 h-4 text-[#22C55E] animate-spin" />
-                  <span className="text-sm text-[#22C55E] font-medium">AURI is building your 7-day plan…</span>
+                <div className="rounded-[10px] border border-[#1F7A4D]/20 bg-[#1F7A4D]/5 p-4 flex items-center gap-3">
+                  <Loader2 className="w-4 h-4 text-[#1F7A4D] animate-spin" />
+                  <span className="text-sm text-[#1F7A4D] font-medium">AURI is building your 7-day plan…</span>
                 </div>
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                    <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-2">
-                      <div className="h-4 w-24 rounded bg-white/[0.06] animate-pulse" />
-                      <div className="h-3 w-48 rounded bg-white/[0.04] animate-pulse" />
+                  <div key={i} className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+                    <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-2">
+                      <div className="h-4 w-24 rounded bg-lp-ink/6 animate-pulse" />
+                      <div className="h-3 w-48 rounded bg-lp-ink/[0.04] animate-pulse" />
                     </div>
                   </div>
                 ))}
@@ -403,24 +401,24 @@ export default function StrategyPage() {
             ) : strategy ? (
               <motion.div key="result" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={SPRING} className="space-y-4">
                 {/* Progress header */}
-                <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4">
+                <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+                  <div className="rounded-[10px]  bg-[#FFFFFF] p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <p className="text-sm font-semibold text-white">{completedCount} / {totalActions} actions completed</p>
-                        <p className="text-xs text-[#60607A] mt-0.5">7-day plan for {targetPosition}</p>
+                        <p className="text-sm font-semibold text-lp-ink">{completedCount} / {totalActions} actions completed</p>
+                        <p className="text-xs text-[#5A5F5C] mt-0.5">7-day plan for {targetPosition}</p>
                       </div>
                       <button
                         onClick={async () => { if (!strategy) return; await navigator.clipboard.writeText(buildPlanText(strategy)); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
                       >
-                        {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#22C55E]" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" /> : <Copy className="w-3.5 h-3.5" />}
                         {copied ? 'Copied!' : 'Copy Plan'}
                       </button>
                     </div>
-                    <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden">
+                    <div className="h-2 rounded-full bg-lp-ink/6 overflow-hidden">
                       <motion.div
-                        className="h-full rounded-full bg-gradient-to-r from-[#22C55E] to-[#16A34A]"
+                        className="h-full rounded-full bg-[#1F7A4D] "
                         initial={{ width: 0 }}
                         animate={{ width: totalActions > 0 ? `${(completedCount / totalActions) * 100}%` : '0%' }}
                         transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -437,13 +435,13 @@ export default function StrategyPage() {
               </motion.div>
             ) : (
               <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-16 flex flex-col items-center text-center">
-                  <div className="w-14 h-14 rounded-2xl bg-[#22C55E]/10 border border-[#22C55E]/20 flex items-center justify-center mb-4">
-                    <Map className="w-6 h-6 text-[#22C55E]" />
+                className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+                <div className="rounded-[10px]  bg-[#FFFFFF] p-16 flex flex-col items-center text-center">
+                  <div className="w-14 h-14 rounded-[10px] bg-[#1F7A4D]/10 border border-[#1F7A4D]/20 flex items-center justify-center mb-4">
+                    <Map className="w-6 h-6 text-[#1F7A4D]" />
                   </div>
-                  <p className="text-sm font-medium text-[#A0A0B8]">Your 7-day plan will appear here</p>
-                  <p className="text-xs text-[#60607A] mt-1">Fill in your target role and click Build Plan</p>
+                  <p className="text-sm font-medium text-[#3C403E]">Your 7-day plan will appear here</p>
+                  <p className="text-xs text-[#5A5F5C] mt-1">Fill in your target role and click Build Plan</p>
                 </div>
               </motion.div>
             )}

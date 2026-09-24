@@ -9,22 +9,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#0A0A0F',
+        // App-wide tokens, same system as the landing page (lp-*).
+        background: '#F4F2EC',
         brand: {
-          DEFAULT: '#6366F1',
-          light: '#818CF8',
-          dark: '#4F46E5',
+          DEFAULT: '#1F5C4A',
+          light: '#EEF3F0',
+          dark: '#15443A',
         },
         surface: {
-          DEFAULT: '#13131A',
-          elevated: '#1C1C26',
+          DEFAULT: '#FFFFFF',
+          elevated: '#FAF9F5',
         },
-        'text-primary': '#F8F8FF',
-        'text-secondary': '#A0A0B8',
-        'text-muted': '#60607A',
-        success: '#22C55E',
-        warning: '#F59E0B',
-        error: '#EF4444',
+        'text-primary': '#1B1D1C',
+        'text-secondary': '#3C403E',
+        'text-muted': '#5A5F5C',
+        success: '#1F7A4D',
+        warning: '#8A5A00',
+        error: '#B42318',
         // Landing page (app/page.tsx) only. Paper + ink neutrals, one brand
         // green, one highlight used solely to mark matched keywords.
         lp: {
@@ -44,8 +45,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        heading: ['Inter', 'sans-serif'],
-        body: ['DM Sans', 'sans-serif'],
+        heading: ['"Newsreader Variable"', 'Georgia', 'serif'],
+        body: ['"IBM Plex Sans"', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
         'lp-serif': ['"Newsreader Variable"', 'Georgia', 'serif'],
         'lp-sans': ['"IBM Plex Sans"', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
         'lp-mono': ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
@@ -66,8 +67,7 @@ const config: Config = {
           '50%': { transform: 'translateY(-20px)' },
         },
         glowPulse: {
-          '0%, 100%': { boxShadow: '0 0 20px rgba(99,102,241,0.3)' },
-          '50%': { boxShadow: '0 0 40px rgba(99,102,241,0.6)' },
+          '0%, 100%': { opacity: '1' },
         },
         fadeIn: {
           '0%': { opacity: '0' },
@@ -79,12 +79,13 @@ const config: Config = {
         },
       },
       backgroundImage: {
-        'brand-gradient': 'linear-gradient(135deg, #6366F1, #8B5CF6)',
-        'hero-gradient': 'radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%)',
+        // Kept as flat fills so any remaining references stay valid.
+        'brand-gradient': 'linear-gradient(#1F5C4A, #1F5C4A)',
+        'hero-gradient': 'none',
       },
       boxShadow: {
-        glow: '0 0 30px rgba(99,102,241,0.3)',
-        'glow-lg': '0 0 60px rgba(99,102,241,0.4)',
+        glow: 'none',
+        'glow-lg': 'none',
         'lp-lift': '0 1px 2px rgba(27,29,28,0.05), 0 12px 32px rgba(27,29,28,0.07)',
       },
     },

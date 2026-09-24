@@ -42,8 +42,8 @@ import type { CoverLetter } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 const INPUT_CLASS =
-  'w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-[#60607A] focus:outline-none focus:border-[#6366F1]/50 focus:ring-1 focus:ring-[#6366F1]/30 transition-all'
-const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
+  'w-full bg-[#F4F2EC] border border-lp-rule rounded-[4px] px-4 py-3 text-lp-ink text-sm placeholder-[#5A5F5C] focus:outline-none focus:border-[#1F5C4A]/50 focus:ring-1 focus:ring-[#1F5C4A]/30 transition-all'
+const LABEL_CLASS = 'block text-xs font-medium text-[#3C403E] mb-1.5'
 const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
 const LETTER_W = 816   // 8.5" at 96 dpi
@@ -73,10 +73,10 @@ function countWords(text: string): number {
 function WordCountBar({ wordCount }: { wordCount: number }) {
   const pct = Math.min((wordCount / MAX_WORDS) * 100, 100)
   const color =
-    wordCount > MAX_WORDS ? '#EF4444'
-    : wordCount >= MIN_WORDS ? '#22C55E'
-    : wordCount >= WARN_WORDS ? '#F59E0B'
-    : '#60607A'
+    wordCount > MAX_WORDS ? '#B42318'
+    : wordCount >= MIN_WORDS ? '#1F7A4D'
+    : wordCount >= WARN_WORDS ? '#8A5A00'
+    : '#5A5F5C'
 
   const label =
     wordCount > MAX_WORDS
@@ -90,12 +90,12 @@ function WordCountBar({ wordCount }: { wordCount: number }) {
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-xs">
-        <span className="text-[#60607A]">Word count (body only)</span>
+        <span className="text-[#5A5F5C]">Word count (body only)</span>
         <span style={{ color }} className="font-semibold tabular-nums">
           {wordCount} / {MAX_WORDS}
         </span>
       </div>
-      <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+      <div className="h-1.5 rounded-full bg-lp-ink/6 overflow-hidden">
         <motion.div
           className="h-full rounded-full"
           style={{ backgroundColor: color }}
@@ -104,7 +104,7 @@ function WordCountBar({ wordCount }: { wordCount: number }) {
           transition={{ duration: 0.4, ease: 'easeOut' }}
         />
       </div>
-      <p className="text-xs" style={{ color: wordCount > MAX_WORDS ? '#EF4444' : wordCount < MIN_WORDS ? (wordCount >= WARN_WORDS ? '#F59E0B' : '#60607A') : '#60607A' }}>
+      <p className="text-xs" style={{ color: wordCount > MAX_WORDS ? '#B42318' : wordCount < MIN_WORDS ? (wordCount >= WARN_WORDS ? '#8A5A00' : '#5A5F5C') : '#5A5F5C' }}>
         {label}
       </p>
     </div>
@@ -141,17 +141,17 @@ function CoverLetterLoadingState() {
       {/* AURI pulsing icon */}
       <div className="relative flex items-center justify-center">
         <motion.div
-          className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706]
-            flex items-center justify-center shadow-lg shadow-[#F59E0B]/30"
+          className="w-20 h-20 rounded-[10px] bg-[#1F5C4A]/10
+            flex items-center justify-center "
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <Mail className="w-9 h-9 text-white" />
+          <Mail className="w-9 h-9 text-lp-ink" />
         </motion.div>
         {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
-            className="absolute rounded-2xl border border-[#F59E0B]/30"
+            className="absolute rounded-[10px] border border-[#1F5C4A]/30"
             style={{ width: `${80 + (i + 1) * 28}px`, height: `${80 + (i + 1) * 28}px` }}
             animate={{ opacity: [0.6, 0, 0.6], scale: [1, 1.15, 1] }}
             transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.5, ease: 'easeInOut' }}
@@ -179,7 +179,7 @@ function CoverLetterLoadingState() {
       {/* Progress bar */}
       <div className="w-full max-w-[256px] h-1.5 rounded-full bg-[#F0F0F0] overflow-hidden">
         <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-[#F59E0B] to-[#D97706]"
+          className="h-full rounded-full bg-[#1F5C4A] "
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         />
@@ -259,8 +259,8 @@ function EditableParagraph({
           onInput={(e) => onChange((e.target as HTMLDivElement).innerText)}
           onClick={(e) => e.stopPropagation()}
           style={{ ...base, padding: '6px 8px', cursor: 'text',
-            border: '1.5px solid rgba(245,158,11,0.4)',
-            background: 'rgba(245,158,11,0.04)' }}
+            border: '1.5px solid rgba(138,90,0,0.4)',
+            background: 'rgba(138,90,0,0.04)' }}
         />
       ) : (
         // key="view" — fresh DOM node every time editing ends; React owns it
@@ -385,10 +385,10 @@ function Toast({ message, type, onDismiss }: { message: string; type: 'success' 
       exit={{ opacity: 0, y: 32, scale: 0.95 }}
       transition={SPRING}
       className={`fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[9999] flex items-center gap-3
-        px-4 py-3 rounded-xl border shadow-xl max-w-sm
+        px-4 py-3 rounded-[4px] border max-w-sm
         ${type === 'success'
-          ? 'bg-[#22C55E]/10 border-[#22C55E]/30 text-[#22C55E]'
-          : 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]'}`}
+          ? 'bg-[#1F7A4D]/10 border-[#1F7A4D]/30 text-[#1F7A4D]'
+          : 'bg-[#B42318]/10 border-[#B42318]/30 text-[#B42318]'}`}
     >
       {type === 'success'
         ? <CheckCircle className="w-4 h-4 flex-shrink-0" />
@@ -675,26 +675,26 @@ function CoverLetterContent() {
         className="flex-shrink-0 flex items-center justify-between gap-4 mb-4 px-1"
       >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center flex-shrink-0">
-            <Mail className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center flex-shrink-0">
+            <Mail className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
-            <h1 className="font-heading text-xl font-bold text-white leading-tight">Cover Letter Generator</h1>
-            <p className="text-xs text-[#60607A] hidden sm:block">
+            <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">Cover Letter Generator</h1>
+            <p className="text-xs text-[#5A5F5C] hidden sm:block">
               280–300 words · Opens with a powerful hook · Never &quot;I am applying for…&quot;
             </p>
           </div>
         </div>
 
         {/* Mobile view toggle — only visible on mobile */}
-        <div className="flex md:hidden items-center gap-1 p-1 rounded-xl
-          bg-[#13131A] border border-white/[0.08]">
+        <div className="flex md:hidden items-center gap-1 p-0 rounded-[10px]
+          bg-[#FFFFFF] border border-lp-rule">
           <button
             onClick={() => setMobileView('form')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium transition-all
               ${mobileView === 'form'
-                ? 'bg-[#F59E0B] text-white shadow-sm'
-                : 'text-[#60607A] hover:text-[#A0A0B8]'
+                ? 'bg-[#1F5C4A] text-white '
+                : 'text-[#5A5F5C] hover:text-[#3C403E]'
               }`}
           >
             <Edit3 className="w-3 h-3" />
@@ -702,10 +702,10 @@ function CoverLetterContent() {
           </button>
           <button
             onClick={() => setMobileView('preview')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium transition-all
               ${mobileView === 'preview'
-                ? 'bg-[#F59E0B] text-white shadow-sm'
-                : 'text-[#60607A] hover:text-[#A0A0B8]'
+                ? 'bg-[#1F5C4A] text-white '
+                : 'text-[#5A5F5C] hover:text-[#3C403E]'
               }`}
           >
             <Eye className="w-3 h-3" />
@@ -720,10 +720,9 @@ function CoverLetterContent() {
               onClick={handleSave}
               disabled={saving}
               aria-label="Save cover letter"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
-                shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50
-                hover:scale-[1.02] transition-all duration-200
+              className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
+                bg-[#1F5C4A] text-white
+                 transition-all duration-200
                 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {saving
@@ -737,8 +736,8 @@ function CoverLetterContent() {
           )}
           <Link
             href="/dashboard/cover-letter/saved"
-            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-              border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium
+              border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
               transition-all duration-200"
           >
             <FolderOpen className="w-3.5 h-3.5" />
@@ -758,26 +757,26 @@ function CoverLetterContent() {
           className={`flex flex-col overflow-hidden w-full md:w-[40%] md:min-w-[380px] md:flex-shrink-0
             ${mobileView === 'preview' ? 'hidden md:flex' : 'flex'}`}
         >
-          <div className="flex-1 min-h-0 rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 flex flex-col">
-            <div className="flex-1 min-h-0 rounded-xl border border-white/[0.05] bg-[#1C1C26] flex flex-col overflow-hidden">
+          <div className="flex-1 min-h-0 rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 flex flex-col">
+            <div className="flex-1 min-h-0 rounded-[10px]  bg-[#FFFFFF] flex flex-col overflow-hidden">
               <div className="flex-1 min-h-0 overflow-y-auto px-5 py-5 space-y-4">
 
                 {profile && profile.experience.length > 0 && (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/20">
-                    <CheckCircle className="w-4 h-4 text-[#22C55E] flex-shrink-0" />
-                    <p className="text-xs text-[#22C55E]">Experience auto-filled from your Career Profile.</p>
+                  <div className="flex items-center gap-2 p-3 rounded-[10px] bg-[#1F7A4D]/10 border border-[#1F7A4D]/20">
+                    <CheckCircle className="w-4 h-4 text-[#1F7A4D] flex-shrink-0" />
+                    <p className="text-xs text-[#1F7A4D]">Experience auto-filled from your Career Profile.</p>
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className={LABEL_CLASS}>Position <span className="text-[#EF4444]">*</span></label>
+                    <label className={LABEL_CLASS}>Position <span className="text-[#B42318]">*</span></label>
                     <input type="text" value={position} onChange={(e) => setPosition(e.target.value)}
                       placeholder="Senior Software Engineer" className={INPUT_CLASS}
                       aria-label="Target position" style={{ fontSize: '16px' }} />
                   </div>
                   <div>
-                    <label className={LABEL_CLASS}>Company Name <span className="text-[#EF4444]">*</span></label>
+                    <label className={LABEL_CLASS}>Company Name <span className="text-[#B42318]">*</span></label>
                     <CompanyAutocomplete value={company} onChange={setCompany} placeholder="Acme Corp"
                       className={INPUT_CLASS} aria-label="Company name" />
                   </div>
@@ -785,7 +784,7 @@ function CoverLetterContent() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className={LABEL_CLASS}>Hiring Manager Name <span className="text-[#60607A] font-normal">(optional)</span></label>
+                    <label className={LABEL_CLASS}>Hiring Manager Name <span className="text-[#5A5F5C] font-normal">(optional)</span></label>
                     <input type="text" className={INPUT_CLASS} placeholder="Jane Smith"
                       value={hiringManagerName} onChange={(e) => setHiringManagerName(e.target.value)}
                       aria-label="Hiring manager name" />
@@ -798,7 +797,7 @@ function CoverLetterContent() {
                 </div>
 
                 <div>
-                  <label className={LABEL_CLASS}>Job Description <span className="text-[#60607A] font-normal">(paste for keyword match)</span></label>
+                  <label className={LABEL_CLASS}>Job Description <span className="text-[#5A5F5C] font-normal">(paste for keyword match)</span></label>
                   <textarea className={TEXTAREA_CLASS} rows={4} placeholder="Paste the job description here…"
                     value={jobDescription} onChange={(e) => setJobDescription(e.target.value)}
                     aria-label="Job description" />
@@ -814,33 +813,32 @@ function CoverLetterContent() {
 
                 {generateError && (
                   generateError === 'FREE_TIER_LIMIT_REACHED' ? (
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-[#6366F1]/10 border border-[#6366F1]/20">
-                      <Zap className="w-4 h-4 text-[#6366F1] flex-shrink-0" />
+                    <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
+                      <Zap className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-white">Monthly limit reached</p>
-                        <p className="text-xs text-[#A0A0B8]">You&apos;ve used all 3 free generations this month.</p>
+                        <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
+                        <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
                       </div>
-                      <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#818CF8] hover:text-white transition-colors">
+                      <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
                         Upgrade →
                       </Link>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 p-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20">
-                      <AlertCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0" />
-                      <p className="text-xs text-[#EF4444]">{generateError}</p>
+                    <div className="flex items-center gap-2 p-3 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20">
+                      <AlertCircle className="w-4 h-4 text-[#B42318] flex-shrink-0" />
+                      <p className="text-xs text-[#B42318]">{generateError}</p>
                     </div>
                   )
                 )}
               </div>
 
               {/* Generate button footer */}
-              <div className="flex-shrink-0 px-5 pb-5 pt-3 border-t border-white/[0.05]">
+              <div className="flex-shrink-0 px-5 pb-5 pt-3 border-t border-lp-hairline">
                 <button
                   onClick={handleGenerate}
                   disabled={!position.trim() || !company.trim() || isStreaming}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-                    bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-semibold text-sm
-                    shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.01]
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
+                    bg-[#1F5C4A] text-white font-semibold text-sm
                     transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   {isStreaming
@@ -865,8 +863,8 @@ function CoverLetterContent() {
           {mobileView === 'preview' && (
             <button
               onClick={() => setMobileView('form')}
-              className="md:hidden flex items-center gap-1.5 text-xs text-[#A0A0B8]
-                hover:text-white transition-colors mb-2"
+              className="md:hidden flex items-center gap-1.5 text-xs text-[#3C403E]
+                hover:text-lp-ink transition-colors mb-2"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               Back to form
@@ -882,9 +880,9 @@ function CoverLetterContent() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden"
+                className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 overflow-hidden"
               >
-                <div className="rounded-xl border border-white/[0.05] overflow-hidden"
+                <div className="rounded-[10px]  overflow-hidden"
                   style={{
                     transformOrigin: 'top left',
                     transform: `scale(${scale})`,
@@ -910,31 +908,30 @@ function CoverLetterContent() {
                 <div className="flex items-center gap-2 flex-wrap print:hidden">
                   {/* Undo / Redo */}
                   <button onClick={handleUndo} disabled={!canUndo} aria-label="Undo"
-                    className="p-2 min-h-[36px] rounded-lg border border-white/[0.08] text-[#A0A0B8]
-                      hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                    className="p-2 min-h-[36px] rounded-[4px] border border-lp-rule text-[#3C403E]
+                      hover:text-lp-ink hover:bg-lp-ink/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={handleRedo} disabled={!canRedo} aria-label="Redo"
-                    className="p-2 min-h-[36px] rounded-lg border border-white/[0.08] text-[#A0A0B8]
-                      hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                    className="p-2 min-h-[36px] rounded-[4px] border border-lp-rule text-[#3C403E]
+                      hover:text-lp-ink hover:bg-lp-ink/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                     <RotateCw className="w-3.5 h-3.5" />
                   </button>
 
-                  <div className="w-px h-5 bg-white/[0.08] mx-1" />
+                  <div className="w-px h-5 bg-lp-ink/8 mx-1" />
 
                   {/* Copy */}
                   <button onClick={handleCopy}
-                    className="flex items-center gap-1.5 px-3 py-2 min-h-[36px] rounded-xl text-sm font-medium
-                      border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all">
-                    {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#22C55E]" /> : <Copy className="w-3.5 h-3.5" />}
+                    className="flex items-center gap-1.5 px-3 py-2 min-h-[36px] rounded-[4px] text-sm font-medium
+                      border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all">
+                    {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
 
                   {/* Download PDF */}
                   <button onClick={handleDownloadPDF} disabled={downloading}
-                    className="flex items-center gap-1.5 px-4 py-2 min-h-[36px] rounded-xl text-sm font-semibold
-                      bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
-                      shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.02]
+                    className="flex items-center gap-1.5 px-4 py-2 min-h-[36px] rounded-[4px] text-sm font-semibold
+                      bg-[#1F5C4A] text-white
                       transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
                     {downloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
                     {downloading ? 'Generating…' : 'Download PDF'}
@@ -943,15 +940,15 @@ function CoverLetterContent() {
 
                 {/* Opening hook callout */}
                 {result.opening_hook && (
-                  <div className="print:hidden p-3 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/20">
-                    <p className="text-xs font-semibold text-[#F59E0B] uppercase tracking-wide mb-1">Opening Hook</p>
-                    <p className="text-sm text-[#FDE68A] italic">{result.opening_hook}</p>
+                  <div className="print:hidden p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
+                    <p className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide mb-1">Opening Hook</p>
+                    <p className="text-sm text-[#F2D45C] italic">{result.opening_hook}</p>
                   </div>
                 )}
 
                 {/* Letter preview — scaled */}
                 <div
-                  className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden"
+                  className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 overflow-hidden"
                   onClick={() => { if (activeParagraphIdx !== null) setActiveParagraphIdx(null) }}
                 >
                   {/* Only the div with ref is captured for PDF — no toolbar / UI chrome */}
@@ -980,14 +977,14 @@ function CoverLetterContent() {
                 </div>
 
                 {/* Word count bar */}
-                <div className="print:hidden rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4">
+                <div className="print:hidden rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+                  <div className="rounded-[10px]  bg-[#FFFFFF] p-4">
                     <WordCountBar wordCount={currentWordCount} />
                   </div>
                 </div>
 
                 {/* Easy Tune tip */}
-                <p className="print:hidden text-xs text-center text-[#60607A]">
+                <p className="print:hidden text-xs text-center text-[#5A5F5C]">
                   Click any paragraph to edit inline · Ctrl+Z to undo
                 </p>
               </motion.div>
@@ -1000,15 +997,15 @@ function CoverLetterContent() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="flex-1 flex flex-col items-center justify-center py-12 px-6 text-center
-                  rounded-2xl border border-dashed border-white/[0.08]"
+                  rounded-[10px] border border-dashed border-lp-rule"
                 style={{ minHeight: '400px' }}
               >
-                <div className="w-14 h-14 rounded-2xl bg-[#F59E0B]/10 border border-[#F59E0B]/20
+                <div className="w-14 h-14 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
                   flex items-center justify-center mb-4">
-                  <Mail className="w-6 h-6 text-[#F59E0B]" />
+                  <Mail className="w-6 h-6 text-[#1F5C4A]" />
                 </div>
-                <p className="text-sm font-medium text-[#A0A0B8]">Your cover letter will appear here</p>
-                <p className="text-xs text-[#60607A] mt-1">Fill in the form and click Generate</p>
+                <p className="text-sm font-medium text-[#3C403E]">Your cover letter will appear here</p>
+                <p className="text-xs text-[#5A5F5C] mt-1">Fill in the form and click Generate</p>
               </motion.div>
             )}
           </AnimatePresence>

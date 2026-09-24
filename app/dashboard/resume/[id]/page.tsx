@@ -59,9 +59,9 @@ function formatDate(iso: unknown): string {
 }
 
 function atsScoreBg(score: number): string {
-  if (score >= 85) return 'bg-[#22C55E]/10 border-[#22C55E]/20 text-[#22C55E]'
-  if (score >= 70) return 'bg-[#F59E0B]/10 border-[#F59E0B]/20 text-[#F59E0B]'
-  return 'bg-[#EF4444]/10 border-[#EF4444]/20 text-[#EF4444]'
+  if (score >= 85) return 'bg-[#1F7A4D]/10 border-[#1F7A4D]/20 text-[#1F7A4D]'
+  if (score >= 70) return 'bg-[#8A5A00]/10 border-[#8A5A00]/20 text-[#8A5A00]'
+  return 'bg-[#B42318]/10 border-[#B42318]/20 text-[#B42318]'
 }
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ function atsScoreBg(score: number): string {
 /** Shimmer skeleton line */
 function SkeletonLine({ width = 'w-full', height = 'h-3' }: { width?: string; height?: string }) {
   return (
-    <div className={`${height} ${width} rounded-full bg-white/[0.06] animate-pulse`} />
+    <div className={`${height} ${width} rounded-full bg-lp-ink/6 animate-pulse`} />
   )
 }
 
@@ -78,7 +78,7 @@ function SidebarSkeleton() {
   return (
     <div className="space-y-2 px-3 py-2">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="rounded-xl p-3 border border-white/[0.05] bg-[#1C1C26] space-y-2">
+        <div key={i} className="rounded-[10px] p-3  bg-[#FFFFFF] space-y-2">
           <SkeletonLine width="w-3/4" />
           <SkeletonLine width="w-1/2" height="h-2.5" />
           <SkeletonLine width="w-1/3" height="h-2" />
@@ -95,12 +95,12 @@ function ContentSkeleton() {
       {/* Toolbar skeleton */}
       <div className="flex items-center gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-9 w-28 rounded-xl bg-white/[0.06] animate-pulse" />
+          <div key={i} className="h-9 w-28 rounded-[10px] bg-lp-ink/6 animate-pulse" />
         ))}
       </div>
       {/* Metadata card skeleton */}
-      <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-        <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-3">
+      <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+        <div className="rounded-[10px]  bg-[#FFFFFF] p-5 space-y-3">
           <SkeletonLine width="w-1/3" height="h-5" />
           <div className="flex gap-6">
             <SkeletonLine width="w-40" />
@@ -110,8 +110,8 @@ function ContentSkeleton() {
         </div>
       </div>
       {/* Preview skeleton */}
-      <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-        <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-8 space-y-4">
+      <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+        <div className="rounded-[10px]  bg-[#FFFFFF] p-8 space-y-4">
           <SkeletonLine width="w-48 mx-auto" height="h-6" />
           <SkeletonLine width="w-64 mx-auto" />
           {Array.from({ length: 8 }).map((_, i) => (
@@ -142,7 +142,7 @@ function DeleteConfirmModal({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center p-4
-          bg-black/60 backdrop-blur-sm"
+          bg-black/60 "
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-dialog-title"
@@ -152,20 +152,20 @@ function DeleteConfirmModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.92, y: 16 }}
           transition={SPRING}
-          className="w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+          className="w-full max-w-md rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
         >
-          <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
+          <div className="rounded-[10px]  bg-[#FFFFFF] p-6">
             {/* Icon */}
-            <div className="w-12 h-12 rounded-2xl bg-[#EF4444]/10 border border-[#EF4444]/20
+            <div className="w-12 h-12 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20
               flex items-center justify-center mb-4">
-              <Trash2 className="w-5 h-5 text-[#EF4444]" />
+              <Trash2 className="w-5 h-5 text-[#B42318]" />
             </div>
 
-            <h2 id="delete-dialog-title" className="font-heading font-semibold text-white text-lg mb-2">
+            <h2 id="delete-dialog-title" className="font-heading font-semibold text-lp-ink text-lg mb-2">
               Delete resume?
             </h2>
-            <p className="text-sm text-[#A0A0B8] mb-6 leading-relaxed">
-              <span className="text-white font-medium">&ldquo;{resumeName}&rdquo;</span> will be
+            <p className="text-sm text-[#3C403E] mb-6 leading-relaxed">
+              <span className="text-lp-ink font-medium">&ldquo;{resumeName}&rdquo;</span> will be
               permanently deleted. This action cannot be undone.
             </p>
 
@@ -174,9 +174,9 @@ function DeleteConfirmModal({
                 onClick={onCancel}
                 disabled={isDeleting}
                 aria-label="Cancel delete"
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium
-                  border border-white/[0.08] text-[#A0A0B8]
-                  hover:bg-white/5 hover:text-white
+                className="flex-1 px-4 py-2.5 rounded-[4px] text-sm font-medium
+                  border border-lp-rule text-[#3C403E]
+                  hover:bg-lp-ink/5 hover:text-lp-ink
                   transition-all duration-200 disabled:opacity-50"
               >
                 Cancel
@@ -185,9 +185,9 @@ function DeleteConfirmModal({
                 onClick={onConfirm}
                 disabled={isDeleting}
                 aria-label="Confirm delete resume"
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
-                  text-sm font-semibold bg-[#EF4444] text-white
-                  hover:bg-[#DC2626] transition-all duration-200
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-[4px]
+                  text-sm font-semibold bg-[#B42318] text-white
+                  hover:bg-[#912018] transition-all duration-200
                   disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isDeleting ? (
@@ -214,34 +214,33 @@ function SignInPrompt() {
       transition={SPRING}
       className="flex items-center justify-center min-h-[60vh]"
     >
-      <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 w-full max-w-md">
-        <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-8 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#6366F1]/10 border border-[#6366F1]/20
+      <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 w-full max-w-md">
+        <div className="rounded-[10px]  bg-[#FFFFFF] p-8 text-center">
+          <div className="w-14 h-14 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
             flex items-center justify-center mx-auto mb-5">
-            <LogIn className="w-6 h-6 text-[#6366F1]" />
+            <LogIn className="w-6 h-6 text-[#1F5C4A]" />
           </div>
-          <h2 className="font-heading font-semibold text-white text-xl mb-2">
+          <h2 className="font-heading font-semibold text-lp-ink text-xl mb-2">
             Sign in to view saved resumes
           </h2>
-          <p className="text-sm text-[#A0A0B8] mb-6 leading-relaxed">
+          <p className="text-sm text-[#3C403E] mb-6 leading-relaxed">
             Your saved resumes are stored securely in the cloud. Sign in to access them from any
             device.
           </p>
           <div className="flex gap-3 justify-center">
             <Link
               href="/login"
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold
-                bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                hover:scale-[1.02] transition-all duration-200"
+              className="px-5 py-2.5 rounded-[4px] text-sm font-semibold
+                bg-[#1F5C4A] text-white
+                 transition-all duration-200"
             >
               Sign in
             </Link>
             <Link
               href="/dashboard/resume"
-              className="px-5 py-2.5 rounded-xl text-sm font-medium
-                border border-white/[0.08] text-[#A0A0B8]
-                hover:bg-white/5 hover:text-white
+              className="px-5 py-2.5 rounded-[4px] text-sm font-medium
+                border border-lp-rule text-[#3C403E]
+                hover:bg-lp-ink/5 hover:text-lp-ink
                 transition-all duration-200"
             >
               New resume
@@ -262,24 +261,23 @@ function ResumeNotFound() {
       transition={SPRING}
       className="flex items-center justify-center min-h-[60vh]"
     >
-      <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 w-full max-w-md">
-        <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-8 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/[0.08]
+      <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 w-full max-w-md">
+        <div className="rounded-[10px]  bg-[#FFFFFF] p-8 text-center">
+          <div className="w-14 h-14 rounded-[10px] bg-lp-ink/[0.04] border border-lp-rule
             flex items-center justify-center mx-auto mb-5">
-            <FileText className="w-6 h-6 text-[#60607A]" />
+            <FileText className="w-6 h-6 text-[#5A5F5C]" />
           </div>
-          <h2 className="font-heading font-semibold text-white text-xl mb-2">
+          <h2 className="font-heading font-semibold text-lp-ink text-xl mb-2">
             Resume not found
           </h2>
-          <p className="text-sm text-[#A0A0B8] mb-6 leading-relaxed">
+          <p className="text-sm text-[#3C403E] mb-6 leading-relaxed">
             This resume may have been deleted or you may not have permission to view it.
           </p>
           <Link
             href="/dashboard/resume"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
-              bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-              shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-              hover:scale-[1.02] transition-all duration-200"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[4px] text-sm font-semibold
+              bg-[#1F5C4A] text-white
+               transition-all duration-200"
           >
             <Plus className="w-4 h-4" />
             Create new resume
@@ -456,7 +454,7 @@ export default function SavedResumePage() {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 text-[#6366F1] animate-spin" />
+        <Loader2 className="w-6 h-6 text-[#1F5C4A] animate-spin" />
       </div>
     )
   }
@@ -475,22 +473,22 @@ export default function SavedResumePage() {
         className={`
           flex-shrink-0 w-[250px]
           hidden lg:flex flex-col
-          rounded-2xl border border-white/[0.08] bg-[#13131A] p-1
+          rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0
           self-start sticky top-6
           max-h-[calc(100vh-120px)]
         `}
         aria-label="Saved resumes list"
       >
-        <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] flex flex-col overflow-hidden flex-1">
+        <div className="rounded-[10px]  bg-[#FFFFFF] flex flex-col overflow-hidden flex-1">
           {/* Sidebar header */}
-          <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/[0.05]">
-            <span className="text-sm font-semibold text-white">Saved Resumes</span>
+          <div className="flex items-center justify-between px-4 py-3.5 border-b border-lp-hairline">
+            <span className="text-sm font-semibold text-lp-ink">Saved Resumes</span>
             <Link
               href="/dashboard/resume"
               aria-label="Create new resume"
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium
-                bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8]
-                hover:bg-[#6366F1]/20 transition-all duration-200"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-[4px] text-xs font-medium
+                bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]
+                hover:bg-[#1F5C4A]/20 transition-all duration-200"
             >
               <Plus className="w-3 h-3" />
               New
@@ -503,8 +501,8 @@ export default function SavedResumePage() {
               <SidebarSkeleton />
             ) : allResumes.length === 0 ? (
               <div className="px-4 py-8 text-center">
-                <FileText className="w-6 h-6 text-[#60607A] mx-auto mb-2" />
-                <p className="text-xs text-[#60607A]">No saved resumes yet</p>
+                <FileText className="w-6 h-6 text-[#5A5F5C] mx-auto mb-2" />
+                <p className="text-xs text-[#5A5F5C]">No saved resumes yet</p>
               </div>
             ) : (
               <ul className="px-2 space-y-1">
@@ -521,30 +519,30 @@ export default function SavedResumePage() {
                           whileHover={{ x: 2 }}
                           transition={SPRING}
                           className={`
-                            rounded-xl px-3 py-2.5 cursor-pointer
+                            rounded-[4px] px-3 py-2.5 cursor-pointer
                             transition-colors duration-200
                             ${isActive
-                              ? 'bg-[#6366F1]/10 border border-[#6366F1]/20'
-                              : 'border border-transparent hover:bg-white/[0.03] hover:border-white/[0.05]'
+                              ? 'bg-[#1F5C4A]/10 border border-[#1F5C4A]/20'
+                              : 'border border-transparent hover:bg-lp-ink/[0.03] hover:border-lp-hairline'
                             }
                           `}
                         >
                           {/* Resume name */}
                           <p className={`text-sm font-medium leading-snug truncate
-                            ${isActive ? 'text-white' : 'text-[#A0A0B8]'}`}>
+                            ${isActive ? 'text-lp-ink' : 'text-[#3C403E]'}`}>
                             {r.name}
                           </p>
 
                           {/* Target position / company */}
                           {(r.targetPosition || r.targetCompany) && (
-                            <p className="text-xs text-[#60607A] truncate mt-0.5">
+                            <p className="text-xs text-[#5A5F5C] truncate mt-0.5">
                               {[r.targetPosition, r.targetCompany].filter(Boolean).join(' @ ')}
                             </p>
                           )}
 
                           {/* Date + ATS badge */}
                           <div className="flex items-center justify-between mt-1.5 gap-2">
-                            <span className="text-[10px] text-[#60607A] flex items-center gap-1">
+                            <span className="text-[10px] text-[#5A5F5C] flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
                               {formatDate(r.createdAt)}
                             </span>
@@ -572,8 +570,8 @@ export default function SavedResumePage() {
         <button
           onClick={() => setSidebarOpen((v) => !v)}
           aria-label="Toggle resumes list"
-          className="w-10 h-10 rounded-xl bg-[#6366F1] text-white flex items-center justify-center
-            shadow-lg shadow-[#6366F1]/40 hover:bg-[#4F46E5] transition-all"
+          className="w-10 h-10 rounded-[10px] bg-[#1F5C4A] text-white flex items-center justify-center
+              hover:bg-[#15443A] transition-all"
         >
           {sidebarOpen ? <X className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
         </button>
@@ -588,14 +586,14 @@ export default function SavedResumePage() {
             exit={{ opacity: 0, x: -280 }}
             transition={SPRING}
             className="lg:hidden fixed left-0 top-0 bottom-0 z-40 w-64
-              bg-[#13131A] border-r border-white/[0.08] overflow-y-auto p-3 pt-16"
+              bg-[#FFFFFF] border-r border-lp-rule overflow-y-auto p-3 pt-16"
           >
             <div className="flex items-center justify-between mb-3 px-1">
-              <span className="text-sm font-semibold text-white">Saved Resumes</span>
+              <span className="text-sm font-semibold text-lp-ink">Saved Resumes</span>
               <button
                 onClick={() => setSidebarOpen(false)}
                 aria-label="Close resumes list"
-                className="p-1 rounded-lg hover:bg-white/5 text-[#60607A] hover:text-white"
+                className="p-1 rounded-[4px] hover:bg-lp-ink/5 text-[#5A5F5C] hover:text-lp-ink"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -615,18 +613,18 @@ export default function SavedResumePage() {
                         aria-current={isActive ? 'page' : undefined}
                       >
                         <div className={`
-                          rounded-xl px-3 py-2.5 cursor-pointer transition-colors duration-200
+                          rounded-[4px] px-3 py-2.5 cursor-pointer transition-colors duration-200
                           ${isActive
-                            ? 'bg-[#6366F1]/10 border border-[#6366F1]/20'
-                            : 'border border-transparent hover:bg-white/[0.03]'
+                            ? 'bg-[#1F5C4A]/10 border border-[#1F5C4A]/20'
+                            : 'border border-transparent hover:bg-lp-ink/[0.03]'
                           }
                         `}>
                           <p className={`text-sm font-medium truncate
-                            ${isActive ? 'text-white' : 'text-[#A0A0B8]'}`}>
+                            ${isActive ? 'text-lp-ink' : 'text-[#3C403E]'}`}>
                             {r.name}
                           </p>
                           <div className="flex items-center justify-between mt-1 gap-2">
-                            <span className="text-[10px] text-[#60607A]">
+                            <span className="text-[10px] text-[#5A5F5C]">
                               {formatDate(r.createdAt)}
                             </span>
                             {r.atsScore !== undefined && (
@@ -659,12 +657,12 @@ export default function SavedResumePage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={SPRING}
-            className="rounded-2xl border border-[#EF4444]/20 bg-[#EF4444]/5 p-5"
+            className="rounded-[10px] border border-[#B42318]/20 bg-[#B42318]/5 p-5"
           >
-            <p className="text-sm text-[#EF4444] font-medium">{error}</p>
+            <p className="text-sm text-[#B42318] font-medium">{error}</p>
             <button
               onClick={() => router.refresh()}
-              className="mt-2 text-xs text-[#A0A0B8] hover:text-white underline"
+              className="mt-2 text-xs text-[#3C403E] hover:text-lp-ink underline"
             >
               Try again
             </button>
@@ -688,12 +686,12 @@ export default function SavedResumePage() {
               <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm">
                 <Link
                   href="/dashboard/resume"
-                  className="text-[#60607A] hover:text-[#A0A0B8] transition-colors"
+                  className="text-[#5A5F5C] hover:text-[#3C403E] transition-colors"
                 >
                   Resumes
                 </Link>
-                <ChevronRight className="w-3.5 h-3.5 text-[#60607A]" />
-                <span className="text-[#A0A0B8] truncate max-w-[180px]">{resume.name}</span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#5A5F5C]" />
+                <span className="text-[#3C403E] truncate max-w-[180px]">{resume.name}</span>
               </nav>
 
               {/* Actions */}
@@ -703,9 +701,9 @@ export default function SavedResumePage() {
                   <Link
                     href="/dashboard/resume/saved"
                     aria-label="Back to saved resumes"
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-                      border border-white/[0.08] text-[#A0A0B8]
-                      hover:bg-white/5 hover:text-white transition-all duration-200"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium
+                      border border-lp-rule text-[#3C403E]
+                      hover:bg-lp-ink/5 hover:text-lp-ink transition-all duration-200"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     Back
@@ -717,8 +715,8 @@ export default function SavedResumePage() {
                   <button
                     onClick={() => setIsEditMode(true)}
                     aria-label="Edit this resume"
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                      bg-[#6366F1] text-white hover:bg-[#4F46E5] transition-colors duration-200"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
+                      bg-[#1F5C4A] text-white hover:bg-[#15443A] transition-colors duration-200"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                     Edit
@@ -728,8 +726,8 @@ export default function SavedResumePage() {
                     <button
                       onClick={handleSaveEdits}
                       disabled={saving}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                        bg-[#22C55E] text-white hover:bg-[#16A34A] transition-colors duration-200
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
+                        bg-[#1F7A4D] text-white hover:bg-[#17603C] transition-colors duration-200
                         disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
@@ -741,8 +739,8 @@ export default function SavedResumePage() {
                         editedResumeDataRef.current = resume.resumeData
                         setEditedResumeData(resume.resumeData)
                       }}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-                        border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium
+                        border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
                         transition-all duration-200"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -756,9 +754,9 @@ export default function SavedResumePage() {
                   <button
                     onClick={() => setShowDeleteModal(true)}
                     aria-label="Delete this resume"
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-                      border border-[#EF4444]/20 text-[#EF4444]/70
-                      hover:bg-[#EF4444]/10 hover:text-[#EF4444] hover:border-[#EF4444]/40
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium
+                      border border-[#B42318]/20 text-[#B42318]/70
+                      hover:bg-[#B42318]/10 hover:text-[#B42318] hover:border-[#B42318]/40
                       transition-all duration-200"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -769,38 +767,38 @@ export default function SavedResumePage() {
             </div>
 
             {/* Metadata card */}
-            <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] px-5 py-4">
+            <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+              <div className="rounded-[4px]  bg-[#FFFFFF] px-5 py-4">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   {/* Left: title block */}
                   <div>
                     <div className="flex items-center gap-2">
-                      <h1 className="font-heading font-semibold text-white text-lg leading-tight">
+                      <h1 className="font-heading font-semibold text-lp-ink text-lg leading-tight">
                         {resume.name}
                       </h1>
                       {isEditMode && (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold
-                          bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B]">
+                          bg-[#8A5A00]/10 border border-[#8A5A00]/20 text-[#8A5A00]">
                           Editing
                         </span>
                       )}
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2">
                       {resume.targetPosition && (
-                        <span className="flex items-center gap-1.5 text-sm text-[#A0A0B8]">
-                          <Target className="w-3.5 h-3.5 text-[#6366F1]" />
+                        <span className="flex items-center gap-1.5 text-sm text-[#3C403E]">
+                          <Target className="w-3.5 h-3.5 text-[#1F5C4A]" />
                           {resume.targetPosition}
                           {resume.targetCompany && (
-                            <span className="text-[#60607A]">@ {resume.targetCompany}</span>
+                            <span className="text-[#5A5F5C]">@ {resume.targetCompany}</span>
                           )}
                         </span>
                       )}
-                      <span className="flex items-center gap-1.5 text-sm text-[#60607A]">
+                      <span className="flex items-center gap-1.5 text-sm text-[#5A5F5C]">
                         <Calendar className="w-3.5 h-3.5" />
                         Created {formatDate(resume.createdAt)}
                       </span>
                       {formatDate(resume.updatedAt) !== formatDate(resume.createdAt) && (
-                        <span className="text-sm text-[#60607A]">
+                        <span className="text-sm text-[#5A5F5C]">
                           · Updated {formatDate(resume.updatedAt)}
                         </span>
                       )}
@@ -810,14 +808,14 @@ export default function SavedResumePage() {
                   {/* Right: meta chips */}
                   <div className="flex items-center gap-2 flex-wrap">
                     {/* Template badge */}
-                    <span className="px-2.5 py-1 rounded-lg text-xs font-medium
-                      bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8]">
+                    <span className="px-2.5 py-1 rounded-[4px] text-xs font-medium
+                      bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]">
                       {TEMPLATE_LABELS[resume.templateId]}
                     </span>
 
                     {/* ATS score badge */}
                     {resume.atsScore !== undefined && (
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold
+                      <span className={`px-2.5 py-1 rounded-[4px] text-xs font-semibold
                         border ${atsScoreBg(resume.atsScore)}`}>
                         ATS {resume.atsScore}%
                       </span>
@@ -831,9 +829,9 @@ export default function SavedResumePage() {
             {/* Resume Preview / Editor — ref lives here so both modes share the same scale */}
             <div ref={editContainerRef} className="overflow-x-hidden">
               {isEditMode && editedResumeData ? (
-                <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
+                <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
                   <div
-                    className="rounded-xl border border-white/[0.05] bg-[#0A0A0F] overflow-x-hidden overflow-y-auto"
+                    className="rounded-[10px]  bg-[#F4F2EC] overflow-x-hidden overflow-y-auto"
                     style={{ minHeight: '600px' }}>
                     <ResumeEditor
                       resumeData={editedResumeData}

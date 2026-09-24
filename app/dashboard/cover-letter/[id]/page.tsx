@@ -87,8 +87,8 @@ function EditableParagraph({
           onInput={(e) => onChange((e.target as HTMLDivElement).innerText)}
           onClick={(e) => e.stopPropagation()}
           style={{ ...base, padding: '6px 8px', cursor: 'text',
-            border: '1.5px solid rgba(245,158,11,0.4)',
-            background: 'rgba(245,158,11,0.04)' }}
+            border: '1.5px solid rgba(138,90,0,0.4)',
+            background: 'rgba(138,90,0,0.04)' }}
         />
       ) : (
         <div
@@ -158,8 +158,8 @@ function LetterShell({ company, name, email, phone, location, children, signerNa
             fontWeight: 700,
             fontSize: '11pt',
             color: '#1a1a1a',
-            border: '1.5px solid rgba(245,158,11,0.4)',
-            background: 'rgba(245,158,11,0.04)',
+            border: '1.5px solid rgba(138,90,0,0.4)',
+            background: 'rgba(138,90,0,0.04)',
             borderRadius: '4px',
             padding: '4px 8px',
             width: '280px',
@@ -235,9 +235,9 @@ function toMs(val: unknown): number {
 
 function WordBadge({ count }: { count: number }) {
   const color =
-    count > 300 ? 'text-[#EF4444] bg-[#EF4444]/10 border-[#EF4444]/20'
-    : count >= 280 ? 'text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/20'
-    : 'text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/20'
+    count > 300 ? 'text-[#B42318] bg-[#B42318]/10 border-[#B42318]/20'
+    : count >= 280 ? 'text-[#1F7A4D] bg-[#1F7A4D]/10 border-[#1F7A4D]/20'
+    : 'text-[#8A5A00] bg-[#8A5A00]/10 border-[#8A5A00]/20'
   return (
     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${color}`}>
       {count}w
@@ -418,15 +418,15 @@ export default function CoverLetterDetailPage() {
   if (!authLoading && !user) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-[#F59E0B]/10 border border-[#F59E0B]/20
+        <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
           flex items-center justify-center mb-4">
-          <Mail className="w-8 h-8 text-[#F59E0B]" />
+          <Mail className="w-8 h-8 text-[#1F5C4A]" />
         </div>
-        <h2 className="font-heading text-lg font-semibold text-white mb-2">Sign in to view your cover letters</h2>
-        <p className="text-sm text-[#60607A] mb-5">Your saved cover letters are stored securely in your account.</p>
-        <Link href="/login" className="px-5 py-2.5 rounded-xl text-sm font-semibold
-          bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
-          shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.02] transition-all">
+        <h2 className="font-heading text-lg font-semibold text-lp-ink mb-2">Sign in to view your cover letters</h2>
+        <p className="text-sm text-[#5A5F5C] mb-5">Your saved cover letters are stored securely in your account.</p>
+        <Link href="/login" className="px-5 py-2.5 rounded-[4px] text-sm font-semibold
+          bg-[#1F5C4A] text-white
+              transition-all">
           Sign in
         </Link>
       </div>
@@ -438,27 +438,27 @@ export default function CoverLetterDetailPage() {
 
       {/* ── Left sidebar ──────────────────────────────────────────────────── */}
       <div className="hidden md:flex flex-col w-[250px] flex-shrink-0 h-full">
-        <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 flex flex-col h-full">
-          <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-3 flex flex-col h-full">
+        <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 flex flex-col h-full">
+          <div className="rounded-[10px]  bg-[#FFFFFF] p-3 flex flex-col h-full">
 
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-[#A0A0B8] uppercase tracking-wide">
+              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">
                 Saved Letters
               </span>
               <Link
                 href="/dashboard/cover-letter"
                 aria-label="New cover letter"
-                className="w-6 h-6 rounded-lg bg-[#F59E0B]/10 border border-[#F59E0B]/20
-                  flex items-center justify-center hover:bg-[#F59E0B]/20 transition-colors"
+                className="w-6 h-6 rounded-[4px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
+                  flex items-center justify-center hover:bg-[#1F5C4A]/20 transition-colors"
               >
-                <Plus className="w-3 h-3 text-[#F59E0B]" />
+                <Plus className="w-3 h-3 text-[#1F5C4A]" />
               </Link>
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-1 min-h-0">
               {loading && (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-4 h-4 text-[#F59E0B] animate-spin" />
+                  <Loader2 className="w-4 h-4 text-[#1F5C4A] animate-spin" />
                 </div>
               )}
               {!loading && allLetters.map((l) => {
@@ -467,22 +467,22 @@ export default function CoverLetterDetailPage() {
                   <button
                     key={l.id}
                     onClick={() => router.push(`/dashboard/cover-letter/${l.id}`)}
-                    className={`w-full text-left px-2.5 py-2 rounded-lg transition-all duration-150
+                    className={`w-full text-left px-2.5 py-2 rounded-[4px] transition-all duration-150
                       ${isActive
-                        ? 'border border-[#F59E0B]/40 bg-[#F59E0B]/5'
-                        : 'border border-transparent hover:bg-white/[0.03]'
+                        ? 'border border-[#1F5C4A]/40 bg-[#1F5C4A]/5'
+                        : 'border border-transparent hover:bg-lp-ink/[0.03]'
                       }`}
                   >
-                    <p className={`text-xs font-semibold truncate ${isActive ? 'text-[#F59E0B]' : 'text-white'}`}>
+                    <p className={`text-xs font-semibold truncate ${isActive ? 'text-[#1F5C4A]' : 'text-lp-ink'}`}>
                       {l.company}
                     </p>
-                    <p className="text-[10px] text-[#60607A] truncate mt-0.5">{l.position}</p>
-                    <p className="text-[10px] text-[#60607A] mt-0.5">{formatDate(l.updatedAt)}</p>
+                    <p className="text-[10px] text-[#5A5F5C] truncate mt-0.5">{l.position}</p>
+                    <p className="text-[10px] text-[#5A5F5C] mt-0.5">{formatDate(l.updatedAt)}</p>
                   </button>
                 )
               })}
               {!loading && allLetters.length === 0 && (
-                <p className="text-xs text-[#60607A] text-center py-6">No saved letters</p>
+                <p className="text-xs text-[#5A5F5C] text-center py-6">No saved letters</p>
               )}
             </div>
           </div>
@@ -499,8 +499,8 @@ export default function CoverLetterDetailPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="flex items-center gap-2 mb-4 p-3 rounded-xl
-                bg-[#EF4444]/10 border border-[#EF4444]/20 text-[#EF4444] text-sm"
+              className="flex items-center gap-2 mb-4 p-3 rounded-[10px]
+                bg-[#B42318]/10 border border-[#B42318]/20 text-[#B42318] text-sm"
             >
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {error}
@@ -511,11 +511,11 @@ export default function CoverLetterDetailPage() {
         {/* Loading skeleton */}
         {loading && (
           <div className="space-y-4">
-            <div className="h-8 rounded-xl bg-white/[0.04] animate-pulse w-48" />
-            <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 space-y-3">
+            <div className="h-8 rounded-[10px] bg-lp-ink/[0.04] animate-pulse w-48" />
+            <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+              <div className="rounded-[10px]  bg-[#FFFFFF] p-6 space-y-3">
                 {[80, 65, 90, 72, 85, 60, 78].map((w, i) => (
-                  <div key={i} className="h-3 rounded-full bg-white/[0.06] animate-pulse" style={{ width: `${w}%` }} />
+                  <div key={i} className="h-3 rounded-full bg-lp-ink/6 animate-pulse" style={{ width: `${w}%` }} />
                 ))}
               </div>
             </div>
@@ -529,16 +529,16 @@ export default function CoverLetterDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-24 text-center"
           >
-            <div className="w-16 h-16 rounded-2xl bg-[#F59E0B]/10 border border-[#F59E0B]/20
+            <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
               flex items-center justify-center mb-4">
-              <Mail className="w-8 h-8 text-[#F59E0B]" />
+              <Mail className="w-8 h-8 text-[#1F5C4A]" />
             </div>
-            <h2 className="font-heading text-lg font-semibold text-white mb-2">Cover letter not found</h2>
-            <p className="text-sm text-[#60607A] mb-5">This letter may have been deleted.</p>
+            <h2 className="font-heading text-lg font-semibold text-lp-ink mb-2">Cover letter not found</h2>
+            <p className="text-sm text-[#5A5F5C] mb-5">This letter may have been deleted.</p>
             <Link href="/dashboard/cover-letter/saved"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
-                bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
-                shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.02] transition-all">
+              className="flex items-center gap-2 px-5 py-2.5 rounded-[4px] text-sm font-semibold
+                bg-[#1F5C4A] text-white
+                    transition-all">
               <ArrowLeft className="w-4 h-4" />
               Back to My Cover Letters
             </Link>
@@ -561,28 +561,28 @@ export default function CoverLetterDetailPage() {
                 <div className="flex items-center gap-2 min-w-0">
                   <Link
                     href="/dashboard/cover-letter/saved"
-                    className="p-1.5 rounded-lg text-[#60607A] hover:text-white hover:bg-white/5
+                    className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5
                       transition-all flex-shrink-0"
                     aria-label="Back to My Cover Letters"
                   >
                     <ArrowLeft className="w-4 h-4" />
                   </Link>
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#F59E0B]/20 to-[#D97706]/20
-                    border border-[#F59E0B]/30 flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-3.5 h-3.5 text-[#F59E0B]" />
+                  <div className="w-7 h-7 rounded-[4px] bg-[#1F5C4A]/20
+                    border border-[#1F5C4A]/30 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-3.5 h-3.5 text-[#1F5C4A]" />
                   </div>
                   <div className="min-w-0">
-                    <h1 className="font-heading text-base font-bold text-white truncate">
+                    <h1 className="font-heading text-base font-bold text-lp-ink truncate">
                       {letter.company}
                     </h1>
-                    <p className="text-xs text-[#60607A] truncate">{letter.position}</p>
+                    <p className="text-xs text-[#5A5F5C] truncate">{letter.position}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setDeleteTarget(true)}
                   aria-label="Delete this cover letter"
-                  className="p-2 rounded-xl text-[#60607A] hover:text-[#EF4444]
-                    hover:bg-[#EF4444]/10 transition-all duration-200 flex-shrink-0"
+                  className="p-2 rounded-[10px] text-[#5A5F5C] hover:text-[#B42318]
+                    hover:bg-[#B42318]/10 transition-all duration-200 flex-shrink-0"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -600,9 +600,8 @@ export default function CoverLetterDetailPage() {
                     onClick={handleDownloadPDF}
                     disabled={downloading}
                     aria-label="Download cover letter as PDF"
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                      bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white
-                      shadow-lg shadow-[#F59E0B]/25 hover:shadow-[#F59E0B]/50 hover:scale-[1.02]
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
+                      bg-[#1F5C4A] text-white
                       transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
@@ -617,8 +616,8 @@ export default function CoverLetterDetailPage() {
                       setEditedParagraphs(letter.paragraphs?.length ? letter.paragraphs : [letter.content])
                       setEditedSignerName(letter.signerName ?? personal.name)
                     }}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                      border border-[#F59E0B]/40 text-[#F59E0B] hover:bg-[#F59E0B]/10 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
+                      border border-[#1F5C4A]/40 text-[#1F5C4A] hover:bg-[#1F5C4A]/10 transition-colors"
                   >
                     <Pencil className="w-3 h-3" />
                     Edit
@@ -628,8 +627,8 @@ export default function CoverLetterDetailPage() {
                     <button
                       onClick={handleSaveEdits}
                       disabled={saving}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                        bg-[#22C55E] text-white hover:bg-[#16A34A] transition-colors
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
+                        bg-[#1F7A4D] text-white hover:bg-[#17603C] transition-colors
                         disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
@@ -640,8 +639,8 @@ export default function CoverLetterDetailPage() {
                         setIsEditMode(false)
                         setActiveParagraphIdx(null)
                       }}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-                        border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium
+                        border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
                     >
                       <X className="w-3 h-3" />
                       Cancel
@@ -653,7 +652,7 @@ export default function CoverLetterDetailPage() {
             </div>
 
             {/* Meta row */}
-            <div className="flex items-center gap-4 text-xs text-[#60607A]">
+            <div className="flex items-center gap-4 text-xs text-[#5A5F5C]">
               <div className="flex items-center gap-1.5">
                 <Target className="w-3.5 h-3.5" />
                 {letter.position}
@@ -664,7 +663,7 @@ export default function CoverLetterDetailPage() {
               </div>
               {isEditMode && (
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold
-                  bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B]">
+                  bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]">
                   Editing
                 </span>
               )}
@@ -672,15 +671,15 @@ export default function CoverLetterDetailPage() {
 
             {/* Opening hook callout */}
             {letter.openingHook && (
-              <div className="rounded-xl border border-[#F59E0B]/20 bg-[#F59E0B]/5 px-4 py-3">
-                <p className="text-xs font-semibold text-[#F59E0B] mb-1">Opening hook</p>
-                <p className="text-sm text-[#A0A0B8] italic">&ldquo;{letter.openingHook}&rdquo;</p>
+              <div className="rounded-[4px] border border-[#1F5C4A]/20 bg-[#1F5C4A]/5 px-4 py-3">
+                <p className="text-xs font-semibold text-[#1F5C4A] mb-1">Opening hook</p>
+                <p className="text-sm text-[#3C403E] italic">&ldquo;{letter.openingHook}&rdquo;</p>
               </div>
             )}
 
             {/* Edit mode hint */}
             {isEditMode && activeParagraphIdx === null && (
-              <p className="text-xs text-[#60607A] text-center py-1">
+              <p className="text-xs text-[#5A5F5C] text-center py-1">
                 Click any paragraph to edit inline
               </p>
             )}
@@ -688,7 +687,7 @@ export default function CoverLetterDetailPage() {
             {/* Letter document */}
             <div
               ref={previewContainerRef}
-              className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 overflow-hidden"
+              className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 overflow-hidden"
               style={{
                 height: `${contentHeight * scale + 32}px`,
               }}
@@ -697,7 +696,7 @@ export default function CoverLetterDetailPage() {
               }}
             >
               <div
-                className="rounded-xl border border-white/[0.05] overflow-hidden"
+                className="rounded-[10px]  overflow-hidden"
                 style={{
                   transformOrigin: 'top left',
                   transform: `scale(${scale})`,
@@ -742,8 +741,8 @@ export default function CoverLetterDetailPage() {
         <button
           onClick={() => setSidebarOpen((v) => !v)}
           aria-label="Toggle saved letters list"
-          className="w-10 h-10 rounded-xl bg-[#F59E0B] text-white flex items-center justify-center
-            shadow-lg shadow-[#F59E0B]/40 hover:bg-[#D97706] transition-all"
+          className="w-10 h-10 rounded-[10px] bg-[#1F5C4A] text-white flex items-center justify-center
+              hover:bg-[#15443A] transition-all"
         >
           {sidebarOpen ? <X className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
         </button>
@@ -766,22 +765,22 @@ export default function CoverLetterDetailPage() {
               exit={{ opacity: 0, x: -280 }}
               transition={SPRING}
               className="lg:hidden fixed left-0 top-0 bottom-0 z-40 w-64
-                bg-[#13131A] border-r border-white/[0.08] overflow-y-auto p-3 pt-16"
+                bg-[#FFFFFF] border-r border-lp-rule overflow-y-auto p-3 pt-16"
             >
               <div className="flex items-center justify-between mb-3 px-1">
-                <span className="text-sm font-semibold text-white">Saved Letters</span>
+                <span className="text-sm font-semibold text-lp-ink">Saved Letters</span>
                 <button
                   onClick={() => setSidebarOpen(false)}
                   aria-label="Close letters list"
-                  className="p-1 rounded-lg hover:bg-white/5 text-[#60607A] hover:text-white"
+                  className="p-1 rounded-[4px] hover:bg-lp-ink/5 text-[#5A5F5C] hover:text-lp-ink"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <Link
                 href="/dashboard/cover-letter"
-                className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3
-                  bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B] text-xs font-semibold"
+                className="flex items-center gap-2 px-3 py-2 rounded-[4px] mb-3
+                  bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A] text-xs font-semibold"
                 onClick={() => setSidebarOpen(false)}
               >
                 <Plus className="w-3.5 h-3.5" /> New Cover Letter
@@ -796,17 +795,17 @@ export default function CoverLetterDetailPage() {
                           router.push(`/dashboard/cover-letter/${l.id}`)
                           setSidebarOpen(false)
                         }}
-                        className={`w-full text-left px-2.5 py-2 rounded-lg transition-all
+                        className={`w-full text-left px-2.5 py-2 rounded-[4px] transition-all
                           ${isActive
-                            ? 'border border-[#F59E0B]/40 bg-[#F59E0B]/5'
-                            : 'border border-transparent hover:bg-white/[0.03]'
+                            ? 'border border-[#1F5C4A]/40 bg-[#1F5C4A]/5'
+                            : 'border border-transparent hover:bg-lp-ink/[0.03]'
                           }`}
                       >
-                        <p className={`text-xs font-semibold truncate ${isActive ? 'text-[#F59E0B]' : 'text-white'}`}>
+                        <p className={`text-xs font-semibold truncate ${isActive ? 'text-[#1F5C4A]' : 'text-lp-ink'}`}>
                           {l.company}
                         </p>
-                        <p className="text-[10px] text-[#60607A] truncate mt-0.5">{l.position}</p>
-                        <p className="text-[10px] text-[#60607A] mt-0.5">{formatDate(l.updatedAt)}</p>
+                        <p className="text-[10px] text-[#5A5F5C] truncate mt-0.5">{l.position}</p>
+                        <p className="text-[10px] text-[#5A5F5C] mt-0.5">{formatDate(l.updatedAt)}</p>
                       </button>
                     </li>
                   )
@@ -824,7 +823,7 @@ export default function CoverLetterDetailPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 "
             onClick={(e) => { if (e.target === e.currentTarget) setDeleteTarget(false) }}
           >
             <motion.div
@@ -832,38 +831,38 @@ export default function CoverLetterDetailPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 16 }}
               transition={SPRING}
-              className="w-full max-w-sm rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+              className="w-full max-w-sm rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
             >
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6">
+              <div className="rounded-[10px]  bg-[#FFFFFF] p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20
+                  <div className="w-10 h-10 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20
                     flex items-center justify-center">
-                    <Trash2 className="w-5 h-5 text-[#EF4444]" />
+                    <Trash2 className="w-5 h-5 text-[#B42318]" />
                   </div>
                   <button
                     onClick={() => setDeleteTarget(false)}
-                    className="p-1.5 rounded-lg text-[#60607A] hover:text-white hover:bg-white/5 transition-all"
+                    className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                <h3 className="font-heading text-base font-semibold text-white mb-1">Delete cover letter?</h3>
-                <p className="text-sm text-[#60607A] mb-6">
+                <h3 className="font-heading text-base font-semibold text-lp-ink mb-1">Delete cover letter?</h3>
+                <p className="text-sm text-[#5A5F5C] mb-6">
                   This will be permanently deleted. This action cannot be undone.
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setDeleteTarget(false)}
-                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium
-                      border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all"
+                    className="flex-1 px-4 py-2.5 rounded-[4px] text-sm font-medium
+                      border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleDelete}
                     disabled={deleting}
-                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold
-                      bg-[#EF4444] text-white hover:bg-[#DC2626] transition-colors
+                    className="flex-1 px-4 py-2.5 rounded-[4px] text-sm font-semibold
+                      bg-[#B42318] text-white hover:bg-[#912018] transition-colors
                       disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Delete'}

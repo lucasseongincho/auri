@@ -64,12 +64,12 @@ export default function PricingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0A0A0F] px-6 py-16">
+    <main className="min-h-screen bg-[#F4F2EC] px-6 py-16">
       <div className="max-w-4xl mx-auto">
         {/* Back link */}
         <Link
           href={user ? '/dashboard' : '/'}
-          className="inline-flex items-center gap-1.5 text-sm text-[#60607A] hover:text-white transition-colors mb-12"
+          className="inline-flex items-center gap-1.5 text-sm text-[#5A5F5C] hover:text-lp-ink transition-colors mb-12"
         >
           <ArrowLeft className="w-4 h-4" />
           {user ? 'Back to dashboard' : 'Back to home'}
@@ -82,13 +82,13 @@ export default function PricingPage() {
           transition={SPRING}
           className="text-center mb-10"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#6366F1]/30 bg-[#6366F1]/10 text-[#818CF8] text-xs font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1F5C4A]/30 bg-[#1F5C4A]/10 text-[#1F5C4A] text-xs font-medium mb-6">
             <Sparkles className="w-3 h-3" /> Simple, transparent pricing
           </div>
-          <h1 className="font-heading text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h1 className="font-heading text-4xl lg:text-5xl font-bold text-lp-ink mb-4">
             Start free. Upgrade when<br />you&apos;re ready.
           </h1>
-          <p className="text-[#A0A0B8] text-lg">
+          <p className="text-[#3C403E] text-lg">
             No credit card required to start. Cancel anytime.
           </p>
         </motion.div>
@@ -100,31 +100,31 @@ export default function PricingPage() {
           transition={{ ...SPRING, delay: 0.05 }}
           className="flex justify-center mb-10"
         >
-          <div className="inline-flex items-center rounded-xl
-            border border-white/[0.08] bg-[#13131A] p-1 gap-1">
+          <div className="inline-flex items-center rounded-[10px]
+            border border-lp-rule bg-[#FFFFFF] p-0 gap-1">
             <button
               onClick={() => setBilling('monthly')}
-              className={`px-5 py-2 rounded-lg text-sm font-medium
+              className={`px-5 py-2 rounded-[4px] text-sm font-medium
                 transition-all duration-200 ${
                 billing === 'monthly'
-                  ? 'bg-[#6366F1] text-white'
-                  : 'text-[#60607A] hover:text-[#A0A0B8]'
+                  ? 'bg-[#1F5C4A] text-white'
+                  : 'text-[#5A5F5C] hover:text-[#3C403E]'
               }`}
             >
               Monthly
             </button>
             <button
               onClick={() => setBilling('annual')}
-              className={`px-5 py-2 rounded-lg text-sm font-medium
+              className={`px-5 py-2 rounded-[4px] text-sm font-medium
                 transition-all duration-200 flex items-center gap-2 ${
                 billing === 'annual'
-                  ? 'bg-[#6366F1] text-white'
-                  : 'text-[#60607A] hover:text-[#A0A0B8]'
+                  ? 'bg-[#1F5C4A] text-white'
+                  : 'text-[#5A5F5C] hover:text-[#3C403E]'
               }`}
             >
               Annual
               <span className="text-[10px] font-semibold px-1.5 py-0.5
-                rounded-full bg-[#22C55E] text-white">
+                rounded-full bg-[#1F7A4D] text-white">
                 Save 17%
               </span>
             </button>
@@ -139,32 +139,32 @@ export default function PricingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING, delay: 0.08 }}
           >
-            <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-full">
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-8 h-full flex flex-col">
+            <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 h-full">
+              <div className="rounded-[10px]  bg-[#FFFFFF] p-8 h-full flex flex-col">
                 <div className="mb-6">
-                  <p className="font-heading font-semibold text-[#A0A0B8] mb-2">Free</p>
+                  <p className="font-heading font-semibold text-[#3C403E] mb-2">Free</p>
                   <div className="flex items-end gap-1">
-                    <span className="font-heading font-bold text-4xl text-white">$0</span>
-                    <span className="text-[#60607A] mb-1">/month</span>
+                    <span className="font-heading font-bold text-4xl text-lp-ink">$0</span>
+                    <span className="text-[#5A5F5C] mb-1">/month</span>
                   </div>
-                  <p className="text-xs text-[#60607A] mt-2">No credit card required</p>
+                  <p className="text-xs text-[#5A5F5C] mt-2">No credit card required</p>
                 </div>
 
                 <ul className="space-y-3 mb-2 flex-1">
                   {FREE_FEATURES.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
-                      <CheckCircle className="w-4 h-4 text-[#22C55E] flex-shrink-0" /> {f}
+                    <li key={f} className="flex items-center gap-2 text-sm text-[#3C403E]">
+                      <CheckCircle className="w-4 h-4 text-[#1F7A4D] flex-shrink-0" /> {f}
                     </li>
                   ))}
                 </ul>
-                <p className="text-xs text-[#60607A] mt-2 mb-8">
+                <p className="text-xs text-[#5A5F5C] mt-2 mb-8">
                   LinkedIn, Strategy, Interview &amp; Rewriter require Pro
                 </p>
 
                 <Link
                   href="/dashboard"
-                  className="block text-center py-3 rounded-xl border border-white/15
-                    text-[#A0A0B8] hover:text-white hover:bg-white/5
+                  className="block text-center py-3 rounded-[10px] border border-lp-rule
+                    text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
                     transition-all duration-200 font-medium"
                 >
                   Get Started Free
@@ -179,14 +179,14 @@ export default function PricingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING, delay: 0.12 }}
           >
-            <div className="rounded-2xl border border-[#6366F1]/40 bg-[#13131A] p-1 h-full relative">
+            <div className="rounded-[10px] border border-[#1F5C4A]/40 bg-[#FFFFFF] p-1 h-full relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full
-                bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-xs font-semibold">
+                bg-[#1F5C4A] text-white text-xs font-semibold">
                 Most Popular
               </div>
-              <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] p-8 h-full flex flex-col">
+              <div className="rounded-[10px] border border-[#1F5C4A]/20 bg-[#FFFFFF] p-8 h-full flex flex-col">
                 <div className="mb-6">
-                  <p className="font-heading font-semibold text-[#818CF8] mb-2">Pro</p>
+                  <p className="font-heading font-semibold text-[#1F5C4A] mb-2">Pro</p>
                   <div className="flex items-end gap-1">
                     <AnimatePresence mode="wait">
                       <motion.span
@@ -195,12 +195,12 @@ export default function PricingPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
                         transition={{ duration: 0.18, ease: 'easeOut' }}
-                        className="font-heading font-bold text-4xl text-white"
+                        className="font-heading font-bold text-4xl text-lp-ink"
                       >
                         {billing === 'annual' ? '$15.83' : '$19'}
                       </motion.span>
                     </AnimatePresence>
-                    <span className="text-[#60607A] mb-1">/month</span>
+                    <span className="text-[#5A5F5C] mb-1">/month</span>
                   </div>
                   <AnimatePresence>
                     {billing === 'annual' && (
@@ -209,7 +209,7 @@ export default function PricingPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
                         transition={{ duration: 0.15 }}
-                        className="text-xs text-[#22C55E] mt-1"
+                        className="text-xs text-[#1F7A4D] mt-1"
                       >
                         $190 billed annually
                       </motion.p>
@@ -219,18 +219,17 @@ export default function PricingPage() {
 
                 <ul className="space-y-3 mb-8 flex-1">
                   {PRO_FEATURES.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
-                      <CheckCircle className="w-4 h-4 text-[#6366F1] flex-shrink-0" /> {f}
+                    <li key={f} className="flex items-center gap-2 text-sm text-[#3C403E]">
+                      <CheckCircle className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" /> {f}
                     </li>
                   ))}
                 </ul>
 
                 <button
                   onClick={handleUpgrade}
-                  className="w-full py-3 rounded-xl font-semibold text-white
-                    bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-                    shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                    hover:scale-[1.02] transition-all duration-200"
+                  className="w-full py-3 rounded-[10px] font-semibold text-white
+                    bg-[#1F5C4A]
+                     transition-all duration-200"
                 >
                   {user ? 'Upgrade to Pro' : 'Sign in to Upgrade'}
                 </button>
@@ -244,10 +243,10 @@ export default function PricingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="text-center text-sm text-[#60607A] mt-12"
+          className="text-center text-sm text-[#5A5F5C] mt-12"
         >
           Questions? Email{' '}
-          <a href="mailto:support@auri.app" className="text-[#6366F1] hover:text-[#818CF8] transition-colors">
+          <a href="mailto:support@auri.app" className="text-[#1F5C4A] underline underline-offset-2 hover:text-[#15443A] transition-colors">
             support@auri.app
           </a>
         </motion.p>

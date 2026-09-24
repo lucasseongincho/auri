@@ -116,8 +116,8 @@ function genId(): string {
 // ─── Input component (shared style) ──────────────────────────────────────────
 
 const INPUT_CLASS =
-  'w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-[#60607A] focus:outline-none focus:border-[#6366F1]/50 focus:ring-1 focus:ring-[#6366F1]/30 transition-all'
-const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
+  'w-full bg-[#F4F2EC] border border-lp-rule rounded-[4px] px-4 py-3 text-lp-ink text-sm placeholder-[#5A5F5C] focus:outline-none focus:border-[#1F5C4A]/50 focus:ring-1 focus:ring-[#1F5C4A]/30 transition-all'
+const LABEL_CLASS = 'block text-xs font-medium text-[#3C403E] mb-1.5'
 const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
 interface FieldProps {
@@ -132,11 +132,11 @@ function Field({ label, required, error, children }: FieldProps) {
     <div>
       <label className={LABEL_CLASS}>
         {label}
-        {required && <span className="text-[#EF4444] ml-0.5">*</span>}
+        {required && <span className="text-[#B42318] ml-0.5">*</span>}
       </label>
       {children}
       {error && (
-        <p className="mt-1 text-xs text-[#EF4444] flex items-center gap-1">
+        <p className="mt-1 text-xs text-[#B42318] flex items-center gap-1">
           <AlertCircle className="w-3 h-3 flex-shrink-0" />
           {error}
         </p>
@@ -248,7 +248,7 @@ function StepPersonal({
             onChange={(e) => update('portfolioLabel', e.target.value)}
             aria-label="Portfolio link label"
           />
-          <p className="mt-1.5 text-[11px] text-[#60607A]">
+          <p className="mt-1.5 text-[11px] text-[#5A5F5C]">
             This is what people will see as the link text (default: &quot;Portfolio&quot;)
           </p>
         </Field>
@@ -299,7 +299,7 @@ function StepExperience({ errors }: { errors: Step2Errors }) {
   return (
     <div className="space-y-4">
       {errors.experience && (
-        <p className="text-xs text-[#EF4444] flex items-center gap-1">
+        <p className="text-xs text-[#B42318] flex items-center gap-1">
           <AlertCircle className="w-3 h-3 flex-shrink-0" />
           {errors.experience}
         </p>
@@ -313,17 +313,17 @@ function StepExperience({ errors }: { errors: Step2Errors }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={SPRING}
-            className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+            className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
           >
-            <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
+            <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide">
+                <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">
                   Position {idx + 1}
                 </span>
                 <button
                   onClick={() => removeExperience(exp.id)}
                   aria-label={`Remove experience ${idx + 1}`}
-                  className="p-1.5 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all"
+                  className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -378,10 +378,10 @@ function StepExperience({ errors }: { errors: Step2Errors }) {
                         onChange={(e) =>
                           updateExp(exp.id, 'end', e.target.checked ? 'Present' : '')
                         }
-                        className="w-3.5 h-3.5 rounded accent-[#6366F1]"
+                        className="w-3.5 h-3.5 rounded accent-[#1F5C4A]"
                         aria-label={`Currently working here for position ${idx + 1}`}
                       />
-                      <span className="text-xs text-[#A0A0B8]">Currently working here</span>
+                      <span className="text-xs text-[#3C403E]">Currently working here</span>
                     </label>
                   </div>
                 </Field>
@@ -405,9 +405,9 @@ function StepExperience({ errors }: { errors: Step2Errors }) {
       <button
         onClick={addExperience}
         aria-label="Add another experience entry"
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-          border border-dashed border-white/[0.12] text-[#A0A0B8] text-sm
-          hover:border-[#6366F1]/40 hover:text-[#6366F1] hover:bg-[#6366F1]/5
+        className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
+          border border-dashed border-lp-rule text-[#3C403E] text-sm
+          hover:border-[#1F5C4A]/40 hover:text-[#1F5C4A] hover:bg-[#1F5C4A]/5
           transition-all duration-200"
       >
         <Plus className="w-4 h-4" />
@@ -467,17 +467,17 @@ function EducationCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={SPRING}
-      className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+      className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
     >
-      <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
+      <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide">
+          <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">
             Education {idx + 1}
           </span>
           <button
             onClick={onRemove}
             aria-label={`Remove education ${idx + 1}`}
-            className="p-1.5 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all"
+            className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -554,8 +554,8 @@ function EducationCard({
             <button
               onClick={() => addMajor(majorInput)}
               aria-label="Add additional major"
-              className="px-4 py-3 rounded-xl bg-[#6366F1]/20 border border-[#6366F1]/30
-                text-[#6366F1] text-sm font-medium hover:bg-[#6366F1]/30 transition-all flex-shrink-0"
+              className="px-4 py-3 rounded-[4px] bg-[#1F5C4A]/20 border border-[#1F5C4A]/30
+                text-[#1F5C4A] text-sm font-medium hover:bg-[#1F5C4A]/30 transition-all flex-shrink-0"
             >
               Add
             </button>
@@ -571,13 +571,13 @@ function EducationCard({
                     exit={{ opacity: 0, scale: 0.85 }}
                     transition={SPRING}
                     className="flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full
-                      bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8] text-xs font-medium"
+                      bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A] text-xs font-medium"
                   >
                     {major}
                     <button
                       onClick={() => removeMajor(major)}
                       aria-label={`Remove major ${major}`}
-                      className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-[#6366F1]/30 transition-all"
+                      className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-[#1F5C4A]/30 transition-all"
                     >
                       <X className="w-2.5 h-2.5" />
                     </button>
@@ -607,8 +607,8 @@ function EducationCard({
             <button
               onClick={() => addMinor(minorInput)}
               aria-label="Add minor"
-              className="px-4 py-3 rounded-xl bg-[#6366F1]/20 border border-[#6366F1]/30
-                text-[#6366F1] text-sm font-medium hover:bg-[#6366F1]/30 transition-all flex-shrink-0"
+              className="px-4 py-3 rounded-[4px] bg-[#1F5C4A]/20 border border-[#1F5C4A]/30
+                text-[#1F5C4A] text-sm font-medium hover:bg-[#1F5C4A]/30 transition-all flex-shrink-0"
             >
               Add
             </button>
@@ -624,13 +624,13 @@ function EducationCard({
                     exit={{ opacity: 0, scale: 0.85 }}
                     transition={SPRING}
                     className="flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full
-                      bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 text-[#A78BFA] text-xs font-medium"
+                      bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A] text-xs font-medium"
                   >
                     {minor}
                     <button
                       onClick={() => removeMinor(minor)}
                       aria-label={`Remove minor ${minor}`}
-                      className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-[#8B5CF6]/30 transition-all"
+                      className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-[#1F5C4A]/30 transition-all"
                     >
                       <X className="w-2.5 h-2.5" />
                     </button>
@@ -689,9 +689,9 @@ function StepEducation() {
       <button
         onClick={addEducation}
         aria-label="Add another education entry"
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-          border border-dashed border-white/[0.12] text-[#A0A0B8] text-sm
-          hover:border-[#6366F1]/40 hover:text-[#6366F1] hover:bg-[#6366F1]/5
+        className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
+          border border-dashed border-lp-rule text-[#3C403E] text-sm
+          hover:border-[#1F5C4A]/40 hover:text-[#1F5C4A] hover:bg-[#1F5C4A]/5
           transition-all duration-200"
       >
         <Plus className="w-4 h-4" />
@@ -749,8 +749,8 @@ function StepSkills() {
           <button
             onClick={() => addSkill(input)}
             aria-label="Add skill"
-            className="px-4 py-3 rounded-xl bg-[#6366F1]/20 border border-[#6366F1]/30
-              text-[#6366F1] text-sm font-medium hover:bg-[#6366F1]/30 transition-all
+            className="px-4 py-3 rounded-[4px] bg-[#1F5C4A]/20 border border-[#1F5C4A]/30
+              text-[#1F5C4A] text-sm font-medium hover:bg-[#1F5C4A]/30 transition-all
               flex-shrink-0"
           >
             Add
@@ -769,14 +769,14 @@ function StepSkills() {
                 exit={{ opacity: 0, scale: 0.85 }}
                 transition={SPRING}
                 className="flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full
-                  bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#818CF8] text-xs font-medium"
+                  bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A] text-xs font-medium"
               >
                 {skill}
                 <button
                   onClick={() => removeSkill(skill)}
                   aria-label={`Remove skill ${skill}`}
                   className="w-4 h-4 rounded-full flex items-center justify-center
-                    hover:bg-[#6366F1]/30 transition-all"
+                    hover:bg-[#1F5C4A]/30 transition-all"
                 >
                   <X className="w-2.5 h-2.5" />
                 </button>
@@ -785,7 +785,7 @@ function StepSkills() {
           </AnimatePresence>
         </div>
       ) : (
-        <p className="text-sm text-[#60607A] text-center py-4">
+        <p className="text-sm text-[#5A5F5C] text-center py-4">
           No skills added yet. Type above and press Enter.
         </p>
       )}
@@ -834,8 +834,8 @@ function StepCertifications() {
           <button
             onClick={() => addCert(input)}
             aria-label="Add certification"
-            className="px-4 py-3 rounded-xl bg-[#6366F1]/20 border border-[#6366F1]/30
-              text-[#6366F1] text-sm font-medium hover:bg-[#6366F1]/30 transition-all
+            className="px-4 py-3 rounded-[4px] bg-[#1F5C4A]/20 border border-[#1F5C4A]/30
+              text-[#1F5C4A] text-sm font-medium hover:bg-[#1F5C4A]/30 transition-all
               flex-shrink-0"
           >
             Add
@@ -853,18 +853,18 @@ function StepCertifications() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -8 }}
                 transition={SPRING}
-                className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl
-                  bg-[#0A0A0F] border border-white/[0.08]"
+                className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-[4px]
+                  bg-[#F4F2EC] border border-lp-rule"
               >
                 <div className="flex items-center gap-2">
-                  <Award className="w-3.5 h-3.5 text-[#F59E0B] flex-shrink-0" />
-                  <span className="text-sm text-white">{cert}</span>
+                  <Award className="w-3.5 h-3.5 text-[#8A5A00] flex-shrink-0" />
+                  <span className="text-sm text-lp-ink">{cert}</span>
                 </div>
                 <button
                   onClick={() => removeCert(cert)}
                   aria-label={`Remove certification ${cert}`}
-                  className="p-1 rounded-lg text-[#60607A] hover:text-[#EF4444]
-                    hover:bg-[#EF4444]/10 transition-all"
+                  className="p-1 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318]
+                    hover:bg-[#B42318]/10 transition-all"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -873,7 +873,7 @@ function StepCertifications() {
           </AnimatePresence>
         </div>
       ) : (
-        <p className="text-sm text-[#60607A] text-center py-4">
+        <p className="text-sm text-[#5A5F5C] text-center py-4">
           No certifications added yet — this section is optional.
         </p>
       )}
@@ -941,17 +941,17 @@ function StepProjects() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={SPRING}
-            className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+            className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
           >
-            <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
+            <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide">
+                <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">
                   Project {idx + 1}
                 </span>
                 <button
                   onClick={() => removeProject(proj.id)}
                   aria-label={`Remove project ${idx + 1}`}
-                  className="p-1.5 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all"
+                  className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -996,9 +996,9 @@ function StepProjects() {
       <button
         onClick={addProject}
         aria-label="Add another project"
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-          border border-dashed border-white/[0.12] text-[#A0A0B8] text-sm
-          hover:border-[#6366F1]/40 hover:text-[#6366F1] hover:bg-[#6366F1]/5
+        className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
+          border border-dashed border-lp-rule text-[#3C403E] text-sm
+          hover:border-[#1F5C4A]/40 hover:text-[#1F5C4A] hover:bg-[#1F5C4A]/5
           transition-all duration-200"
       >
         <Plus className="w-4 h-4" />
@@ -1048,27 +1048,27 @@ function StepAdditional() {
 
   return (
     <div className="space-y-6">
-      <p className="text-xs text-[#A0A0B8]">
+      <p className="text-xs text-[#3C403E]">
         All sections below are optional. They appear on the resume only if you add data.
       </p>
 
       {/* Leadership */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Star className="w-4 h-4 text-[#6366F1]" />
-          <span className="text-sm font-semibold text-white">Leadership Experience</span>
+          <Star className="w-4 h-4 text-[#1F5C4A]" />
+          <span className="text-sm font-semibold text-lp-ink">Leadership Experience</span>
         </div>
         <div className="space-y-3">
           <AnimatePresence initial={false}>
             {leadershipList.map((item, idx) => (
               <motion.div key={item.id} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }} transition={SPRING}
-                className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
+                className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+                <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide">Leadership {idx + 1}</span>
+                    <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">Leadership {idx + 1}</span>
                     <button onClick={() => removeLeadership(item.id)} aria-label={`Remove leadership ${idx + 1}`}
-                      className="p-1.5 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all">
+                      className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -1093,8 +1093,8 @@ function StepAdditional() {
             ))}
           </AnimatePresence>
           <button onClick={addLeadership} aria-label="Add leadership experience"
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-white/[0.12]
-              text-[#A0A0B8] text-sm hover:border-[#6366F1]/40 hover:text-[#6366F1] hover:bg-[#6366F1]/5 transition-all">
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] border border-dashed border-lp-rule
+              text-[#3C403E] text-sm hover:border-[#1F5C4A]/40 hover:text-[#1F5C4A] hover:bg-[#1F5C4A]/5 transition-all">
             <Plus className="w-4 h-4" /> Add Leadership
           </button>
         </div>
@@ -1103,20 +1103,20 @@ function StepAdditional() {
       {/* Volunteer */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Heart className="w-4 h-4 text-[#EC4899]" />
-          <span className="text-sm font-semibold text-white">Volunteer Work</span>
+          <Heart className="w-4 h-4 text-[#1F5C4A]" />
+          <span className="text-sm font-semibold text-lp-ink">Volunteer Work</span>
         </div>
         <div className="space-y-3">
           <AnimatePresence initial={false}>
             {volunteerList.map((item, idx) => (
               <motion.div key={item.id} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }} transition={SPRING}
-                className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 space-y-3">
+                className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+                <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#EC4899] uppercase tracking-wide">Volunteer {idx + 1}</span>
+                    <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">Volunteer {idx + 1}</span>
                     <button onClick={() => removeVolunteer(item.id)} aria-label={`Remove volunteer ${idx + 1}`}
-                      className="p-1.5 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all">
+                      className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -1138,8 +1138,8 @@ function StepAdditional() {
             ))}
           </AnimatePresence>
           <button onClick={addVolunteer} aria-label="Add volunteer work"
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-white/[0.12]
-              text-[#A0A0B8] text-sm hover:border-[#EC4899]/40 hover:text-[#EC4899] hover:bg-[#EC4899]/5 transition-all">
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] border border-dashed border-lp-rule
+              text-[#3C403E] text-sm hover:border-[#1F5C4A]/40 hover:text-[#1F5C4A] hover:bg-[#1F5C4A]/5 transition-all">
             <Plus className="w-4 h-4" /> Add Volunteer
           </button>
         </div>
@@ -1148,20 +1148,20 @@ function StepAdditional() {
       {/* Languages */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Languages className="w-4 h-4 text-[#F59E0B]" />
-          <span className="text-sm font-semibold text-white">Languages</span>
+          <Languages className="w-4 h-4 text-[#8A5A00]" />
+          <span className="text-sm font-semibold text-lp-ink">Languages</span>
         </div>
         <div className="space-y-2">
           <AnimatePresence initial={false}>
             {languageList.map((lang) => (
               <motion.div key={lang.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -8 }} transition={SPRING}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[#0A0A0F] border border-white/[0.08]">
-                <input type="text" className="flex-1 bg-transparent text-sm text-white placeholder-[#60607A] outline-none"
+                className="flex items-center gap-3 px-4 py-2.5 rounded-[4px] bg-[#F4F2EC] border border-lp-rule">
+                <input type="text" className="flex-1 bg-transparent text-sm text-lp-ink placeholder-[#5A5F5C] outline-none"
                   placeholder="Language (e.g. Spanish)" value={lang.name}
                   onChange={(e) => updateLanguage(lang.id, 'name', e.target.value)} aria-label="Language name" />
                 <select
-                  className="bg-[#1C1C26] border border-white/[0.08] rounded-lg px-2 py-1 text-xs text-[#A0A0B8] outline-none"
+                  className="bg-[#FFFFFF] border border-lp-rule rounded-[4px] px-2 py-1 text-xs text-[#3C403E] outline-none"
                   value={lang.proficiency}
                   onChange={(e) => updateLanguage(lang.id, 'proficiency', e.target.value)}
                   aria-label="Proficiency level"
@@ -1171,15 +1171,15 @@ function StepAdditional() {
                   ))}
                 </select>
                 <button onClick={() => removeLanguage(lang.id)} aria-label={`Remove language ${lang.name}`}
-                  className="p-1 rounded-lg text-[#60607A] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all">
+                  className="p-1 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </motion.div>
             ))}
           </AnimatePresence>
           <button onClick={addLanguage} aria-label="Add language"
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-white/[0.12]
-              text-[#A0A0B8] text-sm hover:border-[#F59E0B]/40 hover:text-[#F59E0B] hover:bg-[#F59E0B]/5 transition-all">
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] border border-dashed border-lp-rule
+              text-[#3C403E] text-sm hover:border-[#8A5A00]/40 hover:text-[#8A5A00] hover:bg-[#8A5A00]/5 transition-all">
             <Plus className="w-4 h-4" /> Add Language
           </button>
         </div>
@@ -1213,8 +1213,8 @@ function StepTargetJob({ errors }: { errors: Step8Errors }) {
 
   return (
     <div className="space-y-4">
-      <div className="p-3 rounded-xl bg-[#6366F1]/10 border border-[#6366F1]/20">
-        <p className="text-xs text-[#818CF8]">
+      <div className="p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
+        <p className="text-xs text-[#1F5C4A]">
           AURI will tailor your entire resume to this specific role and job description.
           The more detail you provide, the stronger the keyword match.
         </p>
@@ -1296,30 +1296,30 @@ function SignUpModal({ onClose }: SignUpModalProps) {
         exit={{ opacity: 0, scale: 0.95 }}
         transition={SPRING}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+        className="w-full max-w-sm rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
       >
-        <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 text-center">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6]
+        <div className="rounded-[10px]  bg-[#FFFFFF] p-6 text-center">
+          <div className="w-12 h-12 rounded-[10px] bg-[#1F5C4A]/10
             flex items-center justify-center mx-auto mb-4">
-            <Save className="w-6 h-6 text-white" />
+            <Save className="w-6 h-6 text-lp-ink" />
           </div>
-          <h3 className="font-heading text-lg font-bold text-white mb-2">Save Your Resume</h3>
-          <p className="text-sm text-[#A0A0B8] mb-6">
+          <h3 className="font-heading text-lg font-bold text-lp-ink mb-2">Save Your Resume</h3>
+          <p className="text-sm text-[#3C403E] mb-6">
             Create a free account to save your resume, access it anywhere, and unlock all AI features.
           </p>
           <div className="space-y-2">
             <a
               href="/login"
-              className="block w-full px-6 py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-                text-white font-semibold text-sm shadow-lg shadow-[#6366F1]/25
-                hover:shadow-[#6366F1]/50 hover:scale-[1.02] transition-all text-center"
+              className="block w-full px-6 py-3 rounded-[4px] bg-[#1F5C4A]
+                text-white font-semibold text-sm
+                  transition-all text-center"
             >
               Sign Up Free
             </a>
             <button
               onClick={onClose}
-              className="block w-full px-6 py-3 rounded-xl border border-white/[0.08]
-                text-[#A0A0B8] text-sm hover:text-white hover:bg-white/5 transition-all"
+              className="block w-full px-6 py-3 rounded-[4px] border border-lp-rule
+                text-[#3C403E] text-sm hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
             >
               Continue as Guest
             </button>
@@ -1350,11 +1350,11 @@ function Toast({ message, type, onDismiss }: ToastProps) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 32, scale: 0.95 }}
       transition={SPRING}
-      className={`fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[9999] flex items-center gap-3 px-4 py-3 rounded-xl
-        border shadow-xl max-w-sm
+      className={`fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[9999] flex items-center gap-3 px-4 py-3 rounded-[4px]
+        border max-w-sm
         ${type === 'success'
-          ? 'bg-[#22C55E]/10 border-[#22C55E]/30 text-[#22C55E]'
-          : 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]'
+          ? 'bg-[#1F7A4D]/10 border-[#1F7A4D]/30 text-[#1F7A4D]'
+          : 'bg-[#B42318]/10 border-[#B42318]/30 text-[#B42318]'
         }`}
     >
       {type === 'success'
@@ -1755,15 +1755,15 @@ function ResumePageContent() {
         className="flex-shrink-0 flex items-center justify-between gap-2 mb-4 px-1 min-w-0"
       >
         <div className="flex items-center gap-2 min-w-0 flex-shrink">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6366F1] to-[#4F46E5]
+          <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10
             flex items-center justify-center flex-shrink-0">
-            <FileText className="w-5 h-5 text-white" />
+            <FileText className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
-            <h1 className="font-heading text-xl font-bold text-white leading-tight truncate">
+            <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight truncate">
               Resume Builder
             </h1>
-            <p className="text-xs text-[#60607A] hidden sm:block">
+            <p className="text-xs text-[#5A5F5C] hidden sm:block">
               AI-powered · ATS-optimized · Tailored to your target role
             </p>
           </div>
@@ -1776,10 +1776,9 @@ function ResumePageContent() {
               onClick={handleSave}
               disabled={isSaving}
               aria-label="Save resume"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold
-                bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                hover:scale-[1.02] transition-all duration-200
+              className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
+                bg-[#1F5C4A] text-white
+                 transition-all duration-200
                 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isSaving
@@ -1793,8 +1792,8 @@ function ResumePageContent() {
           )}
           <Link
             href="/dashboard/resume/saved"
-            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
-              border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5
+            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium
+              border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
               transition-all duration-200"
           >
             <FolderOpen className="w-3.5 h-3.5" />
@@ -1803,15 +1802,15 @@ function ResumePageContent() {
         </div>
 
         {/* Mobile: Toggle form / preview */}
-        <div className="flex md:hidden items-center gap-1 p-1 rounded-xl
-          bg-[#13131A] border border-white/[0.08]">
+        <div className="flex md:hidden items-center gap-1 p-0 rounded-[10px]
+          bg-[#FFFFFF] border border-lp-rule">
           <button
             onClick={() => setMobileView('form')}
             aria-label="Show form"
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[4px] text-xs font-medium transition-all
               ${mobileView === 'form'
-                ? 'bg-[#6366F1] text-white'
-                : 'text-[#60607A] hover:text-[#A0A0B8]'
+                ? 'bg-[#1F5C4A] text-white'
+                : 'text-[#5A5F5C] hover:text-[#3C403E]'
               }`}
           >
             <EyeOff className="w-3.5 h-3.5" />
@@ -1820,10 +1819,10 @@ function ResumePageContent() {
           <button
             onClick={() => setMobileView('preview')}
             aria-label="Show preview"
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[4px] text-xs font-medium transition-all
               ${mobileView === 'preview'
-                ? 'bg-[#6366F1] text-white'
-                : 'text-[#60607A] hover:text-[#A0A0B8]'
+                ? 'bg-[#1F5C4A] text-white'
+                : 'text-[#5A5F5C] hover:text-[#3C403E]'
               }`}
           >
             <Eye className="w-3.5 h-3.5" />
@@ -1859,13 +1858,13 @@ function ResumePageContent() {
                     onClick={() => handleStepClick(step.id)}
                     aria-label={`Go to step ${step.id}: ${step.label}`}
                     aria-current={isActive ? 'step' : undefined}
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[4px] text-xs font-medium
                       flex-shrink-0 transition-all duration-200
                       ${isActive
-                        ? 'bg-[#6366F1] text-white shadow-md shadow-[#6366F1]/20'
+                        ? 'bg-[#1F5C4A] text-white '
                         : isDone
-                          ? 'text-[#22C55E] hover:bg-[#22C55E]/10'
-                          : 'text-[#60607A] hover:text-[#A0A0B8] hover:bg-white/5'
+                          ? 'text-[#1F7A4D] hover:bg-[#1F7A4D]/10'
+                          : 'text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/5'
                       }`}
                   >
                     {isDone ? (
@@ -1880,9 +1879,9 @@ function ResumePageContent() {
               })}
             </div>
             {/* Progress bar */}
-            <div className="mt-2 h-0.5 rounded-full bg-white/[0.06] overflow-hidden">
+            <div className="mt-2 h-0.5 rounded-full bg-lp-ink/6 overflow-hidden">
               <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]"
+                className="h-full rounded-full bg-[#1F5C4A] "
                 initial={false}
                 animate={{ width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%` }}
                 transition={{ duration: 0.4, ease: 'easeInOut' }}
@@ -1891,23 +1890,23 @@ function ResumePageContent() {
           </div>
 
           {/* Step card */}
-          <div className="flex-1 min-h-0 flex flex-col rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-            <div className="flex-1 min-h-0 rounded-xl border border-white/[0.05] bg-[#1C1C26]
+          <div className="flex-1 min-h-0 flex flex-col rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+            <div className="flex-1 min-h-0 rounded-[10px]  bg-[#FFFFFF]
               flex flex-col overflow-hidden">
 
               {/* Step header */}
-              <div className="flex-shrink-0 px-5 pt-5 pb-4 border-b border-white/[0.05]">
+              <div className="flex-shrink-0 px-5 pt-5 pb-4 border-b border-lp-hairline">
                 <div className="flex items-center gap-2">
                   {(() => {
                     const Icon = STEPS[currentStep - 1].icon
                     return (
-                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#6366F1]/20 to-[#8B5CF6]/20
-                        border border-[#6366F1]/30 flex items-center justify-center">
-                        <Icon className="w-3.5 h-3.5 text-[#6366F1]" />
+                      <div className="w-7 h-7 rounded-[4px] bg-[#1F5C4A]/20
+                        border border-[#1F5C4A]/30 flex items-center justify-center">
+                        <Icon className="w-3.5 h-3.5 text-[#1F5C4A]" />
                       </div>
                     )
                   })()}
-                  <h2 className="font-heading text-sm font-semibold text-white">
+                  <h2 className="font-heading text-sm font-semibold text-lp-ink">
                     Step {currentStep} of {STEPS.length} — {STEPS[currentStep - 1].label}
                   </h2>
                 </div>
@@ -1929,7 +1928,7 @@ function ResumePageContent() {
               </div>
 
               {/* Navigation footer */}
-              <div className="flex-shrink-0 px-5 pb-5 pt-3 border-t border-white/[0.05]">
+              <div className="flex-shrink-0 px-5 pb-5 pt-3 border-t border-lp-hairline">
                 {/* Generate error */}
                 <AnimatePresence>
                   {generateError && (
@@ -1940,18 +1939,18 @@ function ResumePageContent() {
                       className="mb-3"
                     >
                       {generateError === 'FREE_TIER_LIMIT_REACHED' ? (
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-[#6366F1]/10 border border-[#6366F1]/20">
-                          <Zap className="w-3.5 h-3.5 text-[#6366F1] flex-shrink-0" />
+                        <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
+                          <Zap className="w-3.5 h-3.5 text-[#1F5C4A] flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-white">Monthly limit reached</p>
-                            <p className="text-xs text-[#A0A0B8]">You&apos;ve used all 3 free generations this month.</p>
+                            <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
+                            <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
                           </div>
-                          <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#818CF8] hover:text-white transition-colors">
+                          <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
                             Upgrade →
                           </Link>
                         </div>
                       ) : (
-                        <div className="flex items-start gap-2 p-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20 text-[#EF4444] text-xs">
+                        <div className="flex items-start gap-2 p-3 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 text-[#B42318] text-xs">
                           <AlertCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
                           {generateError}
                         </div>
@@ -1965,9 +1964,9 @@ function ResumePageContent() {
                     onClick={handleBack}
                     disabled={currentStep === 1}
                     aria-label="Go to previous step"
-                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium
-                      border border-white/[0.08] text-[#A0A0B8]
-                      hover:text-white hover:bg-white/5 hover:border-white/[0.15]
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-[4px] text-sm font-medium
+                      border border-lp-rule text-[#3C403E]
+                      hover:text-lp-ink hover:bg-lp-ink/5 hover:border-lp-rule
                       disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -1980,10 +1979,9 @@ function ResumePageContent() {
                         onClick={handleGenerate}
                         disabled={isStreaming}
                         aria-label="Generate resume with AI"
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
-                          bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                          shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                          hover:scale-[1.02] transition-all duration-200
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-[4px] text-sm font-semibold
+                          bg-[#1F5C4A] text-white
+                           transition-all duration-200
                           disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                       >
                         {isStreaming ? (
@@ -2002,10 +2000,9 @@ function ResumePageContent() {
                       <button
                         onClick={handleNext}
                         aria-label="Go to next step"
-                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-semibold
-                          bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white
-                          shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                          hover:scale-[1.02] transition-all duration-200"
+                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-[4px] text-sm font-semibold
+                          bg-[#1F5C4A] text-white
+                           transition-all duration-200"
                       >
                         Next
                         <ChevronRight className="w-4 h-4" />
@@ -2016,7 +2013,7 @@ function ResumePageContent() {
 
                 {/* Generate shortcut hint on last step */}
                 {isLastStep && displayResume && (
-                  <p className="text-xs text-[#60607A] text-center mt-2">
+                  <p className="text-xs text-[#5A5F5C] text-center mt-2">
                     Resume generated — edit inline in the preview or regenerate
                   </p>
                 )}
@@ -2038,9 +2035,9 @@ function ResumePageContent() {
           {/* Resume Preview / Editor — ref on shared wrapper so both modes use the same scale */}
           <div ref={editContainerRef} className="flex-shrink-0 overflow-x-hidden">
             {isEditing && displayResume ? (
-              <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
+              <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
                 <div
-                  className="rounded-xl border border-white/[0.05] bg-[#0A0A0F] overflow-x-hidden overflow-y-auto"
+                  className="rounded-[10px]  bg-[#F4F2EC] overflow-x-hidden overflow-y-auto"
                   style={{ minHeight: '600px' }}>
                   <ResumeEditor
                     resumeData={displayResume}
@@ -2080,11 +2077,11 @@ function ResumePageContent() {
                     }
                   }}
                   aria-label={isEditing ? 'Exit editing mode' : 'Enter Easy Tune editing mode'}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium
+                  className={`flex items-center gap-2 px-4 py-2 rounded-[4px] text-xs font-medium
                     border transition-all duration-200
                     ${isEditing
-                      ? 'border-[#22C55E]/30 text-[#22C55E] bg-[#22C55E]/5 hover:bg-[#22C55E]/10'
-                      : 'border-white/[0.08] text-[#A0A0B8] hover:text-white hover:bg-white/5'
+                      ? 'border-[#1F7A4D]/30 text-[#1F7A4D] bg-[#1F7A4D]/5 hover:bg-[#1F7A4D]/10'
+                      : 'border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5'
                     }`}
                 >
                   {isEditing ? (
@@ -2123,9 +2120,9 @@ function ResumePageContent() {
                   disabled={!profile?.target.job_description}
                   aria-label="Run ATS compatibility score"
                   title={!profile?.target.job_description ? 'Add a job description in Step 8 to run ATS scoring' : undefined}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium
-                    border border-[#6366F1]/30 text-[#818CF8] bg-[#6366F1]/5
-                    hover:bg-[#6366F1]/10 hover:border-[#6366F1]/50
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] text-sm font-medium
+                    border border-[#1F5C4A]/30 text-[#1F5C4A] bg-[#1F5C4A]/5
+                    hover:bg-[#1F5C4A]/10 hover:border-[#1F5C4A]/50
                     disabled:opacity-40 disabled:cursor-not-allowed
                     transition-all duration-200"
                 >
@@ -2177,17 +2174,17 @@ function ResumePageContent() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ ...SPRING, delay: 0.15 }}
               className="flex-1 flex flex-col items-center justify-center py-12 px-6 text-center
-                rounded-2xl border border-dashed border-white/[0.08]"
+                rounded-[10px] border border-dashed border-lp-rule"
             >
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6366F1]/10 to-[#8B5CF6]/10
-                border border-[#6366F1]/20 flex items-center justify-center mb-4">
-                <FileText className="w-7 h-7 text-[#6366F1]/60" />
+              <div className="w-14 h-14 rounded-[10px] bg-[#1F5C4A]/10
+                border border-[#1F5C4A]/20 flex items-center justify-center mb-4">
+                <FileText className="w-7 h-7 text-[#1F5C4A]/60" />
               </div>
-              <p className="text-sm font-medium text-[#A0A0B8] mb-1">
+              <p className="text-sm font-medium text-[#3C403E] mb-1">
                 Your resume will appear here
               </p>
-              <p className="text-xs text-[#60607A] max-w-xs">
-                Complete the form steps and click <strong className="text-[#6366F1]">Generate Resume</strong> on
+              <p className="text-xs text-[#5A5F5C] max-w-xs">
+                Complete the form steps and click <strong className="text-[#1F5C4A]">Generate Resume</strong> on
                 step 8 to create your AI-tailored resume.
               </p>
             </motion.div>

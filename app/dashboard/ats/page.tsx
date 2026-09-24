@@ -34,8 +34,8 @@ const OUTCOME_OPTIONS: Array<{ value: ATSOutcome['outcome']; label: string }> = 
 ]
 
 const INPUT_CLASS =
-  'w-full bg-[#0A0A0F] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-[#60607A] focus:outline-none focus:border-[#6366F1]/50 focus:ring-1 focus:ring-[#6366F1]/30 transition-all resize-none'
-const LABEL_CLASS = 'block text-xs font-medium text-[#A0A0B8] mb-1.5'
+  'w-full bg-[#F4F2EC] border border-lp-rule rounded-[4px] px-4 py-3 text-lp-ink text-sm placeholder-[#5A5F5C] focus:outline-none focus:border-[#1F5C4A]/50 focus:ring-1 focus:ring-[#1F5C4A]/30 transition-all resize-none'
+const LABEL_CLASS = 'block text-xs font-medium text-[#3C403E] mb-1.5'
 
 function convertResumeToPlainText(data: ResumeData): string {
   const lines: string[] = []
@@ -440,12 +440,12 @@ export default function ATSPage() {
     <div className="space-y-6 pb-20 md:pb-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#6366F1] flex items-center justify-center">
-            <Target className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center">
+            <Target className="w-5 h-5 text-lp-ink" />
           </div>
-          <h1 className="font-heading text-2xl font-bold text-white">ATS Optimizer</h1>
+          <h1 className="font-heading text-2xl font-bold text-lp-ink">ATS Optimizer</h1>
         </div>
-        <p className="text-[#A0A0B8] text-sm ml-12">
+        <p className="text-[#3C403E] text-sm ml-12">
           Select a resume and paste a job description to get a real-time ATS match score with keyword analysis.
         </p>
       </motion.div>
@@ -458,25 +458,25 @@ export default function ATSPage() {
           transition={{ ...SPRING, delay: 0.05 }}
           className="space-y-4"
         >
-          <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-            <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-4">
+          <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+            <div className="rounded-[10px]  bg-[#FFFFFF] p-5 space-y-4">
 
               {/* Section A — AURI Saved Resumes */}
               <div>
                 <label className={LABEL_CLASS}>
-                  Your AURI Resumes <span className="text-[#EF4444]">*</span>
+                  Your AURI Resumes <span className="text-[#B42318]">*</span>
                 </label>
                 {isLoadingResumes ? (
                   <div className="flex items-center justify-center h-20">
-                    <Loader2 className="w-5 h-5 text-[#6366F1] animate-spin" />
+                    <Loader2 className="w-5 h-5 text-[#1F5C4A] animate-spin" />
                   </div>
                 ) : savedResumes.length === 0 ? (
-                  <div className="flex flex-col items-center gap-2 py-6 rounded-xl border border-dashed border-white/[0.08] text-center">
-                    <FileText className="w-5 h-5 text-[#60607A]" />
-                    <p className="text-xs text-[#60607A]">No saved resumes yet.</p>
+                  <div className="flex flex-col items-center gap-2 py-6 rounded-[10px] border border-dashed border-lp-rule text-center">
+                    <FileText className="w-5 h-5 text-[#5A5F5C]" />
+                    <p className="text-xs text-[#5A5F5C]">No saved resumes yet.</p>
                     <Link
                       href="/dashboard/resume"
-                      className="text-xs text-[#818CF8] hover:text-white transition-colors"
+                      className="text-xs text-[#1F5C4A] hover:text-lp-ink transition-colors"
                     >
                       Build your first resume →
                     </Link>
@@ -489,19 +489,19 @@ export default function ATSPage() {
                         <button
                           key={resume.id}
                           onClick={() => handleSelectResume(resume)}
-                          className={`w-full text-left rounded-xl border px-4 py-3 transition-all duration-150
+                          className={`w-full text-left rounded-[4px] border px-4 py-3 transition-all duration-150
                             ${isSelected
-                              ? 'border-[#6366F1]/50 bg-[#6366F1]/5 ring-1 ring-[#6366F1]/20'
-                              : 'border-white/[0.06] bg-[#0A0A0F]/50 hover:border-white/[0.12] hover:bg-[#0A0A0F]'
+                              ? 'border-[#1F5C4A]/50 bg-[#1F5C4A]/5 ring-1 ring-[#1F5C4A]/20'
+                              : 'border-lp-hairline bg-[#F4F2EC]/50 hover:border-lp-rule hover:bg-[#F4F2EC]'
                             }`}
                         >
-                          <p className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-[#E0E0F0]'}`}>
+                          <p className={`text-sm font-medium truncate ${isSelected ? 'text-lp-ink' : 'text-[#3C403E]'}`}>
                             {resume.name}
                           </p>
-                          <p className="text-xs text-[#60607A] truncate mt-0.5">
+                          <p className="text-xs text-[#5A5F5C] truncate mt-0.5">
                             {resume.targetPosition}{resume.targetCompany ? ` · ${resume.targetCompany}` : ''}
                           </p>
-                          <p className="text-[10px] text-[#4A4A6A] mt-1">
+                          <p className="text-[10px] text-[#5A5F5C] mt-1">
                             {formatResumeDate(resume.updatedAt, 'Updated')}
                           </p>
                         </button>
@@ -514,9 +514,9 @@ export default function ATSPage() {
               {/* OR Divider */}
               {profile?.isPro && (
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-white/[0.06]" />
-                  <span className="text-[10px] font-medium text-[#4A4A6A] uppercase tracking-widest">or</span>
-                  <div className="flex-1 h-px bg-white/[0.06]" />
+                  <div className="flex-1 h-px bg-lp-ink/6" />
+                  <span className="text-[10px] font-medium text-[#5A5F5C] uppercase tracking-widest">or</span>
+                  <div className="flex-1 h-px bg-lp-ink/6" />
                 </div>
               )}
 
@@ -538,19 +538,19 @@ export default function ATSPage() {
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploadingResume}
-                    className={`w-full flex flex-col items-center gap-2 py-5 rounded-xl border border-dashed
+                    className={`w-full flex flex-col items-center gap-2 py-5 rounded-[10px] border border-dashed
                       transition-all duration-150 disabled:cursor-not-allowed
                       ${resumeSource === 'upload'
-                        ? 'border-[#6366F1]/50 bg-[#6366F1]/5'
-                        : 'border-white/[0.10] hover:border-white/[0.20] hover:bg-white/[0.02]'
+                        ? 'border-[#1F5C4A]/50 bg-[#1F5C4A]/5'
+                        : 'border-lp-rule hover:border-lp-rule hover:bg-lp-ink/[0.02]'
                       }`}
                   >
                     {isUploadingResume ? (
-                      <Loader2 className="w-5 h-5 text-[#6366F1] animate-spin" />
+                      <Loader2 className="w-5 h-5 text-[#1F5C4A] animate-spin" />
                     ) : (
-                      <Upload className={`w-5 h-5 ${resumeSource === 'upload' ? 'text-[#818CF8]' : 'text-[#60607A]'}`} />
+                      <Upload className={`w-5 h-5 ${resumeSource === 'upload' ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`} />
                     )}
-                    <span className={`text-xs ${resumeSource === 'upload' ? 'text-[#818CF8]' : 'text-[#60607A]'}`}>
+                    <span className={`text-xs ${resumeSource === 'upload' ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`}>
                       {isUploadingResume
                         ? 'Parsing PDF…'
                         : resumeSource === 'upload'
@@ -561,48 +561,48 @@ export default function ATSPage() {
 
                   {/* Extraction results */}
                   {resumeSource === 'upload' && parsedResult && (
-                    <div className="rounded-xl border border-[#22C55E]/20 bg-[#22C55E]/[0.04] p-3.5 space-y-2.5">
+                    <div className="rounded-[10px] border border-[#1F7A4D]/20 bg-[#1F7A4D]/[0.04] p-3.5 space-y-2.5">
                       <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-[#22C55E] flex-shrink-0" />
-                        <p className="text-xs font-semibold text-white">Resume Extracted</p>
+                        <CheckCircle className="w-4 h-4 text-[#1F7A4D] flex-shrink-0" />
+                        <p className="text-xs font-semibold text-lp-ink">Resume Extracted</p>
                       </div>
-                      <p className="text-[11px] text-[#A0A0B8] leading-relaxed">
+                      <p className="text-[11px] text-[#3C403E] leading-relaxed">
                         {parsedResult.stats.totalLines} lines · {parsedResult.stats.totalChars.toLocaleString()} characters · Sections found:{' '}
-                        <span className="text-white">
+                        <span className="text-lp-ink">
                           {parsedResult.stats.detectedSections.join(', ') || 'none detected'}
                         </span>
                       </p>
-                      <p className="text-xs italic text-[#60607A]">
+                      <p className="text-xs italic text-[#5A5F5C]">
                         Note: This extraction uses a generic PDF parser. Real ATS systems are more sophisticated and may handle your formatting better.
                       </p>
                       {parsedResult.failures.length === 0 ? (
-                        <p className="text-[11px] text-[#22C55E]">✓ No major parsing issues detected</p>
+                        <p className="text-[11px] text-[#1F7A4D]">✓ No major parsing issues detected</p>
                       ) : (
                         <div className="space-y-1.5">
-                          <p className="text-[11px] font-medium text-[#F59E0B]">
+                          <p className="text-[11px] font-medium text-[#8A5A00]">
                             ⚠ {parsedResult.failures.length} parsing issue{parsedResult.failures.length > 1 ? 's' : ''} detected
                           </p>
                           {parsedResult.failures.slice(0, 3).map((failure, i) => (
                             <div key={i} className="flex items-start gap-2">
                               <span className={`text-[9px] font-bold px-1 py-0.5 rounded uppercase tracking-wide flex-shrink-0 mt-0.5
                                 ${failure.severity === 'high'
-                                  ? 'bg-[#EF4444]/15 text-[#EF4444]'
+                                  ? 'bg-[#B42318]/15 text-[#B42318]'
                                   : failure.severity === 'medium'
-                                  ? 'bg-[#F59E0B]/15 text-[#F59E0B]'
-                                  : 'bg-white/[0.06] text-[#60607A]'
+                                  ? 'bg-[#8A5A00]/15 text-[#8A5A00]'
+                                  : 'bg-lp-ink/6 text-[#5A5F5C]'
                                 }`}>
                                 {failure.severity}
                               </span>
-                              <p className="text-[11px] text-[#A0A0B8] leading-snug">
+                              <p className="text-[11px] text-[#3C403E] leading-snug">
                                 {failure.description}
                                 {failure.affectedPlatforms.length > 0 && (
-                                  <span className="text-[#60607A]"> — {failure.affectedPlatforms.join(' · ')}</span>
+                                  <span className="text-[#5A5F5C]"> — {failure.affectedPlatforms.join(' · ')}</span>
                                 )}
                               </p>
                             </div>
                           ))}
                           {parsedResult.failures.length > 3 && (
-                            <p className="text-[10px] text-[#60607A]">
+                            <p className="text-[10px] text-[#5A5F5C]">
                               + {parsedResult.failures.length - 3} more issue{parsedResult.failures.length - 3 > 1 ? 's' : ''}
                             </p>
                           )}
@@ -615,7 +615,7 @@ export default function ATSPage() {
 
               <div>
                 <label className={LABEL_CLASS}>
-                  Job Description <span className="text-[#EF4444]">*</span>
+                  Job Description <span className="text-[#B42318]">*</span>
                 </label>
                 <textarea
                   className={INPUT_CLASS}
@@ -629,20 +629,20 @@ export default function ATSPage() {
 
               {error && (
                 error === 'FREE_TIER_LIMIT_REACHED' ? (
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-[#6366F1]/10 border border-[#6366F1]/20">
-                    <Zap className="w-4 h-4 text-[#6366F1] flex-shrink-0" />
+                  <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
+                    <Zap className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-white">Monthly limit reached</p>
-                      <p className="text-xs text-[#A0A0B8]">You&apos;ve used all 3 free generations this month.</p>
+                      <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
+                      <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
                     </div>
-                    <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#818CF8] hover:text-white transition-colors">
+                    <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
                       Upgrade →
                     </Link>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20">
-                    <AlertCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0" />
-                    <p className="text-xs text-[#EF4444]">{error}</p>
+                  <div className="flex items-center gap-2 p-3 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20">
+                    <AlertCircle className="w-4 h-4 text-[#B42318] flex-shrink-0" />
+                    <p className="text-xs text-[#B42318]">{error}</p>
                   </div>
                 )
               )}
@@ -650,9 +650,8 @@ export default function ATSPage() {
               <button
                 onClick={handleAnalyze}
                 disabled={!resumeText.trim() || !jobDescription.trim() || isAnalyzing}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-                  bg-gradient-to-r from-[#8B5CF6] to-[#6366F1] text-white font-semibold text-sm
-                  shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50 hover:scale-[1.01]
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
+                  bg-[#1F5C4A] text-white font-semibold text-sm
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isAnalyzing
@@ -677,13 +676,13 @@ export default function ATSPage() {
           ) : score ? (
             <ATSScorePanel score={score} isLoading={false} uploadMode={resumeSource === 'upload'} />
           ) : (
-            <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-16 flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-2xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 flex items-center justify-center mb-4">
-                  <ClipboardList className="w-6 h-6 text-[#8B5CF6]" />
+            <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
+              <div className="rounded-[10px]  bg-[#FFFFFF] p-16 flex flex-col items-center text-center">
+                <div className="w-14 h-14 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 flex items-center justify-center mb-4">
+                  <ClipboardList className="w-6 h-6 text-[#1F5C4A]" />
                 </div>
-                <p className="text-sm font-medium text-[#A0A0B8]">Your ATS score will appear here</p>
-                <p className="text-xs text-[#60607A] mt-1">Select a resume and job description, then click Analyze</p>
+                <p className="text-sm font-medium text-[#3C403E]">Your ATS score will appear here</p>
+                <p className="text-xs text-[#5A5F5C] mt-1">Select a resume and job description, then click Analyze</p>
               </div>
             </div>
           )}
@@ -694,9 +693,9 @@ export default function ATSPage() {
               <button
                 onClick={() => void handleGenerateSuggestions()}
                 disabled={isGeneratingSuggestions || isAnalyzing}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl
-                  border border-[#6366F1]/30 text-[#818CF8] text-sm font-medium
-                  hover:bg-[#6366F1]/10 hover:border-[#6366F1]/50 hover:text-white
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px]
+                  border border-[#1F5C4A]/30 text-[#1F5C4A] text-sm font-medium
+                  hover:bg-[#1F5C4A]/10 hover:border-[#1F5C4A]/50 hover:text-lp-ink
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isGeneratingSuggestions
@@ -705,9 +704,9 @@ export default function ATSPage() {
                 }
               </button>
               {suggestionsError && (
-                <div className="flex items-center gap-2 p-2 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/20">
-                  <AlertCircle className="w-3.5 h-3.5 text-[#EF4444] flex-shrink-0" />
-                  <p className="text-xs text-[#EF4444]">{suggestionsError}</p>
+                <div className="flex items-center gap-2 p-2 rounded-[4px] bg-[#B42318]/10 border border-[#B42318]/20">
+                  <AlertCircle className="w-3.5 h-3.5 text-[#B42318] flex-shrink-0" />
+                  <p className="text-xs text-[#B42318]">{suggestionsError}</p>
                 </div>
               )}
             </div>
@@ -750,20 +749,20 @@ export default function ATSPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={SPRING}
-              className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1"
+              className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0"
             >
-              <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-5 space-y-3">
+              <div className="rounded-[10px]  bg-[#FFFFFF] p-5 space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-medium text-[#60607A] uppercase tracking-wide">
+                  <p className="text-[10px] font-medium text-[#5A5F5C] uppercase tracking-wide">
                     Track your application outcome
                   </p>
                   {isSavingOutcome ? (
-                    <Loader2 className="w-3.5 h-3.5 text-[#6366F1] animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin" />
                   ) : selectedOutcome ? (
-                    <CheckCircle className="w-3.5 h-3.5 text-[#22C55E]" />
+                    <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" />
                   ) : null}
                 </div>
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-semibold text-lp-ink">
                   Did this application lead to an interview?
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -774,8 +773,8 @@ export default function ATSPage() {
                       disabled={isSavingOutcome || isAnalyzing}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150
                         ${selectedOutcome === value
-                          ? 'bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white shadow-lg shadow-[#6366F1]/25'
-                          : 'border border-white/[0.08] text-[#A0A0B8] hover:text-white hover:border-white/[0.2] bg-transparent'
+                          ? 'bg-[#1F5C4A] text-white '
+                          : 'border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:border-lp-rule bg-transparent'
                         } disabled:cursor-not-allowed disabled:opacity-60`}
                     >
                       {label}
@@ -792,16 +791,16 @@ export default function ATSPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={SPRING}
-              className="rounded-2xl border border-[#6366F1]/30 bg-[#13131A] p-1"
+              className="rounded-[10px] border border-[#1F5C4A]/30 bg-[#FFFFFF] p-1"
             >
-              <div className="rounded-xl border border-[#6366F1]/20 bg-gradient-to-br from-[#6366F1]/[0.06] to-[#8B5CF6]/[0.06] p-5 space-y-3">
+              <div className="rounded-[10px] border border-[#1F5C4A]/20 bg-[#1F5C4A]/[0.06] p-5 space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center flex-shrink-0">
-                    <Zap className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-[4px] bg-[#1F5C4A]/10 flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-4 h-4 text-lp-ink" />
                   </div>
                   <div className="space-y-1 min-w-0">
-                    <p className="text-sm font-semibold text-white">Build a Better Version in AURI</p>
-                    <p className="text-xs text-[#A0A0B8] leading-relaxed">
+                    <p className="text-sm font-semibold text-lp-ink">Build a Better Version in AURI</p>
+                    <p className="text-xs text-[#3C403E] leading-relaxed">
                       Your resume scored {score.score}/100 based on extracted text — real ATS systems may score it higher. But AURI can rebuild it as a fully structured resume with targeted keyword optimization, so you know exactly where you stand.
                     </p>
                   </div>
@@ -809,7 +808,7 @@ export default function ATSPage() {
                 <button
                   onClick={() => void handleImportToBuilder()}
                   disabled={isImportingToBuilder}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-sm font-semibold shadow-lg shadow-[#6366F1]/25 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-[4px] bg-[#1F5C4A] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isImportingToBuilder ? (
                     <>

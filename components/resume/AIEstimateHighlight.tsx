@@ -108,10 +108,10 @@ export default function AIEstimateHighlight({
       {/* Tooltip */}
       <span
         className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52
-          px-3 py-2 bg-gray-900 border border-amber-500/30 rounded-lg
+          px-3 py-2 bg-gray-900 border border-amber-500/30 rounded-[4px]
           text-xs text-gray-300 opacity-0 group-hover:opacity-100
           transition-opacity duration-200 pointer-events-none z-50
-          text-center shadow-xl whitespace-normal"
+          text-center whitespace-normal"
         role="tooltip"
       >
         ⚠️ AI estimated
