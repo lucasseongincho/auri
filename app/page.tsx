@@ -235,6 +235,16 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ── 1.5. Social proof ── */}
+        <section className="px-4 md:px-6 py-10 border-t border-white/[0.06]">
+          <p className="max-w-6xl mx-auto text-base md:text-lg text-[#A0A0B8]">
+            Our users have landed interviews at{' '}
+            <span className="text-white font-medium">Amazon</span>,{' '}
+            <span className="text-white font-medium">Advantest</span>, and{' '}
+            <span className="text-white font-medium">Toss</span>.
+          </p>
+        </section>
+
         {/* ── 2. Features ── */}
         <section id="features" className="py-16 md:py-24 px-4 md:px-6 border-t border-white/[0.06]">
           <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-10 lg:gap-16">
