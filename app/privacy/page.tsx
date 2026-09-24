@@ -187,6 +187,12 @@ export default function PrivacyPage() {
             browser type, device type, operating system, referring URLs, and pages viewed. This data is used
             solely for security, debugging, and improving the reliability of our platform.
           </p>
+          {/* TODO(legal): confirm replay masking settings and Sentry retention period before publishing retention details. */}
+          <p className="text-[#A0A0B8] leading-relaxed mb-4">
+            We use Sentry for error monitoring. When an error occurs, and for a sample of other sessions, Sentry may
+            record a replay of your interactions with the page along with your IP address and account identifier so
+            we can reproduce and fix the problem.
+          </p>
 
           <h3 className="font-heading text-base font-semibold text-white mb-2">
             Guest mode data
@@ -243,7 +249,8 @@ export default function PrivacyPage() {
               <span>
                 <strong className="text-white">Service providers.</strong> We share data with third-party vendors who
                 help us operate the platform, including Anthropic (AI processing), Firebase and Google Cloud
-                (authentication and database), Stripe (payments), Vercel (hosting), and Upstash (rate limiting).
+                (authentication and database), Stripe (payments), Vercel (hosting), Upstash (rate limiting), Sentry (error monitoring), and Resend (account and
+                support email).
                 Each provider is bound by data processing agreements appropriate to their role.
               </span>
             </li>

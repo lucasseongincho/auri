@@ -1,81 +1,17 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { motion, useInView } from 'framer-motion'
-import {
-  FileText, Edit3, Linkedin,
-  Map, Mail, MessageSquare, CheckCircle, ArrowRight,
-  Sparkles, Target, ChevronRight,
-} from 'lucide-react'
+import { motion, useInView, MotionConfig } from 'framer-motion'
+import { Sparkles } from 'lucide-react'
 import { getStartedRedirect } from '@/lib/getStartedRedirect'
 
 // Spring config per CLAUDE.md §9
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
-const SPRING_SLOW = { type: 'spring' as const, stiffness: 200, damping: 25 }
-
-// ── Animated counter hook ─────────────────────────────────────────────────────
-function useCounter(end: number, duration = 2000, start = false) {
-  const [count, setCount] = useState(0)
-  useEffect(() => {
-    if (!start) return
-    let startTime: number | null = null
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp
-      const progress = Math.min((timestamp - startTime) / duration, 1)
-      setCount(Math.floor(progress * end))
-      if (progress < 1) requestAnimationFrame(step)
-    }
-    requestAnimationFrame(step)
-  }, [end, duration, start])
-  return count
-}
-
-// ── Magnetic button effect ────────────────────────────────────────────────────
-function MagneticButton({
-  children,
-  className,
-  onClick,
-  href,
-}: {
-  children: React.ReactNode
-  className?: string
-  onClick?: () => void
-  href?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [pos, setPos] = useState({ x: 0, y: 0 })
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!ref.current) return
-    const rect = ref.current.getBoundingClientRect()
-    const x = (e.clientX - rect.left - rect.width / 2) * 0.15
-    const y = (e.clientY - rect.top - rect.height / 2) * 0.15
-    setPos({ x, y })
-  }
-
-  const handleMouseLeave = () => setPos({ x: 0, y: 0 })
-
-  const content = (
-    <motion.div
-      ref={ref}
-      animate={{ x: pos.x, y: pos.y }}
-      transition={SPRING}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  )
-
-  if (href) return <Link href={href}>{content}</Link>
-  return content
-}
 
 // ── Section wrapper with scroll-triggered fade-in ─────────────────────────────
+// Transform is dropped automatically for prefers-reduced-motion via <MotionConfig reducedMotion="user">.
 function FadeInSection({
   children,
   className,
@@ -86,14 +22,14 @@ function FadeInSection({
   delay?: number
 }) {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-100px' })
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-      transition={{ ...SPRING_SLOW, delay }}
+      initial={{ opacity: 0, y: 16 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+      transition={{ ...SPRING, delay }}
       className={className}
     >
       {children}
@@ -101,633 +37,430 @@ function FadeInSection({
   )
 }
 
-// ── Feature data ──────────────────────────────────────────────────────────────
-const FEATURES = [
-  { icon: FileText, label: 'Smart Resume Builder', desc: 'AI-generated, ATS-optimized resumes tailored to every job', href: '/dashboard/resume', color: 'from-[#6366F1] to-[#4F46E5]' },
-  { icon: Target, label: 'ATS Score & Optimizer', desc: 'Real-time match score with one-click fix suggestions', href: '/dashboard/ats', color: 'from-[#8B5CF6] to-[#6366F1]' },
-  { icon: Edit3, label: 'Easy Tune Editor', desc: 'Inline editing with per-bullet AI rewrites', href: '/dashboard/resume', color: 'from-[#A78BFA] to-[#8B5CF6]' },
-  { icon: Linkedin, label: 'LinkedIn Rewriter', desc: 'Attract recruiters with an optimized profile', href: '/dashboard/linkedin', color: 'from-[#0EA5E9] to-[#6366F1]' },
-  { icon: Map, label: '7-Day Job Strategy', desc: 'A personalized, day-by-day job search action plan', href: '/dashboard/strategy', color: 'from-[#22C55E] to-[#16A34A]' },
-  { icon: Mail, label: 'Cover Letter Generator', desc: '280-300 word letters that open doors', href: '/dashboard/cover-letter', color: 'from-[#F59E0B] to-[#D97706]' },
-  { icon: MessageSquare, label: 'Interview Prep', desc: '8 likely questions + STAR frameworks + flip cards', href: '/dashboard/interview', color: 'from-[#EF4444] to-[#DC2626]' },
+// ── Content ───────────────────────────────────────────────────────────────────
+// Grouped by where each tool sits in the job-application workflow.
+const FEATURE_GROUPS = [
+  {
+    title: 'Your resume, matched to one posting',
+    items: [
+      { label: 'Resume Builder', desc: 'Generates a single-column, ATS-parseable resume from your career profile and a target job description.', href: '/dashboard/resume', pro: false },
+      { label: 'ATS Score & Optimizer', desc: 'Scores your resume against the posting and lists missing keywords with specific fixes.', href: '/dashboard/ats', pro: false },
+      { label: 'Easy Tune Editor', desc: 'A structured form editor. Rewrite any single bullet with AI without regenerating the rest.', href: '/dashboard/resume', pro: false },
+    ],
+  },
+  {
+    title: 'Everything around the application',
+    items: [
+      { label: 'Cover Letter Generator', desc: 'A 280 to 300 word letter written from the same profile and posting.', href: '/dashboard/cover-letter', pro: false },
+      { label: 'Interview Prep', desc: 'Eight likely questions for the role, each with a STAR answer outline and practice flip cards.', href: '/dashboard/interview', pro: true },
+      { label: 'LinkedIn Rewriter', desc: 'Headline and About section rewritten for recruiter search.', href: '/dashboard/linkedin', pro: true },
+      { label: '7-Day Job Strategy', desc: 'A day-by-day plan for applications, outreach, and follow-ups.', href: '/dashboard/strategy', pro: true },
+    ],
+  },
 ]
+
+// Mirrors lib/prompts.ts ATS rubric and the ATSScorePanel dimension labels.
+const ATS_DIMENSIONS = [
+  { label: 'Keyword Match', max: 40, desc: 'Exact and semantic matches to terms in the job description, including the critical ones.' },
+  { label: 'Achievement Orientation', max: 25, desc: 'Bullets that state measurable results and use action verbs, not lists of duties.' },
+  { label: 'Formatting Compliance', max: 20, desc: 'Parseable structure and standard section headers. No tables, columns, or graphics.' },
+  { label: 'Readability', max: 15, desc: 'Clear, concise sentences with consistent tense and appropriate length.' },
+]
+
+const SAMPLE_SCORES = [
+  { label: 'Keyword Match', value: 31, max: 40 },
+  { label: 'Achievement Orientation', value: 20, max: 25 },
+  { label: 'Formatting Compliance', value: 18, max: 20 },
+  { label: 'Readability', value: 13, max: 15 },
+]
+
+const FREE_FEATURES = ['3 AI generations per month', 'Resume builder and ATS optimizer', 'Cover letter generator']
+const PRO_FEATURES = [
+  'Unlimited AI generations',
+  'Everything in Free',
+  'LinkedIn profile rewriter',
+  '7-day job search strategy',
+  'Interview prep',
+  'Priority support',
+]
+
+// ── Hero product sample: job description in, score and rewrite out ────────────
+function ProductSample() {
+  return (
+    <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
+      <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] text-left">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
+          <p className="text-xs font-semibold text-[#F8F8FF]">ATS analysis</p>
+          <p className="text-[11px] text-[#8B8BA3]">Sample data</p>
+        </div>
+
+        {/* Input */}
+        <div className="px-5 py-4 border-b border-white/[0.06]">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8B8BA3] mb-2">Job description</p>
+          <p className="text-sm text-[#A0A0B8] leading-relaxed">
+            <span className="text-[#F8F8FF]">Product Analyst, Growth.</span> Own experiment design and
+            analysis. Requirements: SQL, A/B testing, Looker, stakeholder communication.
+          </p>
+        </div>
+
+        {/* Keywords */}
+        <div className="px-5 py-4 border-b border-white/[0.06] grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8B8BA3] mb-2">Matched</p>
+            <ul className="flex flex-wrap gap-1.5">
+              {['SQL', 'Stakeholder communication'].map((k) => (
+                <li key={k} className="text-xs px-2 py-1 rounded-md bg-[#22C55E]/10 text-[#4ADE80]">{k}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8B8BA3] mb-2">Missing</p>
+            <ul className="flex flex-wrap gap-1.5">
+              {['A/B testing', 'Looker'].map((k) => (
+                <li key={k} className="text-xs px-2 py-1 rounded-md border border-white/[0.12] text-[#F8F8FF]">{k}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Bullet rewrite */}
+        <div className="px-5 py-4 border-b border-white/[0.06]">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8B8BA3] mb-2">Bullet rewrite</p>
+          <p className="text-sm text-[#8B8BA3] line-through decoration-white/20 mb-2">
+            Responsible for weekly reports on product metrics.
+          </p>
+          <p className="text-sm text-[#F8F8FF] leading-relaxed">
+            Built weekly product-metrics reports in SQL for three product teams, used to set quarterly growth targets.
+          </p>
+        </div>
+
+        {/* Result */}
+        <div className="px-5 py-4 flex flex-col sm:flex-row gap-5 sm:items-center">
+          <div className="flex items-baseline gap-2 sm:w-32 flex-shrink-0">
+            <span className="font-heading text-4xl font-bold tracking-tight text-[#F8F8FF]">82</span>
+            <span className="text-xs text-[#8B8BA3]">/100<br />was 64</span>
+          </div>
+          <dl className="flex-1 space-y-2">
+            {SAMPLE_SCORES.map((s) => (
+              <div key={s.label}>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <dt className="text-[#A0A0B8]">{s.label}</dt>
+                  <dd className="text-[#F8F8FF] tabular-nums">{s.value}/{s.max}</dd>
+                </div>
+                <div className="h-1 rounded-full bg-white/[0.06]" aria-hidden="true">
+                  <div className="h-1 rounded-full bg-[#6366F1]" style={{ width: `${(s.value / s.max) * 100}%` }} />
+                </div>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
   const router = useRouter()
-  const atsRef = useRef(null)
-  const atsInView = useInView(atsRef, { once: true })
-  const atsScore = useCounter(87, 2500, atsInView)
   const [billing, setBilling] = useState<'monthly' | 'annual'>('annual')
 
+  const primaryBtn = 'rounded-lg font-semibold text-white bg-[#4F46E5] hover:bg-[#4338CA] transition-colors duration-200'
+  const secondaryBtn = 'rounded-lg font-medium text-[#F8F8FF] border border-white/15 hover:bg-white/5 transition-colors duration-200'
+
   return (
-    <main className="min-h-screen bg-[#0A0A0F] overflow-x-hidden">
+    <MotionConfig reducedMotion="user">
+      <main className="min-h-screen bg-[#0A0A0F] overflow-x-hidden">
 
-      {/* ── Glass Navbar ── */}
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50
-        rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl
-        shadow-xl shadow-black/20 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-heading font-bold text-white text-lg">AURI</span>
-        </div>
-        <div className="hidden md:flex items-center gap-8">
-          {[['Features', '#features'], ['How It Works', '#how-it-works'], ['Pricing', '#pricing']].map(([label, href]) => (
-            <a key={label} href={href}
-              className="text-sm text-[#A0A0B8] hover:text-white transition-colors duration-200">
-              {label}
-            </a>
-          ))}
-          <Link href="/blog"
-            className="text-sm text-[#A0A0B8] hover:text-white transition-colors duration-200">
-            Blog
-          </Link>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/login"
-            className="text-sm text-[#A0A0B8] hover:text-white transition-colors duration-200 hidden md:block">
-            Sign In
-          </Link>
-          <button
-            onClick={() => router.push(getStartedRedirect('free'))}
-            className="px-3 py-2 sm:px-4 rounded-xl text-sm font-semibold text-white
-              bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-              shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-              hover:scale-[1.02] transition-all duration-200">
-            Get Started Free
-          </button>
-        </div>
-      </nav>
-
-      {/* ── 1. Hero ── */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 px-4 md:px-6">
-        {/* Gradient background orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full
-            bg-[#6366F1]/10 blur-[120px]" />
-          <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] rounded-full
-            bg-[#8B5CF6]/8 blur-[100px]" />
-        </div>
-
-        <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          {/* Left — copy */}
-          <div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...SPRING, delay: 0.1 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
-                border border-[#6366F1]/30 bg-[#6366F1]/10 mb-6"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#818CF8]" />
-              <span className="text-xs font-medium text-[#818CF8]">Powered by AURI</span>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...SPRING, delay: 0.2 }}
-              className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-6"
-            >
-              Get Hired{' '}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#6366F1] via-[#8B5CF6] to-[#A78BFA]">
-                Faster
-              </span>{' '}
-              with AI
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...SPRING, delay: 0.3 }}
-              className="text-base md:text-lg text-[#A0A0B8] leading-relaxed mb-8 max-w-lg"
-            >
-              Generate ATS-optimized resumes, rewrite your LinkedIn, craft cover letters,
-              and prepare for interviews — all from one AI-powered career toolkit.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...SPRING, delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-4"
-            >
-              <MagneticButton href="/signup"
-                className="px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-semibold text-white cursor-pointer
-                  bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-                  shadow-lg shadow-[#6366F1]/30 hover:shadow-[#6366F1]/60
-                  hover:scale-[1.02] transition-all duration-200 text-center">
-                Start for Free
-                <ArrowRight className="inline-block ml-2 w-4 h-4" />
-              </MagneticButton>
-              <MagneticButton href="/login"
-                className="px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-medium cursor-pointer
-                  border border-white/15 text-[#A0A0B8] hover:text-white
-                  hover:bg-white/5 transition-all duration-200 text-center">
-                Upload Existing Resume
-              </MagneticButton>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="flex items-center gap-4 mt-6 md:mt-8"
-            >
-              <div className="flex -space-x-2">
-                {['#6366F1', '#8B5CF6', '#A78BFA', '#818CF8'].map((c, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-[#0A0A0F]"
-                    style={{ backgroundColor: c }} />
-                ))}
+        {/* ── Navbar ── */}
+        <nav className="sticky top-0 z-50 bg-[#0A0A0F] border-b border-white/[0.06]">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <p className="text-sm text-[#60607A]">
-                Trusted by job seekers landing interviews at top companies
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Right — floating resume preview mockup */}
-          <motion.div
-            initial={{ opacity: 0, x: 40, rotate: 3 }}
-            animate={{ opacity: 1, x: 0, rotate: 3 }}
-            transition={{ ...SPRING_SLOW, delay: 0.3 }}
-            className="hidden lg:block relative"
-            style={{ animation: 'float 6s ease-in-out infinite' }}
-          >
-            <div className="rounded-2xl border border-white/10 bg-[#13131A] p-1 shadow-2xl shadow-[#6366F1]/10">
-              <div className="rounded-xl bg-[#1C1C26] p-6 min-h-[480px]">
-                {/* Fake resume content */}
-                <div className="border-b border-white/10 pb-4 mb-4">
-                  <div className="h-6 w-48 rounded bg-gradient-to-r from-[#6366F1]/30 to-[#8B5CF6]/30 mb-2" />
-                  <div className="h-3 w-64 rounded bg-white/10 mb-1" />
-                  <div className="h-3 w-56 rounded bg-white/[0.06]" />
-                </div>
-                <div className="mb-4">
-                  <div className="h-3 w-24 rounded bg-[#6366F1]/40 mb-2" />
-                  <div className="space-y-1.5">
-                    {[80, 90, 70, 85].map((w, i) => (
-                      <div key={i} className="h-2.5 rounded bg-white/[0.07]" style={{ width: `${w}%` }} />
-                    ))}
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <div className="h-3 w-28 rounded bg-[#6366F1]/40 mb-2" />
-                  <div className="h-4 w-40 rounded bg-white/10 mb-1" />
-                  <div className="space-y-1.5 ml-3">
-                    {[75, 88, 65].map((w, i) => (
-                      <div key={i} className="h-2 rounded bg-white/[0.06]" style={{ width: `${w}%` }} />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-2 flex-wrap mt-4">
-                  {[60, 50, 70, 55, 65].map((w, i) => (
-                    <div key={i} className="h-6 rounded-full bg-[#6366F1]/20 border border-[#6366F1]/30"
-                      style={{ width: `${w}px` }} />
-                  ))}
-                </div>
-                {/* ATS badge */}
-                <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5
-                  rounded-full bg-[#22C55E]/20 border border-[#22C55E]/30">
-                  <CheckCircle className="w-3.5 h-3.5 text-[#22C55E]" />
-                  <span className="text-xs font-medium text-[#22C55E]">ATS 94%</span>
-                </div>
-              </div>
+              <span className="font-heading font-bold text-white text-lg">AURI</span>
             </div>
-            {/* Glow */}
-            <div className="absolute inset-0 rounded-2xl bg-[#6366F1]/5 blur-xl -z-10" />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── 1.5. Social Proof ── */}
-      <section className="py-12 md:py-16 px-6 bg-[#0A0A0F]">
-        <div className="max-w-2xl mx-auto">
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-[#6366F1]/35 to-transparent" />
-          <FadeInSection className="text-center py-10 md:py-12">
-            <p className="font-heading text-xl sm:text-2xl font-semibold text-white leading-snug mb-3">
-              Our users have landed interviews at{' '}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#6366F1] via-[#8B5CF6] to-[#A78BFA]">
-                Amazon
-              </span>{' '}
-              and leading tech companies worldwide.
-            </p>
-            <p className="text-sm text-[#A0A0B8]">
-              Real interviews. Real companies. Real results.
-            </p>
-          </FadeInSection>
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-[#6366F1]/35 to-transparent" />
-        </div>
-      </section>
-
-      {/* ── 2. Social Proof ── */}
-      <section className="py-16 md:py-24 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <FadeInSection>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
-              border border-[#6366F1]/30 bg-[#6366F1]/10 text-[#818CF8] text-xs font-semibold
-              tracking-wide mb-6">
-              ✦ AI-Powered Career Toolkit
-            </div>
-
-            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
-              Everything you need to land your next role
-            </h2>
-            <p className="text-[#A0A0B8] text-base md:text-lg max-w-xl mx-auto mb-12 leading-relaxed">
-              AURI handles the tedious parts of job searching — so you can focus
-              on what actually matters: showing up prepared and confident.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-stretch">
-              {[
-                { stat: '8 AI-powered tools', desc: 'Resume, cover letter, interview prep, and more' },
-                { stat: 'ATS-optimized output', desc: 'Structured for Workday, Greenhouse, Lever & iCIMS' },
-                { stat: 'Powered by Claude AI', desc: "Anthropic's most capable model, built into every feature" },
-              ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ ...SPRING, delay: i * 0.1 }}
-                  className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-full"
-                >
-                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 text-center
-                    flex flex-col items-center justify-center h-full min-h-[120px]">
-                    <p className="font-heading text-lg font-bold text-white mb-1">{item.stat}</p>
-                    <p className="text-sm text-[#60607A]">{item.desc}</p>
-                  </div>
-                </motion.div>
+            <div className="hidden md:flex items-center gap-8">
+              {[['Features', '#features'], ['How It Works', '#how-it-works'], ['Pricing', '#pricing']].map(([label, href]) => (
+                <a key={label} href={href}
+                  className="text-sm text-[#A0A0B8] hover:text-white transition-colors duration-200">
+                  {label}
+                </a>
               ))}
+              <Link href="/blog"
+                className="text-sm text-[#A0A0B8] hover:text-white transition-colors duration-200">
+                Blog
+              </Link>
             </div>
-          </FadeInSection>
-        </div>
-      </section>
-
-      {/* ── 3. Features Grid ── */}
-      <section id="features" className="py-16 md:py-24 px-6">
-        <div className="max-w-6xl mx-auto">
-          <FadeInSection className="text-center mb-16">
-            <span className="text-xs font-semibold uppercase tracking-widest text-[#6366F1] mb-3 block">
-              Everything you need
-            </span>
-            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
-              One toolkit. Every career need.
-            </h2>
-            <p className="text-[#A0A0B8] max-w-xl mx-auto px-4">
-              Every feature shares your career data. Enter your experience once — use it everywhere.
-            </p>
-          </FadeInSection>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-            style={{ gridAutoRows: '1fr' }}>
-            {FEATURES.map((f, i) => (
-              <FadeInSection key={f.label} delay={i * 0.05} className="h-full">
-                <Link href={f.href} className="h-full block">
-                  <motion.div
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    transition={SPRING}
-                    className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 cursor-pointer group h-full"
-                  >
-                    <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-4 md:p-5 h-full flex flex-col justify-start">
-                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4 flex-shrink-0
-                        group-hover:shadow-lg group-hover:shadow-[#6366F1]/20 transition-shadow duration-300`}>
-                        <f.icon className="w-5 h-5 text-white" />
-                      </div>
-                      <h3 className="font-heading font-semibold text-white mb-1.5">{f.label}</h3>
-                      <p className="text-sm text-[#60607A] leading-relaxed flex-1">{f.desc}</p>
-                      <div className="flex items-center gap-1 mt-3 text-[#6366F1] text-xs font-medium
-                        opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        Try it <ChevronRight className="w-3 h-3" />
-                      </div>
-                    </div>
-                  </motion.div>
-                </Link>
-              </FadeInSection>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. How It Works ── */}
-      <section id="how-it-works" className="py-16 md:py-24 px-6">
-        <div className="max-w-4xl mx-auto">
-          <FadeInSection className="text-center mb-16">
-            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">How it works</h2>
-            <p className="text-[#A0A0B8]">From zero to hired in three steps.</p>
-          </FadeInSection>
-
-          <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Connecting line — z-0 so it sits behind the step boxes */}
-            <div className="hidden md:block absolute left-0 right-0 h-px bg-gradient-to-r from-[#6366F1]/50 to-[#8B5CF6]/50"
-              style={{ top: '40px', zIndex: 0 }} />
-
-            {[
-              { step: '01', title: 'Add Your Experience', desc: 'Fill in your background or paste your existing resume. Takes 3 minutes.' },
-              { step: '02', title: 'AI Magic Happens', desc: 'AURI rewrites, optimizes, and tailors everything to your target role.' },
-              { step: '03', title: 'Get Hired', desc: 'Download your ATS-optimized resume, apply, and land the interview.' },
-            ].map((item, i) => (
-              <FadeInSection key={item.step} delay={i * 0.15}>
-                <div className="text-center relative" style={{ zIndex: 1 }}>
-                  <div className="w-20 h-20 rounded-2xl bg-[#0A0A0F] bg-gradient-to-br from-[#6366F1]/20 to-[#8B5CF6]/20
-                    border border-[#6366F1]/30 flex items-center justify-center mx-auto mb-4">
-                    <span className="font-heading font-bold text-2xl
-                      bg-clip-text text-transparent bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]">
-                      {item.step}
-                    </span>
-                  </div>
-                  <h3 className="font-heading font-semibold text-white mb-2">{item.title}</h3>
-                  <p className="text-sm text-[#60607A] leading-relaxed">{item.desc}</p>
-                </div>
-              </FadeInSection>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 5. ATS Section ── */}
-      <section id="ats" className="py-16 md:py-24 px-6" ref={atsRef}>
-        <div className="max-w-5xl mx-auto">
-          <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1">
-            <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 sm:p-8 md:p-10 lg:p-16
-              grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
-              {/* Score meter */}
-              <FadeInSection className="text-center">
-                <div className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto">
-                  <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-                    <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
-                    <motion.circle
-                      cx="60" cy="60" r="50" fill="none"
-                      stroke="url(#scoreGradient)" strokeWidth="10"
-                      strokeLinecap="round"
-                      strokeDasharray={`${2 * Math.PI * 50}`}
-                      initial={{ strokeDashoffset: 2 * Math.PI * 50 }}
-                      animate={atsInView ? {
-                        strokeDashoffset: 2 * Math.PI * 50 * (1 - atsScore / 100)
-                      } : {}}
-                      transition={{ duration: 2.5, ease: 'easeOut' }}
-                    />
-                    <defs>
-                      <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#6366F1" />
-                        <stop offset="100%" stopColor="#22C55E" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="font-heading font-bold text-3xl sm:text-4xl text-white">{atsScore}</span>
-                    <span className="text-sm text-[#A0A0B8]">ATS Score</span>
-                  </div>
-                </div>
-                <p className="text-[#22C55E] font-medium mt-4">Excellent Match</p>
-              </FadeInSection>
-
-              {/* Copy */}
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-widest text-[#6366F1] mb-3 block">
-                  Why ATS matters
-                </span>
-                <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4">
-                  75% of resumes are rejected before a human sees them
-                </h2>
-                <p className="text-[#A0A0B8] leading-relaxed mb-6">
-                  Applicant Tracking Systems filter resumes by keyword match, formatting,
-                  and structure before any recruiter reads them. AURI ensures you
-                  pass every filter.
-                </p>
-                <ul className="space-y-3">
-                  {[
-                    'Keyword optimization from the actual job description',
-                    'ATS-safe formatting — no tables, no columns',
-                    'Standard section headers every system recognizes',
-                    'Real-time score with specific fix suggestions',
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <CheckCircle className="w-4 h-4 text-[#22C55E] mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-[#A0A0B8]">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 7. Pricing ── */}
-      <section id="pricing" className="py-16 md:py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <FadeInSection className="text-center mb-16">
-            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">Simple pricing</h2>
-            <p className="text-[#A0A0B8]">Start free. Upgrade when you land the job.</p>
-          </FadeInSection>
-
-          <div className="flex justify-center mb-10">
-            <div className="inline-flex items-center rounded-xl
-              border border-white/[0.08] bg-[#13131A] p-1 gap-1">
-              <button
-                onClick={() => setBilling('monthly')}
-                className={`px-5 py-2 rounded-lg text-sm font-medium
-                  transition-all duration-200 ${
-                  billing === 'monthly'
-                    ? 'bg-[#1C1C26] text-white border border-white/[0.08]'
-                    : 'text-[#60607A] hover:text-[#A0A0B8]'
-                }`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setBilling('annual')}
-                className={`px-5 py-2 rounded-lg text-sm font-medium
-                  transition-all duration-200 flex items-center gap-2 ${
-                  billing === 'annual'
-                    ? 'bg-[#1C1C26] text-white border border-white/[0.08]'
-                    : 'text-[#60607A] hover:text-[#A0A0B8]'
-                }`}
-              >
-                Annual
-                <span className="text-[10px] font-semibold px-1.5 py-0.5
-                  rounded-full bg-[#22C55E] text-white">
-                  Save 17%
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {/* Free */}
-            <FadeInSection>
-              <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-full">
-                <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 md:p-8 h-full flex flex-col">
-                  <p className="font-heading font-semibold text-[#A0A0B8] mb-1">Free</p>
-                  <div className="flex items-end gap-1 mb-6">
-                    <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$0</span>
-                    <span className="text-[#60607A] mb-1">/month</span>
-                  </div>
-                  <ul className="space-y-3 mb-2 flex-1">
-                    {['3 AI generations/month', 'Resume builder & ATS optimizer', 'Cover letter generator'].map(f => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
-                        <CheckCircle className="w-4 h-4 text-[#22C55E]" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="text-xs text-[#60607A] mt-2 mb-8">
-                    LinkedIn, Strategy, Interview &amp; Rewriter require Pro
-                  </p>
-                  <button
-                    onClick={() => router.push(getStartedRedirect('free'))}
-                    className="w-full py-3 rounded-xl border border-white/15
-                      text-[#A0A0B8] hover:text-white hover:bg-white/5 transition-all duration-200 font-medium">
-                    Get Started
-                  </button>
-                </div>
-              </div>
-            </FadeInSection>
-
-            {/* Pro */}
-            <FadeInSection delay={0.1}>
-              <div className="rounded-2xl border border-[#6366F1]/40 bg-[#13131A] p-1 relative h-full">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full
-                  bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white text-xs font-semibold">
-                  Most Popular
-                </div>
-                <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] p-6 md:p-8 h-full flex flex-col">
-                  <p className="font-heading font-semibold text-[#818CF8] mb-1">Pro</p>
-                  <div className="flex items-end gap-1 mb-6">
-                    <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$19</span>
-                    <span className="text-[#60607A] mb-1">/month</span>
-                  </div>
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {[
-                      'Unlimited AI generations',
-                      'All Free features included',
-                      'LinkedIn profile rewriter',
-                      '7-day job search strategy',
-                      'Interview prep system',
-                      'Priority support',
-                    ].map(f => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
-                        <CheckCircle className="w-4 h-4 text-[#6366F1]" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={() => router.push(getStartedRedirect('pro'))}
-                    className="w-full py-3 rounded-xl font-semibold text-white
-                      bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-                      shadow-lg shadow-[#6366F1]/25 hover:shadow-[#6366F1]/50
-                      hover:scale-[1.02] transition-all duration-200">
-                    Start Pro Free
-                  </button>
-                </div>
-              </div>
-            </FadeInSection>
-
-            {/* Pro Annual */}
-            <FadeInSection delay={0.2}>
-              <div className="rounded-2xl border border-[#22C55E]/30 bg-[#13131A] p-1 relative h-full">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full
-                  bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-white text-xs font-semibold
-                  whitespace-nowrap">
-                  Save 17%
-                </div>
-                <div className="rounded-xl border border-[#22C55E]/15 bg-[#1C1C26] p-6 md:p-8 h-full flex flex-col">
-                  <div>
-                    <p className="font-heading font-semibold text-[#22C55E] mb-1">Pro Annual</p>
-                    <div className="flex items-end gap-1 mb-1">
-                      <span className="font-heading font-bold text-3xl sm:text-4xl text-white">$15.83</span>
-                      <span className="text-[#60607A] mb-1">/month</span>
-                    </div>
-                    <p className="text-xs text-[#22C55E] mb-6">$190 billed once a year</p>
-                  </div>
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {[
-                      'Unlimited AI generations',
-                      'All Free features included',
-                      'LinkedIn profile rewriter',
-                      '7-day job search strategy',
-                      'Interview prep system',
-                      'Priority support',
-                      '2 months free vs monthly',
-                    ].map(f => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-[#A0A0B8]">
-                        <CheckCircle className="w-4 h-4 text-[#22C55E] flex-shrink-0" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={() => router.push(getStartedRedirect('pro'))}
-                    className="w-full py-3 rounded-xl font-semibold text-white
-                      bg-gradient-to-r from-[#22C55E] to-[#16A34A]
-                      shadow-lg shadow-[#22C55E]/25 hover:shadow-[#22C55E]/40
-                      hover:scale-[1.02] transition-all duration-200">
-                    Get Annual Plan
-                  </button>
-                </div>
-              </div>
-            </FadeInSection>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 8. Final CTA ── */}
-      <section className="py-16 md:py-24 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="rounded-2xl overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#6366F1]/20 to-[#8B5CF6]/20" />
-            <div className="absolute inset-0 border border-[#6366F1]/30 rounded-2xl" />
-            <div className="relative p-8 sm:p-10 md:p-12 lg:p-16 text-center">
-              <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-                Your next job is waiting.
-              </h2>
-              <p className="text-base md:text-lg text-[#A0A0B8] mb-8 max-w-xl mx-auto">
-                Start building your best resume in minutes.
-                No credit card required.
-              </p>
-
+            <div className="flex items-center gap-3">
+              <Link href="/login"
+                className="text-sm text-[#A0A0B8] hover:text-white transition-colors duration-200 hidden md:block">
+                Sign In
+              </Link>
               <button
                 onClick={() => router.push(getStartedRedirect('free'))}
-                className="px-8 py-3 rounded-xl font-semibold text-white
-                  bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]
-                  shadow-lg shadow-[#6366F1]/30 hover:shadow-[#6366F1]/60
-                  hover:scale-[1.02] transition-all duration-200"
-              >
+                className={`px-3 py-2 sm:px-4 text-sm ${primaryBtn}`}>
                 Get Started Free
               </button>
+            </div>
+          </div>
+        </nav>
 
-              <p className="text-xs text-[#60607A] mt-4">
-                Free to start · No credit card required
+        {/* ── 1. Hero: copy + product sample ── */}
+        <section className="px-4 md:px-6 pt-12 pb-16 md:pt-20 md:pb-24">
+          <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-16 items-center">
+            <div>
+              <p className="text-sm font-medium text-[#818CF8] mb-4">ATS resume toolkit</p>
+              <h1 className="font-heading text-[2rem] leading-[1.1] sm:text-5xl lg:text-[3.5rem] font-bold tracking-[-0.02em] text-white mb-6">
+                Paste the job description. See what your resume is missing.
+              </h1>
+              <p className="text-base md:text-lg text-[#A0A0B8] leading-relaxed mb-8 max-w-xl">
+                AURI scores your resume against a specific posting on keyword match, achievements,
+                formatting, and readability, then rewrites the weak bullets. Your cover letter,
+                interview prep, and LinkedIn copy are built from the same profile.
               </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href="/signup" className={`px-6 py-3 text-center ${primaryBtn}`}>
+                  Start for free
+                </Link>
+                <Link href="/login" className={`px-6 py-3 text-center ${secondaryBtn}`}>
+                  Upload existing resume
+                </Link>
+              </div>
+              <p className="text-sm text-[#8B8BA3] mt-4">3 free AI generations a month. No credit card.</p>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="py-10 px-4 md:px-6 border-t border-white/[0.06]">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
-              <Sparkles className="w-3 h-3 text-white" />
+            <ProductSample />
+          </div>
+        </section>
+
+        {/* ── 2. Features ── */}
+        <section id="features" className="py-16 md:py-24 px-4 md:px-6 border-t border-white/[0.06]">
+          <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-10 lg:gap-16">
+            <FadeInSection>
+              <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold tracking-[-0.02em] leading-tight text-white mb-4">
+                Enter your experience once. Use it for every application.
+              </h2>
+              <p className="text-[#A0A0B8] leading-relaxed">
+                Every tool reads from the same career profile, so the resume, cover letter, and
+                interview answers stay consistent.
+              </p>
+            </FadeInSection>
+
+            <div className="space-y-12">
+              {FEATURE_GROUPS.map((group) => (
+                <FadeInSection key={group.title}>
+                  <h3 className="text-sm font-semibold text-[#818CF8] mb-2">{group.title}</h3>
+                  <ul className="divide-y divide-white/[0.06] border-y border-white/[0.06]">
+                    {group.items.map((f) => (
+                      <li key={f.label}>
+                        <Link href={f.href}
+                          className="group grid sm:grid-cols-[14rem_1fr_auto] gap-1 sm:gap-6 py-4 items-baseline">
+                          <span className="font-heading font-semibold text-white flex items-center gap-2">
+                            {f.label}
+                            {f.pro && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white/[0.06] text-[#A0A0B8]">PRO</span>
+                            )}
+                          </span>
+                          <span className="text-sm text-[#A0A0B8] leading-relaxed">{f.desc}</span>
+                          <span aria-hidden="true"
+                            className="hidden sm:block text-sm text-[#60607A] group-hover:text-[#818CF8] transition-colors duration-200">
+                            →
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </FadeInSection>
+              ))}
             </div>
-            <span className="font-heading font-semibold text-white">AURI</span>
           </div>
-          <p className="text-sm text-[#60607A]">© 2026 AURI. Powered by AI.</p>
-          <div className="flex gap-6">
-            {[
-              { label: 'Privacy', href: '/privacy' },
-              { label: 'Terms', href: '/terms' },
-              { label: 'Contact', href: '/contact' },
-            ].map(({ label, href }) => (
-              <a key={label} href={href} className="text-sm text-[#60607A] hover:text-white transition-colors duration-200">
-                {label}
-              </a>
-            ))}
+        </section>
+
+        {/* ── 3. How It Works ── */}
+        <section id="how-it-works" className="py-16 md:py-24 px-4 md:px-6 border-t border-white/[0.06]">
+          <div className="max-w-6xl mx-auto">
+            <FadeInSection className="mb-12 max-w-2xl">
+              <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold tracking-[-0.02em] leading-tight text-white">
+                How it works
+              </h2>
+            </FadeInSection>
+
+            <FadeInSection>
+            <ol className="grid md:grid-cols-3 gap-10 md:gap-8">
+              {[
+                { step: '1', title: 'Add your experience', desc: 'Fill in the career profile form, or upload the resume you already have.' },
+                { step: '2', title: 'Paste a job description', desc: 'AURI rewrites your bullets toward the posting and scores the match on four dimensions.' },
+                { step: '3', title: 'Edit and export', desc: 'Adjust any line in the structured editor, re-check the score, and download a PDF.' },
+              ].map((item) => (
+                  <li key={item.step} className="border-t border-white/15 pt-5">
+                    <span className="block font-heading text-sm font-semibold text-[#818CF8] tabular-nums mb-3">
+                      Step {item.step}
+                    </span>
+                    <h3 className="font-heading text-lg font-semibold text-white mb-2">{item.title}</h3>
+                    <p className="text-sm text-[#A0A0B8] leading-relaxed">{item.desc}</p>
+                  </li>
+              ))}
+            </ol>
+            </FadeInSection>
           </div>
-        </div>
-      </footer>
-    </main>
+        </section>
+
+        {/* ── 4. ATS scoring rubric ── */}
+        <section id="ats" className="py-16 md:py-24 px-4 md:px-6 border-t border-white/[0.06]">
+          <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-10 lg:gap-16">
+            <FadeInSection>
+              <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold tracking-[-0.02em] leading-tight text-white mb-4">
+                What the ATS score measures
+              </h2>
+              <p className="text-[#A0A0B8] leading-relaxed">
+                Applicant tracking systems parse and filter resumes before a recruiter reads them.
+                The score adds up four parts, and each result lists the specific lines to fix.
+              </p>
+            </FadeInSection>
+
+            <FadeInSection>
+              <dl className="divide-y divide-white/[0.06] border-y border-white/[0.06]">
+                {ATS_DIMENSIONS.map((d) => (
+                  <div key={d.label} className="grid grid-cols-[1fr_auto] sm:grid-cols-[14rem_1fr_auto] gap-x-6 gap-y-1 py-4 items-baseline">
+                    <dt className="font-heading font-semibold text-white">{d.label}</dt>
+                    <dd className="col-span-2 sm:col-span-1 row-start-2 sm:row-start-auto text-sm text-[#A0A0B8] leading-relaxed">{d.desc}</dd>
+                    <dd className="col-start-2 row-start-1 sm:col-start-auto sm:row-start-auto text-sm text-[#F8F8FF] tabular-nums text-right">
+                      {d.max} pts
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </FadeInSection>
+          </div>
+        </section>
+
+        {/* ── 5. Pricing ── */}
+        <section id="pricing" className="py-16 md:py-24 px-4 md:px-6 border-t border-white/[0.06]">
+          <div className="max-w-4xl mx-auto">
+            <FadeInSection className="text-center mb-10">
+              <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold tracking-[-0.02em] text-white mb-4">Pricing</h2>
+              <p className="text-[#A0A0B8]">Start free. Upgrade when you need the full toolkit.</p>
+            </FadeInSection>
+
+            <div className="flex justify-center mb-10">
+              <div role="group" aria-label="Billing period"
+                className="inline-flex items-center rounded-lg border border-white/[0.08] bg-[#13131A] p-1 gap-1">
+                {(['monthly', 'annual'] as const).map((period) => (
+                  <button
+                    key={period}
+                    onClick={() => setBilling(period)}
+                    aria-pressed={billing === period}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                      billing === period
+                        ? 'bg-[#1C1C26] text-white'
+                        : 'text-[#A0A0B8] hover:text-white'
+                    }`}
+                  >
+                    {period === 'monthly' ? 'Monthly' : 'Annual · save 17%'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Free */}
+              <FadeInSection>
+                <div className="rounded-2xl border border-white/[0.08] bg-[#13131A] p-1 h-full">
+                  <div className="rounded-xl border border-white/[0.05] bg-[#1C1C26] p-6 md:p-8 h-full flex flex-col">
+                    <h3 className="font-heading font-semibold text-[#A0A0B8] mb-1">Free</h3>
+                    <div className="flex items-end gap-1 mb-1">
+                      <span className="font-heading font-bold text-4xl tracking-tight text-white">$0</span>
+                      <span className="text-[#8B8BA3] mb-1">/month</span>
+                    </div>
+                    <p className="text-sm text-[#8B8BA3] mb-6">No card required</p>
+                    <ul className="space-y-2 mb-4 flex-1 text-sm text-[#A0A0B8] list-disc pl-5 marker:text-[#60607A]">
+                      {FREE_FEATURES.map(f => <li key={f}>{f}</li>)}
+                    </ul>
+                    <p className="text-sm text-[#8B8BA3] mb-8">
+                      LinkedIn, Strategy, Interview, and Rewriter require Pro.
+                    </p>
+                    <button
+                      onClick={() => router.push(getStartedRedirect('free'))}
+                      className={`w-full py-3 ${secondaryBtn}`}>
+                      Get started
+                    </button>
+                  </div>
+                </div>
+              </FadeInSection>
+
+              {/* Pro */}
+              <FadeInSection delay={0.08}>
+                <div className="rounded-2xl border border-[#6366F1]/40 bg-[#13131A] p-1 h-full">
+                  <div className="rounded-xl border border-[#6366F1]/20 bg-[#1C1C26] p-6 md:p-8 h-full flex flex-col">
+                    <h3 className="font-heading font-semibold text-[#818CF8] mb-1">Pro</h3>
+                    <div className="flex items-end gap-1 mb-1">
+                      <span className="font-heading font-bold text-4xl tracking-tight text-white tabular-nums">
+                        {billing === 'annual' ? '$15.83' : '$19'}
+                      </span>
+                      <span className="text-[#8B8BA3] mb-1">/month</span>
+                    </div>
+                    <p className="text-sm text-[#8B8BA3] mb-6" aria-live="polite">
+                      {billing === 'annual' ? '$190 billed once a year, 2 months free' : 'Billed monthly'}
+                    </p>
+                    <ul className="space-y-2 mb-8 flex-1 text-sm text-[#A0A0B8] list-disc pl-5 marker:text-[#6366F1]">
+                      {PRO_FEATURES.map(f => <li key={f}>{f}</li>)}
+                    </ul>
+                    <button
+                      onClick={() => router.push(getStartedRedirect('pro'))}
+                      className={`w-full py-3 ${primaryBtn}`}>
+                      Upgrade to Pro
+                    </button>
+                  </div>
+                </div>
+              </FadeInSection>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 6. Final CTA ── */}
+        <section className="py-16 md:py-24 px-4 md:px-6 border-t border-white/[0.06]">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+            <div className="max-w-2xl">
+              <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold tracking-[-0.02em] leading-tight text-white mb-4">
+                Check your resume against the next job you apply to.
+              </h2>
+              <p className="text-[#A0A0B8]">Free to start. No credit card required.</p>
+            </div>
+            <button
+              onClick={() => router.push(getStartedRedirect('free'))}
+              className={`px-8 py-3 flex-shrink-0 ${primaryBtn}`}
+            >
+              Get Started Free
+            </button>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="py-10 px-4 md:px-6 border-t border-white/[0.06]">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
+                <Sparkles className="w-3 h-3 text-white" />
+              </div>
+              <span className="font-heading font-semibold text-white">AURI</span>
+            </div>
+            <p className="text-sm text-[#8B8BA3]">© 2026 AURI</p>
+            <div className="flex gap-6">
+              {[
+                { label: 'Privacy', href: '/privacy' },
+                { label: 'Terms', href: '/terms' },
+                { label: 'Contact', href: '/contact' },
+              ].map(({ label, href }) => (
+                <Link key={label} href={href} className="text-sm text-[#8B8BA3] hover:text-white transition-colors duration-200">
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </footer>
+      </main>
+    </MotionConfig>
   )
 }
