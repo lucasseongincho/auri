@@ -25,10 +25,34 @@ const config: Config = {
         success: '#22C55E',
         warning: '#F59E0B',
         error: '#EF4444',
+        // Landing page (app/page.tsx) only. Paper + ink neutrals, one brand
+        // green, one highlight used solely to mark matched keywords.
+        lp: {
+          paper: '#F4F2EC',
+          sunk: '#E9E6DD',
+          sheet: '#FAF9F5',
+          rule: '#D9D5CC',
+          hairline: '#E6E2D9',
+          ink: '#1B1D1C',
+          body: '#3C403E',
+          muted: '#5A5F5C',
+          pine: '#1F5C4A',
+          'pine-dark': '#15443A',
+          'pine-tint': '#EEF3F0',
+          mark: '#F2D45C',
+          miss: '#9A3B12',
+        },
       },
       fontFamily: {
         heading: ['Inter', 'sans-serif'],
         body: ['DM Sans', 'sans-serif'],
+        'lp-serif': ['"Newsreader Variable"', 'Georgia', 'serif'],
+        'lp-sans': ['"IBM Plex Sans"', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
+        'lp-mono': ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+      },
+      borderRadius: {
+        'lp-control': '4px',
+        'lp-panel': '10px',
       },
       animation: {
         float: 'float 6s ease-in-out infinite',
@@ -61,6 +85,7 @@ const config: Config = {
       boxShadow: {
         glow: '0 0 30px rgba(99,102,241,0.3)',
         'glow-lg': '0 0 60px rgba(99,102,241,0.4)',
+        'lp-lift': '0 1px 2px rgba(27,29,28,0.05), 0 12px 32px rgba(27,29,28,0.07)',
       },
     },
   },
