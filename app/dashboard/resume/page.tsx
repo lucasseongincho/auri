@@ -2173,7 +2173,7 @@ function ResumePageContent() {
                 {t("Your resume will appear here")}
               </p>
               <p className="text-xs text-[#5A5F5C] max-w-xs">
-                {t("Complete the form steps and click")}{' '}<strong className="text-[#1F5C4A]">{t("Generate Resume")}</strong>{' '}{t("on step 8 to create your AI-tailored resume.")}
+                {t("Complete the form steps and click")}{' '}<strong className="text-[#1F5C4A]">{t("Generate Resume")}</strong>{t(" on step 8 to create your AI-tailored resume.")}
               </p>
             </motion.div>
           )}

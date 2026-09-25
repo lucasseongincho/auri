@@ -49,7 +49,7 @@ export default function EstimateDisclaimerModal({ open, onClose }: EstimateDiscl
                 <div className="flex items-start gap-2">
                   <IconMatched className="w-5 h-5 text-[#1F7A4D] flex-shrink-0" />
                   <p className="text-[#3C403E] text-sm">
-                    {t("Always replace")}{' '}<span className="text-amber-400 font-medium">{t("amber numbers")}</span>{' '}{t("with your real data before submitting")}
+                    {t("Always replace")}{' '}<span className="text-[#8A5A00] font-medium">{t("amber numbers")}</span>{t(" with your real data before submitting")}
                   </p>
                 </div>
                 <div className="flex items-start gap-2">

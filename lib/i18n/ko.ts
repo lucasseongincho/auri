@@ -1,6 +1,8 @@
 // Korean UI strings. Keys are the English source text used in t("...").
 // Placeholders like {v0} are filled in at render time; a missing key falls back to English.
 export const ko: Record<string, string> = {
+  " on step 8 to create your AI-tailored resume.": "을 누르면 공고에 맞춘 이력서가 만들어집니다.",
+  " with your real data before submitting": "는 반드시 실제 값으로 바꾸세요.",
   "$190 billed annually": "연 $190 결제",
   "(optional)": "(선택)",
   "(paste for keyword match)": "(키워드 비교용으로 붙여넣기)",
@@ -725,11 +727,9 @@ export const ko: Record<string, string> = {
   "e.g. Statistics": "예: Statistics",
   "none detected": "찾지 못함",
   "of {v0}": "/ {v0}",
-  "on step 8 to create your AI-tailored resume.": "을 누르면 공고에 맞춘 이력서가 만들어집니다.",
   "or": "또는",
   "semantic": "의미 분석",
   "will be permanently deleted. This action cannot be undone.": "이(가) 영구적으로 삭제됩니다. 되돌릴 수 없습니다.",
-  "with your real data before submitting": "는 반드시 실제 값으로 바꾸세요.",
   "you're ready.": "필요할 때 업그레이드하세요.",
   "{greeting}, {name}": "{name}님, {greeting}",
   "{v0} / 20 min": "{v0} / 최소 20자",
