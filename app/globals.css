@@ -161,3 +161,9 @@
     background: #E9E6DD;
   }
 }
+
+/* Custom icon set: the Matched icon's highlight bar uses the keyword highlighter. */
+.auri-highlight {
+  fill: #F2D45C;
+  fill-opacity: 1;
+}

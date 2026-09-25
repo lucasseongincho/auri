@@ -3,7 +3,8 @@
 import { useT } from '@/lib/i18n/client'
 
 import { motion } from 'framer-motion'
-import { Wand2, Loader2 } from 'lucide-react'
+import { Wand2 } from 'lucide-react'
+import { IconLoading } from '@/components/icons'
 import type { StructuredSuggestion } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -168,7 +169,7 @@ export default function SuggestionsPanel({
               transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isApplying
-              ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Applying…")}</>
+              ? <><IconLoading className="w-4 h-4 animate-spin" />{' '}{t("Applying…")}</>
               : t("Apply {v0} Selected", { v0: checkedIds.size })
             }
           </button>

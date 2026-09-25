@@ -6,10 +6,8 @@ import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  FileText, Target, Linkedin, Map, Mail, MessageSquare,
-  ChevronRight, TrendingUp, CheckCircle, AlertCircle, Sparkles, X, Zap,
-} from 'lucide-react'
+import { ChevronRight, TrendingUp, CheckCircle, AlertCircle, X, Zap } from 'lucide-react'
+import { IconAtsOptimizer, IconCoverLetter, IconInterviewPrep, IconJobStrategy, IconProBadge, IconProfileRewriter, IconResumeBuilder } from '@/components/icons'
 import { useCareerProfile } from '@/hooks/useCareerProfile'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -29,10 +27,10 @@ function UpgradedToast({ onDismiss }: { onDismiss: () => void }) {
       <div className="rounded-[10px] border border-[#1F5C4A]/40 bg-[#FFFFFF] p-1 ">
         <div className="rounded-[4px] border border-[#1F5C4A]/20 bg-[#FFFFFF] px-5 py-4 flex items-start gap-3">
           <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-4 h-4 text-lp-ink" />
+            <IconProBadge className="w-5 h-5 text-[#1F5C4A]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-heading font-bold text-lp-ink text-sm">{t("Welcome to AURI Pro! 🎉")}</p>
+            <p className="font-heading font-bold text-lp-ink text-sm">{t("Welcome to AURI Pro!")}</p>
             <p className="text-xs text-[#3C403E] mt-0.5">{t("Unlimited generations unlocked. You're ready to land the job.")}</p>
           </div>
           <button onClick={onDismiss} aria-label={t("Dismiss")} className="text-[#5A5F5C] hover:text-lp-ink transition-colors flex-shrink-0">
@@ -75,12 +73,12 @@ function UpgradeSuccessHandler() {
 }
 
 const QUICK_ACTIONS = [
-  { label: 'Build Resume', desc: 'Generate ATS-optimized resume', icon: FileText, href: '/dashboard/resume', color: ' ' },
-  { label: 'ATS Score', desc: 'Check your resume match score', icon: Target, href: '/dashboard/ats', color: ' ' },
-  { label: 'Cover Letter', desc: 'Generate in under a minute', icon: Mail, href: '/dashboard/cover-letter', color: ' ' },
-  { label: 'Interview Prep', desc: 'Practice likely questions', icon: MessageSquare, href: '/dashboard/interview', color: ' ' },
-  { label: 'LinkedIn', desc: 'Optimize your profile', icon: Linkedin, href: '/dashboard/linkedin', color: ' ' },
-  { label: 'Job Strategy', desc: '7-day action plan', icon: Map, href: '/dashboard/strategy', color: ' ' },
+  { label: 'Build Resume', desc: 'Generate ATS-optimized resume', icon: IconResumeBuilder, href: '/dashboard/resume', color: ' ' },
+  { label: 'ATS Score', desc: 'Check your resume match score', icon: IconAtsOptimizer, href: '/dashboard/ats', color: ' ' },
+  { label: 'Cover Letter', desc: 'Generate in under a minute', icon: IconCoverLetter, href: '/dashboard/cover-letter', color: ' ' },
+  { label: 'Interview Prep', desc: 'Practice likely questions', icon: IconInterviewPrep, href: '/dashboard/interview', color: ' ' },
+  { label: 'LinkedIn', desc: 'Optimize your profile', icon: IconProfileRewriter, href: '/dashboard/linkedin', color: ' ' },
+  { label: 'Job Strategy', desc: '7-day action plan', icon: IconJobStrategy, href: '/dashboard/strategy', color: ' ' },
 ]
 
 function UpgradeBanner() {

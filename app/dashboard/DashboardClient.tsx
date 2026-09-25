@@ -6,11 +6,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  LayoutDashboard, FileText, FolderOpen, Target, Linkedin,
-  Map, Mail, MessageSquare, Settings, ChevronRight,
-  Sparkles, User, Cloud, CloudOff, MoreHorizontal, X, Crown,
-} from 'lucide-react'
+import { MessageSquare, ChevronRight, User, MoreHorizontal, X } from 'lucide-react'
+import { IconAtsOptimizer, IconAtsOptimizerActive, IconCoverLetter, IconCoverLetterActive, IconDashboard, IconDashboardActive, IconInterviewPrep, IconInterviewPrepActive, IconJobStrategy, IconJobStrategyActive, IconLogoMark, IconMyCoverLetters, IconMyCoverLettersActive, IconMyResumes, IconMyResumesActive, IconMyStrategies, IconMyStrategiesActive, IconOffline, IconProBadge, IconProfileRewriter, IconProfileRewriterActive, IconResumeBuilder, IconResumeBuilderActive, IconSettings, IconSettingsActive, IconSynced } from '@/components/icons'
 import * as Sentry from '@sentry/nextjs'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
@@ -45,37 +42,37 @@ function getBreadcrumbLabel(pathname: string): string {
 }
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', isPro: false },
-  { id: 'resume', label: 'Resume Builder', icon: FileText, href: '/dashboard/resume', isPro: false },
-  { id: 'my-resumes', label: 'My Resumes', icon: FolderOpen, href: '/dashboard/resume/saved', isPro: false },
-  { id: 'ats', label: 'ATS Optimizer', icon: Target, href: '/dashboard/ats', isPro: false },
-  { id: 'strategy', label: 'Job Strategy', icon: Map, href: '/dashboard/strategy', isPro: true },
-  { id: 'my-strategies', label: 'My Strategies', icon: FolderOpen, href: '/dashboard/strategy/saved', isPro: false },
-  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin', isPro: true },
-  { id: 'cover-letter', label: 'Cover Letter', icon: Mail, href: '/dashboard/cover-letter', isPro: false },
-  { id: 'my-cover-letters', label: 'My Cover Letters', icon: FolderOpen, href: '/dashboard/cover-letter/saved', isPro: false },
-  { id: 'interview', label: 'Interview Prep', icon: MessageSquare, href: '/dashboard/interview', isPro: true },
+  { id: 'dashboard', label: 'Dashboard', icon: IconDashboard, activeIcon: IconDashboardActive, href: '/dashboard', isPro: false },
+  { id: 'resume', label: 'Resume Builder', icon: IconResumeBuilder, activeIcon: IconResumeBuilderActive, href: '/dashboard/resume', isPro: false },
+  { id: 'my-resumes', label: 'My Resumes', icon: IconMyResumes, activeIcon: IconMyResumesActive, href: '/dashboard/resume/saved', isPro: false },
+  { id: 'ats', label: 'ATS Optimizer', icon: IconAtsOptimizer, activeIcon: IconAtsOptimizerActive, href: '/dashboard/ats', isPro: false },
+  { id: 'strategy', label: 'Job Strategy', icon: IconJobStrategy, activeIcon: IconJobStrategyActive, href: '/dashboard/strategy', isPro: true },
+  { id: 'my-strategies', label: 'My Strategies', icon: IconMyStrategies, activeIcon: IconMyStrategiesActive, href: '/dashboard/strategy/saved', isPro: false },
+  { id: 'linkedin', label: 'LinkedIn', icon: IconProfileRewriter, activeIcon: IconProfileRewriterActive, href: '/dashboard/linkedin', isPro: true },
+  { id: 'cover-letter', label: 'Cover Letter', icon: IconCoverLetter, activeIcon: IconCoverLetterActive, href: '/dashboard/cover-letter', isPro: false },
+  { id: 'my-cover-letters', label: 'My Cover Letters', icon: IconMyCoverLetters, activeIcon: IconMyCoverLettersActive, href: '/dashboard/cover-letter/saved', isPro: false },
+  { id: 'interview', label: 'Interview Prep', icon: IconInterviewPrep, activeIcon: IconInterviewPrepActive, href: '/dashboard/interview', isPro: true },
 ]
 
 const BOTTOM_ITEMS = [
-  { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/settings' },
+  { id: 'settings', label: 'Settings', icon: IconSettings, activeIcon: IconSettingsActive, href: '/dashboard/settings' },
 ] as const
 
 const MOBILE_PRIMARY_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-  { id: 'resume', label: 'Resume', icon: FileText, href: '/dashboard/resume' },
-  { id: 'my-resumes', label: 'My Resumes', icon: FolderOpen, href: '/dashboard/resume/saved' },
-  { id: 'cover-letter', label: 'Cover Letter', icon: Mail, href: '/dashboard/cover-letter' },
+  { id: 'dashboard', label: 'Dashboard', icon: IconDashboard, activeIcon: IconDashboardActive, href: '/dashboard' },
+  { id: 'resume', label: 'Resume', icon: IconResumeBuilder, activeIcon: IconResumeBuilderActive, href: '/dashboard/resume' },
+  { id: 'my-resumes', label: 'My Resumes', icon: IconMyResumes, activeIcon: IconMyResumesActive, href: '/dashboard/resume/saved' },
+  { id: 'cover-letter', label: 'Cover Letter', icon: IconCoverLetter, activeIcon: IconCoverLetterActive, href: '/dashboard/cover-letter' },
 ] as const
 
 const MOBILE_MORE_ITEMS = [
-  { id: 'ats', label: 'ATS Score', icon: Target, href: '/dashboard/ats', isPro: false },
-  { id: 'strategy', label: 'Strategy', icon: Map, href: '/dashboard/strategy', isPro: true },
-  { id: 'my-strategies', label: 'My Strategies', icon: FolderOpen, href: '/dashboard/strategy/saved', isPro: false },
-  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, href: '/dashboard/linkedin', isPro: true },
-  { id: 'my-cover-letters', label: 'My Letters', icon: FolderOpen, href: '/dashboard/cover-letter/saved', isPro: false },
-  { id: 'interview', label: 'Interview', icon: MessageSquare, href: '/dashboard/interview', isPro: true },
-  { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/settings', isPro: false },
+  { id: 'ats', label: 'ATS Score', icon: IconAtsOptimizer, activeIcon: IconAtsOptimizerActive, href: '/dashboard/ats', isPro: false },
+  { id: 'strategy', label: 'Strategy', icon: IconJobStrategy, activeIcon: IconJobStrategyActive, href: '/dashboard/strategy', isPro: true },
+  { id: 'my-strategies', label: 'My Strategies', icon: IconMyStrategies, activeIcon: IconMyStrategiesActive, href: '/dashboard/strategy/saved', isPro: false },
+  { id: 'linkedin', label: 'LinkedIn', icon: IconProfileRewriter, activeIcon: IconProfileRewriterActive, href: '/dashboard/linkedin', isPro: true },
+  { id: 'my-cover-letters', label: 'My Letters', icon: IconMyCoverLetters, activeIcon: IconMyCoverLettersActive, href: '/dashboard/cover-letter/saved', isPro: false },
+  { id: 'interview', label: 'Interview', icon: IconInterviewPrep, activeIcon: IconInterviewPrepActive, href: '/dashboard/interview', isPro: true },
+  { id: 'settings', label: 'Settings', icon: IconSettings, activeIcon: IconSettingsActive, href: '/dashboard/settings', isPro: false },
 ]
 
 export default function DashboardClient({ children }: { children: React.ReactNode }) {
@@ -157,7 +154,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
         <div className="flex items-center gap-3 px-4 py-5 border-b border-lp-hairline">
           <div className="w-9 h-9 flex-shrink-0 rounded-[10px] bg-[#1F5C4A]/10
             flex items-center justify-center ">
-            <Sparkles className="w-4 h-4 text-lp-ink" />
+            <IconLogoMark className="w-5 h-5 text-[#1F5C4A]" />
           </div>
           <AnimatePresence>
             {sidebarExpanded && (
@@ -190,7 +187,9 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                       : 'text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/[0.04]'
                     }`}
                 >
-                  <item.icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-[#1F5C4A]' : ''}`} />
+                  {active
+                    ? <item.activeIcon className="w-5 h-5 flex-shrink-0 text-[#1F5C4A]" />
+                    : <item.icon className="w-5 h-5 flex-shrink-0" />}
                   <AnimatePresence>
                     {sidebarExpanded && (
                       <motion.span
@@ -205,7 +204,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                     )}
                   </AnimatePresence>
                   {sidebarExpanded && item.isPro && !userIsPro && !active && (
-                    <Crown className="w-3 h-3 text-[#8A5A00] flex-shrink-0 ml-auto" />
+                    <IconProBadge className="w-3 h-3 text-[#8A5A00] flex-shrink-0 ml-auto" />
                   )}
                   {active && (
                     <div className="ml-auto w-1 h-4 rounded-full bg-[#1F5C4A] flex-shrink-0" />
@@ -228,7 +227,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                 className={`flex items-center gap-2 px-3 py-2 rounded-[4px] text-xs
                   ${syncError ? 'text-[#B42318]' : 'text-[#5A5F5C]'}`}
               >
-                {syncError ? <CloudOff className="w-3.5 h-3.5" /> : <Cloud className="w-3.5 h-3.5 animate-pulse" />}
+                {syncError ? <IconOffline className="w-3.5 h-3.5" /> : <IconSynced className="w-3.5 h-3.5 animate-pulse" />}
                 {syncError ? t("Sync failed") : 'Syncing...'}
               </motion.div>
             )}
@@ -240,7 +239,9 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                 transition-colors duration-200
                 ${isActive(item.href) ? 'bg-[#1F5C4A]/20 text-lp-ink' : 'text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/[0.04]'}`}
               >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
+                {isActive(item.href)
+                  ? <item.activeIcon className="w-5 h-5 flex-shrink-0 text-[#1F5C4A]" />
+                  : <item.icon className="w-5 h-5 flex-shrink-0" />}
                 <AnimatePresence>
                   {sidebarExpanded && (
                     <motion.span
@@ -303,7 +304,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
             {/* Mobile: show logo */}
             <div className="md:hidden flex items-center gap-2">
               <div className="w-7 h-7 rounded-[4px] bg-[#1F5C4A]/10 flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5 text-lp-ink" />
+                <IconLogoMark className="w-4 h-4 text-[#1F5C4A]" />
               </div>
               <span className="font-heading font-bold text-lp-ink">{t("AURI")}</span>
             </div>
@@ -312,7 +313,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
           <div className="flex items-center gap-3">
             {isSyncing && (
               <div className="hidden md:flex items-center gap-1.5 text-xs text-[#5A5F5C]">
-                <Cloud className="w-3.5 h-3.5 animate-pulse" />
+                <IconSynced className="w-3.5 h-3.5 animate-pulse" />
                 {t("Saving...")}
               </div>
             )}
@@ -351,7 +352,9 @@ export default function DashboardClient({ children }: { children: React.ReactNod
             <Link key={item.id} href={item.href} aria-label={t(item.label)}
               className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-[4px]
                 transition-colors duration-200 min-w-0 min-h-[44px] justify-center">
-              <item.icon className={`w-5 h-5 ${active ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`} />
+              {active
+                ? <item.activeIcon className="w-5 h-5 text-[#1F5C4A]" />
+                : <item.icon className="w-5 h-5 text-[#5A5F5C]" />}
               <span className={`text-[9px] font-medium truncate ${active ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`}>
                 {t(item.label)}
               </span>
@@ -414,9 +417,11 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                           : 'text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/[0.04]'
                         }`}
                     >
-                      <item.icon className={`w-5 h-5 ${active ? 'text-[#1F5C4A]' : ''}`} />
+                      {active
+                        ? <item.activeIcon className="w-5 h-5 text-[#1F5C4A]" />
+                        : <item.icon className="w-5 h-5" />}
                       {item.isPro && !userIsPro && (
-                        <Crown className="w-3 h-3 text-[#8A5A00]" />
+                        <IconProBadge className="w-3 h-3 text-[#8A5A00]" />
                       )}
                       <span className="text-[10px] font-medium leading-tight">{t(item.label)}</span>
                     </Link>

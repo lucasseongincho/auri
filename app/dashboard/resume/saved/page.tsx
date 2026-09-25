@@ -5,11 +5,8 @@ import { useLocale } from '@/lib/i18n/client'
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  FileText, Plus, Search, Trash2, Calendar,
-  Target, Building2, Loader2, AlertCircle, SortAsc,
-  X, Star, Layout, Pencil, Check,
-} from 'lucide-react'
+import { Plus, Search, Trash2, Calendar, Building2, AlertCircle, SortAsc, X, Star, Layout, Pencil, Check } from 'lucide-react'
+import { IconAtsOptimizer, IconLoading, IconResumeBuilder } from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { getSavedResumes, deleteSavedResume, updateSavedResume } from '@/lib/firestore'
 import { toDate, formatResumeDate } from '@/lib/utils'
@@ -159,7 +156,7 @@ export default function SavedResumesPage() {
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10
             flex items-center justify-center flex-shrink-0">
-            <FileText className="w-5 h-5 text-lp-ink" />
+            <IconResumeBuilder className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
             <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">{t("My Resumes")}</h1>
@@ -237,7 +234,7 @@ export default function SavedResumesPage() {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-6 h-6 text-[#1F5C4A] animate-spin" />
+            <IconLoading className="w-6 h-6 text-[#1F5C4A] animate-spin" />
           </div>
         )}
 
@@ -250,7 +247,7 @@ export default function SavedResumesPage() {
           >
             <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
               flex items-center justify-center mb-4">
-              <FileText className="w-8 h-8 text-[#1F5C4A]" />
+              <IconResumeBuilder className="w-8 h-8 text-[#1F5C4A]" />
             </div>
             <h3 className="font-heading text-base font-semibold text-lp-ink mb-2">{t("No saved resumes yet")}</h3>
             <p className="text-sm text-[#5A5F5C] mb-5 max-w-sm">
@@ -305,7 +302,7 @@ export default function SavedResumesPage() {
                     <div className="flex items-center gap-2 min-w-0 flex-1">
                       <div className="w-8 h-8 rounded-[4px] bg-[#1F5C4A]/20
                         border border-[#1F5C4A]/30 flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-3.5 h-3.5 text-[#1F5C4A]" />
+                        <IconResumeBuilder className="w-3.5 h-3.5 text-[#1F5C4A]" />
                       </div>
                       {renamingId === resume.id ? (
                         <div className="flex items-center gap-1 flex-1 min-w-0">
@@ -328,7 +325,7 @@ export default function SavedResumesPage() {
                             aria-label={t("Save rename")}
                             className="p-1 rounded-[4px] text-[#1F7A4D] hover:bg-[#1F7A4D]/10 transition-colors flex-shrink-0"
                           >
-                            {renameSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                            {renameSaving ? <IconLoading className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                           </button>
                           <button
                             onClick={handleCancelRename}
@@ -365,7 +362,7 @@ export default function SavedResumesPage() {
                   <div className="space-y-1.5">
                     {resume.targetPosition && (
                       <div className="flex items-center gap-1.5 text-xs text-[#3C403E]">
-                        <Target className="w-3.5 h-3.5 text-[#5A5F5C] flex-shrink-0" />
+                        <IconAtsOptimizer className="w-3.5 h-3.5 text-[#5A5F5C] flex-shrink-0" />
                         <span className="truncate">{resume.targetPosition}</span>
                       </div>
                     )}
@@ -461,7 +458,7 @@ export default function SavedResumesPage() {
                       bg-[#B42318] text-white hover:bg-[#912018] transition-colors
                       disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t("Delete")}
+                    {deleting ? <IconLoading className="w-4 h-4 animate-spin mx-auto" /> : t("Delete")}
                   </button>
                 </div>
               </div>

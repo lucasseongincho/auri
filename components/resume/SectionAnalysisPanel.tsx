@@ -3,7 +3,8 @@
 import { useT } from '@/lib/i18n/client'
 
 import { motion } from 'framer-motion'
-import { CheckCircle, XCircle, ArrowRight, LayoutList, Loader2 } from 'lucide-react'
+import { ArrowRight, LayoutList } from 'lucide-react'
+import { IconLoading, IconMatched, IconMissing } from '@/components/icons'
 import type { SectionAnalysis } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -28,7 +29,7 @@ export default function SectionAnalysisPanel({ sections, isLoading }: SectionAna
           <div className="flex items-center gap-2 mb-4">
             <LayoutList className="w-4 h-4 text-[#1F5C4A]" />
             <span className="text-sm font-semibold text-lp-ink">{t("Analyzing sections…")}</span>
-            <Loader2 className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin ml-auto" />
+            <IconLoading className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin ml-auto" />
           </div>
           <div className="space-y-2">
             {[90, 70, 80, 60, 75].map((w, i) => (
@@ -87,7 +88,7 @@ export default function SectionAnalysisPanel({ sections, isLoading }: SectionAna
                 <div className="space-y-1">
                   {item.strengths.map((s, j) => (
                     <div key={j} className="flex items-start gap-2">
-                      <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D] mt-0.5 flex-shrink-0" />
+                      <IconMatched className="w-3.5 h-3.5 text-[#1F7A4D] mt-0.5 flex-shrink-0" />
                       <p className="text-xs text-[#3C403E] leading-snug">{s}</p>
                     </div>
                   ))}
@@ -99,7 +100,7 @@ export default function SectionAnalysisPanel({ sections, isLoading }: SectionAna
                 <div className="space-y-1">
                   {item.gaps.map((g, j) => (
                     <div key={j} className="flex items-start gap-2">
-                      <XCircle className="w-3.5 h-3.5 text-[#B42318] mt-0.5 flex-shrink-0" />
+                      <IconMissing className="w-3.5 h-3.5 text-[#B42318] mt-0.5 flex-shrink-0" />
                       <p className="text-xs text-[#3C403E] leading-snug">{g}</p>
                     </div>
                   ))}

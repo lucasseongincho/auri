@@ -13,24 +13,8 @@ import {
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Mail,
-  Sparkles,
-  Loader2,
-  Copy,
-  CheckCircle,
-  Download,
-  AlertCircle,
-  X,
-  Save,
-  FolderOpen,
-  RotateCcw,
-  RotateCw,
-  Edit3,
-  Zap,
-  Eye,
-  ChevronLeft,
-} from 'lucide-react'
+import { Copy, CheckCircle, Download, AlertCircle, X, Save, RotateCcw, RotateCw, Edit3, Zap, Eye, ChevronLeft } from 'lucide-react'
+import { IconAiMark, IconCoverLetter, IconLoading, IconMyCoverLetters } from '@/components/icons'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
@@ -150,7 +134,7 @@ function CoverLetterLoadingState() {
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <Mail className="w-9 h-9 text-lp-ink" />
+          <IconCoverLetter className="w-9 h-9 text-lp-ink" />
         </motion.div>
         {[0, 1, 2].map((i) => (
           <motion.div
@@ -683,7 +667,7 @@ function CoverLetterContent() {
       >
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center flex-shrink-0">
-            <Mail className="w-5 h-5 text-lp-ink" />
+            <IconCoverLetter className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
             <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">{t("Cover Letter Generator")}</h1>
@@ -733,7 +717,7 @@ function CoverLetterContent() {
                 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {saving
-                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ? <IconLoading className="w-3.5 h-3.5 animate-spin" />
                 : savedId
                 ? <CheckCircle className="w-3.5 h-3.5" />
                 : <Save className="w-3.5 h-3.5" />
@@ -747,7 +731,7 @@ function CoverLetterContent() {
               border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
               transition-all duration-200"
           >
-            <FolderOpen className="w-3.5 h-3.5" />
+            <IconMyCoverLetters className="w-3.5 h-3.5" />
             {t("My Letters")}
           </Link>
         </div>
@@ -849,8 +833,8 @@ function CoverLetterContent() {
                     transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   {isStreaming
-                    ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Generating…")}</>
-                    : <><Sparkles className="w-4 h-4" />{' '}{t("Generate Cover Letter")}</>}
+                    ? <><IconLoading className="w-4 h-4 animate-spin" />{' '}{t("Generating…")}</>
+                    : <><IconAiMark className="w-4 h-4" />{' '}{t("Generate Cover Letter")}</>}
                 </button>
               </div>
             </div>
@@ -940,7 +924,7 @@ function CoverLetterContent() {
                     className="flex items-center gap-1.5 px-4 py-2 min-h-[36px] rounded-[4px] text-sm font-semibold
                       bg-[#1F5C4A] text-white
                       transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
-                    {downloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+                    {downloading ? <IconLoading className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
                     {downloading ? t("Generating…") : t("Download PDF")}
                   </button>
                 </div>
@@ -1009,7 +993,7 @@ function CoverLetterContent() {
               >
                 <div className="w-14 h-14 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
                   flex items-center justify-center mb-4">
-                  <Mail className="w-6 h-6 text-[#1F5C4A]" />
+                  <IconCoverLetter className="w-6 h-6 text-[#1F5C4A]" />
                 </div>
                 <p className="text-sm font-medium text-[#3C403E]">{t("Your cover letter will appear here")}</p>
                 <p className="text-xs text-[#5A5F5C] mt-1">{t("Fill in the form and click Generate")}</p>

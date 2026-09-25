@@ -1,5 +1,7 @@
 'use client'
 
+import { Globe, MapPin } from 'lucide-react'
+
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader'
@@ -265,12 +267,12 @@ export default function LocationAutocomplete({
               }}
               className={`w-full text-left px-4 text-sm transition-colors flex items-center gap-2 ${
                 index === selectedIndex
-                  ? 'bg-indigo-500/20 text-lp-ink'
+                  ? 'bg-[#1F5C4A]/10 text-lp-ink'
                   : 'text-[#1B1D1C] hover:bg-lp-ink/5'
-              } ${ALWAYS_SHOW.includes(suggestion) ? 'text-indigo-300' : ''}`}
+              } ${ALWAYS_SHOW.includes(suggestion) ? 'text-[#1F5C4A]' : ''}`}
               style={{ minHeight: '44px' }}
             >
-              <span>{ALWAYS_SHOW.includes(suggestion) ? '🌐' : '📍'}</span>
+              {ALWAYS_SHOW.includes(suggestion) ? <Globe className="w-4 h-4 flex-shrink-0" aria-hidden="true" /> : <MapPin className="w-4 h-4 flex-shrink-0" aria-hidden="true" />}
               {suggestion}
             </button>
           ))}

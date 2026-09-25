@@ -19,7 +19,7 @@ export default function GlobalError({
       <body style={{ background: '#F4F2EC', display: 'flex', alignItems: 'center',
         justifyContent: 'center', minHeight: '100vh', margin: 0, fontFamily: 'sans-serif' }}>
         <div style={{ textAlign: 'center', color: '#1B1D1C', padding: '2rem', maxWidth: '400px' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⚠️</div>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8A5A00" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ margin: '0 auto 1rem' }}><path d="M11.02 5.24Q12 3.5 12.98 5.24L20.02 17.76Q21 19.5 19 19.5H5Q3 19.5 3.98 17.76zM12 9.5V14M12 16.75v.01" /></svg>
           <h1 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>
             Something went wrong
           </h1>

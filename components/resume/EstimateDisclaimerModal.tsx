@@ -1,6 +1,7 @@
 'use client'
 
 import { useT } from '@/lib/i18n/client'
+import { IconMatched, IconNeedsCheck } from '@/components/icons'
 
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -36,7 +37,7 @@ export default function EstimateDisclaimerModal({ open, onClose }: EstimateDiscl
           >
             <div className="rounded-[10px]  bg-[#FFFFFF] p-6">
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">📋</span>
+                <IconNeedsCheck className="w-6 h-6 text-[#8A5A00]" />
                 <h3 className="text-lp-ink font-semibold text-base">{t("About your AI-generated resume")}</h3>
               </div>
 
@@ -46,19 +47,19 @@ export default function EstimateDisclaimerModal({ open, onClose }: EstimateDiscl
 
               <div className="space-y-2 mb-6">
                 <div className="flex items-start gap-2">
-                  <span className="text-[#1F7A4D] text-sm flex-shrink-0">✅</span>
+                  <IconMatched className="w-5 h-5 text-[#1F7A4D] flex-shrink-0" />
                   <p className="text-[#3C403E] text-sm">
                     {t("Always replace")}{' '}<span className="text-amber-400 font-medium">{t("amber numbers")}</span>{' '}{t("with your real data before submitting")}
                   </p>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-[#1F7A4D] text-sm flex-shrink-0">✅</span>
+                  <IconMatched className="w-5 h-5 text-[#1F7A4D] flex-shrink-0" />
                   <p className="text-[#3C403E] text-sm">
                     {t("Click any amber highlight to edit it inline — it turns green when verified")}
                   </p>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-[#1F7A4D] text-sm flex-shrink-0">✅</span>
+                  <IconMatched className="w-5 h-5 text-[#1F7A4D] flex-shrink-0" />
                   <p className="text-[#3C403E] text-sm">
                     {t("The download button will warn you if unverified numbers remain")}
                   </p>

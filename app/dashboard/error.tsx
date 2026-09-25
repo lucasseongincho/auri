@@ -4,7 +4,8 @@ import { useT } from '@/lib/i18n/client'
 
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
+import { RefreshCw, Home } from 'lucide-react'
+import { IconWarning } from '@/components/icons'
 import Link from 'next/link'
 
 export default function DashboardError({
@@ -30,7 +31,7 @@ export default function DashboardError({
         <div className="rounded-[10px]  bg-[#FFFFFF] p-8 flex flex-col items-center gap-4">
           <div className="w-14 h-14 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20
             flex items-center justify-center">
-            <AlertTriangle className="w-7 h-7 text-[#B42318]" />
+            <IconWarning className="w-7 h-7 text-[#B42318]" />
           </div>
           <div>
             <h2 className="font-heading text-lg font-bold text-lp-ink mb-1">

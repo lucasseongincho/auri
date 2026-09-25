@@ -6,20 +6,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Mail,
-  Plus,
-  Trash2,
-  Calendar,
-  Target,
-  Loader2,
-  AlertCircle,
-  X,
-  Pencil,
-  ArrowLeft,
-  Download,
-  Check,
-} from 'lucide-react'
+import { Plus, Trash2, Calendar, AlertCircle, X, Pencil, ArrowLeft, Download, Check } from 'lucide-react'
+import { IconCoverLetter, IconLoading, IconTargetJob } from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
 import {
@@ -424,7 +412,7 @@ export default function CoverLetterDetailPage() {
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
           flex items-center justify-center mb-4">
-          <Mail className="w-8 h-8 text-[#1F5C4A]" />
+          <IconCoverLetter className="w-8 h-8 text-[#1F5C4A]" />
         </div>
         <h2 className="font-heading text-lg font-semibold text-lp-ink mb-2">{t("Sign in to view your cover letters")}</h2>
         <p className="text-sm text-[#5A5F5C] mb-5">{t("Your saved cover letters are stored securely in your account.")}</p>
@@ -462,7 +450,7 @@ export default function CoverLetterDetailPage() {
             <div className="flex-1 overflow-y-auto space-y-1 min-h-0">
               {loading && (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-4 h-4 text-[#1F5C4A] animate-spin" />
+                  <IconLoading className="w-4 h-4 text-[#1F5C4A] animate-spin" />
                 </div>
               )}
               {!loading && allLetters.map((l) => {
@@ -535,7 +523,7 @@ export default function CoverLetterDetailPage() {
           >
             <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
               flex items-center justify-center mb-4">
-              <Mail className="w-8 h-8 text-[#1F5C4A]" />
+              <IconCoverLetter className="w-8 h-8 text-[#1F5C4A]" />
             </div>
             <h2 className="font-heading text-lg font-semibold text-lp-ink mb-2">{t("Cover letter not found")}</h2>
             <p className="text-sm text-[#5A5F5C] mb-5">{t("This letter may have been deleted.")}</p>
@@ -573,7 +561,7 @@ export default function CoverLetterDetailPage() {
                   </Link>
                   <div className="w-7 h-7 rounded-[4px] bg-[#1F5C4A]/20
                     border border-[#1F5C4A]/30 flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-3.5 h-3.5 text-[#1F5C4A]" />
+                    <IconCoverLetter className="w-3.5 h-3.5 text-[#1F5C4A]" />
                   </div>
                   <div className="min-w-0">
                     <h1 className="font-heading text-base font-bold text-lp-ink truncate">
@@ -608,7 +596,7 @@ export default function CoverLetterDetailPage() {
                       bg-[#1F5C4A] text-white
                       transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
-                    {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                    {downloading ? <IconLoading className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
                     {downloading ? t("Generating…") : t("Download PDF")}
                   </button>
                 )}
@@ -635,7 +623,7 @@ export default function CoverLetterDetailPage() {
                         bg-[#1F7A4D] text-white hover:bg-[#17603C] transition-colors
                         disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                      {saving ? <IconLoading className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                       {saving ? t("Saving…") : saveSuccess ? t("Saved!") : t("Save Changes")}
                     </button>
                     <button
@@ -658,7 +646,7 @@ export default function CoverLetterDetailPage() {
             {/* Meta row */}
             <div className="flex items-center gap-4 text-xs text-[#5A5F5C]">
               <div className="flex items-center gap-1.5">
-                <Target className="w-3.5 h-3.5" />
+                <IconTargetJob className="w-3.5 h-3.5" />
                 {letter.position}
               </div>
               <div className="flex items-center gap-1.5">
@@ -748,7 +736,7 @@ export default function CoverLetterDetailPage() {
           className="w-10 h-10 rounded-[10px] bg-[#1F5C4A] text-white flex items-center justify-center
               hover:bg-[#15443A] transition-all"
         >
-          {sidebarOpen ? <X className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
+          {sidebarOpen ? <X className="w-4 h-4" /> : <IconCoverLetter className="w-4 h-4" />}
         </button>
       </div>
 
@@ -869,7 +857,7 @@ export default function CoverLetterDetailPage() {
                       bg-[#B42318] text-white hover:bg-[#912018] transition-colors
                       disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t("Delete")}
+                    {deleting ? <IconLoading className="w-4 h-4 animate-spin mx-auto" /> : t("Delete")}
                   </button>
                 </div>
               </div>

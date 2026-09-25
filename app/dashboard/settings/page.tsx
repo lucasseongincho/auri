@@ -4,7 +4,8 @@ import { useLocale } from '@/lib/i18n/client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Settings, Crown, Zap } from 'lucide-react'
+import { Zap } from 'lucide-react'
+import { IconProBadge, IconSettings } from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useSignOut } from '@/hooks/useSignOut'
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -65,7 +66,7 @@ export default function SettingsPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center gap-3 mb-1">
           <div className="w-9 h-9 rounded-[10px] bg-[#5A5F5C]/10 flex items-center justify-center">
-            <Settings className="w-5 h-5 text-lp-ink" />
+            <IconSettings className="w-5 h-5 text-lp-ink" />
           </div>
           <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("Settings")}</h1>
         </div>
@@ -104,7 +105,7 @@ export default function SettingsPage() {
                   : 'bg-lp-ink/6'
               }`}>
                 {isPro ? (
-                  <Crown className="w-5 h-5 text-white" />
+                  <IconProBadge className="w-5 h-5 text-white" />
                 ) : (
                   <Zap className="w-5 h-5 text-[#5A5F5C]" />
                 )}
@@ -140,7 +141,7 @@ export default function SettingsPage() {
                 bg-[#1F5C4A]
                  transition-all duration-200"
             >
-              <Crown className="w-3.5 h-3.5" />
+              <IconProBadge className="w-3.5 h-3.5" />
               {t("View Plans")}
             </Link>
           )}

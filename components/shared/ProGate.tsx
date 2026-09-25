@@ -2,7 +2,8 @@
 
 import { useT } from '@/lib/i18n/client'
 import { motion } from 'framer-motion'
-import { Crown, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
+import { IconProBadge } from '@/components/icons'
 import Link from 'next/link'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
@@ -49,7 +50,7 @@ export default function ProGate({
 
             <div>
               <div className="flex items-center justify-center gap-1.5 mb-2">
-                <Crown className="w-3.5 h-3.5 text-[#8A5A00]" />
+                <IconProBadge className="w-3.5 h-3.5 text-[#8A5A00]" />
                 <span className="text-xs font-semibold text-[#8A5A00] uppercase tracking-wide">
                   {t("Pro Feature")}
                 </span>

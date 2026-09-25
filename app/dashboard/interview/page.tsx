@@ -5,23 +5,8 @@ import { useT } from '@/lib/i18n/client'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  MessageSquare,
-  Sparkles,
-  Loader2,
-  ChevronLeft,
-  ChevronRight,
-  RotateCcw,
-  CheckCircle,
-  AlertCircle,
-  BookOpen,
-  Send,
-  Star,
-  BookMarked,
-  Copy,
-  ExternalLink,
-  Zap,
-} from 'lucide-react'
+import { ChevronLeft, ChevronRight, RotateCcw, CheckCircle, AlertCircle, BookOpen, Send, Star, BookMarked, Copy, ExternalLink, Zap } from 'lucide-react'
+import { IconAiMark, IconInterviewPrep, IconLoading } from '@/components/icons'
 import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
@@ -216,7 +201,7 @@ function FlipCard({
                     className="flex items-center gap-2 px-4 py-2 rounded-[4px] text-sm font-semibold bg-[#B42318] text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isScoring
-                      ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />{' '}{t("Scoring…")}</>
+                      ? <><IconLoading className="w-3.5 h-3.5 animate-spin" />{' '}{t("Scoring…")}</>
                       : <><Send className="w-3.5 h-3.5" />{' '}{t("Submit Answer")}</>
                     }
                   </button>
@@ -453,7 +438,7 @@ export default function InterviewPage() {
     <ProGate
       featureName={t("Interview Prep System")}
       featureDescription={t("Generate the 8 most likely interview questions with STAR frameworks, plus 3 strategic questions to ask. Practice mode with AI feedback included.")}
-      icon={<MessageSquare className="w-6 h-6 text-[#1F5C4A]" />}
+      icon={<IconInterviewPrep className="w-6 h-6 text-[#1F5C4A]" />}
     >
     <div className="space-y-6 pb-20 md:pb-0">
       {/* ── Toast ─────────────────────────────────────────── */}
@@ -486,7 +471,7 @@ export default function InterviewPage() {
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-[10px] bg-[#B42318]/10 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-lp-ink" />
+              <IconInterviewPrep className="w-5 h-5 text-lp-ink" />
             </div>
             <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("Interview Prep")}</h1>
           </div>
@@ -503,7 +488,7 @@ export default function InterviewPage() {
                   disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isSaving
-                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ? <IconLoading className="w-3.5 h-3.5 animate-spin" />
                   : savedToStudyList
                   ? <CheckCircle className="w-3.5 h-3.5" />
                   : <BookMarked className="w-3.5 h-3.5" />
@@ -580,8 +565,8 @@ export default function InterviewPage() {
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isStreaming
-                  ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Preparing…")}</>
-                  : <><Sparkles className="w-4 h-4" />{' '}{t("Generate Interview Prep")}</>
+                  ? <><IconLoading className="w-4 h-4 animate-spin" />{' '}{t("Preparing…")}</>
+                  : <><IconAiMark className="w-4 h-4" />{' '}{t("Generate Interview Prep")}</>
                 }
               </button>
             </div>
@@ -650,7 +635,7 @@ export default function InterviewPage() {
             {isStreaming ? (
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <div className="rounded-[10px] border border-[#B42318]/20 bg-[#B42318]/5 p-4 flex items-center gap-3">
-                  <Loader2 className="w-4 h-4 text-[#B42318] animate-spin" />
+                  <IconLoading className="w-4 h-4 text-[#B42318] animate-spin" />
                   <span className="text-sm text-[#B42318] font-medium">{t("AURI is preparing your interview questions…")}</span>
                 </div>
                 {Array.from({ length: 2 }).map((_, i) => (
@@ -725,7 +710,7 @@ export default function InterviewPage() {
                 className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
                 <div className="rounded-[10px]  bg-[#FFFFFF] p-16 flex flex-col items-center text-center">
                   <div className="w-14 h-14 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mb-4">
-                    <MessageSquare className="w-6 h-6 text-[#B42318]" />
+                    <IconInterviewPrep className="w-6 h-6 text-[#B42318]" />
                   </div>
                   <p className="text-sm font-medium text-[#3C403E]">{t("Your interview prep will appear here")}</p>
                   <p className="text-xs text-[#5A5F5C] mt-1">{t("Enter the position and company, then click Generate")}</p>

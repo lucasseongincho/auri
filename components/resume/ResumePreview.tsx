@@ -4,7 +4,8 @@ import { useT } from '@/lib/i18n/client'
 
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, Copy, CheckCircle, Loader2, Layout, AlertCircle, X } from 'lucide-react'
+import { Download, Copy, CheckCircle, Layout, AlertCircle, X } from 'lucide-react'
+import { IconLoading } from '@/components/icons'
 import ClassicPro from '@/components/resume/templates/ClassicPro'
 import { stripAllAITags } from '@/lib/resumeHighlight'
 import type { ResumeData, PersonalInfo } from '@/types'
@@ -389,7 +390,7 @@ export default function ResumePreview({
                transition-all duration-200
               disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            {downloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+            {downloading ? <IconLoading className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
             {downloading ? 'Generating...' : t("Download PDF")}
           </button>
         </div>
@@ -431,7 +432,7 @@ export default function ResumePreview({
                 {/* Spinner */}
                 <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/15
                   border border-[#1F5C4A]/25 flex items-center justify-center mb-5">
-                  <Loader2 className="w-7 h-7 text-[#1F5C4A] animate-spin" />
+                  <IconLoading className="w-7 h-7 text-[#1F5C4A] animate-spin" />
                 </div>
 
                 {/* Cycling message */}

@@ -59,3 +59,13 @@ no glow shadows.
 - Main content: overflow-x-hidden, p-4 md:p-6, pb-24 md:pb-0
 - Resume preview: MobileResumeCard on mobile (md:hidden), paper preview on desktop (hidden md:block)
 - All feature pages: form/preview toggle on mobile
+
+## Icons
+- Custom set in `components/icons` (generated from `design/icons/*.svg` by
+  `python3 scripts/build-icons.py`). Import as `IconDashboard`, `IconMatched`, …
+- Feature, brand, status and resume-step icons are custom. Generic controls
+  (close, chevrons, trash, copy, download, search…) stay lucide-react.
+- Nav items use `*Active` (filled) variants for the current page.
+- `IconMatched` has a `.auri-highlight` shape filled with #F2D45C via globals.css.
+- `IconLoading` is static; add `animate-spin`.
+- No emoji in the UI. No third-party logos as nav icons.

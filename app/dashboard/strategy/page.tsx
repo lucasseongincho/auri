@@ -5,21 +5,8 @@ import { useT } from '@/lib/i18n/client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Map,
-  Sparkles,
-  Loader2,
-  CheckCircle,
-  ChevronDown,
-  ChevronUp,
-  Copy,
-  AlertCircle,
-  Globe,
-  Clock,
-  Zap,
-  Save,
-  FolderOpen,
-} from 'lucide-react'
+import { CheckCircle, ChevronDown, ChevronUp, Copy, AlertCircle, Globe, Clock, Zap, Save } from 'lucide-react'
+import { IconAiMark, IconJobStrategy, IconLoading, IconMyStrategies } from '@/components/icons'
 import { useCareerStore } from '@/store/careerStore'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import { useAuth } from '@/hooks/useAuth'
@@ -271,14 +258,14 @@ export default function StrategyPage() {
     <ProGate
       featureName={t("7-Day Job Search Strategy")}
       featureDescription={t("Get a personalized, immediately executable 7-day action plan for your target role — with specific job sites, search terms, and daily actions.")}
-      icon={<Map className="w-6 h-6 text-[#1F5C4A]" />}
+      icon={<IconJobStrategy className="w-6 h-6 text-[#1F5C4A]" />}
     >
     <div className="space-y-6 pb-20 md:pb-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-[10px] bg-[#1F7A4D]/10 flex items-center justify-center">
-              <Map className="w-5 h-5 text-lp-ink" />
+              <IconJobStrategy className="w-5 h-5 text-lp-ink" />
             </div>
             <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("7-Day Job Strategy")}</h1>
           </div>
@@ -294,7 +281,7 @@ export default function StrategyPage() {
                   disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {saving
-                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ? <IconLoading className="w-3.5 h-3.5 animate-spin" />
                   : savedId
                   ? <CheckCircle className="w-3.5 h-3.5" />
                   : <Save className="w-3.5 h-3.5" />
@@ -308,7 +295,7 @@ export default function StrategyPage() {
                 border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
                 transition-all duration-200"
             >
-              <FolderOpen className="w-3.5 h-3.5" />
+              <IconMyStrategies className="w-3.5 h-3.5" />
               {t("My Strategies")}
             </Link>
           </div>
@@ -375,7 +362,7 @@ export default function StrategyPage() {
                 bg-[#1F7A4D] text-white font-semibold text-sm
                 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {isStreaming ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Building Plan…")}</> : <><Sparkles className="w-4 h-4" />{' '}{t("Build 7-Day Plan")}</>}
+              {isStreaming ? <><IconLoading className="w-4 h-4 animate-spin" />{' '}{t("Building Plan…")}</> : <><IconAiMark className="w-4 h-4" />{' '}{t("Build 7-Day Plan")}</>}
             </button>
           </div>
         </motion.div>
@@ -391,7 +378,7 @@ export default function StrategyPage() {
             {isStreaming ? (
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
                 <div className="rounded-[10px] border border-[#1F7A4D]/20 bg-[#1F7A4D]/5 p-4 flex items-center gap-3">
-                  <Loader2 className="w-4 h-4 text-[#1F7A4D] animate-spin" />
+                  <IconLoading className="w-4 h-4 text-[#1F7A4D] animate-spin" />
                   <span className="text-sm text-[#1F7A4D] font-medium">{t("AURI is building your 7-day plan…")}</span>
                 </div>
                 {Array.from({ length: 3 }).map((_, i) => (
@@ -443,7 +430,7 @@ export default function StrategyPage() {
                 className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
                 <div className="rounded-[10px]  bg-[#FFFFFF] p-16 flex flex-col items-center text-center">
                   <div className="w-14 h-14 rounded-[10px] bg-[#1F7A4D]/10 border border-[#1F7A4D]/20 flex items-center justify-center mb-4">
-                    <Map className="w-6 h-6 text-[#1F7A4D]" />
+                    <IconJobStrategy className="w-6 h-6 text-[#1F7A4D]" />
                   </div>
                   <p className="text-sm font-medium text-[#3C403E]">{t("Your 7-day plan will appear here")}</p>
                   <p className="text-xs text-[#5A5F5C] mt-1">{t("Fill in your target role and click Build Plan")}</p>

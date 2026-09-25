@@ -1,6 +1,7 @@
 'use client'
 
 import { useT } from '@/lib/i18n/client'
+import { IconNeedsCheck } from '@/components/icons'
 
 interface VerificationBannerProps {
   estimateCount: number
@@ -39,13 +40,14 @@ export default function VerificationBanner({
     : 0
 
   return (
-    <div className="px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-[4px] mb-3">
+    <div className="px-4 py-3 bg-[#8A5A00]/10 border border-[#8A5A00]/20 rounded-[4px] mb-3">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-amber-300 text-sm font-semibold">
-            {t("⚠️ {v0} AI-estimated number{v1} need verification", { v0: remaining, v1: remaining !== 1 ? 's' : '' })}
+          <p className="flex items-center gap-1.5 text-[#8A5A00] text-sm font-semibold">
+            <IconNeedsCheck className="w-4 h-4 flex-shrink-0" />
+            {t("{v0} AI-estimated number{v1} need verification", { v0: remaining, v1: remaining !== 1 ? 's' : '' })}
           </p>
-          <p className="text-gray-400 text-xs mt-0.5">
+          <p className="text-[#5A5F5C] text-xs mt-0.5">
             {t("Amber highlights show where AURI added numbers not from your input. Click each one to replace with your real data before submitting.")}
           </p>
         </div>

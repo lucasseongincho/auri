@@ -6,20 +6,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  ArrowLeft,
-  Calendar,
-  Check,
-  ChevronRight,
-  FileText,
-  Loader2,
-  LogIn,
-  Pencil,
-  Plus,
-  Target,
-  Trash2,
-  X,
-} from 'lucide-react'
+import { ArrowLeft, Calendar, Check, ChevronRight, LogIn, Pencil, Plus, Trash2, X } from 'lucide-react'
+import { IconAtsOptimizer, IconLoading, IconResumeBuilder } from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerStore } from '@/store/careerStore'
 import { useLetterScale } from '@/hooks/useLetterScale'
@@ -193,7 +181,7 @@ function DeleteConfirmModal({
                   disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isDeleting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <IconLoading className="w-4 h-4 animate-spin" />
                 ) : (
                   <Trash2 className="w-4 h-4" />
                 )}
@@ -268,7 +256,7 @@ function ResumeNotFound() {
         <div className="rounded-[10px]  bg-[#FFFFFF] p-8 text-center">
           <div className="w-14 h-14 rounded-[10px] bg-lp-ink/[0.04] border border-lp-rule
             flex items-center justify-center mx-auto mb-5">
-            <FileText className="w-6 h-6 text-[#5A5F5C]" />
+            <IconResumeBuilder className="w-6 h-6 text-[#5A5F5C]" />
           </div>
           <h2 className="font-heading font-semibold text-lp-ink text-xl mb-2">
             {t("Resume not found")}
@@ -458,7 +446,7 @@ export default function SavedResumePage() {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 text-[#1F5C4A] animate-spin" />
+        <IconLoading className="w-6 h-6 text-[#1F5C4A] animate-spin" />
       </div>
     )
   }
@@ -505,7 +493,7 @@ export default function SavedResumePage() {
               <SidebarSkeleton />
             ) : allResumes.length === 0 ? (
               <div className="px-4 py-8 text-center">
-                <FileText className="w-6 h-6 text-[#5A5F5C] mx-auto mb-2" />
+                <IconResumeBuilder className="w-6 h-6 text-[#5A5F5C] mx-auto mb-2" />
                 <p className="text-xs text-[#5A5F5C]">{t("No saved resumes yet")}</p>
               </div>
             ) : (
@@ -577,7 +565,7 @@ export default function SavedResumePage() {
           className="w-10 h-10 rounded-[10px] bg-[#1F5C4A] text-white flex items-center justify-center
               hover:bg-[#15443A] transition-all"
         >
-          {sidebarOpen ? <X className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+          {sidebarOpen ? <X className="w-4 h-4" /> : <IconResumeBuilder className="w-4 h-4" />}
         </button>
       </div>
 
@@ -734,7 +722,7 @@ export default function SavedResumePage() {
                         bg-[#1F7A4D] text-white hover:bg-[#17603C] transition-colors duration-200
                         disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                      {saving ? <IconLoading className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                       {saving ? t("Saving…") : saveSuccess ? t("Saved!") : t("Save Changes")}
                     </button>
                     <button
@@ -790,7 +778,7 @@ export default function SavedResumePage() {
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2">
                       {resume.targetPosition && (
                         <span className="flex items-center gap-1.5 text-sm text-[#3C403E]">
-                          <Target className="w-3.5 h-3.5 text-[#1F5C4A]" />
+                          <IconAtsOptimizer className="w-3.5 h-3.5 text-[#1F5C4A]" />
                           {resume.targetPosition}
                           {resume.targetCompany && (
                             <span className="text-[#5A5F5C]">@ {resume.targetCompany}</span>

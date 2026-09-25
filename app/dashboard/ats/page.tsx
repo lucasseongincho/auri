@@ -6,10 +6,8 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import {
-  Target, Sparkles, Loader2, AlertCircle, FileText,
-  ClipboardList, CheckCircle, Zap, Upload, X,
-} from 'lucide-react'
+import { AlertCircle, ClipboardList, CheckCircle, Zap, Upload, X } from 'lucide-react'
+import { IconAiMark, IconAtsOptimizer, IconLoading, IconResumeBuilder } from '@/components/icons'
 import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
@@ -444,7 +442,7 @@ export default function ATSPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center gap-3 mb-1">
           <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center">
-            <Target className="w-5 h-5 text-lp-ink" />
+            <IconAtsOptimizer className="w-5 h-5 text-lp-ink" />
           </div>
           <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("ATS Optimizer")}</h1>
         </div>
@@ -471,11 +469,11 @@ export default function ATSPage() {
                 </label>
                 {isLoadingResumes ? (
                   <div className="flex items-center justify-center h-20">
-                    <Loader2 className="w-5 h-5 text-[#1F5C4A] animate-spin" />
+                    <IconLoading className="w-5 h-5 text-[#1F5C4A] animate-spin" />
                   </div>
                 ) : savedResumes.length === 0 ? (
                   <div className="flex flex-col items-center gap-2 py-6 rounded-[10px] border border-dashed border-lp-rule text-center">
-                    <FileText className="w-5 h-5 text-[#5A5F5C]" />
+                    <IconResumeBuilder className="w-5 h-5 text-[#5A5F5C]" />
                     <p className="text-xs text-[#5A5F5C]">{t("No saved resumes yet.")}</p>
                     <Link
                       href="/dashboard/resume"
@@ -549,7 +547,7 @@ export default function ATSPage() {
                       }`}
                   >
                     {isUploadingResume ? (
-                      <Loader2 className="w-5 h-5 text-[#1F5C4A] animate-spin" />
+                      <IconLoading className="w-5 h-5 text-[#1F5C4A] animate-spin" />
                     ) : (
                       <Upload className={`w-5 h-5 ${resumeSource === 'upload' ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`} />
                     )}
@@ -658,8 +656,8 @@ export default function ATSPage() {
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isAnalyzing
-                  ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Analyzing…")}</>
-                  : <><Sparkles className="w-4 h-4" />{' '}{t("Analyze ATS Score")}</>
+                  ? <><IconLoading className="w-4 h-4 animate-spin" />{' '}{t("Analyzing…")}</>
+                  : <><IconAiMark className="w-4 h-4" />{' '}{t("Analyze ATS Score")}</>
                 }
               </button>
             </div>
@@ -702,8 +700,8 @@ export default function ATSPage() {
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isGeneratingSuggestions
-                  ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Generating suggestions…")}</>
-                  : <><Sparkles className="w-4 h-4" />{' '}{t("Apply to Editor")}</>
+                  ? <><IconLoading className="w-4 h-4 animate-spin" />{' '}{t("Generating suggestions…")}</>
+                  : <><IconAiMark className="w-4 h-4" />{' '}{t("Apply to Editor")}</>
                 }
               </button>
               {suggestionsError && (
@@ -760,7 +758,7 @@ export default function ATSPage() {
                     {t("Track your application outcome")}
                   </p>
                   {isSavingOutcome ? (
-                    <Loader2 className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin" />
+                    <IconLoading className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin" />
                   ) : selectedOutcome ? (
                     <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" />
                   ) : null}
@@ -815,7 +813,7 @@ export default function ATSPage() {
                 >
                   {isImportingToBuilder ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <IconLoading className="w-4 h-4 animate-spin" />
                       {t("Importing…")}
                     </>
                   ) : (

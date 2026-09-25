@@ -5,17 +5,8 @@ import { useT } from '@/lib/i18n/client'
 import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Linkedin,
-  Sparkles,
-  Loader2,
-  Copy,
-  CheckCircle,
-  AlertCircle,
-  User,
-  Briefcase,
-  Zap,
-} from 'lucide-react'
+import { Copy, CheckCircle, AlertCircle, User, Zap } from 'lucide-react'
+import { IconAiMark, IconExperience, IconLoading, IconProfileRewriter } from '@/components/icons'
 import { useCareerStore } from '@/store/careerStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useAIStream } from '@/hooks/useAIStream'
@@ -80,7 +71,7 @@ function LinkedInCard({ data }: { data: LinkedInRewrite }) {
           {data.experiences.map((exp, i) => (
             <div key={i} className="flex items-start gap-3">
               <div className="w-9 h-9 rounded bg-gray-100 flex items-center justify-center flex-shrink-0">
-                <Briefcase className="w-4 h-4 text-gray-400" />
+                <IconExperience className="w-4 h-4 text-gray-400" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
@@ -160,13 +151,13 @@ export default function LinkedInPage() {
     <ProGate
       featureName={t("LinkedIn Profile Rewriter")}
       featureDescription={t("Rewrite your headline, About section, and top experiences to attract recruiters for your target role. Optimized for LinkedIn's search algorithm.")}
-      icon={<Linkedin className="w-6 h-6 text-[#1F5C4A]" />}
+      icon={<IconProfileRewriter className="w-6 h-6 text-[#1F5C4A]" />}
     >
     <div className="space-y-6 pb-20 md:pb-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center gap-3 mb-1">
           <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center">
-            <Linkedin className="w-5 h-5 text-lp-ink" />
+            <IconProfileRewriter className="w-5 h-5 text-lp-ink" />
           </div>
           <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("LinkedIn Profile Rewriter")}</h1>
         </div>
@@ -238,7 +229,7 @@ export default function LinkedInPage() {
                 bg-[#1F5C4A] text-white font-semibold text-sm
                 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {isStreaming ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Rewriting…")}</> : <><Sparkles className="w-4 h-4" />{' '}{t("Rewrite LinkedIn Profile")}</>}
+              {isStreaming ? <><IconLoading className="w-4 h-4 animate-spin" />{' '}{t("Rewriting…")}</> : <><IconAiMark className="w-4 h-4" />{' '}{t("Rewrite LinkedIn Profile")}</>}
             </button>
           </div>
         </motion.div>
@@ -256,7 +247,7 @@ export default function LinkedInPage() {
                 className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
                 <div className="rounded-[10px]  bg-[#FFFFFF] p-6 space-y-3 min-h-[300px]">
                   <div className="flex items-center gap-2 p-3 rounded-[4px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
-                    <Loader2 className="w-4 h-4 text-[#1F5C4A] animate-spin" />
+                    <IconLoading className="w-4 h-4 text-[#1F5C4A] animate-spin" />
                     <span className="text-sm text-[#1F5C4A] font-medium">{t("AURI is rewriting your LinkedIn profile…")}</span>
                   </div>
                   {[85, 70, 90, 75, 88, 60].map((w, i) => (
@@ -273,7 +264,7 @@ export default function LinkedInPage() {
                 className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
                 <div className="rounded-[10px]  bg-[#FFFFFF] p-12 flex flex-col items-center text-center min-h-[300px] justify-center">
                   <div className="w-14 h-14 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 flex items-center justify-center mb-4">
-                    <Linkedin className="w-6 h-6 text-[#1F5C4A]" />
+                    <IconProfileRewriter className="w-6 h-6 text-[#1F5C4A]" />
                   </div>
                   <p className="text-sm font-medium text-[#3C403E]">{t("Your rewritten LinkedIn profile will appear here")}</p>
                   <p className="text-xs text-[#5A5F5C] mt-1">{t("Fill in your current profile and click Rewrite")}</p>

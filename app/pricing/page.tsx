@@ -5,7 +5,7 @@ import { useT } from '@/lib/i18n/client'
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle, Sparkles, ArrowLeft } from 'lucide-react'
+import { CheckCircle, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -86,7 +86,7 @@ export default function PricingPage() {
           className="text-center mb-10"
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1F5C4A]/30 bg-[#1F5C4A]/10 text-[#1F5C4A] text-xs font-medium mb-6">
-            <Sparkles className="w-3 h-3" />{' '}{t("Simple, transparent pricing")}
+            {t("Simple, transparent pricing")}
           </div>
           <h1 className="font-heading text-4xl lg:text-5xl font-bold text-lp-ink mb-4">
             {t("Start free. Upgrade when")}<br />{t("you're ready.")}

@@ -4,10 +4,8 @@ import { useT } from '@/lib/i18n/client'
 
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import {
-  X, User, Briefcase, GraduationCap, Wrench, Target,
-  Plus, LogOut, ChevronRight,
-} from 'lucide-react'
+import { X, Plus, LogOut, ChevronRight } from 'lucide-react'
+import { IconEducation, IconExperience, IconPersonal, IconSkills, IconTargetJob } from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useCareerProfile } from '@/hooks/useCareerProfile'
 import { useSignOut } from '@/hooks/useSignOut'
@@ -51,7 +49,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-[#1F5C4A]/10
                   flex items-center justify-center">
-                  <User className="w-4 h-4 text-lp-ink" />
+                  <IconPersonal className="w-4 h-4 text-lp-ink" />
                 </div>
                 <div>
                   <p className="font-semibold text-lp-ink text-sm">
@@ -79,7 +77,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Target className="w-4 h-4 text-[#1F5C4A]" />
+                    <IconTargetJob className="w-4 h-4 text-[#1F5C4A]" />
                     <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">{t("Target Role")}</span>
                   </div>
                   <Link href="/dashboard/resume" onClick={onClose}
@@ -108,7 +106,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-[#1F5C4A]" />
+                    <IconExperience className="w-4 h-4 text-[#1F5C4A]" />
                     <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">{t("Experience")}</span>
                   </div>
                   <span className="text-xs text-[#5A5F5C]">{t("{v0} entries", { v0: profile?.experience.length ?? 0 })}</span>
@@ -141,7 +139,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <GraduationCap className="w-4 h-4 text-[#1F5C4A]" />
+                    <IconEducation className="w-4 h-4 text-[#1F5C4A]" />
                     <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">{t("Education")}</span>
                   </div>
                 </div>
@@ -165,7 +163,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               {/* Skills */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <Wrench className="w-4 h-4 text-[#1F7A4D]" />
+                  <IconSkills className="w-4 h-4 text-[#1F7A4D]" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">{t("Skills")}</span>
                 </div>
                 {profile?.skills && profile.skills.length > 0 ? (

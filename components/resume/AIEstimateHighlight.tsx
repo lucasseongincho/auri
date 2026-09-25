@@ -1,6 +1,7 @@
 'use client'
 
 import { useT } from '@/lib/i18n/client'
+import { IconNeedsCheck } from '@/components/icons'
 
 import { useState, useRef, useEffect } from 'react'
 
@@ -117,7 +118,7 @@ export default function AIEstimateHighlight({
           text-center whitespace-normal"
         role="tooltip"
       >
-        {t("⚠️ AI estimated")}
+        <span className="inline-flex items-center gap-1"><IconNeedsCheck className="w-3.5 h-3.5" />{t("AI estimated")}</span>
         <br />
         <span className="text-amber-300">{t("Click to replace with your real number")}</span>
       </span>

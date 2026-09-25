@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Map } from 'lucide-react'
+import { IconJobStrategy } from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 import {
   getSavedStrategies,
@@ -204,7 +204,7 @@ export default function SavedStrategiesPage() {
             className="flex flex-col items-center justify-center py-24 text-center"
           >
             <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 flex items-center justify-center mb-4">
-              <Map className="w-8 h-8 text-[#1F5C4A]" />
+              <IconJobStrategy className="w-8 h-8 text-[#1F5C4A]" />
             </div>
             <h2 className="text-lg font-semibold text-[#1B1D1C] mb-2">{t("No saved strategies yet")}</h2>
             <p className="text-[#5A5F5C] text-sm max-w-xs mb-6">

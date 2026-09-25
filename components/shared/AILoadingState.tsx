@@ -3,7 +3,7 @@
 import { useT } from '@/lib/i18n/client'
 
 import { motion } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
+import { IconAiMark } from '@/components/icons'
 
 interface AILoadingStateProps {
   message?: string
@@ -40,7 +40,7 @@ export default function AILoadingState({
           className="w-12 h-12 rounded-[10px] bg-[#1F5C4A]/10
             flex items-center justify-center "
         >
-          <Sparkles className="w-6 h-6 text-lp-ink" />
+          <IconAiMark className="w-6 h-6 text-lp-ink" />
         </motion.div>
         <p className="text-[#3C403E] font-medium">{message}</p>
         <div className="flex gap-1.5">
@@ -66,7 +66,7 @@ export default function AILoadingState({
         className="w-5 h-5 rounded-[4px] bg-[#1F5C4A]/10
           flex items-center justify-center"
       >
-        <Sparkles className="w-3 h-3 text-lp-ink" />
+        <IconAiMark className="w-3 h-3 text-lp-ink" />
       </motion.div>
       <span className="text-sm text-[#3C403E]">{message}</span>
       <div className="flex gap-1">

@@ -6,32 +6,8 @@ import { useState, useCallback, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  User,
-  Briefcase,
-  GraduationCap,
-  Wrench,
-  Award,
-  FolderOpen,
-  Target,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  Trash2,
-  Sparkles,
-  Save,
-  CheckCircle,
-  X,
-  FileText,
-  Loader2,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Star,
-  Heart,
-  Languages,
-  Zap,
-} from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Trash2, Save, CheckCircle, X, Eye, EyeOff, AlertCircle, Heart, Languages, Zap } from 'lucide-react'
+import { IconAiMark, IconCerts, IconEducation, IconExperience, IconExtra, IconLoading, IconMyResumes, IconPersonal, IconProjects, IconResumeBuilder, IconSkills, IconTargetJob } from '@/components/icons'
 import { getIdToken } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useCareerStore } from '@/store/careerStore'
@@ -64,14 +40,14 @@ import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
 const STEPS = [
-  { id: 1, label: 'Personal', icon: User },
-  { id: 2, label: 'Experience', icon: Briefcase },
-  { id: 3, label: 'Education', icon: GraduationCap },
-  { id: 4, label: 'Skills', icon: Wrench },
-  { id: 5, label: 'Certifications', icon: Award },
-  { id: 6, label: 'Projects', icon: FolderOpen },
-  { id: 7, label: 'Extra', icon: Star },
-  { id: 8, label: 'Target Job', icon: Target },
+  { id: 1, label: 'Personal', icon: IconPersonal },
+  { id: 2, label: 'Experience', icon: IconExperience },
+  { id: 3, label: 'Education', icon: IconEducation },
+  { id: 4, label: 'Skills', icon: IconSkills },
+  { id: 5, label: 'Certifications', icon: IconCerts },
+  { id: 6, label: 'Projects', icon: IconProjects },
+  { id: 7, label: 'Extra', icon: IconExtra },
+  { id: 8, label: 'Target Job', icon: IconTargetJob },
 ] as const
 
 // ─── Plain-text builder (used for ATS scoring) ────────────────────────────────
@@ -865,7 +841,7 @@ function StepCertifications() {
                   bg-[#F4F2EC] border border-lp-rule"
               >
                 <div className="flex items-center gap-2">
-                  <Award className="w-3.5 h-3.5 text-[#8A5A00] flex-shrink-0" />
+                  <IconCerts className="w-3.5 h-3.5 text-[#8A5A00] flex-shrink-0" />
                   <span className="text-sm text-lp-ink">{cert}</span>
                 </div>
                 <button
@@ -1065,7 +1041,7 @@ function StepAdditional() {
       {/* Leadership */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Star className="w-4 h-4 text-[#1F5C4A]" />
+          <IconExtra className="w-4 h-4 text-[#1F5C4A]" />
           <span className="text-sm font-semibold text-lp-ink">{t("Leadership Experience")}</span>
         </div>
         <div className="space-y-3">
@@ -1770,7 +1746,7 @@ function ResumePageContent() {
         <div className="flex items-center gap-2 min-w-0 flex-shrink">
           <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10
             flex items-center justify-center flex-shrink-0">
-            <FileText className="w-5 h-5 text-lp-ink" />
+            <IconResumeBuilder className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
             <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight truncate">
@@ -1795,7 +1771,7 @@ function ResumePageContent() {
                 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isSaving
-                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ? <IconLoading className="w-3.5 h-3.5 animate-spin" />
                 : saveSuccess
                 ? <CheckCircle className="w-3.5 h-3.5" />
                 : <Save className="w-3.5 h-3.5" />
@@ -1809,7 +1785,7 @@ function ResumePageContent() {
               border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
               transition-all duration-200"
           >
-            <FolderOpen className="w-3.5 h-3.5" />
+            <IconMyResumes className="w-3.5 h-3.5" />
             {t("My Resumes")}
           </Link>
         </div>
@@ -1999,12 +1975,12 @@ function ResumePageContent() {
                       >
                         {isStreaming ? (
                           <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <IconLoading className="w-4 h-4 animate-spin" />
                             {t("Generating...")}
                           </>
                         ) : (
                           <>
-                            <Sparkles className="w-4 h-4" />
+                            <IconAiMark className="w-4 h-4" />
                             {t("Generate Resume")}
                           </>
                         )}
@@ -2104,7 +2080,7 @@ function ResumePageContent() {
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <IconAiMark className="w-3.5 h-3.5" />
                       {t("Easy Tune — Edit Inline")}
                     </>
                   )}
@@ -2139,7 +2115,7 @@ function ResumePageContent() {
                     disabled:opacity-40 disabled:cursor-not-allowed
                     transition-all duration-200"
                 >
-                  <Target className="w-4 h-4" />
+                  <IconTargetJob className="w-4 h-4" />
                   {profile?.target.job_description ? t("Run ATS Score") : t("Add a job description to run ATS Score")}
                 </button>
               </motion.div>
@@ -2191,7 +2167,7 @@ function ResumePageContent() {
             >
               <div className="w-14 h-14 rounded-[10px] bg-[#1F5C4A]/10
                 border border-[#1F5C4A]/20 flex items-center justify-center mb-4">
-                <FileText className="w-7 h-7 text-[#1F5C4A]/60" />
+                <IconResumeBuilder className="w-7 h-7 text-[#1F5C4A]/60" />
               </div>
               <p className="text-sm font-medium text-[#3C403E] mb-1">
                 {t("Your resume will appear here")}

@@ -3,7 +3,8 @@
 import { useT } from '@/lib/i18n/client'
 
 import { motion } from 'framer-motion'
-import { CheckCircle, AlertTriangle, XCircle, Layers, Loader2 } from 'lucide-react'
+import { Layers } from 'lucide-react'
+import { IconLoading, IconMatched, IconMissing, IconPartial } from '@/components/icons'
 import type { RequirementCoverage } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -13,19 +14,19 @@ const STATUS_CONFIG = {
     color: 'text-[#1F7A4D]',
     bg: 'bg-[#1F7A4D]/10',
     border: 'border-[#1F7A4D]/20',
-    Icon: CheckCircle,
+    Icon: IconMatched,
   },
   partial: {
     color: 'text-[#8A5A00]',
     bg: 'bg-[#8A5A00]/10',
     border: 'border-[#8A5A00]/20',
-    Icon: AlertTriangle,
+    Icon: IconPartial,
   },
   missing: {
     color: 'text-[#B42318]',
     bg: 'bg-[#B42318]/10',
     border: 'border-[#B42318]/20',
-    Icon: XCircle,
+    Icon: IconMissing,
   },
 } as const
 
@@ -52,7 +53,7 @@ export default function RequirementCoveragePanel({
           <div className="flex items-center gap-2 mb-4">
             <Layers className="w-4 h-4 text-[#1F5C4A]" />
             <span className="text-sm font-semibold text-lp-ink">{t("Running semantic analysis…")}</span>
-            <Loader2 className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin ml-auto" />
+            <IconLoading className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin ml-auto" />
           </div>
           <div className="space-y-2">
             {[75, 55, 85, 65, 70].map((w, i) => (

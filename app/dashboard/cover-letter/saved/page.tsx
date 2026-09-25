@@ -5,19 +5,8 @@ import { useLocale } from '@/lib/i18n/client'
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Mail,
-  Plus,
-  Trash2,
-  Calendar,
-  Building2,
-  Target,
-  Loader2,
-  AlertCircle,
-  SortAsc,
-  X,
-  Search,
-} from 'lucide-react'
+import { Plus, Trash2, Calendar, Building2, AlertCircle, SortAsc, X, Search } from 'lucide-react'
+import { IconCoverLetter, IconLoading, IconTargetJob } from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { getSavedCoverLetters, deleteCoverLetter, getGuestCoverLetters, deleteGuestCoverLetter } from '@/lib/firestore'
 import { toDate, formatResumeDate } from '@/lib/utils'
@@ -132,7 +121,7 @@ export default function SavedCoverLettersPage() {
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10
             flex items-center justify-center flex-shrink-0">
-            <Mail className="w-5 h-5 text-lp-ink" />
+            <IconCoverLetter className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
             <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">{t("Saved Cover Letters")}</h1>
@@ -209,7 +198,7 @@ export default function SavedCoverLettersPage() {
 
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-6 h-6 text-[#1F5C4A] animate-spin" />
+            <IconLoading className="w-6 h-6 text-[#1F5C4A] animate-spin" />
           </div>
         )}
 
@@ -221,7 +210,7 @@ export default function SavedCoverLettersPage() {
           >
             <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
               flex items-center justify-center mb-4">
-              <Mail className="w-8 h-8 text-[#1F5C4A]" />
+              <IconCoverLetter className="w-8 h-8 text-[#1F5C4A]" />
             </div>
             <h3 className="font-heading text-base font-semibold text-lp-ink mb-2">{t("No saved cover letters yet")}</h3>
             <p className="text-sm text-[#5A5F5C] mb-5 max-w-sm">
@@ -274,7 +263,7 @@ export default function SavedCoverLettersPage() {
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="w-8 h-8 rounded-[4px] bg-[#1F5C4A]/20
                         border border-[#1F5C4A]/30 flex items-center justify-center flex-shrink-0">
-                        <Mail className="w-3.5 h-3.5 text-[#1F5C4A]" />
+                        <IconCoverLetter className="w-3.5 h-3.5 text-[#1F5C4A]" />
                       </div>
                       <p className="text-sm font-bold text-lp-ink truncate">{letter.company}</p>
                     </div>
@@ -285,7 +274,7 @@ export default function SavedCoverLettersPage() {
                   <div className="space-y-1.5">
                     {letter.position && (
                       <div className="flex items-center gap-1.5 text-xs text-[#3C403E]">
-                        <Target className="w-3.5 h-3.5 text-[#5A5F5C] flex-shrink-0" />
+                        <IconTargetJob className="w-3.5 h-3.5 text-[#5A5F5C] flex-shrink-0" />
                         <span className="truncate">{letter.position}</span>
                       </div>
                     )}
@@ -372,7 +361,7 @@ export default function SavedCoverLettersPage() {
                       bg-[#B42318] text-white hover:bg-[#912018] transition-colors
                       disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t("Delete")}
+                    {deleting ? <IconLoading className="w-4 h-4 animate-spin mx-auto" /> : t("Delete")}
                   </button>
                 </div>
               </div>

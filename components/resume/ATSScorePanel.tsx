@@ -4,7 +4,8 @@ import { useT } from '@/lib/i18n/client'
 
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Target, CheckCircle, XCircle, AlertTriangle, Lightbulb, Loader2, TrendingUp } from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
+import { IconAtsOptimizer, IconLoading, IconMatched, IconMissing, IconTip, IconWarning } from '@/components/icons'
 import type { ATSScore, ATSDimensionScores } from '@/types'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -146,9 +147,9 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
       <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
         <div className="rounded-[10px]  bg-[#FFFFFF] p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Target className="w-4 h-4 text-[#1F5C4A]" />
+            <IconAtsOptimizer className="w-4 h-4 text-[#1F5C4A]" />
             <span className="text-sm font-semibold text-lp-ink">{t("Analyzing ATS compatibility...")}</span>
-            <Loader2 className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin ml-auto" />
+            <IconLoading className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin ml-auto" />
           </div>
           <div className="space-y-2">
             {[70, 50, 80, 60].map((w, i) => (
@@ -178,7 +179,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
           <ScoreMeter score={score.score} prevScore={prevScore} />
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <Target className="w-4 h-4 text-[#1F5C4A]" />
+              <IconAtsOptimizer className="w-4 h-4 text-[#1F5C4A]" />
               <span className="text-sm font-semibold text-lp-ink">{t("ATS Score")}</span>
             </div>
             <p className={`text-2xl font-heading font-bold ${scoreColor}`}>{t(scoreLabel)}</p>
@@ -226,7 +227,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
         {score.matched_keywords.length > 0 && (
           <div>
             <div className="flex items-center gap-1.5 mb-2">
-              <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" />
+              <IconMatched className="w-3.5 h-3.5 text-[#1F7A4D]" />
               <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Matched Keywords")}</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -248,7 +249,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
         {score.missing_keywords.length > 0 && (
           <div>
             <div className="flex items-center gap-1.5 mb-2">
-              <XCircle className="w-3.5 h-3.5 text-[#B42318]" />
+              <IconMissing className="w-3.5 h-3.5 text-[#B42318]" />
               <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Missing Keywords")}</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -265,7 +266,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
         {score.formatting_issues.length > 0 && (
           <div>
             <div className="flex items-center gap-1.5 mb-2">
-              <AlertTriangle className="w-3.5 h-3.5 text-[#8A5A00]" />
+              <IconWarning className="w-3.5 h-3.5 text-[#8A5A00]" />
               <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Formatting Issues")}</span>
             </div>
             <ul className="space-y-1">
@@ -283,7 +284,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
         {score.suggestions.length > 0 && (
           <div>
             <div className="flex items-center gap-1.5 mb-2">
-              <Lightbulb className="w-3.5 h-3.5 text-[#1F5C4A]" />
+              <IconTip className="w-3.5 h-3.5 text-[#1F5C4A]" />
               <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Suggestions")}</span>
             </div>
             <ul className="space-y-1.5">

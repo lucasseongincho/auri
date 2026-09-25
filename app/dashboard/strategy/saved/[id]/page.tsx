@@ -5,14 +5,8 @@ import { useLocale } from '@/lib/i18n/client'
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Map,
-  CheckCircle,
-  ChevronDown,
-  ChevronUp,
-  Globe,
-  Clock,
-} from 'lucide-react'
+import { CheckCircle, ChevronDown, ChevronUp, Globe, Clock } from 'lucide-react'
+import { IconJobStrategy } from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 import {
   getSavedStrategy,
@@ -223,7 +217,7 @@ export default function SavedStrategyDetailPage() {
     return (
       <div className="min-h-screen bg-[#F4F2EC] flex flex-col items-center justify-center gap-4 text-center px-4">
         <div className="w-14 h-14 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mb-2">
-          <Map className="w-7 h-7 text-[#B42318]" />
+          <IconJobStrategy className="w-7 h-7 text-[#B42318]" />
         </div>
         <h2 className="text-lg font-semibold text-[#1B1D1C]">{t("Strategy not found")}</h2>
         <p className="text-[#5A5F5C] text-sm">{t("This strategy may have been deleted.")}</p>
