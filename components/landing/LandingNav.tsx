@@ -3,14 +3,9 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import StartLink from './StartLink'
+import type { NavCopy } from './copy'
 
-const LINKS: { label: string; href: string }[] = [
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Blog', href: '/blog' },
-]
-
-export default function LandingNav() {
+export default function LandingNav({ c, homeHref }: { c: NavCopy; homeHref: string }) {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -22,18 +17,31 @@ export default function LandingNav() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
+  const langSwitch = (extra: string) => (
+    <Link
+      href={c.switchTo.href}
+      hrefLang={c.switchTo.hrefLang}
+      lang={c.switchTo.hrefLang}
+      aria-label={c.switchTo.ariaLabel}
+      className={`inline-flex min-h-[44px] items-center text-lp-ink no-underline hover:text-lp-pine ${extra}`}
+    >
+      {c.switchTo.label}
+    </Link>
+  )
+
   return (
     <header className="border-b border-lp-rule">
       <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-3 md:px-8 lg:py-[14px] xl:px-0">
         <Link
-          href="/"
+          href={homeHref}
+          aria-label={c.home}
           className="inline-flex min-h-[44px] items-center font-lp-serif text-2xl font-semibold tracking-[0.06em] text-lp-ink no-underline lg:text-[28px]"
         >
           AURI
         </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-2 text-[15px] lg:flex">
-          {LINKS.map((l) => (
+        <nav aria-label={c.mainLabel} className="hidden items-center gap-2 text-[15px] lg:flex">
+          {c.links.map((l) => (
             <a
               key={l.href}
               href={l.href}
@@ -46,26 +54,28 @@ export default function LandingNav() {
             href="/login"
             className="inline-flex min-h-[44px] items-center px-4 text-lp-ink no-underline hover:text-lp-pine"
           >
-            Log in
+            {c.login}
           </Link>
+          {langSwitch('border-l border-lp-rule pl-4 pr-2')}
           <StartLink
             intent="free"
             className="ml-2 inline-flex min-h-[44px] items-center rounded-lp-control bg-lp-pine px-5 font-medium text-white no-underline hover:bg-lp-pine-dark hover:text-white"
           >
-            Start free
+            {c.start}
           </StartLink>
         </nav>
 
         <div className="flex items-center gap-1 lg:hidden">
+          {langSwitch('px-2 text-[15px]')}
           <Link
             href="/login"
-            className="inline-flex min-h-[44px] items-center px-3 text-[15px] text-lp-ink no-underline"
+            className="inline-flex min-h-[44px] items-center px-2 text-[15px] text-lp-ink no-underline"
           >
-            Log in
+            {c.login}
           </Link>
           <button
             type="button"
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-label={open ? c.menuClose : c.menuOpen}
             aria-expanded={open}
             aria-controls="lp-mobile-menu"
             onClick={() => setOpen((v) => !v)}
@@ -79,9 +89,9 @@ export default function LandingNav() {
       </div>
 
       {open && (
-        <nav id="lp-mobile-menu" aria-label="Main" className="border-t border-lp-rule px-4 pb-4 lg:hidden">
+        <nav id="lp-mobile-menu" aria-label={c.mainLabel} className="border-t border-lp-rule px-4 pb-4 lg:hidden">
           <ul className="flex flex-col">
-            {LINKS.map((l) => (
+            {c.links.map((l) => (
               <li key={l.href}>
                 <a
                   href={l.href}
@@ -97,7 +107,7 @@ export default function LandingNav() {
             intent="free"
             className="mt-4 flex min-h-[48px] items-center justify-center rounded-lp-control bg-lp-pine font-medium text-white no-underline"
           >
-            Start free
+            {c.start}
           </StartLink>
         </nav>
       )}

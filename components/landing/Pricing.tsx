@@ -2,37 +2,22 @@
 
 import { useState } from 'react'
 import StartLink from './StartLink'
+import type { PricingCopy } from './copy'
 
 type Billing = 'monthly' | 'annual'
-
-// Plan contents match what the product gates today: LinkedIn, Strategy,
-// Interview and the Resume Rewriter sit behind ProGate / isPro.
-const ROWS: { feature: string; free: string | null; pro: string }[] = [
-  { feature: 'AI generations', free: '3 a month', pro: 'Unlimited' },
-  { feature: 'Resume builder and ATS optimizer', free: 'Included', pro: 'Included' },
-  { feature: 'Cover letter generator', free: 'Included', pro: 'Included' },
-  { feature: 'Resume Rewriter', free: null, pro: 'Included' },
-  { feature: 'Interview prep', free: null, pro: 'Included' },
-  { feature: 'LinkedIn Rewriter', free: null, pro: 'Included' },
-  { feature: '7-Day Job Strategy', free: null, pro: 'Included' },
-  { feature: 'Priority support', free: null, pro: 'Included' },
-]
 
 // TODO(입력 필요): one line on refunds / cancellation plus a link to the policy.
 // Rendered only when filled in. Do not invent terms here.
 const REFUND_NOTE: { text: string; href: string } | null = null
 
-const PRICE: Record<Billing, { amount: string; unit: string; note: string }> = {
-  monthly: { amount: '$19', unit: '/ month', note: 'Billed monthly, or $190 a year' },
-  annual: { amount: '$190', unit: '/ year', note: 'Works out to $15.83 a month, 2 months free' },
-}
-
-export default function Pricing() {
+// Plan contents match what the product gates today: LinkedIn, Strategy,
+// Interview and the Resume Rewriter sit behind ProGate / isPro.
+export default function Pricing({ c }: { c: PricingCopy }) {
   const [billing, setBilling] = useState<Billing>('annual')
-  const price = PRICE[billing]
+  const price = c.price[billing]
 
   const toggle = (
-    <div role="group" aria-label="Billing period" className="grid grid-cols-2 gap-1 rounded-md bg-lp-sunk p-1 md:inline-grid">
+    <div role="group" aria-label={c.groupLabel} className="grid grid-cols-2 gap-1 rounded-md bg-lp-sunk p-1 md:inline-grid">
       {(['monthly', 'annual'] as const).map((b) => (
         <button
           key={b}
@@ -43,8 +28,11 @@ export default function Pricing() {
             billing === b ? 'bg-white font-medium text-lp-ink' : 'text-lp-body hover:text-lp-ink'
           }`}
         >
-          {b === 'monthly' ? 'Monthly' : (
-            <>Yearly<span className="hidden md:inline">, 2 months free</span></>
+          {b === 'monthly' ? c.monthly : (
+            <>
+              <span className="md:hidden">{c.annualShort}</span>
+              <span className="hidden md:inline">{c.annual}</span>
+            </>
           )}
         </button>
       ))}
@@ -58,9 +46,9 @@ export default function Pricing() {
       <div className="mx-auto flex max-w-[1200px] flex-col gap-6 md:gap-12">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="flex flex-col gap-2.5 md:gap-3.5">
-            <h2 className="font-lp-serif text-[32px] font-medium leading-[1.15] md:text-5xl md:leading-[1.1]">Two plans.</h2>
+            <h2 className="font-lp-serif text-[32px] font-medium leading-[1.15] md:text-5xl md:leading-[1.1]">{c.title}</h2>
             <p className="text-base leading-relaxed text-lp-body md:text-lg">
-              Free covers the resume and cover letter. Pro removes the limit and adds the rest.
+              {c.body}
             </p>
           </div>
           {toggle}
@@ -68,22 +56,22 @@ export default function Pricing() {
 
         {/* Desktop: one comparison table */}
         <table className="hidden w-full border-collapse border border-lp-rule bg-white text-base md:table">
-          <caption className="sr-only">Free and Pro plan comparison</caption>
+          <caption className="sr-only">{c.tableCaption}</caption>
           <thead>
             <tr>
               <th scope="col" className="w-[40%] border-b border-lp-rule p-8 text-left align-bottom text-[15px] font-normal text-lp-muted">
-                Plan
+                {c.planHeader}
               </th>
               <th scope="col" className="w-[30%] border-b border-l border-lp-rule p-8 text-left align-top">
                 <span className="flex flex-col gap-2.5">
-                  <span className="text-xl font-semibold">Free</span>
-                  <span className="font-lp-serif text-[44px] font-medium leading-none">$0</span>
-                  <span className="text-sm font-normal text-lp-muted">No charge</span>
+                  <span className="text-xl font-semibold">{c.free.name}</span>
+                  <span className="font-lp-serif text-[44px] font-medium leading-none">{c.free.price}</span>
+                  <span className="text-sm font-normal text-lp-muted">{c.free.note}</span>
                 </span>
               </th>
               <th scope="col" className="w-[30%] border-b border-l border-lp-rule bg-lp-pine-tint p-8 text-left align-top">
                 <span className="flex flex-col gap-2.5">
-                  <span className="text-xl font-semibold text-lp-pine">Pro</span>
+                  <span className="text-xl font-semibold text-lp-pine">{c.pro.name}</span>
                   <span className="font-lp-serif text-[44px] font-medium leading-none" aria-live="polite">
                     {price.amount}
                     <span className="font-lp-sans text-base font-normal text-lp-muted"> {price.unit}</span>
@@ -94,25 +82,28 @@ export default function Pricing() {
             </tr>
           </thead>
           <tbody>
-            {ROWS.map((r) => (
+            {c.rows.map((r) => (
               <tr key={r.feature}>
                 <th scope="row" className="border-b border-lp-hairline px-8 py-[18px] text-left font-normal">
                   {r.feature}
                 </th>
-                <td className={`${cell} ${r.free ? '' : 'text-lp-muted'}`}>{r.free ?? 'Not included'}</td>
-                <td className={`${cell} bg-lp-pine-tint ${r.feature === 'AI generations' ? 'font-medium' : ''}`}>{r.pro}</td>
+                <td className={`${cell} ${r.free ? '' : 'text-lp-muted'}`}>{r.free ?? c.notIncluded}</td>
+                <td className={`${cell} bg-lp-pine-tint ${r.strong ? 'font-medium' : ''}`}>{r.pro}</td>
               </tr>
             ))}
             <tr>
               <td className="px-8 py-7 text-sm text-lp-muted">
-                {REFUND_NOTE && <a href={REFUND_NOTE.href}>{REFUND_NOTE.text}</a>}
+                <span className="flex flex-col gap-1">
+                  {c.currencyNote && <span>{c.currencyNote}</span>}
+                  {REFUND_NOTE && <a href={REFUND_NOTE.href}>{REFUND_NOTE.text}</a>}
+                </span>
               </td>
               <td className="border-l border-lp-rule px-8 py-7">
                 <StartLink
                   intent="free"
                   className="inline-flex min-h-[48px] items-center rounded-lp-control border border-lp-pine px-6 font-medium text-lp-pine no-underline hover:bg-white"
                 >
-                  Start free
+                  {c.free.cta}
                 </StartLink>
               </td>
               <td className="border-l border-lp-rule bg-lp-pine-tint px-8 py-7">
@@ -120,7 +111,7 @@ export default function Pricing() {
                   intent="pro"
                   className="inline-flex min-h-[48px] items-center rounded-lp-control bg-lp-pine px-6 font-medium text-white no-underline hover:bg-lp-pine-dark hover:text-white"
                 >
-                  Start with Pro
+                  {c.pro.cta}
                 </StartLink>
               </td>
             </tr>
@@ -131,7 +122,7 @@ export default function Pricing() {
         <div className="flex flex-col gap-4 md:hidden">
           <div className="flex flex-col gap-4 rounded-lp-panel border border-lp-pine bg-lp-pine-tint px-5 py-6">
             <div className="flex items-baseline justify-between">
-              <h3 className="text-xl font-semibold text-lp-pine">Pro</h3>
+              <h3 className="font-lp-sans text-xl font-semibold text-lp-pine">{c.pro.name}</h3>
               <p className="font-lp-serif text-4xl font-medium">
                 {price.amount}
                 <span className="font-lp-sans text-[15px] text-lp-muted"> {price.unit}</span>
@@ -139,31 +130,31 @@ export default function Pricing() {
             </div>
             <p className="text-sm text-lp-body">{price.note}</p>
             <p className="text-[15px] leading-relaxed">
-              Unlimited AI generations. Everything in Free, plus the Resume Rewriter, interview prep, LinkedIn Rewriter,
-              the 7-Day Job Strategy and priority support.
+              {c.pro.summary}
             </p>
             <StartLink
               intent="pro"
               className="flex min-h-[48px] items-center justify-center rounded-lp-control bg-lp-pine font-medium text-white no-underline"
             >
-              Start with Pro
+              {c.pro.cta}
             </StartLink>
           </div>
           <div className="flex flex-col gap-4 rounded-lp-panel border border-lp-rule bg-white px-5 py-6">
             <div className="flex items-baseline justify-between">
-              <h3 className="text-xl font-semibold">Free</h3>
-              <p className="font-lp-serif text-4xl font-medium">$0</p>
+              <h3 className="font-lp-sans text-xl font-semibold">{c.free.name}</h3>
+              <p className="font-lp-serif text-4xl font-medium">{c.free.price}</p>
             </div>
             <p className="text-[15px] leading-relaxed">
-              3 AI generations a month. Resume builder, ATS optimizer and cover letter generator.
+              {c.free.summary}
             </p>
             <StartLink
               intent="free"
               className="flex min-h-[48px] items-center justify-center rounded-lp-control border border-lp-pine font-medium text-lp-pine no-underline"
             >
-              Start free
+              {c.free.cta}
             </StartLink>
           </div>
+          {c.currencyNote && <p className="text-sm text-lp-muted">{c.currencyNote}</p>}
           {REFUND_NOTE && (
             <a href={REFUND_NOTE.href} className="text-sm">
               {REFUND_NOTE.text}

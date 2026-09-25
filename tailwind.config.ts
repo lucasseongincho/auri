@@ -47,9 +47,9 @@ const config: Config = {
       fontFamily: {
         heading: ['"Newsreader Variable"', 'Georgia', 'serif'],
         body: ['"IBM Plex Sans"', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
-        'lp-serif': ['"Newsreader Variable"', 'Georgia', 'serif'],
-        'lp-sans': ['"IBM Plex Sans"', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
-        'lp-mono': ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+        'lp-serif': ['"Newsreader Variable"', '"Noto Serif KR"', 'Georgia', 'serif'],
+        'lp-sans': ['"IBM Plex Sans"', '"IBM Plex Sans KR"', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
+        'lp-mono': ['"IBM Plex Mono"', '"IBM Plex Sans KR"', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         'lp-control': '4px',
