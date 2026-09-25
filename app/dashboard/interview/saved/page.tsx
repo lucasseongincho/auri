@@ -1,6 +1,8 @@
 'use client'
 
 import { useLocale } from '@/lib/i18n/client'
+import { IconInterviewPrep } from '@/components/icons'
+import { AlertCircle, ChevronLeft, Clock, HelpCircle, Search, Trash2 } from 'lucide-react'
 
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
@@ -128,9 +130,7 @@ export default function SavedInterviewPrepsPage() {
             onClick={() => router.push('/dashboard/interview')}
             className="flex items-center gap-2 text-[#3C403E] hover:text-[#1B1D1C] transition-colors text-sm"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             {t("Back")}
           </button>
           <div>
@@ -145,12 +145,7 @@ export default function SavedInterviewPrepsPage() {
         {preps.length > 0 && (
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <div className="relative flex-1">
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A5F5C]"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-              </svg>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A5F5C]" aria-hidden="true" />
               <input
                 type="text"
                 placeholder={t("Search by role or company…")}
@@ -175,9 +170,7 @@ export default function SavedInterviewPrepsPage() {
         {/* Error banner */}
         {error && (
           <div className="mb-4 px-4 py-3 rounded-[4px] bg-[#B42318]/10 border border-[#B42318]/30 text-[#B42318] text-sm flex items-center gap-2">
-            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
+            <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
             {error}
           </div>
         )}
@@ -190,9 +183,7 @@ export default function SavedInterviewPrepsPage() {
             className="flex flex-col items-center justify-center py-24 text-center"
           >
             <div className="w-16 h-16 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-[#1F5C4A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082M19.8 15l-1.057.587A2.25 2.25 0 0116.7 16h-7.4a2.25 2.25 0 01-2.043-1.313L6.2 13.5m0 0l-2.7-5.414m0 0A2.25 2.25 0 015.5 6h13a2.25 2.25 0 012 1.086L18.8 8.1" />
-              </svg>
+              <IconInterviewPrep className="w-8 h-8 text-[#1F5C4A]" aria-hidden="true" />
             </div>
             <h2 className="text-lg font-semibold text-[#1B1D1C] mb-2">{t("No saved sessions yet")}</h2>
             <p className="text-[#5A5F5C] text-sm max-w-xs mb-6">
@@ -244,15 +235,11 @@ export default function SavedInterviewPrepsPage() {
                   {/* Stats */}
                   <div className="flex items-center gap-3 mb-4">
                     <span className="flex items-center gap-1.5 text-xs text-[#3C403E]">
-                      <svg className="w-3.5 h-3.5 text-[#1F5C4A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <circle cx="12" cy="12" r="10" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" />
-                      </svg>
+                      <Clock className="w-3.5 h-3.5 text-[#1F5C4A]" aria-hidden="true" />
                       {t("{v0} questions", { v0: prep.prep.questions.length })}
                     </span>
                     <span className="flex items-center gap-1.5 text-xs text-[#3C403E]">
-                      <svg className="w-3.5 h-3.5 text-[#1F7A4D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <HelpCircle className="w-3.5 h-3.5 text-[#1F7A4D]" aria-hidden="true" />
                       {t("{v0} to ask", { v0: prep.prep.questions_to_ask.length })}
                     </span>
                   </div>
@@ -270,9 +257,7 @@ export default function SavedInterviewPrepsPage() {
                       className="p-2 rounded-[4px] bg-lp-ink/5 hover:bg-[#B42318]/10 hover:text-[#B42318] text-[#5A5F5C] transition-colors"
                       aria-label={t("Delete session")}
                     >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
+                      <Trash2 className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
 
@@ -303,9 +288,7 @@ export default function SavedInterviewPrepsPage() {
             >
               <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-6 max-w-sm w-full ">
                 <div className="w-12 h-12 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-[#B42318]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                  <Trash2 className="w-6 h-6 text-[#B42318]" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-[#1B1D1C] text-center mb-2">{t("Delete Session?")}</h3>
                 <p className="text-[#3C403E] text-sm text-center mb-6">

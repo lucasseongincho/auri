@@ -5,7 +5,7 @@ import { useLocale } from '@/lib/i18n/client'
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle, ChevronDown, ChevronUp, Globe, Clock } from 'lucide-react'
+import { CheckCircle, ChevronDown, ChevronLeft, ChevronUp, Clock, Globe, Trash2 } from 'lucide-react'
 import { IconJobStrategy } from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 import {
@@ -245,9 +245,7 @@ export default function SavedStrategyDetailPage() {
               onClick={() => router.push('/dashboard/strategy/saved')}
               className="flex items-center gap-1.5 text-[#3C403E] hover:text-[#1B1D1C] transition-colors text-sm flex-shrink-0"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
               {t("Back")}
             </button>
             <div className="w-px h-5 bg-lp-ink/10" />
@@ -266,9 +264,7 @@ export default function SavedStrategyDetailPage() {
             className="p-2 rounded-[4px] bg-lp-ink/5 hover:bg-[#B42318]/10 hover:text-[#B42318] text-[#5A5F5C] transition-colors flex-shrink-0"
             aria-label={t("Delete strategy")}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+            <Trash2 className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
 
@@ -330,9 +326,7 @@ export default function SavedStrategyDetailPage() {
             >
               <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-6 max-w-sm w-full ">
                 <div className="w-12 h-12 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-[#B42318]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                  <Trash2 className="w-6 h-6 text-[#B42318]" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-[#1B1D1C] text-center mb-2">{t("Delete Strategy?")}</h3>
                 <p className="text-[#3C403E] text-sm text-center mb-6">

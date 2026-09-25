@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { Menu, X } from 'lucide-react'
 import StartLink from './StartLink'
 import type { NavCopy } from './copy'
 
@@ -81,9 +82,7 @@ export default function LandingNav({ c, homeHref }: { c: NavCopy; homeHref: stri
             onClick={() => setOpen((v) => !v)}
             className="flex h-11 w-11 items-center justify-center text-lp-ink"
           >
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-              {open ? <path d="M5 5l12 12M17 5L5 17" /> : <path d="M3 6h16M3 11h16M3 16h16" />}
-            </svg>
+            {open ? <X className="h-[22px] w-[22px]" strokeWidth={1.5} aria-hidden="true" /> : <Menu className="h-[22px] w-[22px]" strokeWidth={1.5} aria-hidden="true" />}
           </button>
         </div>
       </div>
