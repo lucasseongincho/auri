@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/i18n/client'
+
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -28,8 +30,8 @@ function toMs(val: unknown): number {
   return toDate(val)?.getTime() ?? 0
 }
 
-function formatDate(val: unknown) {
-  return formatResumeDate(val, 'Saved')
+function formatDate(locale: 'en' | 'ko', val: unknown) {
+  return formatResumeDate(val, 'Saved', locale)
 }
 
 function WordBadge({ count }: { count: number }) {
@@ -45,6 +47,7 @@ function WordBadge({ count }: { count: number }) {
 }
 
 export default function SavedCoverLettersPage() {
+  const { t, locale } = useLocale()
   const { user, loading: authLoading } = useAuth()
 
   const [letters, setLetters] = useState<SavedCoverLetter[]>([])
@@ -66,7 +69,7 @@ export default function SavedCoverLettersPage() {
           setLetters([])
         }
       } catch {
-        setError('Failed to load saved cover letters.')
+        setError(t("Failed to load saved cover letters."))
       } finally {
         setLoading(false)
       }
@@ -109,7 +112,7 @@ export default function SavedCoverLettersPage() {
       }
       setLetters((prev) => prev.filter((l) => l.id !== id))
     } catch {
-      setError('Failed to delete cover letter.')
+      setError(t("Failed to delete cover letter."))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -132,9 +135,9 @@ export default function SavedCoverLettersPage() {
             <Mail className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
-            <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">Saved Cover Letters</h1>
+            <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">{t("Saved Cover Letters")}</h1>
             <p className="text-xs text-[#5A5F5C]">
-              {loading ? 'Loading…' : `${letters.length} saved letter${letters.length !== 1 ? 's' : ''}`}
+              {loading ? t("Loading…") : t("{v0} saved letter{v1}", { v0: letters.length, v1: letters.length !== 1 ? 's' : '' })}
             </p>
           </div>
         </div>
@@ -145,7 +148,7 @@ export default function SavedCoverLettersPage() {
              transition-all duration-200"
         >
           <Plus className="w-4 h-4" />
-          New Letter
+          {t("New Letter")}
         </Link>
       </motion.div>
 
@@ -176,7 +179,7 @@ export default function SavedCoverLettersPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A5F5C]" />
             <input
               type="text"
-              placeholder="Search by company or position…"
+              placeholder={t("Search by company or position…")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2 rounded-[10px] text-sm
@@ -192,10 +195,10 @@ export default function SavedCoverLettersPage() {
               className="px-3 py-2 rounded-[4px] text-sm bg-[#FFFFFF] border border-lp-rule
                 text-[#3C403E] focus:outline-none focus:border-[#1F5C4A]/50 transition-colors"
             >
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-              <option value="az">Company A–Z</option>
-              <option value="za">Company Z–A</option>
+              <option value="newest">{t("Newest first")}</option>
+              <option value="oldest">{t("Oldest first")}</option>
+              <option value="az">{t("Company A–Z")}</option>
+              <option value="za">{t("Company Z–A")}</option>
             </select>
           </div>
         </motion.div>
@@ -220,9 +223,9 @@ export default function SavedCoverLettersPage() {
               flex items-center justify-center mb-4">
               <Mail className="w-8 h-8 text-[#1F5C4A]" />
             </div>
-            <h3 className="font-heading text-base font-semibold text-lp-ink mb-2">No saved cover letters yet</h3>
+            <h3 className="font-heading text-base font-semibold text-lp-ink mb-2">{t("No saved cover letters yet")}</h3>
             <p className="text-sm text-[#5A5F5C] mb-5 max-w-sm">
-              Generate a cover letter and click Save to access it here.
+              {t("Generate a cover letter and click Save to access it here.")}
             </p>
             <Link
               href="/dashboard/cover-letter"
@@ -231,7 +234,7 @@ export default function SavedCoverLettersPage() {
                     transition-all"
             >
               <Plus className="w-4 h-4" />
-              Generate your first letter
+              {t("Generate your first letter")}
             </Link>
           </motion.div>
         )}
@@ -243,9 +246,9 @@ export default function SavedCoverLettersPage() {
             className="flex flex-col items-center justify-center py-16 text-center"
           >
             <Search className="w-8 h-8 text-[#5A5F5C] mb-3" />
-            <p className="text-sm text-[#3C403E]">No letters match &ldquo;{search}&rdquo;</p>
+            <p className="text-sm text-[#3C403E]">{t("No letters match “{v0}”", { v0: search })}</p>
             <button onClick={() => setSearch('')} className="mt-2 text-xs text-[#1F5C4A] hover:underline">
-              Clear search
+              {t("Clear search")}
             </button>
           </motion.div>
         )}
@@ -289,12 +292,12 @@ export default function SavedCoverLettersPage() {
                     {letter.openingHook && (
                       <div className="flex items-start gap-1.5 text-xs text-[#5A5F5C]">
                         <Building2 className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-                        <span className="line-clamp-2 italic">&ldquo;{letter.openingHook}&rdquo;</span>
+                        <span className="line-clamp-2 italic">{t("“{v0}”", { v0: letter.openingHook })}</span>
                       </div>
                     )}
                     <div className="flex items-center gap-1.5 text-xs text-[#5A5F5C]">
                       <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>{formatDate(letter.updatedAt)}</span>
+                      <span>{formatDate(locale, letter.updatedAt)}</span>
                     </div>
                   </div>
 
@@ -306,11 +309,11 @@ export default function SavedCoverLettersPage() {
                         rounded-[4px] text-xs font-semibold bg-[#1F5C4A] text-white
                         hover:bg-[#15443A] transition-colors"
                     >
-                      Open
+                      {t("Open")}
                     </Link>
                     <button
                       onClick={() => setDeleteTarget(letter.id)}
-                      aria-label={`Delete letter for ${letter.company}`}
+                      aria-label={t("Delete letter for {v0}", { v0: letter.company })}
                       className="p-2 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318]
                         hover:bg-[#B42318]/10 transition-all duration-200"
                     >
@@ -352,15 +355,15 @@ export default function SavedCoverLettersPage() {
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                <h3 className="font-heading text-base font-semibold text-lp-ink mb-1">Delete cover letter?</h3>
+                <h3 className="font-heading text-base font-semibold text-lp-ink mb-1">{t("Delete cover letter?")}</h3>
                 <p className="text-sm text-[#5A5F5C] mb-6">
-                  This will be permanently deleted. This action cannot be undone.
+                  {t("This will be permanently deleted. This action cannot be undone.")}
                 </p>
                 <div className="flex gap-3">
                   <button onClick={() => setDeleteTarget(null)}
                     className="flex-1 px-4 py-2.5 rounded-[4px] text-sm font-medium
                       border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all">
-                    Cancel
+                    {t("Cancel")}
                   </button>
                   <button
                     onClick={() => handleDelete(deleteTarget)}
@@ -369,7 +372,7 @@ export default function SavedCoverLettersPage() {
                       bg-[#B42318] text-white hover:bg-[#912018] transition-colors
                       disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Delete'}
+                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t("Delete")}
                   </button>
                 </div>
               </div>

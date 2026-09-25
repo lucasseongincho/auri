@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { motion, AnimatePresence } from 'framer-motion'
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
@@ -15,6 +17,7 @@ interface EstimateDisclaimerModalProps {
  * Shown state is persisted to Firestore (profile.hasSeenEstimateDisclaimer).
  */
 export default function EstimateDisclaimerModal({ open, onClose }: EstimateDisclaimerModalProps) {
+  const t = useT()
   return (
     <AnimatePresence>
       {open && (
@@ -34,33 +37,30 @@ export default function EstimateDisclaimerModal({ open, onClose }: EstimateDiscl
             <div className="rounded-[10px]  bg-[#FFFFFF] p-6">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-2xl">📋</span>
-                <h3 className="text-lp-ink font-semibold text-base">About your AI-generated resume</h3>
+                <h3 className="text-lp-ink font-semibold text-base">{t("About your AI-generated resume")}</h3>
               </div>
 
               <p className="text-[#3C403E] text-sm mb-4">
-                AURI rewrites your experience to be ATS-optimized and achievement-focused.
-                Where you didn&apos;t provide specific numbers, AURI adds realistic estimates
-                highlighted in amber so you can easily find and verify them.
+                {t("AURI rewrites your experience to be ATS-optimized and achievement-focused. Where you didn't provide specific numbers, AURI adds realistic estimates highlighted in amber so you can easily find and verify them.")}
               </p>
 
               <div className="space-y-2 mb-6">
                 <div className="flex items-start gap-2">
                   <span className="text-[#1F7A4D] text-sm flex-shrink-0">✅</span>
                   <p className="text-[#3C403E] text-sm">
-                    Always replace <span className="text-amber-400 font-medium">amber numbers</span> with your
-                    real data before submitting
+                    {t("Always replace")}{' '}<span className="text-amber-400 font-medium">{t("amber numbers")}</span>{' '}{t("with your real data before submitting")}
                   </p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-[#1F7A4D] text-sm flex-shrink-0">✅</span>
                   <p className="text-[#3C403E] text-sm">
-                    Click any amber highlight to edit it inline — it turns green when verified
+                    {t("Click any amber highlight to edit it inline — it turns green when verified")}
                   </p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-[#1F7A4D] text-sm flex-shrink-0">✅</span>
                   <p className="text-[#3C403E] text-sm">
-                    The download button will warn you if unverified numbers remain
+                    {t("The download button will warn you if unverified numbers remain")}
                   </p>
                 </div>
               </div>
@@ -71,7 +71,7 @@ export default function EstimateDisclaimerModal({ open, onClose }: EstimateDiscl
                   bg-[#1F5C4A] text-white
                    transition-all duration-200"
               >
-                Got it — show my resume
+                {t("Got it — show my resume")}
               </button>
             </div>
           </motion.div>

@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
 
@@ -14,9 +16,10 @@ export default function AILoadingState({
   variant = 'inline',
   lines = 4,
 }: AILoadingStateProps) {
+  const t = useT()
   if (variant === 'skeleton') {
     return (
-      <div className="space-y-3 animate-pulse" aria-label="Loading content">
+      <div className="space-y-3 animate-pulse" aria-label={t("Loading content")}>
         {Array.from({ length: lines }).map((_, i) => (
           <div
             key={i}

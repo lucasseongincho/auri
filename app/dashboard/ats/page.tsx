@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/i18n/client'
+
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -79,6 +81,7 @@ function convertResumeToPlainText(data: ResumeData): string {
 }
 
 export default function ATSPage() {
+  const { t, locale } = useLocale()
   const { user } = useAuth()
   const { profile, setATSScore, atsScore, currentResume, setResume, pushToHistory } = useCareerStore()
   const router = useRouter()
@@ -151,7 +154,7 @@ export default function ATSPage() {
     try {
       const idToken = await getIdTokenSafe()
       if (!idToken) {
-        setError('Please sign in to upload a resume.')
+        setError(t("Please sign in to upload a resume."))
         return
       }
       const formData = new FormData()
@@ -174,7 +177,7 @@ export default function ATSPage() {
       setParsedResult(json.data)
       setShouldShowImportCTA(false)
     } catch {
-      setError('Failed to parse resume PDF. Please try again.')
+      setError(t("Failed to parse resume PDF. Please try again."))
     } finally {
       setIsUploadingResume(false)
     }
@@ -214,14 +217,14 @@ export default function ATSPage() {
     })
     if (res.status === 429) {
       const j = await res.json()
-      throw new Error(`Rate limit reached. Try again in ${j.retryAfter}s.`)
+      throw new Error(t("Rate limit reached. Try again in {v0}s.", { v0: j.retryAfter }))
     }
     if (!res.ok) {
       const j = await res.json().catch(() => ({ error: 'Analysis failed' }))
-      throw new Error(j.error ?? 'Analysis failed')
+      throw new Error(j.error ?? t("Analysis failed"))
     }
     const json = await res.json()
-    if (!json.success) throw new Error(json.error ?? 'Analysis failed')
+    if (!json.success) throw new Error(json.error ?? t("Analysis failed"))
     return json.data as ATSScore
   }, [user?.uid, selectedResume?.id, getIdTokenSafe])
 
@@ -251,7 +254,7 @@ export default function ATSPage() {
         setAnalysisTimestamp(new Date().toISOString())
         if (resumeSource === 'upload') setShouldShowImportCTA(true)
       } else if (atsResult.status === 'rejected') {
-        setError(atsResult.reason instanceof Error ? atsResult.reason.message : 'Analysis failed. Please try again.')
+        setError(atsResult.reason instanceof Error ? atsResult.reason.message : t("Analysis failed. Please try again."))
       }
 
       if (coverageResult.status === 'fulfilled' && coverageResult.value) {
@@ -307,7 +310,7 @@ export default function ATSPage() {
     try {
       const idToken = await getIdTokenSafe()
       if (!idToken) {
-        setSuggestionsError('Please sign in to use this feature.')
+        setSuggestionsError(t("Please sign in to use this feature."))
         return
       }
       const res = await fetch('/api/structured-suggestions', {
@@ -330,7 +333,7 @@ export default function ATSPage() {
       setSuggestions(data.suggestions)
       setCheckedIds(new Set(data.suggestions.map((s) => s.id)))
     } catch {
-      setSuggestionsError('Failed to generate suggestions')
+      setSuggestionsError(t("Failed to generate suggestions"))
     } finally {
       setIsGeneratingSuggestions(false)
     }
@@ -339,7 +342,7 @@ export default function ATSPage() {
   const handleApplySuggestions = useCallback(async () => {
     if (!suggestions || (!selectedResume && !currentResume)) return
     if (!selectedResume) {
-      setSuggestionsError('Apply to Editor is only available for AURI-generated resumes.')
+      setSuggestionsError(t("Apply to Editor is only available for AURI-generated resumes."))
       return
     }
     if (!user) return
@@ -397,7 +400,7 @@ export default function ATSPage() {
       setResume({ ...resumeDataToWrite, id: selectedResume.id })
       router.push(`/dashboard/resume/${selectedResume.id}?from=ats`)
     } catch {
-      setSuggestionsError('Failed to save changes. Please try again.')
+      setSuggestionsError(t("Failed to save changes. Please try again."))
       setIsApplyingSuggestions(false)
     }
   }, [suggestions, selectedResume, currentResume, user, checkedIds, setResume, router])
@@ -408,7 +411,7 @@ export default function ATSPage() {
     try {
       const idToken = await getIdTokenSafe()
       if (!idToken) {
-        setSuggestionsError('Please sign in to import your resume.')
+        setSuggestionsError(t("Please sign in to import your resume."))
         return
       }
       const res = await fetch('/api/import-resume', {
@@ -423,14 +426,14 @@ export default function ATSPage() {
         | { success: true; resumeData: ResumeData }
         | { success: false; error: string }
       if (!data.success) {
-        setSuggestionsError('Failed to import resume. Please try again.')
+        setSuggestionsError(t("Failed to import resume. Please try again."))
         return
       }
       setResume(data.resumeData)
       pushToHistory(data.resumeData)
       router.push('/dashboard/resume?from=ats')
     } catch {
-      setSuggestionsError('Failed to import resume. Please try again.')
+      setSuggestionsError(t("Failed to import resume. Please try again."))
     } finally {
       setIsImportingToBuilder(false)
     }
@@ -443,10 +446,10 @@ export default function ATSPage() {
           <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center">
             <Target className="w-5 h-5 text-lp-ink" />
           </div>
-          <h1 className="font-heading text-2xl font-bold text-lp-ink">ATS Optimizer</h1>
+          <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("ATS Optimizer")}</h1>
         </div>
         <p className="text-[#3C403E] text-sm ml-12">
-          Select a resume and paste a job description to get a real-time ATS match score with keyword analysis.
+          {t("Select a resume and paste a job description to get a real-time ATS match score with keyword analysis.")}
         </p>
       </motion.div>
 
@@ -464,7 +467,7 @@ export default function ATSPage() {
               {/* Section A — AURI Saved Resumes */}
               <div>
                 <label className={LABEL_CLASS}>
-                  Your AURI Resumes <span className="text-[#B42318]">*</span>
+                  {t("Your AURI Resumes")}{' '}<span className="text-[#B42318]">*</span>
                 </label>
                 {isLoadingResumes ? (
                   <div className="flex items-center justify-center h-20">
@@ -473,12 +476,12 @@ export default function ATSPage() {
                 ) : savedResumes.length === 0 ? (
                   <div className="flex flex-col items-center gap-2 py-6 rounded-[10px] border border-dashed border-lp-rule text-center">
                     <FileText className="w-5 h-5 text-[#5A5F5C]" />
-                    <p className="text-xs text-[#5A5F5C]">No saved resumes yet.</p>
+                    <p className="text-xs text-[#5A5F5C]">{t("No saved resumes yet.")}</p>
                     <Link
                       href="/dashboard/resume"
                       className="text-xs text-[#1F5C4A] hover:text-lp-ink transition-colors"
                     >
-                      Build your first resume →
+                      {t("Build your first resume →")}
                     </Link>
                   </div>
                 ) : (
@@ -502,7 +505,7 @@ export default function ATSPage() {
                             {resume.targetPosition}{resume.targetCompany ? ` · ${resume.targetCompany}` : ''}
                           </p>
                           <p className="text-[10px] text-[#5A5F5C] mt-1">
-                            {formatResumeDate(resume.updatedAt, 'Updated')}
+                            {formatResumeDate(resume.updatedAt, 'Updated', locale)}
                           </p>
                         </button>
                       )
@@ -515,7 +518,7 @@ export default function ATSPage() {
               {profile?.isPro && (
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-px bg-lp-ink/6" />
-                  <span className="text-[10px] font-medium text-[#5A5F5C] uppercase tracking-widest">or</span>
+                  <span className="text-[10px] font-medium text-[#5A5F5C] uppercase tracking-widest">{t("or")}</span>
                   <div className="flex-1 h-px bg-lp-ink/6" />
                 </div>
               )}
@@ -523,7 +526,7 @@ export default function ATSPage() {
               {/* Section B — PDF Upload (Pro only) */}
               {profile?.isPro && (
                 <div className="space-y-3">
-                  <label className={LABEL_CLASS}>Upload a PDF Resume</label>
+                  <label className={LABEL_CLASS}>{t("Upload a PDF Resume")}</label>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -552,10 +555,10 @@ export default function ATSPage() {
                     )}
                     <span className={`text-xs ${resumeSource === 'upload' ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`}>
                       {isUploadingResume
-                        ? 'Parsing PDF…'
+                        ? t("Parsing PDF…")
                         : resumeSource === 'upload'
-                          ? 'PDF loaded — click to replace'
-                          : 'Click to upload PDF (max 5 MB)'}
+                          ? t("PDF loaded — click to replace")
+                          : t("Click to upload PDF (max 5 MB)")}
                     </span>
                   </button>
 
@@ -564,23 +567,23 @@ export default function ATSPage() {
                     <div className="rounded-[10px] border border-[#1F7A4D]/20 bg-[#1F7A4D]/[0.04] p-3.5 space-y-2.5">
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-[#1F7A4D] flex-shrink-0" />
-                        <p className="text-xs font-semibold text-lp-ink">Resume Extracted</p>
+                        <p className="text-xs font-semibold text-lp-ink">{t("Resume Extracted")}</p>
                       </div>
                       <p className="text-[11px] text-[#3C403E] leading-relaxed">
-                        {parsedResult.stats.totalLines} lines · {parsedResult.stats.totalChars.toLocaleString()} characters · Sections found:{' '}
+                        {t("{v0} lines · {v1} characters · Sections found:", { v0: parsedResult.stats.totalLines, v1: parsedResult.stats.totalChars.toLocaleString() })}{' '}
                         <span className="text-lp-ink">
-                          {parsedResult.stats.detectedSections.join(', ') || 'none detected'}
+                          {parsedResult.stats.detectedSections.join(', ') || t("none detected")}
                         </span>
                       </p>
                       <p className="text-xs italic text-[#5A5F5C]">
-                        Note: This extraction uses a generic PDF parser. Real ATS systems are more sophisticated and may handle your formatting better.
+                        {t("Note: This extraction uses a generic PDF parser. Real ATS systems are more sophisticated and may handle your formatting better.")}
                       </p>
                       {parsedResult.failures.length === 0 ? (
-                        <p className="text-[11px] text-[#1F7A4D]">✓ No major parsing issues detected</p>
+                        <p className="text-[11px] text-[#1F7A4D]">{t("✓ No major parsing issues detected")}</p>
                       ) : (
                         <div className="space-y-1.5">
                           <p className="text-[11px] font-medium text-[#8A5A00]">
-                            ⚠ {parsedResult.failures.length} parsing issue{parsedResult.failures.length > 1 ? 's' : ''} detected
+                            {t("⚠ {v0} parsing issue{v1} detected", { v0: parsedResult.failures.length, v1: parsedResult.failures.length > 1 ? 's' : '' })}
                           </p>
                           {parsedResult.failures.slice(0, 3).map((failure, i) => (
                             <div key={i} className="flex items-start gap-2">
@@ -603,7 +606,7 @@ export default function ATSPage() {
                           ))}
                           {parsedResult.failures.length > 3 && (
                             <p className="text-[10px] text-[#5A5F5C]">
-                              + {parsedResult.failures.length - 3} more issue{parsedResult.failures.length - 3 > 1 ? 's' : ''}
+                              {t("+ {v0} more issue{v1}", { v0: parsedResult.failures.length - 3, v1: parsedResult.failures.length - 3 > 1 ? 's' : '' })}
                             </p>
                           )}
                         </div>
@@ -615,15 +618,15 @@ export default function ATSPage() {
 
               <div>
                 <label className={LABEL_CLASS}>
-                  Job Description <span className="text-[#B42318]">*</span>
+                  {t("Job Description")}{' '}<span className="text-[#B42318]">*</span>
                 </label>
                 <textarea
                   className={INPUT_CLASS}
                   rows={8}
-                  placeholder="Paste the job description here…"
+                  placeholder={t("Paste the job description here…")}
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
-                  aria-label="Job description"
+                  aria-label={t("Job description")}
                 />
               </div>
 
@@ -632,11 +635,11 @@ export default function ATSPage() {
                   <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
                     <Zap className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
-                      <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
+                      <p className="text-xs font-medium text-lp-ink">{t("Monthly limit reached")}</p>
+                      <p className="text-xs text-[#3C403E]">{t("You've used all 3 free generations this month.")}</p>
                     </div>
                     <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
-                      Upgrade →
+                      {t("Upgrade →")}
                     </Link>
                   </div>
                 ) : (
@@ -655,8 +658,8 @@ export default function ATSPage() {
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isAnalyzing
-                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing…</>
-                  : <><Sparkles className="w-4 h-4" /> Analyze ATS Score</>
+                  ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Analyzing…")}</>
+                  : <><Sparkles className="w-4 h-4" />{' '}{t("Analyze ATS Score")}</>
                 }
               </button>
             </div>
@@ -681,8 +684,8 @@ export default function ATSPage() {
                 <div className="w-14 h-14 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 flex items-center justify-center mb-4">
                   <ClipboardList className="w-6 h-6 text-[#1F5C4A]" />
                 </div>
-                <p className="text-sm font-medium text-[#3C403E]">Your ATS score will appear here</p>
-                <p className="text-xs text-[#5A5F5C] mt-1">Select a resume and job description, then click Analyze</p>
+                <p className="text-sm font-medium text-[#3C403E]">{t("Your ATS score will appear here")}</p>
+                <p className="text-xs text-[#5A5F5C] mt-1">{t("Select a resume and job description, then click Analyze")}</p>
               </div>
             </div>
           )}
@@ -699,8 +702,8 @@ export default function ATSPage() {
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isGeneratingSuggestions
-                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating suggestions…</>
-                  : <><Sparkles className="w-4 h-4" /> Apply to Editor</>
+                  ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Generating suggestions…")}</>
+                  : <><Sparkles className="w-4 h-4" />{' '}{t("Apply to Editor")}</>
                 }
               </button>
               {suggestionsError && (
@@ -754,7 +757,7 @@ export default function ATSPage() {
               <div className="rounded-[10px]  bg-[#FFFFFF] p-5 space-y-3">
                 <div className="flex items-center justify-between">
                   <p className="text-[10px] font-medium text-[#5A5F5C] uppercase tracking-wide">
-                    Track your application outcome
+                    {t("Track your application outcome")}
                   </p>
                   {isSavingOutcome ? (
                     <Loader2 className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin" />
@@ -763,7 +766,7 @@ export default function ATSPage() {
                   ) : null}
                 </div>
                 <p className="text-sm font-semibold text-lp-ink">
-                  Did this application lead to an interview?
+                  {t("Did this application lead to an interview?")}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {OUTCOME_OPTIONS.map(({ value, label }) => (
@@ -777,7 +780,7 @@ export default function ATSPage() {
                           : 'border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:border-lp-rule bg-transparent'
                         } disabled:cursor-not-allowed disabled:opacity-60`}
                     >
-                      {label}
+                      {t(label)}
                     </button>
                   ))}
                 </div>
@@ -799,9 +802,9 @@ export default function ATSPage() {
                     <Zap className="w-4 h-4 text-lp-ink" />
                   </div>
                   <div className="space-y-1 min-w-0">
-                    <p className="text-sm font-semibold text-lp-ink">Build a Better Version in AURI</p>
+                    <p className="text-sm font-semibold text-lp-ink">{t("Build a Better Version in AURI")}</p>
                     <p className="text-xs text-[#3C403E] leading-relaxed">
-                      Your resume scored {score.score}/100 based on extracted text — real ATS systems may score it higher. But AURI can rebuild it as a fully structured resume with targeted keyword optimization, so you know exactly where you stand.
+                      {t("Your resume scored {v0}/100 based on extracted text — real ATS systems may score it higher. But AURI can rebuild it as a fully structured resume with targeted keyword optimization, so you know exactly where you stand.", { v0: score.score })}
                     </p>
                   </div>
                 </div>
@@ -813,12 +816,12 @@ export default function ATSPage() {
                   {isImportingToBuilder ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Importing…
+                      {t("Importing…")}
                     </>
                   ) : (
                     <>
                       <Upload className="w-4 h-4" />
-                      Import to Builder
+                      {t("Import to Builder")}
                     </>
                   )}
                 </button>

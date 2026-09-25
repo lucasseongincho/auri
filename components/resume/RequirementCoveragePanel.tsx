@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { motion } from 'framer-motion'
 import { CheckCircle, AlertTriangle, XCircle, Layers, Loader2 } from 'lucide-react'
 import type { RequirementCoverage } from '@/types'
@@ -42,13 +44,14 @@ export default function RequirementCoveragePanel({
   coverage,
   isLoading,
 }: RequirementCoveragePanelProps) {
+  const t = useT()
   if (isLoading) {
     return (
       <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
         <div className="rounded-[10px]  bg-[#FFFFFF] p-5">
           <div className="flex items-center gap-2 mb-4">
             <Layers className="w-4 h-4 text-[#1F5C4A]" />
-            <span className="text-sm font-semibold text-lp-ink">Running semantic analysis…</span>
+            <span className="text-sm font-semibold text-lp-ink">{t("Running semantic analysis…")}</span>
             <Loader2 className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin ml-auto" />
           </div>
           <div className="space-y-2">
@@ -88,9 +91,9 @@ export default function RequirementCoveragePanel({
         {/* Header */}
         <div className="flex items-center gap-2">
           <Layers className="w-4 h-4 text-[#1F5C4A]" />
-          <span className="text-sm font-semibold text-lp-ink">Requirement Coverage</span>
+          <span className="text-sm font-semibold text-lp-ink">{t("Requirement Coverage")}</span>
           <span className="text-[10px] text-[#5A5F5C] ml-auto uppercase tracking-wide">
-            semantic
+            {t("semantic")}
           </span>
         </div>
 
@@ -98,17 +101,17 @@ export default function RequirementCoveragePanel({
         <div className="flex gap-2 flex-wrap">
           {counts.strong > 0 && (
             <span className="px-2 py-0.5 rounded-full text-xs bg-[#1F7A4D]/10 text-[#1F7A4D] border border-[#1F7A4D]/20">
-              {counts.strong} strong
+              {t("{v0} strong", { v0: counts.strong })}
             </span>
           )}
           {counts.partial > 0 && (
             <span className="px-2 py-0.5 rounded-full text-xs bg-[#8A5A00]/10 text-[#8A5A00] border border-[#8A5A00]/20">
-              {counts.partial} partial
+              {t("{v0} partial", { v0: counts.partial })}
             </span>
           )}
           {counts.missing > 0 && (
             <span className="px-2 py-0.5 rounded-full text-xs bg-[#B42318]/10 text-[#B42318] border border-[#B42318]/20">
-              {counts.missing} missing
+              {t("{v0} missing", { v0: counts.missing })}
             </span>
           )}
         </div>

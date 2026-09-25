@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import {
@@ -16,6 +18,7 @@ interface CareerProfileDrawerProps {
 }
 
 export default function CareerProfileDrawer({ open, onClose }: CareerProfileDrawerProps) {
+  const t = useT()
   const { user } = useAuth()
   const { profile } = useCareerProfile()
   const { handleSignOut } = useSignOut()
@@ -41,7 +44,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="fixed right-0 top-0 h-full w-[400px] max-w-full z-50
               border-l border-lp-rule bg-[#FFFFFF] overflow-y-auto"
-            aria-label="Career profile drawer"
+            aria-label={t("Career profile drawer")}
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-lp-hairline">
@@ -52,7 +55,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                 </div>
                 <div>
                   <p className="font-semibold text-lp-ink text-sm">
-                    {user?.displayName ?? user?.email ?? 'Guest User'}
+                    {user?.displayName ?? user?.email ?? t("Guest User")}
                   </p>
                   <p className="text-xs text-[#5A5F5C]">
                     {user?.email ?? ''}
@@ -61,7 +64,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               </div>
               <button
                 onClick={onClose}
-                aria-label="Close profile drawer"
+                aria-label={t("Close profile drawer")}
                 className="w-8 h-8 rounded-[4px] flex items-center justify-center
                   text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5 transition-all duration-200"
               >
@@ -77,11 +80,11 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Target className="w-4 h-4 text-[#1F5C4A]" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">Target Role</span>
+                    <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">{t("Target Role")}</span>
                   </div>
                   <Link href="/dashboard/resume" onClick={onClose}
                     className="text-xs text-[#1F5C4A] hover:text-[#1F5C4A] transition-colors flex items-center gap-0.5">
-                    Edit <ChevronRight className="w-3 h-3" />
+                    {t("Edit")}{' '}<ChevronRight className="w-3 h-3" />
                   </Link>
                 </div>
                 {profile?.target.position ? (
@@ -95,7 +98,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                     <div className="rounded-[10px] bg-[#FFFFFF] border border-dashed border-lp-rule p-4
                       flex items-center gap-2 text-[#5A5F5C] hover:text-[#3C403E] hover:border-[#1F5C4A]/30 transition-all duration-200 cursor-pointer">
                       <Plus className="w-4 h-4" />
-                      <span className="text-sm">Set your target role</span>
+                      <span className="text-sm">{t("Set your target role")}</span>
                     </div>
                   </Link>
                 )}
@@ -106,9 +109,9 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Briefcase className="w-4 h-4 text-[#1F5C4A]" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">Experience</span>
+                    <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">{t("Experience")}</span>
                   </div>
-                  <span className="text-xs text-[#5A5F5C]">{profile?.experience.length ?? 0} entries</span>
+                  <span className="text-xs text-[#5A5F5C]">{t("{v0} entries", { v0: profile?.experience.length ?? 0 })}</span>
                 </div>
                 {profile?.experience && profile.experience.length > 0 ? (
                   <div className="space-y-2">
@@ -120,7 +123,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                       </div>
                     ))}
                     {profile.experience.length > 3 && (
-                      <p className="text-xs text-[#5A5F5C] pl-1">+{profile.experience.length - 3} more</p>
+                      <p className="text-xs text-[#5A5F5C] pl-1">{t("+{v0} more", { v0: profile.experience.length - 3 })}</p>
                     )}
                   </div>
                 ) : (
@@ -128,7 +131,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                     <div className="rounded-[10px] bg-[#FFFFFF] border border-dashed border-lp-rule p-4
                       flex items-center gap-2 text-[#5A5F5C] hover:text-[#3C403E] hover:border-[#1F5C4A]/30 transition-all duration-200 cursor-pointer">
                       <Plus className="w-4 h-4" />
-                      <span className="text-sm">Add work experience</span>
+                      <span className="text-sm">{t("Add work experience")}</span>
                     </div>
                   </Link>
                 )}
@@ -139,14 +142,14 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <GraduationCap className="w-4 h-4 text-[#1F5C4A]" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">Education</span>
+                    <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">{t("Education")}</span>
                   </div>
                 </div>
                 {profile?.education && profile.education.length > 0 ? (
                   <div className="space-y-2">
                     {profile.education.map((edu) => (
                       <div key={edu.id} className="rounded-[10px] bg-[#FFFFFF]  p-3">
-                        <p className="text-sm font-medium text-lp-ink">{edu.degree} in {edu.field}</p>
+                        <p className="text-sm font-medium text-lp-ink">{t("{v0} in {v1}", { v0: edu.degree, v1: edu.field })}</p>
                         <p className="text-xs text-[#3C403E]">{edu.institution}</p>
                         <p className="text-xs text-[#5A5F5C]">{edu.year}</p>
                       </div>
@@ -154,7 +157,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                   </div>
                 ) : (
                   <div className="rounded-[10px] bg-[#FFFFFF] border border-dashed border-lp-rule p-3 text-[#5A5F5C] text-sm">
-                    No education added yet
+                    {t("No education added yet")}
                   </div>
                 )}
               </div>
@@ -163,7 +166,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Wrench className="w-4 h-4 text-[#1F7A4D]" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">Skills</span>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[#5A5F5C]">{t("Skills")}</span>
                 </div>
                 {profile?.skills && profile.skills.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
@@ -181,7 +184,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                   </div>
                 ) : (
                   <div className="rounded-[10px] bg-[#FFFFFF] border border-dashed border-lp-rule p-3 text-[#5A5F5C] text-sm">
-                    No skills added yet
+                    {t("No skills added yet")}
                   </div>
                 )}
               </div>
@@ -197,7 +200,7 @@ export default function CareerProfileDrawer({ open, onClose }: CareerProfileDraw
                   transition-all duration-200 text-sm font-medium"
               >
                 <LogOut className="w-4 h-4" />
-                Sign Out
+                {t("Sign Out")}
               </button>
             </div>
           </motion.aside>

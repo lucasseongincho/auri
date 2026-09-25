@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale, useT } from '@/lib/i18n/client'
+
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -12,6 +14,7 @@ const CARD_SPRING = { type: 'spring', stiffness: 280, damping: 28 } as const
 // ── STARAnswer ────────────────────────────────────────────────────────────────
 
 function STARAnswer({ text }: { text: string }) {
+  const t = useT()
   const sections = text.split(/(?=Situation:|Task:|Action:|Result:)/i)
   const parsed = sections
     .map((section) => {
@@ -30,7 +33,7 @@ function STARAnswer({ text }: { text: string }) {
       {parsed.map((s, i) => (
         <div key={i} className="mb-5">
           <span className="block text-[0.75rem] font-bold uppercase tracking-[0.1em] text-[#1F5C4A] mb-1">
-            {s.label}
+            {t(s.label.charAt(0).toUpperCase() + s.label.slice(1).toLowerCase())}
           </span>
           <p className="text-[0.95rem] leading-[1.6] pl-3 border-l-2 border-[#1F5C4A] text-[#1B1D1C] mb-4">
             {s.content}
@@ -90,6 +93,7 @@ function scoreAnswer(question: string, framework: string, userAnswer: string): {
 // ── Sub-components ───────────────────────────────────────────────────────────
 
 function ProgressBar({ value, total }: { value: number; total: number }) {
+  const { t, locale } = useLocale()
   const pct = total === 0 ? 0 : Math.round((value / total) * 100)
   return (
     <div className="flex items-center gap-3">
@@ -102,13 +106,14 @@ function ProgressBar({ value, total }: { value: number; total: number }) {
         />
       </div>
       <span className="text-xs text-[#3C403E] tabular-nums w-16 text-right">
-        {value}/{total} reviewed
+        {t("{v0}/{v1} reviewed", { v0: value, v1: total })}
       </span>
     </div>
   )
 }
 
 function ScoreMeter({ score }: { score: number }) {
+  const { t, locale } = useLocale()
   const color =
     score >= 80 ? '#1F7A4D' : score >= 60 ? '#8A5A00' : score >= 40 ? '#1F5C4A' : '#B42318'
   return (
@@ -132,9 +137,9 @@ function ScoreMeter({ score }: { score: number }) {
       </div>
       <div>
         <p className="text-xs font-semibold" style={{ color }}>
-          {score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : score >= 40 ? 'Developing' : 'Needs Work'}
+          {score >= 80 ? t("Excellent") : score >= 60 ? t("Good") : score >= 40 ? t("Developing") : t("Needs Work")}
         </p>
-        <p className="text-[10px] text-[#5A5F5C]">STAR score</p>
+        <p className="text-[10px] text-[#5A5F5C]">{t("STAR score")}</p>
       </div>
     </div>
   )
@@ -143,6 +148,7 @@ function ScoreMeter({ score }: { score: number }) {
 // ── Main Page ────────────────────────────────────────────────────────────────
 
 export default function StudyViewPage() {
+  const { t, locale } = useLocale()
   const { user, loading: authLoading } = useAuth()
   const params = useParams()
   const router = useRouter()
@@ -275,9 +281,9 @@ export default function StudyViewPage() {
     }
   }
 
-  function formatDate(iso: string) {
+  function formatDate(locale: 'en' | 'ko', iso: string) {
     try {
-      return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+      return new Date(iso).toLocaleDateString(locale === 'ko' ? 'ko-KR' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     } catch { return iso }
   }
 
@@ -288,7 +294,7 @@ export default function StudyViewPage() {
       <div className="min-h-screen bg-[#F4F2EC] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-[#1F5C4A] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[#3C403E] text-sm">Loading session…</p>
+          <p className="text-[#3C403E] text-sm">{t("Loading session…")}</p>
         </div>
       </div>
     )
@@ -302,13 +308,13 @@ export default function StudyViewPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h2 className="text-lg font-semibold text-[#1B1D1C]">Session not found</h2>
-        <p className="text-[#5A5F5C] text-sm">This prep session may have been deleted.</p>
+        <h2 className="text-lg font-semibold text-[#1B1D1C]">{t("Session not found")}</h2>
+        <p className="text-[#5A5F5C] text-sm">{t("This prep session may have been deleted.")}</p>
         <button
           onClick={() => router.push('/dashboard/interview/saved')}
           className="mt-2 px-5 py-2.5 rounded-[4px] bg-[#1F5C4A] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
         >
-          Back to sessions
+          {t("Back to sessions")}
         </button>
       </div>
     )
@@ -396,9 +402,9 @@ export default function StudyViewPage() {
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-xs font-semibold text-[#1F5C4A] bg-[#1F5C4A]/10 px-2.5 py-1 rounded-full">
-                    Q{currentCard + 1} of {questions.length}
+                    {t("Q{v0} of {v1}", { v0: currentCard + 1, v1: questions.length })}
                   </span>
-                  <span className="text-xs text-[#5A5F5C]">Tap to reveal answer</span>
+                  <span className="text-xs text-[#5A5F5C]">{t("Tap to reveal answer")}</span>
                 </div>
                 <p className="text-lg font-semibold text-[#1B1D1C] leading-snug">
                   {questions[currentCard].question}
@@ -416,7 +422,7 @@ export default function StudyViewPage() {
                   <svg className="w-4 h-4" fill={reviewed.has(currentCard) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
-                  {reviewed.has(currentCard) ? 'Reviewed' : 'Mark reviewed'}
+                  {reviewed.has(currentCard) ? t("Reviewed") : t("Mark reviewed")}
                 </button>
                 <svg className="w-5 h-5 text-[#5A5F5C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 3M21 7.5H7.5" />
@@ -436,14 +442,14 @@ export default function StudyViewPage() {
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-xs font-semibold text-[#1F5C4A] bg-[#1F5C4A]/10 px-2.5 py-1 rounded-full">
-                    Answer Framework
+                    {t("Answer Framework")}
                   </span>
                 </div>
                 <p className="text-[1.05rem] font-semibold text-[#1B1D1C] mb-3 leading-snug">{questions[currentCard].question}</p>
                 <p className="text-[0.95rem] text-[#3C403E] leading-[1.7] mb-3">{questions[currentCard].answer_framework}</p>
                 {questions[currentCard].star_example && (
                   <div className="mt-4 p-3 rounded-[10px] bg-[#1F5C4A]/8 border border-[#1F5C4A]/15">
-                    <p className="text-xs font-semibold text-[#1F5C4A] mb-3">STAR Example</p>
+                    <p className="text-xs font-semibold text-[#1F5C4A] mb-3">{t("STAR Example")}</p>
                     <STARAnswer text={questions[currentCard].star_example} />
                   </div>
                 )}
@@ -460,7 +466,7 @@ export default function StudyViewPage() {
                   <svg className="w-4 h-4" fill={reviewed.has(currentCard) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
-                  {reviewed.has(currentCard) ? 'Reviewed' : 'Mark reviewed'}
+                  {reviewed.has(currentCard) ? t("Reviewed") : t("Mark reviewed")}
                 </button>
                 <svg className="w-5 h-5 text-[#5A5F5C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 3M21 7.5H7.5" />
@@ -480,11 +486,11 @@ export default function StudyViewPage() {
       {/* Stats bar */}
       <div className="flex items-center justify-between mb-5">
         <div className="text-sm text-[#3C403E]">
-          Question <span className="font-semibold text-[#1B1D1C]">{practiceIndex + 1}</span> of {questions.length}
+          {t("Question")}{' '}<span className="font-semibold text-[#1B1D1C]">{practiceIndex + 1}</span>{' '}{t("of {v0}", { v0: questions.length })}
         </div>
         {avgScore !== null && (
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-[#5A5F5C]">Avg score:</span>
+            <span className="text-[#5A5F5C]">{t("Avg score:")}</span>
             <span className="font-bold" style={{ color: avgScore >= 70 ? '#1F7A4D' : avgScore >= 50 ? '#8A5A00' : '#B42318' }}>
               {avgScore}
             </span>
@@ -496,7 +502,7 @@ export default function StudyViewPage() {
       <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-5 sm:p-6 mb-4">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-xs font-semibold text-[#1F5C4A] bg-[#1F5C4A]/10 px-2.5 py-1 rounded-full">
-            Practice
+            {t("Practice")}
           </span>
           {practiceEntry && <ScoreMeter score={practiceEntry.score} />}
         </div>
@@ -504,14 +510,14 @@ export default function StudyViewPage() {
           {practiceQuestion.question}
         </p>
         <div className="p-3 rounded-[10px] bg-[#1F5C4A]/8 border border-[#1F5C4A]/15 mb-4">
-          <p className="text-xs font-semibold text-[#1F5C4A] mb-1">Framework hint</p>
+          <p className="text-xs font-semibold text-[#1F5C4A] mb-1">{t("Framework hint")}</p>
           <p className="text-[0.95rem] text-[#3C403E] leading-relaxed">{practiceQuestion.answer_framework}</p>
         </div>
 
         <textarea
           value={currentAnswer}
           onChange={(e) => { setCurrentAnswer(e.target.value); setScored(false) }}
-          placeholder="Type your answer here… Use the STAR method: Situation → Task → Action → Result"
+          placeholder={t("Type your answer here… Use the STAR method: Situation → Task → Action → Result")}
           rows={5}
           className="w-full px-4 py-3 rounded-[4px] bg-[#F4F2EC] border border-lp-rule text-[#1B1D1C] placeholder-[#5A5F5C] text-sm resize-none focus:outline-none focus:border-[#1F5C4A]/50 transition-colors"
         />
@@ -530,7 +536,7 @@ export default function StudyViewPage() {
                   : 'bg-[#B42318]/8 border-[#B42318]/20 text-[#B42318]'
               }`}
             >
-              {practiceEntry.feedback}
+              {t(practiceEntry.feedback)}
             </motion.div>
           )}
         </AnimatePresence>
@@ -542,14 +548,14 @@ export default function StudyViewPage() {
               disabled={!currentAnswer.trim()}
               className="px-5 py-2.5 rounded-[4px] bg-[#1F5C4A] text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
             >
-              Get Feedback
+              {t("Get Feedback")}
             </button>
           ) : (
             <button
               onClick={() => { setCurrentAnswer(''); setScored(false) }}
               className="px-5 py-2.5 rounded-[4px] bg-lp-ink/8 hover:bg-lp-ink/12 text-[#3C403E] text-sm font-medium transition-colors"
             >
-              Try again
+              {t("Try again")}
             </button>
           )}
           <div className="flex gap-2 ml-auto">
@@ -592,7 +598,7 @@ export default function StudyViewPage() {
                 ? 'w-2 h-2 bg-[#1F7A4D]'
                 : 'w-2 h-2 bg-lp-ink/15 hover:bg-lp-ink/25'
             }`}
-            aria-label={`Practice question ${i + 1}`}
+            aria-label={t("Practice question {v0}", { v0: i + 1 })}
           />
         ))}
       </div>
@@ -615,13 +621,13 @@ export default function StudyViewPage() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
-              Back
+              {t("Back")}
             </button>
             <div className="w-px h-5 bg-lp-ink/10" />
             <div>
               <h1 className="text-xl font-bold text-[#1B1D1C] leading-tight">{prep.company}</h1>
               <p className="text-[#1F5C4A] text-sm font-medium">{prep.position}</p>
-              <p className="text-[#5A5F5C] text-xs mt-0.5">{formatDate(prep.createdAt)}</p>
+              <p className="text-[#5A5F5C] text-xs mt-0.5">{formatDate(locale, prep.createdAt)}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -632,12 +638,12 @@ export default function StudyViewPage() {
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              PDF
+              {t("PDF")}
             </button>
             <button
               onClick={() => setShowDelete(true)}
               className="p-2 rounded-[4px] bg-lp-ink/5 hover:bg-[#B42318]/10 hover:text-[#B42318] text-[#5A5F5C] transition-colors"
-              aria-label="Delete session"
+              aria-label={t("Delete session")}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -656,7 +662,7 @@ export default function StudyViewPage() {
                 : 'text-[#5A5F5C] hover:text-[#3C403E]'
             }`}
           >
-            Study Cards
+            {t("Study Cards")}
           </button>
           <button
             onClick={() => setPracticeMode(true)}
@@ -666,7 +672,7 @@ export default function StudyViewPage() {
                 : 'text-[#5A5F5C] hover:text-[#3C403E]'
             }`}
           >
-            Practice Mode
+            {t("Practice Mode")}
             {practicedCount > 0 && (
               <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${practiceMode ? 'bg-lp-ink/20' : 'bg-[#1F7A4D]/20 text-[#1F7A4D]'}`}>
                 {practicedCount}/{questions.length}
@@ -693,7 +699,7 @@ export default function StudyViewPage() {
           <div className="mt-8">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-1 h-5 rounded-full bg-[#1F7A4D] " />
-              <h2 className="text-base font-semibold text-[#1B1D1C]">Questions to Ask the Interviewer</h2>
+              <h2 className="text-base font-semibold text-[#1B1D1C]">{t("Questions to Ask the Interviewer")}</h2>
             </div>
             <div className="space-y-3">
               {questionsToAsk.map((q, i) => (
@@ -708,7 +714,7 @@ export default function StudyViewPage() {
                   <button
                     onClick={() => handleCopy(q, i)}
                     className="flex-shrink-0 p-1.5 rounded-[4px] hover:bg-lp-ink/8 text-[#5A5F5C] hover:text-[#3C403E] transition-colors"
-                    aria-label="Copy question"
+                    aria-label={t("Copy question")}
                   >
                     {copiedIdx === i ? (
                       <svg className="w-3.5 h-3.5 text-[#1F7A4D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -732,10 +738,10 @@ export default function StudyViewPage() {
       <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
         <div ref={printRef} style={{ fontFamily: 'Arial, sans-serif', padding: '24px', maxWidth: '700px', color: '#111' }}>
           <h1 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '4px' }}>
-            Interview Prep — {prep.position} @ {prep.company}
+            {t("Interview Prep — {v0} @ {v1}", { v0: prep.position, v1: prep.company })}
           </h1>
           <p style={{ fontSize: '11px', color: '#666', marginBottom: '20px' }}>
-            {formatDate(prep.createdAt)} · {questions.length} questions
+            {t("{v0} · {v1} questions", { v0: formatDate(locale, prep.createdAt), v1: questions.length })}
           </p>
           {questions.map((q, i) => (
             <div key={i} style={{ marginBottom: '20px', pageBreakInside: 'avoid' }}>
@@ -743,16 +749,16 @@ export default function StudyViewPage() {
                 Q{i + 1}. {q.question}
               </p>
               <p style={{ fontSize: '11px', color: '#444', marginBottom: '4px' }}>
-                <strong>Framework:</strong> {q.answer_framework}
+                <strong>{t("Framework:")}</strong> {q.answer_framework}
               </p>
               {q.star_example && (
                 <p style={{ fontSize: '11px', color: '#555', marginBottom: '4px' }}>
-                  <strong>STAR Example:</strong> {q.star_example}
+                  <strong>{t("STAR Example:")}</strong> {q.star_example}
                 </p>
               )}
               {answers[i] && (
                 <div style={{ background: '#f5f5f5', padding: '8px', borderRadius: '6px', marginTop: '6px' }}>
-                  <p style={{ fontSize: '10px', fontWeight: 600, color: '#333' }}>Your Practice Answer (Score: {answers[i].score})</p>
+                  <p style={{ fontSize: '10px', fontWeight: 600, color: '#333' }}>{t("Your Practice Answer (Score: {v0})", { v0: answers[i].score })}</p>
                   <p style={{ fontSize: '10px', color: '#555', marginTop: '2px' }}>{answers[i].text}</p>
                 </div>
               )}
@@ -761,7 +767,7 @@ export default function StudyViewPage() {
           {questionsToAsk.length > 0 && (
             <>
               <div style={{ borderTop: '1px solid #ddd', paddingTop: '16px', marginTop: '16px' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px' }}>Questions to Ask the Interviewer</p>
+                <p style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px' }}>{t("Questions to Ask the Interviewer")}</p>
                 {questionsToAsk.map((q, i) => (
                   <p key={i} style={{ fontSize: '11px', color: '#444', marginBottom: '6px' }}>
                     {i + 1}. {q}
@@ -796,9 +802,9 @@ export default function StudyViewPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-[#1B1D1C] text-center mb-2">Delete Session?</h3>
+                <h3 className="text-lg font-semibold text-[#1B1D1C] text-center mb-2">{t("Delete Session?")}</h3>
                 <p className="text-[#3C403E] text-sm text-center mb-6">
-                  This prep session will be permanently deleted.
+                  {t("This prep session will be permanently deleted.")}
                 </p>
                 <div className="flex gap-3">
                   <button
@@ -806,7 +812,7 @@ export default function StudyViewPage() {
                     disabled={deleting}
                     className="flex-1 px-4 py-2.5 rounded-[4px] bg-lp-ink/5 hover:bg-lp-ink/8 text-[#3C403E] text-sm font-medium transition-colors disabled:opacity-50"
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                   <button
                     onClick={handleDelete}
@@ -814,8 +820,8 @@ export default function StudyViewPage() {
                     className="flex-1 px-4 py-2.5 rounded-[4px] bg-[#B42318] hover:bg-[#912018] text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {deleting ? (
-                      <><div className="w-4 h-4 border-2 border-lp-rule border-t-lp-rule rounded-full animate-spin" />Deleting…</>
-                    ) : 'Delete'}
+                      <><div className="w-4 h-4 border-2 border-lp-rule border-t-lp-rule rounded-full animate-spin" />{t("Deleting…")}</>
+                    ) : t("Delete")}
                   </button>
                 </div>
               </div>

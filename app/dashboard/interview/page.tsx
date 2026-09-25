@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -36,6 +38,7 @@ const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 // ── STARAnswer ───────────────────────────────────────────────────────────────
 
 function STARAnswer({ text }: { text: string }) {
+  const t = useT()
   const sections = text.split(/(?=Situation:|Task:|Action:|Result:)/i)
   const parsed = sections
     .map((section) => {
@@ -54,7 +57,7 @@ function STARAnswer({ text }: { text: string }) {
       {parsed.map((s, i) => (
         <div key={i} className="mb-5">
           <span className="block text-[0.75rem] font-bold uppercase tracking-[0.1em] text-[#1F5C4A] mb-1">
-            {s.label}
+            {t(s.label.charAt(0).toUpperCase() + s.label.slice(1).toLowerCase())}
           </span>
           <p className="text-[0.95rem] leading-[1.6] pl-3 border-l-2 border-[#1F5C4A] text-[#1B1D1C] mb-4">
             {s.content}
@@ -93,6 +96,7 @@ function FlipCard({
   targetPosition: string
   uid?: string
 }) {
+  const t = useT()
   const [flipped, setFlipped] = useState(false)
   const [userAnswer, setUserAnswer] = useState('')
   const [feedback, setFeedback] = useState<PracticeFeedback | null>(null)
@@ -118,14 +122,14 @@ function FlipCard({
       })
       if (res.status === 429) {
         const j = await res.json()
-        setScoreError(`Rate limit reached. Try again in ${j.retryAfter}s.`)
+        setScoreError(t("Rate limit reached. Try again in {v0}s.", { v0: j.retryAfter }))
         return
       }
       const json = await res.json()
-      if (!json.success) throw new Error(json.error ?? 'Scoring failed')
+      if (!json.success) throw new Error(json.error ?? t("Scoring failed"))
       setFeedback(json.data as PracticeFeedback)
     } catch (err) {
-      setScoreError(err instanceof Error ? err.message : 'Scoring failed')
+      setScoreError(err instanceof Error ? err.message : t("Scoring failed"))
     } finally {
       setIsScoring(false)
     }
@@ -155,7 +159,7 @@ function FlipCard({
               </span>
               {!isPracticeMode && (
                 <span className="text-xs text-[#5A5F5C] flex items-center gap-1">
-                  <RotateCcw className="w-3 h-3" /> Tap to reveal
+                  <RotateCcw className="w-3 h-3" />{' '}{t("Tap to reveal")}
                 </span>
               )}
             </div>
@@ -165,10 +169,10 @@ function FlipCard({
                 <textarea
                   className={`${TEXTAREA_CLASS} text-sm`}
                   rows={4}
-                  placeholder="Type your answer here using the STAR method…"
+                  placeholder={t("Type your answer here using the STAR method…")}
                   value={userAnswer}
                   onChange={(e) => setUserAnswer(e.target.value)}
-                  aria-label="Your answer"
+                  aria-label={t("Your answer")}
                 />
                 {scoreError && (
                   <p className="text-xs text-[#B42318] flex items-center gap-1">
@@ -186,23 +190,23 @@ function FlipCard({
                       ))}
                       <div className="flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
                         <Star className="w-3 h-3 text-[#1F5C4A]" />
-                        <span className="text-xs font-bold text-[#1F5C4A]">Overall: {feedback.overall}/10</span>
+                        <span className="text-xs font-bold text-[#1F5C4A]">{t("Overall: {v0}/10", { v0: feedback.overall })}</span>
                       </div>
                     </div>
                     {feedback.strengths.length > 0 && (
                       <div>
-                        <p className="text-xs font-semibold text-[#1F7A4D] mb-1">Strengths</p>
+                        <p className="text-xs font-semibold text-[#1F7A4D] mb-1">{t("Strengths")}</p>
                         {feedback.strengths.map((s, i) => <p key={i} className="text-xs text-[#3C403E]">✓ {s}</p>)}
                       </div>
                     )}
                     {feedback.improvements.length > 0 && (
                       <div>
-                        <p className="text-xs font-semibold text-[#8A5A00] mb-1">Improvements</p>
+                        <p className="text-xs font-semibold text-[#8A5A00] mb-1">{t("Improvements")}</p>
                         {feedback.improvements.map((s, i) => <p key={i} className="text-xs text-[#3C403E]">→ {s}</p>)}
                       </div>
                     )}
                     <button onClick={() => { setFeedback(null); setUserAnswer('') }} className="text-xs text-[#1F5C4A] underline">
-                      Try again
+                      {t("Try again")}
                     </button>
                   </div>
                 ) : (
@@ -212,8 +216,8 @@ function FlipCard({
                     className="flex items-center gap-2 px-4 py-2 rounded-[4px] text-sm font-semibold bg-[#B42318] text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isScoring
-                      ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Scoring…</>
-                      : <><Send className="w-3.5 h-3.5" /> Submit Answer</>
+                      ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />{' '}{t("Scoring…")}</>
+                      : <><Send className="w-3.5 h-3.5" />{' '}{t("Submit Answer")}</>
                     }
                   </button>
                 )}
@@ -231,16 +235,16 @@ function FlipCard({
           <div className="rounded-[10px] border border-[#1F5C4A]/10 bg-[#FFFFFF] p-6 flex flex-col gap-3">
             <div className="flex items-start justify-between">
               <span className="px-2.5 py-1 rounded-[4px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">
-                STAR Framework
+                {t("STAR Framework")}
               </span>
               <span className="text-xs text-[#5A5F5C] flex items-center gap-1">
-                <RotateCcw className="w-3 h-3" /> Tap to flip back
+                <RotateCcw className="w-3 h-3" />{' '}{t("Tap to flip back")}
               </span>
             </div>
             <p className="text-[0.95rem] text-[#3C403E] leading-[1.7] mb-3">{question.answer_framework}</p>
             {question.star_example && (
               <div className="p-3 rounded-[10px] bg-[#1F5C4A]/5 border border-[#1F5C4A]/15">
-                <p className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide mb-3">Example</p>
+                <p className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide mb-3">{t("Example")}</p>
                 <STARAnswer text={question.star_example} />
               </div>
             )}
@@ -254,13 +258,14 @@ function FlipCard({
 // ── QuestionsToAsk ───────────────────────────────────────────────────────────
 
 function QuestionsToAsk({ questions }: { questions: string[] }) {
+  const t = useT()
   const [copied, setCopied] = useState<number | null>(null)
   return (
     <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
       <div className="rounded-[10px]  bg-[#FFFFFF] p-5">
         <div className="flex items-center gap-2 mb-4">
           <BookOpen className="w-4 h-4 text-[#1F5C4A]" />
-          <h3 className="text-sm font-semibold text-lp-ink">Questions to Ask the Interviewer</h3>
+          <h3 className="text-sm font-semibold text-lp-ink">{t("Questions to Ask the Interviewer")}</h3>
         </div>
         <div className="space-y-3">
           {questions.map((q, i) => (
@@ -274,10 +279,10 @@ function QuestionsToAsk({ questions }: { questions: string[] }) {
               <div className="w-6 h-6 rounded-full bg-[#1F5C4A]/20 border border-[#1F5C4A]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-xs font-bold text-[#1F5C4A]">{i + 1}</span>
               </div>
-              <p className="flex-1 text-[0.95rem] text-[#1B1D1C] leading-[1.6] italic">&ldquo;{q}&rdquo;</p>
+              <p className="flex-1 text-[0.95rem] text-[#1B1D1C] leading-[1.6] italic">{t("“{v0}”", { v0: q })}</p>
               <button
                 onClick={async () => { await navigator.clipboard.writeText(q); setCopied(i); setTimeout(() => setCopied(null), 1500) }}
-                aria-label={`Copy question ${i + 1}`}
+                aria-label={t("Copy question {v0}", { v0: i + 1 })}
                 className="flex-shrink-0 p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/5 transition-all"
               >
                 {copied === i ? <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" /> : <Copy className="w-3.5 h-3.5" />}
@@ -361,6 +366,7 @@ function parseInterviewPrep(raw: string): InterviewPrep | null {
 // ── Main page ────────────────────────────────────────────────────────────────
 
 export default function InterviewPage() {
+  const t = useT()
   const { user } = useAuth()
   const { profile, updateProfile } = useCareerStore()
 
@@ -414,7 +420,7 @@ export default function InterviewPage() {
           updateProfile({ generated: { ...profile.generated, interview_prep: parsed } })
         }
       } else {
-        setGenerateError('Could not parse the interview prep. Check browser console (F12) for details.')
+        setGenerateError(t("Could not parse the interview prep. Check browser console (F12) for details."))
       }
     }
   }, [position, company, experienceSummary, user?.uid, stream, profile, updateProfile])
@@ -433,11 +439,11 @@ export default function InterviewPage() {
       setSavedToStudyList(true)
       showToast({
         type: 'success',
-        message: 'Saved to study list!',
-        link: { label: 'View all sessions →', href: '/dashboard/interview/saved' },
+        message: t("Saved to study list!"),
+        link: { label: t('View all sessions →'), href: '/dashboard/interview/saved' },
       })
     } catch {
-      showToast({ type: 'error', message: 'Failed to save. Please try again.' })
+      showToast({ type: 'error', message: t("Failed to save. Please try again.") })
     } finally {
       setIsSaving(false)
     }
@@ -445,8 +451,8 @@ export default function InterviewPage() {
 
   return (
     <ProGate
-      featureName="Interview Prep System"
-      featureDescription="Generate the 8 most likely interview questions with STAR frameworks, plus 3 strategic questions to ask. Practice mode with AI feedback included."
+      featureName={t("Interview Prep System")}
+      featureDescription={t("Generate the 8 most likely interview questions with STAR frameworks, plus 3 strategic questions to ask. Practice mode with AI feedback included.")}
       icon={<MessageSquare className="w-6 h-6 text-[#1F5C4A]" />}
     >
     <div className="space-y-6 pb-20 md:pb-0">
@@ -482,7 +488,7 @@ export default function InterviewPage() {
             <div className="w-9 h-9 rounded-[10px] bg-[#B42318]/10 flex items-center justify-center">
               <MessageSquare className="w-5 h-5 text-lp-ink" />
             </div>
-            <h1 className="font-heading text-2xl font-bold text-lp-ink">Interview Prep</h1>
+            <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("Interview Prep")}</h1>
           </div>
           <div className="flex items-center gap-2">
             {/* Save — only show when prep results exist */}
@@ -490,7 +496,7 @@ export default function InterviewPage() {
               <button
                 onClick={handleSaveToStudyList}
                 disabled={savedToStudyList || isSaving}
-                aria-label="Save to study list"
+                aria-label={t("Save to study list")}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
                   bg-[#1F5C4A] text-white
                    transition-all duration-200
@@ -502,7 +508,7 @@ export default function InterviewPage() {
                   ? <CheckCircle className="w-3.5 h-3.5" />
                   : <BookMarked className="w-3.5 h-3.5" />
                 }
-                {isSaving ? 'Saving…' : savedToStudyList ? 'Saved!' : 'Save'}
+                {isSaving ? t("Saving…") : savedToStudyList ? t("Saved!") : t("Save")}
               </button>
             )}
             <Link
@@ -512,12 +518,12 @@ export default function InterviewPage() {
                 transition-all duration-200"
             >
               <BookMarked className="w-3.5 h-3.5" />
-              My Sessions
+              {t("My Sessions")}
             </Link>
           </div>
         </div>
         <p className="text-[#3C403E] text-sm ml-12">
-          8 likely questions with STAR frameworks, plus 3 strategic questions to ask.
+          {t("8 likely questions with STAR frameworks, plus 3 strategic questions to ask.")}
         </p>
       </motion.div>
 
@@ -534,16 +540,16 @@ export default function InterviewPage() {
               {profile && profile.experience.length > 0 && (
                 <div className="flex items-center gap-2 p-3 rounded-[10px] bg-[#1F7A4D]/10 border border-[#1F7A4D]/20">
                   <CheckCircle className="w-4 h-4 text-[#1F7A4D] flex-shrink-0" />
-                  <p className="text-xs text-[#1F7A4D]">Experience auto-loaded from Career Profile.</p>
+                  <p className="text-xs text-[#1F7A4D]">{t("Experience auto-loaded from Career Profile.")}</p>
                 </div>
               )}
               <div>
-                <label className={LABEL_CLASS}>Position <span className="text-[#B42318]">*</span></label>
-                <input type="text" value={position} onChange={(e) => setPosition(e.target.value)} placeholder="Senior Backend Engineer" className={INPUT_CLASS} aria-label="Position" style={{ fontSize: '16px' }} />
+                <label className={LABEL_CLASS}>{t("Position")}{' '}<span className="text-[#B42318]">*</span></label>
+                <input type="text" value={position} onChange={(e) => setPosition(e.target.value)} placeholder={t("Senior Backend Engineer")} className={INPUT_CLASS} aria-label={t("Position")} style={{ fontSize: '16px' }} />
               </div>
               <div>
-                <label className={LABEL_CLASS}>Company Name <span className="text-[#B42318]">*</span></label>
-                <CompanyAutocomplete value={company} onChange={setCompany} placeholder="Stripe" className={INPUT_CLASS} aria-label="Company" />
+                <label className={LABEL_CLASS}>{t("Company Name")}{' '}<span className="text-[#B42318]">*</span></label>
+                <CompanyAutocomplete value={company} onChange={setCompany} placeholder={t("Stripe")} className={INPUT_CLASS} aria-label={t("Company")} />
               </div>
 
               {generateError && (
@@ -551,11 +557,11 @@ export default function InterviewPage() {
                   <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
                     <Zap className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
-                      <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
+                      <p className="text-xs font-medium text-lp-ink">{t("Monthly limit reached")}</p>
+                      <p className="text-xs text-[#3C403E]">{t("You've used all 3 free generations this month.")}</p>
                     </div>
                     <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
-                      Upgrade →
+                      {t("Upgrade →")}
                     </Link>
                   </div>
                 ) : (
@@ -574,8 +580,8 @@ export default function InterviewPage() {
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isStreaming
-                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Preparing…</>
-                  : <><Sparkles className="w-4 h-4" /> Generate Interview Prep</>
+                  ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Preparing…")}</>
+                  : <><Sparkles className="w-4 h-4" />{' '}{t("Generate Interview Prep")}</>
                 }
               </button>
             </div>
@@ -588,7 +594,7 @@ export default function InterviewPage() {
 
                 {/* Practice Mode toggle — fixed overflow */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">Practice Mode</span>
+                  <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Practice Mode")}</span>
                   <button
                     onClick={() => setIsPracticeMode(!isPracticeMode)}
                     className={`relative inline-flex items-center w-12 h-6 rounded-full
@@ -596,7 +602,7 @@ export default function InterviewPage() {
                       ${isPracticeMode ? 'bg-[#B42318]' : 'bg-lp-ink/10'}`}
                     role="switch"
                     aria-checked={isPracticeMode}
-                    aria-label="Toggle practice mode"
+                    aria-label={t("Toggle practice mode")}
                   >
                     <span
                       className={`inline-block w-5 h-5 bg-white rounded-full
@@ -607,23 +613,23 @@ export default function InterviewPage() {
                 </div>
 
                 <div className="border-t border-lp-hairline pt-3">
-                  <p className="text-xs text-[#5A5F5C] mb-2">Card {currentCard + 1} of {prep.questions.length}</p>
+                  <p className="text-xs text-[#5A5F5C] mb-2">{t("Card {v0} of {v1}", { v0: currentCard + 1, v1: prep.questions.length })}</p>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setCurrentCard(Math.max(0, currentCard - 1))}
                       disabled={currentCard === 0}
-                      aria-label="Previous question"
+                      aria-label={t("Previous question")}
                       className="flex-1 flex items-center justify-center gap-1 py-2 rounded-[4px] border border-lp-rule text-[#3C403E] text-sm hover:text-lp-ink hover:bg-lp-ink/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     >
-                      <ChevronLeft className="w-4 h-4" /> Prev
+                      <ChevronLeft className="w-4 h-4" />{' '}{t("Prev")}
                     </button>
                     <button
                       onClick={() => setCurrentCard(Math.min(prep.questions.length - 1, currentCard + 1))}
                       disabled={currentCard === prep.questions.length - 1}
-                      aria-label="Next question"
+                      aria-label={t("Next question")}
                       className="flex-1 flex items-center justify-center gap-1 py-2 rounded-[4px] border border-lp-rule text-[#3C403E] text-sm hover:text-lp-ink hover:bg-lp-ink/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     >
-                      Next <ChevronRight className="w-4 h-4" />
+                      {t("Next")}{' '}<ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -645,7 +651,7 @@ export default function InterviewPage() {
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <div className="rounded-[10px] border border-[#B42318]/20 bg-[#B42318]/5 p-4 flex items-center gap-3">
                   <Loader2 className="w-4 h-4 text-[#B42318] animate-spin" />
-                  <span className="text-sm text-[#B42318] font-medium">AURI is preparing your interview questions…</span>
+                  <span className="text-sm text-[#B42318] font-medium">{t("AURI is preparing your interview questions…")}</span>
                 </div>
                 {Array.from({ length: 2 }).map((_, i) => (
                   <div key={i} className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
@@ -664,12 +670,12 @@ export default function InterviewPage() {
                   {isPracticeMode ? (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#B42318]/10 border border-[#B42318]/20">
                       <span className="w-2 h-2 rounded-full bg-[#B42318]" />
-                      <span className="text-xs font-medium text-[#B42318]">Practice Mode Active — Type your answers below</span>
+                      <span className="text-xs font-medium text-[#B42318]">{t("Practice Mode Active — Type your answers below")}</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-lp-ink/5 border border-lp-rule">
                       <BookOpen className="w-3.5 h-3.5 text-[#3C403E]" />
-                      <span className="text-xs text-[#3C403E]">Tap any card to reveal the STAR framework</span>
+                      <span className="text-xs text-[#3C403E]">{t("Tap any card to reveal the STAR framework")}</span>
                     </div>
                   )}
                 </div>
@@ -721,8 +727,8 @@ export default function InterviewPage() {
                   <div className="w-14 h-14 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mb-4">
                     <MessageSquare className="w-6 h-6 text-[#B42318]" />
                   </div>
-                  <p className="text-sm font-medium text-[#3C403E]">Your interview prep will appear here</p>
-                  <p className="text-xs text-[#5A5F5C] mt-1">Enter the position and company, then click Generate</p>
+                  <p className="text-sm font-medium text-[#3C403E]">{t("Your interview prep will appear here")}</p>
+                  <p className="text-xs text-[#5A5F5C] mt-1">{t("Enter the position and company, then click Generate")}</p>
                 </div>
               </motion.div>
             )}

@@ -23,12 +23,20 @@ export function toDate(value: unknown): Date | null {
   return null
 }
 
+const KO_PREFIX: Record<string, string> = { Updated: '수정', Saved: '저장' }
+
 export function formatResumeDate(
   value: unknown,
-  prefix: string = 'Updated'
+  prefix: string = 'Updated',
+  locale: 'en' | 'ko' = 'en'
 ): string {
   const date = toDate(value)
-  if (!date) return 'Date unavailable'
+  if (!date) return locale === 'ko' ? '날짜 정보 없음' : 'Date unavailable'
+  if (locale === 'ko') {
+    const formatted = date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
+    const p = prefix ? KO_PREFIX[prefix] ?? prefix : ''
+    return p ? `${formatted} ${p}` : formatted
+  }
   const formatted = date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',

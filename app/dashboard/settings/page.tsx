@@ -1,4 +1,6 @@
 'use client'
+
+import { useLocale } from '@/lib/i18n/client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -19,6 +21,7 @@ async function getToken(): Promise<string | null> {
 }
 
 export default function SettingsPage() {
+  const { t, locale, setLocale } = useLocale()
   const { user, isAuthenticated } = useAuth()
   const { handleSignOut } = useSignOut()
   const [billingLoading, setBillingLoading] = useState(false)
@@ -64,7 +67,7 @@ export default function SettingsPage() {
           <div className="w-9 h-9 rounded-[10px] bg-[#5A5F5C]/10 flex items-center justify-center">
             <Settings className="w-5 h-5 text-lp-ink" />
           </div>
-          <h1 className="font-heading text-2xl font-bold text-lp-ink">Settings</h1>
+          <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("Settings")}</h1>
         </div>
       </motion.div>
 
@@ -72,7 +75,7 @@ export default function SettingsPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING, delay: 0.1 }}
         className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
         <div className="rounded-[10px]  bg-[#FFFFFF] p-6 space-y-4">
-          <h2 className="font-heading font-semibold text-lp-ink">Account</h2>
+          <h2 className="font-heading font-semibold text-lp-ink">{t("Account")}</h2>
           <div className="flex items-center justify-between py-3 border-b border-lp-hairline">
             <div>
               <p className="text-sm text-lp-ink">{user?.displayName ?? ''}</p>
@@ -82,7 +85,7 @@ export default function SettingsPage() {
           <button type="button" onClick={handleSignOut}
             className="px-4 py-2 rounded-[4px] border border-[#B42318]/30 text-[#B42318]
               hover:bg-[#B42318]/10 transition-all duration-200 text-sm font-medium">
-            Sign Out
+            {t("Sign Out")}
           </button>
         </div>
       </motion.div>
@@ -91,7 +94,7 @@ export default function SettingsPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING, delay: 0.15 }}
         className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
         <div className="rounded-[10px]  bg-[#FFFFFF] p-6 space-y-4">
-          <h2 className="font-heading font-semibold text-lp-ink">Billing</h2>
+          <h2 className="font-heading font-semibold text-lp-ink">{t("Billing")}</h2>
 
           <div className="flex items-center justify-between py-3 border-b border-lp-hairline">
             <div className="flex items-center gap-3">
@@ -101,17 +104,17 @@ export default function SettingsPage() {
                   : 'bg-lp-ink/6'
               }`}>
                 {isPro ? (
-                  <Crown className="w-5 h-5 text-lp-ink" />
+                  <Crown className="w-5 h-5 text-white" />
                 ) : (
                   <Zap className="w-5 h-5 text-[#5A5F5C]" />
                 )}
               </div>
               <div>
                 <p className="text-sm font-medium text-lp-ink">
-                  {isPro === null ? 'Loading…' : isPro ? 'AURI Pro' : 'Free Plan'}
+                  {isPro === null ? t("Loading…") : isPro ? t("AURI Pro") : t("Free Plan")}
                 </p>
                 <p className="text-xs text-[#5A5F5C]">
-                  {isPro ? 'Unlimited AI generations' : '3 AI generations/month'}
+                  {isPro ? t("Unlimited AI generations") : t('3 AI generations/month')}
                 </p>
               </div>
             </div>
@@ -126,7 +129,7 @@ export default function SettingsPage() {
                 hover:text-lp-ink hover:bg-lp-ink/5 transition-all duration-200 text-sm font-medium
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {billingLoading ? 'Loading…' : 'Manage Billing'}
+              {billingLoading ? t("Loading…") : t("Manage Billing")}
             </button>
           )}
           {isPro === false && (
@@ -138,9 +141,35 @@ export default function SettingsPage() {
                  transition-all duration-200"
             >
               <Crown className="w-3.5 h-3.5" />
-              View Plans
+              {t("View Plans")}
             </Link>
           )}
+        </div>
+      </motion.div>
+      {/* Language card */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING, delay: 0.2 }}
+        className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-6 space-y-4">
+        <div>
+          <h2 className="font-heading font-semibold text-lp-ink">{t("Language")}</h2>
+          <p className="text-xs text-[#5A5F5C] mt-1">
+            {t("Changes the language of menus and buttons. Resumes, cover letters and interview prep are still written in English.")}
+          </p>
+        </div>
+        <div role="group" aria-label={t("Language")} className="inline-grid grid-cols-2 gap-1 rounded-md bg-lp-sunk p-1">
+          {([['en', 'English'], ['ko', '한국어']] as const).map(([code, name]) => (
+            <button
+              key={code}
+              type="button"
+              lang={code}
+              aria-pressed={locale === code}
+              onClick={() => setLocale(code)}
+              className={`min-h-[44px] rounded-[4px] px-5 text-sm ${
+                locale === code ? 'bg-white font-medium text-lp-ink' : 'text-[#3C403E] hover:text-lp-ink'
+              }`}
+            >
+              {name}
+            </button>
+          ))}
         </div>
       </motion.div>
     </div>

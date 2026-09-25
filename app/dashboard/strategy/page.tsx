@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -59,13 +61,14 @@ function ActionItem({ action, actionKey, completed, onToggle }: {
   completed: boolean
   onToggle: (key: string) => void
 }) {
+  const t = useT()
   return (
     <motion.div layout className={`flex items-start gap-3 p-3 rounded-[10px] border transition-all duration-200 ${
       completed ? 'border-[#1F7A4D]/20 bg-[#1F7A4D]/5' : 'border-lp-hairline bg-[#F4F2EC]/40 hover:border-lp-rule'
     }`}>
       <button
         onClick={() => onToggle(actionKey)}
-        aria-label={completed ? 'Mark incomplete' : 'Mark complete'}
+        aria-label={completed ? t("Mark incomplete") : t("Mark complete")}
         className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 transition-all ${
           completed ? 'border-[#1F7A4D] bg-[#1F7A4D]' : 'border-lp-rule hover:border-[#1F7A4D]/60'
         }`}
@@ -95,6 +98,7 @@ function DayCard({ day, dayIndex, completed, onToggle }: {
   completed: CompletedMap
   onToggle: (key: string) => void
 }) {
+  const t = useT()
   const [expanded, setExpanded] = useState(dayIndex === 0)
   const color = DAY_COLORS[dayIndex % DAY_COLORS.length]
   const completedCount = day.actions.filter((_, ai) => completed[`${day.day}-${ai}`]).length
@@ -113,7 +117,7 @@ function DayCard({ day, dayIndex, completed, onToggle }: {
             </div>
             <div>
               <p className="text-sm font-semibold text-lp-ink leading-tight">{day.theme}</p>
-              <p className="text-xs text-[#5A5F5C] mt-0.5">{completedCount}/{day.actions.length} actions complete</p>
+              <p className="text-xs text-[#5A5F5C] mt-0.5">{t("{v0}/{v1} actions complete", { v0: completedCount, v1: day.actions.length })}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -146,6 +150,7 @@ function DayCard({ day, dayIndex, completed, onToggle }: {
 const STORAGE_KEY = 'auri_strategy_completed'
 
 export default function StrategyPage() {
+  const t = useT()
   const { user } = useAuth()
   const { profile, updateProfile } = useCareerStore()
 
@@ -211,9 +216,9 @@ export default function StrategyPage() {
         const stripped = fullText.replace(/```json\n?|```\n?/g, '').trim()
         const start = stripped.indexOf('{')
         const end = stripped.lastIndexOf('}')
-        if (start === -1 || end === -1) throw new Error('No JSON object found')
+        if (start === -1 || end === -1) throw new Error(t("No JSON object found"))
         const parsed = JSON.parse(stripped.slice(start, end + 1)) as JobStrategy
-        if (!parsed.days || !Array.isArray(parsed.days)) throw new Error('Invalid structure')
+        if (!parsed.days || !Array.isArray(parsed.days)) throw new Error(t("Invalid structure"))
         setStrategy(parsed)
         setCompleted({})
         // Save to careerStore
@@ -221,7 +226,7 @@ export default function StrategyPage() {
           updateProfile({ generated: { ...profile.generated, job_strategy: parsed } })
         }
       } catch {
-        setGenerateError('Could not parse the strategy plan. Please try again.')
+        setGenerateError(t("Could not parse the strategy plan. Please try again."))
       }
     }
   }, [targetPosition, sectorOrIndustry, city, isRemote, companySizeOrType, user?.uid, stream, profile, updateProfile])
@@ -264,8 +269,8 @@ export default function StrategyPage() {
 
   return (
     <ProGate
-      featureName="7-Day Job Search Strategy"
-      featureDescription="Get a personalized, immediately executable 7-day action plan for your target role — with specific job sites, search terms, and daily actions."
+      featureName={t("7-Day Job Search Strategy")}
+      featureDescription={t("Get a personalized, immediately executable 7-day action plan for your target role — with specific job sites, search terms, and daily actions.")}
       icon={<Map className="w-6 h-6 text-[#1F5C4A]" />}
     >
     <div className="space-y-6 pb-20 md:pb-0">
@@ -275,14 +280,14 @@ export default function StrategyPage() {
             <div className="w-9 h-9 rounded-[10px] bg-[#1F7A4D]/10 flex items-center justify-center">
               <Map className="w-5 h-5 text-lp-ink" />
             </div>
-            <h1 className="font-heading text-2xl font-bold text-lp-ink">7-Day Job Strategy</h1>
+            <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("7-Day Job Strategy")}</h1>
           </div>
           <div className="flex items-center gap-2">
             {strategy && (
               <button
                 onClick={handleSave}
                 disabled={saving || !!savedId}
-                aria-label="Save strategy"
+                aria-label={t("Save strategy")}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
                   bg-[#1F5C4A] text-white
                    transition-all duration-200
@@ -294,7 +299,7 @@ export default function StrategyPage() {
                   ? <CheckCircle className="w-3.5 h-3.5" />
                   : <Save className="w-3.5 h-3.5" />
                 }
-                {saving ? 'Saving…' : savedId ? 'Saved!' : 'Save'}
+                {saving ? t("Saving…") : savedId ? t("Saved!") : t("Save")}
               </button>
             )}
             <Link
@@ -304,12 +309,12 @@ export default function StrategyPage() {
                 transition-all duration-200"
             >
               <FolderOpen className="w-3.5 h-3.5" />
-              My Strategies
+              {t("My Strategies")}
             </Link>
           </div>
         </div>
         <p className="text-[#3C403E] text-sm ml-12">
-          A personalized, immediately executable day-by-day job search plan with specific sites, search terms, and daily actions.
+          {t("A personalized, immediately executable day-by-day job search plan with specific sites, search terms, and daily actions.")}
         </p>
       </motion.div>
 
@@ -323,24 +328,24 @@ export default function StrategyPage() {
         >
           <div className="rounded-[10px]  bg-[#FFFFFF] p-5 space-y-4">
             <div>
-              <label className={LABEL_CLASS}>Target Position <span className="text-[#B42318]">*</span></label>
-              <input type="text" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} placeholder="Growth Marketing Manager" className={INPUT_CLASS} aria-label="Target position" style={{ fontSize: '16px' }} />
+              <label className={LABEL_CLASS}>{t("Target Position")}{' '}<span className="text-[#B42318]">*</span></label>
+              <input type="text" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} placeholder={t("Growth Marketing Manager")} className={INPUT_CLASS} aria-label={t("Target position")} style={{ fontSize: '16px' }} />
             </div>
             <div>
-              <label className={LABEL_CLASS}>Sector / Industry</label>
-              <input type="text" className={INPUT_CLASS} placeholder="FinTech, Healthcare, B2B SaaS…" value={sectorOrIndustry} onChange={(e) => setSectorOrIndustry(e.target.value)} aria-label="Sector" />
+              <label className={LABEL_CLASS}>{t("Sector / Industry")}</label>
+              <input type="text" className={INPUT_CLASS} placeholder={t("FinTech, Healthcare, B2B SaaS…")} value={sectorOrIndustry} onChange={(e) => setSectorOrIndustry(e.target.value)} aria-label={t("Sector")} />
             </div>
             <div>
-              <label className={LABEL_CLASS}>Location</label>
+              <label className={LABEL_CLASS}>{t("Location")}</label>
               <div className="flex items-center gap-2 mb-2">
-                <button onClick={() => setIsRemote(false)} className={`flex-1 py-2 rounded-[4px] text-xs font-medium border transition-all ${!isRemote ? 'border-[#1F7A4D]/40 bg-[#1F7A4D]/10 text-[#1F7A4D]' : 'border-lp-rule text-[#5A5F5C] hover:text-[#3C403E]'}`}>City</button>
-                <button onClick={() => setIsRemote(true)} className={`flex-1 py-2 rounded-[4px] text-xs font-medium border transition-all ${isRemote ? 'border-[#1F7A4D]/40 bg-[#1F7A4D]/10 text-[#1F7A4D]' : 'border-lp-rule text-[#5A5F5C] hover:text-[#3C403E]'}`}>Remote</button>
+                <button onClick={() => setIsRemote(false)} className={`flex-1 py-2 rounded-[4px] text-xs font-medium border transition-all ${!isRemote ? 'border-[#1F7A4D]/40 bg-[#1F7A4D]/10 text-[#1F7A4D]' : 'border-lp-rule text-[#5A5F5C] hover:text-[#3C403E]'}`}>{t("City")}</button>
+                <button onClick={() => setIsRemote(true)} className={`flex-1 py-2 rounded-[4px] text-xs font-medium border transition-all ${isRemote ? 'border-[#1F7A4D]/40 bg-[#1F7A4D]/10 text-[#1F7A4D]' : 'border-lp-rule text-[#5A5F5C] hover:text-[#3C403E]'}`}>{t("Remote")}</button>
               </div>
-              {!isRemote && <LocationAutocomplete value={city} onChange={setCity} placeholder="New York, NY" className={INPUT_CLASS} aria-label="City" />}
+              {!isRemote && <LocationAutocomplete value={city} onChange={setCity} placeholder={t("New York, NY")} className={INPUT_CLASS} aria-label={t("City")} />}
             </div>
             <div>
-              <label className={LABEL_CLASS}>Company Size / Type</label>
-              <input type="text" className={INPUT_CLASS} placeholder="Series B startups, Fortune 500…" value={companySizeOrType} onChange={(e) => setCompanySizeOrType(e.target.value)} aria-label="Company size" />
+              <label className={LABEL_CLASS}>{t("Company Size / Type")}</label>
+              <input type="text" className={INPUT_CLASS} placeholder={t("Series B startups, Fortune 500…")} value={companySizeOrType} onChange={(e) => setCompanySizeOrType(e.target.value)} aria-label={t("Company size")} />
             </div>
 
             {generateError && (
@@ -348,11 +353,11 @@ export default function StrategyPage() {
                 <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
                   <Zap className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
-                    <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
+                    <p className="text-xs font-medium text-lp-ink">{t("Monthly limit reached")}</p>
+                    <p className="text-xs text-[#3C403E]">{t("You've used all 3 free generations this month.")}</p>
                   </div>
                   <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
-                    Upgrade →
+                    {t("Upgrade →")}
                   </Link>
                 </div>
               ) : (
@@ -370,7 +375,7 @@ export default function StrategyPage() {
                 bg-[#1F7A4D] text-white font-semibold text-sm
                 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {isStreaming ? <><Loader2 className="w-4 h-4 animate-spin" /> Building Plan…</> : <><Sparkles className="w-4 h-4" /> Build 7-Day Plan</>}
+              {isStreaming ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Building Plan…")}</> : <><Sparkles className="w-4 h-4" />{' '}{t("Build 7-Day Plan")}</>}
             </button>
           </div>
         </motion.div>
@@ -387,7 +392,7 @@ export default function StrategyPage() {
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
                 <div className="rounded-[10px] border border-[#1F7A4D]/20 bg-[#1F7A4D]/5 p-4 flex items-center gap-3">
                   <Loader2 className="w-4 h-4 text-[#1F7A4D] animate-spin" />
-                  <span className="text-sm text-[#1F7A4D] font-medium">AURI is building your 7-day plan…</span>
+                  <span className="text-sm text-[#1F7A4D] font-medium">{t("AURI is building your 7-day plan…")}</span>
                 </div>
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
@@ -405,15 +410,15 @@ export default function StrategyPage() {
                   <div className="rounded-[10px]  bg-[#FFFFFF] p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <p className="text-sm font-semibold text-lp-ink">{completedCount} / {totalActions} actions completed</p>
-                        <p className="text-xs text-[#5A5F5C] mt-0.5">7-day plan for {targetPosition}</p>
+                        <p className="text-sm font-semibold text-lp-ink">{t("{v0} / {v1} actions completed", { v0: completedCount, v1: totalActions })}</p>
+                        <p className="text-xs text-[#5A5F5C] mt-0.5">{t("7-day plan for {v0}", { v0: targetPosition })}</p>
                       </div>
                       <button
                         onClick={async () => { if (!strategy) return; await navigator.clipboard.writeText(buildPlanText(strategy)); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
                       >
                         {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" /> : <Copy className="w-3.5 h-3.5" />}
-                        {copied ? 'Copied!' : 'Copy Plan'}
+                        {copied ? t("Copied!") : t("Copy Plan")}
                       </button>
                     </div>
                     <div className="h-2 rounded-full bg-lp-ink/6 overflow-hidden">
@@ -440,8 +445,8 @@ export default function StrategyPage() {
                   <div className="w-14 h-14 rounded-[10px] bg-[#1F7A4D]/10 border border-[#1F7A4D]/20 flex items-center justify-center mb-4">
                     <Map className="w-6 h-6 text-[#1F7A4D]" />
                   </div>
-                  <p className="text-sm font-medium text-[#3C403E]">Your 7-day plan will appear here</p>
-                  <p className="text-xs text-[#5A5F5C] mt-1">Fill in your target role and click Build Plan</p>
+                  <p className="text-sm font-medium text-[#3C403E]">{t("Your 7-day plan will appear here")}</p>
+                  <p className="text-xs text-[#5A5F5C] mt-1">{t("Fill in your target role and click Build Plan")}</p>
                 </div>
               </motion.div>
             )}

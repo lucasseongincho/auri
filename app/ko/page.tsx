@@ -1,10 +1,7 @@
+import '@/lib/i18n/fonts'
 import type { Metadata } from 'next'
-import '@fontsource/noto-serif-kr/500.css'
-import '@fontsource/noto-serif-kr/600.css'
-import '@fontsource/ibm-plex-sans-kr/400.css'
-import '@fontsource/ibm-plex-sans-kr/500.css'
-import '@fontsource/ibm-plex-sans-kr/600.css'
 import Landing from '@/components/landing/Landing'
+import { RememberLocale } from '@/lib/i18n/client'
 import { ko } from '@/components/landing/copy'
 
 const title = 'AURI — 해외 취업을 위한 영문 이력서 · 커버레터 · 영어 면접 준비'
@@ -33,5 +30,10 @@ export const metadata: Metadata = {
 }
 
 export default function KoreanLandingPage() {
-  return <Landing c={ko} />
+  return (
+    <>
+      <RememberLocale locale='ko' />
+      <Landing c={ko} />
+    </>
+  )
 }

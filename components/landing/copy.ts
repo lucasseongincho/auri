@@ -93,7 +93,7 @@ export type LandingCopy = {
   }
   testimonialLabel: string
   pricing: PricingCopy
-  footer: { poweredBy: string; copyright: string; label: string; links: { label: string; href: string }[] }
+  footer: { copyright: string; label: string; links: { label: string; href: string }[] }
 }
 
 const KEYWORDS = ['Tableau', 'SQL', 'stakeholders', 'Python']
@@ -293,7 +293,6 @@ export const en: LandingCopy = {
     currencyNote: null,
   },
   footer: {
-    poweredBy: "AI features run on Anthropic's Claude.",
     copyright: '© 2026 AURI',
     label: 'Footer',
     links: [
@@ -489,7 +488,6 @@ export const ko: LandingCopy = {
     currencyNote: '결제는 미국 달러(USD)로 진행됩니다.',
   },
   footer: {
-    poweredBy: 'AI 기능은 Anthropic의 Claude로 동작합니다.',
     copyright: '© 2026 AURI',
     label: '하단 메뉴',
     links: [

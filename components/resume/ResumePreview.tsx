@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Download, Copy, CheckCircle, Loader2, Layout, AlertCircle, X } from 'lucide-react'
@@ -151,6 +153,7 @@ interface MobileResumeCardProps {
 }
 
 function MobileResumeCard({ data, personal }: MobileResumeCardProps) {
+  const t = useT()
   const safe = sanitizeResumeData(data)
   return (
     <div className="md:hidden w-full rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
@@ -190,7 +193,7 @@ function MobileResumeCard({ data, personal }: MobileResumeCardProps) {
                       <p className="text-xs text-gray-500">{job.company}</p>
                     </div>
                     <p className="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">
-                      {job.start} – {job.end || 'Present'}
+                      {job.start} – {job.end || t("Present")}
                     </p>
                   </div>
                   {job.bullets.length > 0 && (
@@ -264,6 +267,7 @@ export default function ResumePreview({
   streamText = '',
   forcedScale,
 }: ResumePreviewProps) {
+  const t = useT()
   const previewRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
@@ -320,7 +324,7 @@ export default function ResumePreview({
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(body.error ?? `Server responded ${res.status}`)
+        throw new Error(body.error ?? t("Server responded {v0}", { v0: res.status }))
       }
 
       const blob = await res.blob()
@@ -335,7 +339,7 @@ export default function ResumePreview({
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error'
       console.error('[pdf] Download failed:', msg)
-      setPdfError('PDF generation is temporarily unavailable — please try again in a moment.')
+      setPdfError(t("PDF generation is temporarily unavailable — please try again in a moment."))
     } finally {
       el.classList.remove('printing')
       setDownloading(false)
@@ -368,25 +372,25 @@ export default function ResumePreview({
           <button
             onClick={handleCopyATS}
             disabled={!safeData || isStreaming}
-            aria-label="Copy plain text for ATS portals"
+            aria-label={t("Copy plain text for ATS portals")}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium
               border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
               transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" /> : <Copy className="w-3.5 h-3.5" />}
-            {copied ? 'Copied!' : 'Copy for ATS'}
+            {copied ? t("Copied!") : t("Copy for ATS")}
           </button>
           <button
             onClick={handleDownloadPDF}
             disabled={!safeData || isStreaming || downloading}
-            aria-label="Download resume as PDF"
+            aria-label={t("Download resume as PDF")}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-semibold
               bg-[#1F5C4A] text-white
                transition-all duration-200
               disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {downloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-            {downloading ? 'Generating...' : 'Download PDF'}
+            {downloading ? 'Generating...' : t("Download PDF")}
           </button>
         </div>
       </div>
@@ -440,12 +444,12 @@ export default function ResumePreview({
                     transition={{ duration: 0.3 }}
                     className="text-sm font-medium text-[#1F5C4A] mb-2 text-center"
                   >
-                    {LOADING_MESSAGES[msgIdx]}
+                    {t(LOADING_MESSAGES[msgIdx])}
                   </motion.p>
                 </AnimatePresence>
 
                 <p className="text-xs text-gray-400 mb-6">
-                  Step {msgIdx + 1} of {LOADING_MESSAGES.length}
+                  {t("Step {v0} of {v1}", { v0: msgIdx + 1, v1: LOADING_MESSAGES.length })}
                 </p>
 
                 {/* Progress bar */}
@@ -518,8 +522,8 @@ export default function ResumePreview({
                 <div className="w-16 h-16 rounded-[10px] bg-gray-100 flex items-center justify-center mb-4">
                   <Layout className="w-8 h-8 text-gray-300" />
                 </div>
-                <p className="text-sm font-medium text-gray-400">Your resume preview will appear here</p>
-                <p className="text-xs text-gray-300 mt-1">Fill in the form and click Generate Resume</p>
+                <p className="text-sm font-medium text-gray-400">{t("Your resume preview will appear here")}</p>
+                <p className="text-xs text-gray-300 mt-1">{t("Fill in the form and click Generate Resume")}</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -542,7 +546,7 @@ export default function ResumePreview({
             <span className="text-xs font-medium flex-1">{pdfError}</span>
             <button
               onClick={() => setPdfError(null)}
-              aria-label="Dismiss"
+              aria-label={t("Dismiss")}
               className="p-0.5 rounded opacity-60 hover:opacity-100 flex-shrink-0"
             >
               <X className="w-3.5 h-3.5" />

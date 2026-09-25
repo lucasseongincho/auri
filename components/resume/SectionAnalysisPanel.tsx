@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { motion } from 'framer-motion'
 import { CheckCircle, XCircle, ArrowRight, LayoutList, Loader2 } from 'lucide-react'
 import type { SectionAnalysis } from '@/types'
@@ -18,13 +20,14 @@ function scoreBadgeClass(score: number): string {
 }
 
 export default function SectionAnalysisPanel({ sections, isLoading }: SectionAnalysisPanelProps) {
+  const t = useT()
   if (isLoading) {
     return (
       <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
         <div className="rounded-[10px]  bg-[#FFFFFF] p-5">
           <div className="flex items-center gap-2 mb-4">
             <LayoutList className="w-4 h-4 text-[#1F5C4A]" />
-            <span className="text-sm font-semibold text-lp-ink">Analyzing sections…</span>
+            <span className="text-sm font-semibold text-lp-ink">{t("Analyzing sections…")}</span>
             <Loader2 className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin ml-auto" />
           </div>
           <div className="space-y-2">
@@ -57,8 +60,8 @@ export default function SectionAnalysisPanel({ sections, isLoading }: SectionAna
         {/* Header */}
         <div className="flex items-center gap-2">
           <LayoutList className="w-4 h-4 text-[#1F5C4A]" />
-          <span className="text-sm font-semibold text-lp-ink">Section-by-Section Analysis</span>
-          <span className="text-[10px] text-[#5A5F5C] ml-auto uppercase tracking-wide">pro</span>
+          <span className="text-sm font-semibold text-lp-ink">{t("Section-by-Section Analysis")}</span>
+          <span className="text-[10px] text-[#5A5F5C] ml-auto uppercase tracking-wide">{t("pro")}</span>
         </div>
 
         {/* Section cards */}

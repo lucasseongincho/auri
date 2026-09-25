@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import {
   useCallback,
   useEffect,
@@ -71,6 +73,7 @@ function countWords(text: string): number {
 // ── Word Count Bar ────────────────────────────────────────────────────────────
 
 function WordCountBar({ wordCount }: { wordCount: number }) {
+  const t = useT()
   const pct = Math.min((wordCount / MAX_WORDS) * 100, 100)
   const color =
     wordCount > MAX_WORDS ? '#B42318'
@@ -80,17 +83,17 @@ function WordCountBar({ wordCount }: { wordCount: number }) {
 
   const label =
     wordCount > MAX_WORDS
-      ? `${wordCount - MAX_WORDS} words over limit — trim to 280-300`
+      ? t('{v0} words over limit — trim to 280-300', { v0: wordCount - MAX_WORDS })
       : wordCount >= MIN_WORDS
-      ? `${MAX_WORDS - wordCount} words remaining`
+      ? t('{v0} words remaining', { v0: MAX_WORDS - wordCount })
       : wordCount >= WARN_WORDS
-      ? `${MIN_WORDS - wordCount} more words to reach minimum`
-      : 'Too short — aim for 280-300 words'
+      ? t('{v0} more words to reach minimum', { v0: MIN_WORDS - wordCount })
+      : t('Too short — aim for 280-300 words')
 
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-xs">
-        <span className="text-[#5A5F5C]">Word count (body only)</span>
+        <span className="text-[#5A5F5C]">{t("Word count (body only)")}</span>
         <span style={{ color }} className="font-semibold tabular-nums">
           {wordCount} / {MAX_WORDS}
         </span>
@@ -114,6 +117,7 @@ function WordCountBar({ wordCount }: { wordCount: number }) {
 // ── Loading Animation ────────────────────────────────────────────────────────
 
 function CoverLetterLoadingState() {
+  const t = useT()
   const [msgIdx, setMsgIdx] = useState(0)
   const [progress, setProgress] = useState(0)
 
@@ -170,10 +174,10 @@ function CoverLetterLoadingState() {
             transition={{ duration: 0.35 }}
             className="text-base font-medium text-[#444]"
           >
-            {LOADING_MESSAGES[msgIdx]}
+            {t(LOADING_MESSAGES[msgIdx])}
           </motion.p>
         </AnimatePresence>
-        <p className="text-sm text-[#999]">AURI is writing your cover letter</p>
+        <p className="text-sm text-[#999]">{t("AURI is writing your cover letter")}</p>
       </div>
 
       {/* Progress bar */}
@@ -299,6 +303,7 @@ function LetterDocument({
   onParagraphClick,
   onParagraphChange,
 }: LetterDocProps) {
+  const t = useT()
   const today = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -323,7 +328,7 @@ function LetterDocument({
       {/* Sender block */}
       <div style={{ marginBottom: '24px' }}>
         <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700, fontSize: '13pt', margin: '0 0 4px 0' }}>
-          {personal.name || 'Your Name'}
+          {personal.name || t("Your Name")}
         </p>
         <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '9.5pt', color: '#555', margin: 0 }}>
           {[personal.location, personal.email, personal.phone].filter(Boolean).join('  ·  ')}
@@ -359,9 +364,9 @@ function LetterDocument({
       ))}
 
       {/* Closing */}
-      <p style={{ marginBottom: '40px' }}>Sincerely,</p>
+      <p style={{ marginBottom: '40px' }}>{t("Sincerely,")}</p>
       <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700 }}>
-        {personal.name || 'Your Name'}
+        {personal.name || t("Your Name")}
       </p>
 
       {/* Invisible result reference for word count */}
@@ -373,6 +378,7 @@ function LetterDocument({
 // ── Toast ─────────────────────────────────────────────────────────────────────
 
 function Toast({ message, type, onDismiss }: { message: string; type: 'success' | 'error'; onDismiss: () => void }) {
+  const t = useT()
   useEffect(() => {
     const t = setTimeout(onDismiss, 4000)
     return () => clearTimeout(t)
@@ -394,7 +400,7 @@ function Toast({ message, type, onDismiss }: { message: string; type: 'success' 
         ? <CheckCircle className="w-4 h-4 flex-shrink-0" />
         : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
       <span className="text-sm font-medium">{message}</span>
-      <button onClick={onDismiss} aria-label="Dismiss" className="p-0.5 ml-1 rounded opacity-60 hover:opacity-100">
+      <button onClick={onDismiss} aria-label={t("Dismiss")} className="p-0.5 ml-1 rounded opacity-60 hover:opacity-100">
         <X className="w-3.5 h-3.5" />
       </button>
     </motion.div>
@@ -404,6 +410,7 @@ function Toast({ message, type, onDismiss }: { message: string; type: 'success' 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 function CoverLetterContent() {
+  const t = useT()
   const { user } = useAuth()
   const { profile } = useCareerStore()
   const searchParams = useSearchParams()
@@ -553,7 +560,7 @@ function CoverLetterContent() {
           setSavedId(guestId)
         }
       } catch {
-        setGenerateError('Could not parse the cover letter. Please try again.')
+        setGenerateError(t("Could not parse the cover letter. Please try again."))
       }
     }
   }, [position, company, jobDescription, experienceSummary, hiringManagerName, cityState, user?.uid, stream])
@@ -601,7 +608,7 @@ function CoverLetterContent() {
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(body.error ?? `Server responded ${res.status}`)
+        throw new Error(body.error ?? t("Server responded {v0}", { v0: res.status }))
       }
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
@@ -614,7 +621,7 @@ function CoverLetterContent() {
       URL.revokeObjectURL(url)
     } catch (err) {
       console.error('[pdf] Cover letter download failed:', err instanceof Error ? err.message : err)
-      setToast({ message: 'PDF generation is temporarily unavailable — please try again in a moment.', type: 'error' })
+      setToast({ message: t("PDF generation is temporarily unavailable — please try again in a moment."), type: 'error' })
     } finally {
       setDownloading(false)
     }
@@ -644,9 +651,9 @@ function CoverLetterContent() {
         const id = await saveCoverLetter(user.uid, payload)
         setSavedId(id)
       }
-      setToast({ message: 'Cover letter saved ✓', type: 'success' })
+      setToast({ message: t("Cover letter saved ✓"), type: 'success' })
     } catch {
-      setToast({ message: 'Failed to save. Please try again.', type: 'error' })
+      setToast({ message: t("Failed to save. Please try again."), type: 'error' })
     } finally {
       setSaving(false)
     }
@@ -679,9 +686,9 @@ function CoverLetterContent() {
             <Mail className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
-            <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">Cover Letter Generator</h1>
+            <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">{t("Cover Letter Generator")}</h1>
             <p className="text-xs text-[#5A5F5C] hidden sm:block">
-              280–300 words · Opens with a powerful hook · Never &quot;I am applying for…&quot;
+              {t("280–300 words · Opens with a powerful hook · Never \"I am applying for…\"")}
             </p>
           </div>
         </div>
@@ -698,7 +705,7 @@ function CoverLetterContent() {
               }`}
           >
             <Edit3 className="w-3 h-3" />
-            Form
+            {t("Form")}
           </button>
           <button
             onClick={() => setMobileView('preview')}
@@ -709,7 +716,7 @@ function CoverLetterContent() {
               }`}
           >
             <Eye className="w-3 h-3" />
-            Preview
+            {t("Preview")}
           </button>
         </div>
 
@@ -719,7 +726,7 @@ function CoverLetterContent() {
             <button
               onClick={handleSave}
               disabled={saving}
-              aria-label="Save cover letter"
+              aria-label={t("Save cover letter")}
               className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
                 bg-[#1F5C4A] text-white
                  transition-all duration-200
@@ -731,7 +738,7 @@ function CoverLetterContent() {
                 ? <CheckCircle className="w-3.5 h-3.5" />
                 : <Save className="w-3.5 h-3.5" />
               }
-              {saving ? 'Saving…' : savedId ? 'Saved!' : 'Save'}
+              {saving ? t("Saving…") : savedId ? t("Saved!") : t("Save")}
             </button>
           )}
           <Link
@@ -741,7 +748,7 @@ function CoverLetterContent() {
               transition-all duration-200"
           >
             <FolderOpen className="w-3.5 h-3.5" />
-            My Letters
+            {t("My Letters")}
           </Link>
         </div>
       </motion.div>
@@ -764,51 +771,51 @@ function CoverLetterContent() {
                 {profile && profile.experience.length > 0 && (
                   <div className="flex items-center gap-2 p-3 rounded-[10px] bg-[#1F7A4D]/10 border border-[#1F7A4D]/20">
                     <CheckCircle className="w-4 h-4 text-[#1F7A4D] flex-shrink-0" />
-                    <p className="text-xs text-[#1F7A4D]">Experience auto-filled from your Career Profile.</p>
+                    <p className="text-xs text-[#1F7A4D]">{t("Experience auto-filled from your Career Profile.")}</p>
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className={LABEL_CLASS}>Position <span className="text-[#B42318]">*</span></label>
+                    <label className={LABEL_CLASS}>{t("Position")}{' '}<span className="text-[#B42318]">*</span></label>
                     <input type="text" value={position} onChange={(e) => setPosition(e.target.value)}
-                      placeholder="Senior Software Engineer" className={INPUT_CLASS}
-                      aria-label="Target position" style={{ fontSize: '16px' }} />
+                      placeholder={t("Senior Software Engineer")} className={INPUT_CLASS}
+                      aria-label={t("Target position")} style={{ fontSize: '16px' }} />
                   </div>
                   <div>
-                    <label className={LABEL_CLASS}>Company Name <span className="text-[#B42318]">*</span></label>
-                    <CompanyAutocomplete value={company} onChange={setCompany} placeholder="Acme Corp"
-                      className={INPUT_CLASS} aria-label="Company name" />
+                    <label className={LABEL_CLASS}>{t("Company Name")}{' '}<span className="text-[#B42318]">*</span></label>
+                    <CompanyAutocomplete value={company} onChange={setCompany} placeholder={t("Acme Corp")}
+                      className={INPUT_CLASS} aria-label={t("Company name")} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className={LABEL_CLASS}>Hiring Manager Name <span className="text-[#5A5F5C] font-normal">(optional)</span></label>
-                    <input type="text" className={INPUT_CLASS} placeholder="Jane Smith"
+                    <label className={LABEL_CLASS}>{t("Hiring Manager Name")}{' '}<span className="text-[#5A5F5C] font-normal">{t("(optional)")}</span></label>
+                    <input type="text" className={INPUT_CLASS} placeholder={t("Jane Smith")}
                       value={hiringManagerName} onChange={(e) => setHiringManagerName(e.target.value)}
-                      aria-label="Hiring manager name" />
+                      aria-label={t("Hiring manager name")} />
                   </div>
                   <div>
-                    <label className={LABEL_CLASS}>Your City, State</label>
-                    <LocationAutocomplete value={cityState} onChange={setCityState} placeholder="New York, NY"
-                      className={INPUT_CLASS} aria-label="City and state" />
+                    <label className={LABEL_CLASS}>{t("Your City, State")}</label>
+                    <LocationAutocomplete value={cityState} onChange={setCityState} placeholder={t("New York, NY")}
+                      className={INPUT_CLASS} aria-label={t("City and state")} />
                   </div>
                 </div>
 
                 <div>
-                  <label className={LABEL_CLASS}>Job Description <span className="text-[#5A5F5C] font-normal">(paste for keyword match)</span></label>
-                  <textarea className={TEXTAREA_CLASS} rows={4} placeholder="Paste the job description here…"
+                  <label className={LABEL_CLASS}>{t("Job Description")}{' '}<span className="text-[#5A5F5C] font-normal">{t("(paste for keyword match)")}</span></label>
+                  <textarea className={TEXTAREA_CLASS} rows={4} placeholder={t("Paste the job description here…")}
                     value={jobDescription} onChange={(e) => setJobDescription(e.target.value)}
-                    aria-label="Job description" />
+                    aria-label={t("Job description")} />
                 </div>
 
                 <div>
-                  <label className={LABEL_CLASS}>Your Experience Summary</label>
+                  <label className={LABEL_CLASS}>{t("Your Experience Summary")}</label>
                   <textarea className={TEXTAREA_CLASS} rows={5}
-                    placeholder="Auto-filled from your profile, or paste a summary here…"
+                    placeholder={t("Auto-filled from your profile, or paste a summary here…")}
                     value={experienceSummary} onChange={(e) => setExperienceSummary(e.target.value)}
-                    aria-label="Experience summary" />
+                    aria-label={t("Experience summary")} />
                 </div>
 
                 {generateError && (
@@ -816,11 +823,11 @@ function CoverLetterContent() {
                     <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
                       <Zap className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
-                        <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
+                        <p className="text-xs font-medium text-lp-ink">{t("Monthly limit reached")}</p>
+                        <p className="text-xs text-[#3C403E]">{t("You've used all 3 free generations this month.")}</p>
                       </div>
                       <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
-                        Upgrade →
+                        {t("Upgrade →")}
                       </Link>
                     </div>
                   ) : (
@@ -842,8 +849,8 @@ function CoverLetterContent() {
                     transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   {isStreaming
-                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating…</>
-                    : <><Sparkles className="w-4 h-4" /> Generate Cover Letter</>}
+                    ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Generating…")}</>
+                    : <><Sparkles className="w-4 h-4" />{' '}{t("Generate Cover Letter")}</>}
                 </button>
               </div>
             </div>
@@ -867,7 +874,7 @@ function CoverLetterContent() {
                 hover:text-lp-ink transition-colors mb-2"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
-              Back to form
+              {t("Back to form")}
             </button>
           )}
 
@@ -907,12 +914,12 @@ function CoverLetterContent() {
                 {/* Toolbar */}
                 <div className="flex items-center gap-2 flex-wrap print:hidden">
                   {/* Undo / Redo */}
-                  <button onClick={handleUndo} disabled={!canUndo} aria-label="Undo"
+                  <button onClick={handleUndo} disabled={!canUndo} aria-label={t("Undo")}
                     className="p-2 min-h-[36px] rounded-[4px] border border-lp-rule text-[#3C403E]
                       hover:text-lp-ink hover:bg-lp-ink/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>
-                  <button onClick={handleRedo} disabled={!canRedo} aria-label="Redo"
+                  <button onClick={handleRedo} disabled={!canRedo} aria-label={t("Redo")}
                     className="p-2 min-h-[36px] rounded-[4px] border border-lp-rule text-[#3C403E]
                       hover:text-lp-ink hover:bg-lp-ink/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                     <RotateCw className="w-3.5 h-3.5" />
@@ -925,7 +932,7 @@ function CoverLetterContent() {
                     className="flex items-center gap-1.5 px-3 py-2 min-h-[36px] rounded-[4px] text-sm font-medium
                       border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all">
                     {copied ? <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copied ? 'Copied!' : 'Copy'}
+                    {copied ? t("Copied!") : t("Copy")}
                   </button>
 
                   {/* Download PDF */}
@@ -934,14 +941,14 @@ function CoverLetterContent() {
                       bg-[#1F5C4A] text-white
                       transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
                     {downloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-                    {downloading ? 'Generating…' : 'Download PDF'}
+                    {downloading ? t("Generating…") : t("Download PDF")}
                   </button>
                 </div>
 
                 {/* Opening hook callout */}
                 {result.opening_hook && (
                   <div className="print:hidden p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
-                    <p className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide mb-1">Opening Hook</p>
+                    <p className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide mb-1">{t("Opening Hook")}</p>
                     <p className="text-sm text-[#F2D45C] italic">{result.opening_hook}</p>
                   </div>
                 )}
@@ -985,7 +992,7 @@ function CoverLetterContent() {
 
                 {/* Easy Tune tip */}
                 <p className="print:hidden text-xs text-center text-[#5A5F5C]">
-                  Click any paragraph to edit inline · Ctrl+Z to undo
+                  {t("Click any paragraph to edit inline · Ctrl+Z to undo")}
                 </p>
               </motion.div>
             )}
@@ -1004,8 +1011,8 @@ function CoverLetterContent() {
                   flex items-center justify-center mb-4">
                   <Mail className="w-6 h-6 text-[#1F5C4A]" />
                 </div>
-                <p className="text-sm font-medium text-[#3C403E]">Your cover letter will appear here</p>
-                <p className="text-xs text-[#5A5F5C] mt-1">Fill in the form and click Generate</p>
+                <p className="text-sm font-medium text-[#3C403E]">{t("Your cover letter will appear here")}</p>
+                <p className="text-xs text-[#5A5F5C] mt-1">{t("Fill in the form and click Generate")}</p>
               </motion.div>
             )}
           </AnimatePresence>

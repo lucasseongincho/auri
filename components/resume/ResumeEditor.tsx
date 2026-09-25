@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Redo2, Undo2, X } from 'lucide-react'
@@ -24,6 +26,7 @@ interface BulletRowProps {
 }
 
 function BulletRow({ value, onChange, onDelete, placeholder }: BulletRowProps) {
+  const t = useT()
   const ref = useRef<HTMLTextAreaElement>(null)
   useEffect(() => {
     if (ref.current) {
@@ -40,11 +43,11 @@ function BulletRow({ value, onChange, onDelete, placeholder }: BulletRowProps) {
         rows={1}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder ?? 'Bullet point...'}
+        placeholder={placeholder ?? t("Bullet point...")}
         className={`${INPUT_CLASS} flex-1`}
         style={{ overflow: 'hidden', minHeight: '36px' }}
       />
-      <button onClick={onDelete} className={DELETE_BTN} aria-label="Delete bullet">
+      <button onClick={onDelete} className={DELETE_BTN} aria-label={t("Delete bullet")}>
         <X className="w-3.5 h-3.5" />
       </button>
     </div>
@@ -52,13 +55,14 @@ function BulletRow({ value, onChange, onDelete, placeholder }: BulletRowProps) {
 }
 
 function SkillInput({ onAdd }: { onAdd: (s: string) => void }) {
+  const t = useT()
   const [val, setVal] = useState('')
   return (
     <input
       type="text"
       className={INPUT_CLASS}
       value={val}
-      placeholder="Type a skill and press Enter..."
+      placeholder={t("Type a skill and press Enter...")}
       onChange={(e) => setVal(e.target.value)}
       onKeyDown={(e) => {
         if ((e.key === 'Enter' || e.key === ',') && val.trim()) {
@@ -80,6 +84,7 @@ interface ResumeEditorProps {
 }
 
 export default function ResumeEditor({ resumeData, onDataChange, syncRef }: ResumeEditorProps) {
+  const t = useT()
   const { pushToHistory, undo, redo, canUndo, canRedo } = useCareerStore()
 
   useImperativeHandle(syncRef, () => ({ sync: () => {} }), [])
@@ -166,8 +171,8 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
           <button
             onClick={handleUndo}
             disabled={!canUndo()}
-            aria-label="Undo (Ctrl+Z)"
-            title="Undo (Ctrl+Z)"
+            aria-label={t("Undo (Ctrl+Z)")}
+            title={t("Undo (Ctrl+Z)")}
             className="p-1.5 rounded-md text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5
               disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
           >
@@ -176,27 +181,27 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
           <button
             onClick={handleRedo}
             disabled={!canRedo()}
-            aria-label="Redo (Ctrl+Y)"
-            title="Redo (Ctrl+Y)"
+            aria-label={t("Redo (Ctrl+Y)")}
+            title={t("Redo (Ctrl+Y)")}
             className="p-1.5 rounded-md text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5
               disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
           >
             <Redo2 className="w-3.5 h-3.5" />
           </button>
         </div>
-        <span className="text-xs text-[#5A5F5C]">Structured editor · Changes update the preview instantly</span>
+        <span className="text-xs text-[#5A5F5C]">{t("Structured editor · Changes update the preview instantly")}</span>
       </div>
 
       {/* ── Summary ── */}
       <div className={SECTION_CARD}>
         <div className={SECTION_INNER}>
-          <p className={SECTION_TITLE}>Summary</p>
+          <p className={SECTION_TITLE}>{t("Summary")}</p>
           <textarea
             className={INPUT_CLASS}
             rows={3}
             value={stripAITags(resumeData.summary ?? '')}
             onChange={(e) => onDataChange({ ...resumeData, summary: e.target.value })}
-            placeholder="Professional summary..."
+            placeholder={t("Professional summary...")}
           />
         </div>
       </div>
@@ -214,7 +219,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
           >
             <div className={SECTION_INNER}>
               <div className="flex items-center justify-between mb-3">
-                <p className={SECTION_TITLE}>Experience {i + 1}</p>
+                <p className={SECTION_TITLE}>{t("Experience {v0}", { v0: i + 1 })}</p>
                 <button
                   onClick={() => {
                     pushToHistory(resumeData)
@@ -225,36 +230,36 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                   }}
                   className="text-xs text-[#B42318]/60 hover:text-[#B42318] transition-colors"
                 >
-                  Remove position
+                  {t("Remove position")}
                 </button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className={LABEL_CLASS}>Job Title</label>
+                  <label className={LABEL_CLASS}>{t("Job Title")}</label>
                   <input type="text" className={INPUT_CLASS} value={exp.title}
                     onChange={(e) => updateExp(i, { title: e.target.value })} />
                 </div>
                 <div>
-                  <label className={LABEL_CLASS}>Company</label>
+                  <label className={LABEL_CLASS}>{t("Company")}</label>
                   <input type="text" className={INPUT_CLASS} value={exp.company}
                     onChange={(e) => updateExp(i, { company: e.target.value })} />
                 </div>
                 <div>
-                  <label className={LABEL_CLASS}>Start Date</label>
+                  <label className={LABEL_CLASS}>{t("Start Date")}</label>
                   <input type="text" className={INPUT_CLASS} value={exp.start}
-                    placeholder="Jan 2023"
+                    placeholder={t("Jan 2023")}
                     onChange={(e) => updateExp(i, { start: e.target.value })} />
                 </div>
                 <div>
-                  <label className={LABEL_CLASS}>End Date</label>
+                  <label className={LABEL_CLASS}>{t("End Date")}</label>
                   <input type="text" className={INPUT_CLASS} value={exp.end}
-                    placeholder="Present"
+                    placeholder={t("Present")}
                     onChange={(e) => updateExp(i, { end: e.target.value })} />
                 </div>
               </div>
 
-              <label className={LABEL_CLASS}>Bullets</label>
+              <label className={LABEL_CLASS}>{t("Bullets")}</label>
               <div className="space-y-2">
                 {(exp.bullets ?? []).map((bullet, bi) => (
                   <BulletRow
@@ -274,7 +279,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                 className={ADD_BTN}
                 onClick={() => updateExp(i, { bullets: [...exp.bullets, ''] })}
               >
-                <Plus className="w-3 h-3" /> Add bullet
+                <Plus className="w-3 h-3" />{' '}{t("Add bullet")}
               </button>
             </div>
           </motion.div>
@@ -294,7 +299,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
           })
         }}
       >
-        <Plus className="w-3.5 h-3.5" /> Add Position
+        <Plus className="w-3.5 h-3.5" />{' '}{t("Add Position")}
       </button>
 
       {/* ── Education ── */}
@@ -310,7 +315,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
           >
             <div className={SECTION_INNER}>
               <div className="flex items-center justify-between mb-3">
-                <p className={SECTION_TITLE}>Education {i + 1}</p>
+                <p className={SECTION_TITLE}>{t("Education {v0}", { v0: i + 1 })}</p>
                 <button
                   onClick={() => {
                     pushToHistory(resumeData)
@@ -321,35 +326,35 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                   }}
                   className="text-xs text-[#B42318]/60 hover:text-[#B42318] transition-colors"
                 >
-                  Remove
+                  {t("Remove")}
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className={LABEL_CLASS}>Institution</label>
+                  <label className={LABEL_CLASS}>{t("Institution")}</label>
                   <input type="text" className={INPUT_CLASS} value={edu.institution}
                     onChange={(e) => updateEdu(i, { institution: e.target.value })} />
                 </div>
                 <div>
-                  <label className={LABEL_CLASS}>Degree</label>
+                  <label className={LABEL_CLASS}>{t("Degree")}</label>
                   <input type="text" className={INPUT_CLASS} value={edu.degree}
                     onChange={(e) => updateEdu(i, { degree: e.target.value })} />
                 </div>
                 <div>
-                  <label className={LABEL_CLASS}>Field of Study</label>
+                  <label className={LABEL_CLASS}>{t("Field of Study")}</label>
                   <input type="text" className={INPUT_CLASS} value={edu.field}
                     onChange={(e) => updateEdu(i, { field: e.target.value })} />
                 </div>
                 <div>
-                  <label className={LABEL_CLASS}>Year</label>
+                  <label className={LABEL_CLASS}>{t("Year")}</label>
                   <input type="text" className={INPUT_CLASS} value={edu.year}
                     placeholder="2025"
                     onChange={(e) => updateEdu(i, { year: e.target.value })} />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className={LABEL_CLASS}>GPA (optional)</label>
+                  <label className={LABEL_CLASS}>{t("GPA (optional)")}</label>
                   <input type="text" className={INPUT_CLASS} value={edu.gpa ?? ''}
-                    placeholder="3.8/4.0 — leave blank if below 3.5"
+                    placeholder={t("3.8/4.0 — leave blank if below 3.5")}
                     onChange={(e) => updateEdu(i, { gpa: e.target.value })} />
                 </div>
               </div>
@@ -371,13 +376,13 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
           })
         }}
       >
-        <Plus className="w-3.5 h-3.5" /> Add Education
+        <Plus className="w-3.5 h-3.5" />{' '}{t("Add Education")}
       </button>
 
       {/* ── Skills ── */}
       <div className={SECTION_CARD}>
         <div className={SECTION_INNER}>
-          <p className={SECTION_TITLE}>Skills</p>
+          <p className={SECTION_TITLE}>{t("Skills")}</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {(resumeData.skills ?? []).map((skill, i) => (
               <span key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-full
@@ -389,7 +394,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                     onDataChange({ ...resumeData, skills: resumeData.skills.filter((_, idx) => idx !== i) })
                   }}
                   className="hover:text-[#B42318] transition-colors"
-                  aria-label={`Remove skill ${skill}`}
+                  aria-label={t("Remove skill {skill}", { skill })}
                 >
                   <X className="w-2.5 h-2.5" />
                 </button>
@@ -408,7 +413,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
       {(resumeData.certifications ?? []).length > 0 && (
         <div className={SECTION_CARD}>
           <div className={SECTION_INNER}>
-            <p className={SECTION_TITLE}>Certifications</p>
+            <p className={SECTION_TITLE}>{t("Certifications")}</p>
             <div className="flex flex-wrap gap-2 mb-3">
               {(resumeData.certifications ?? []).map((cert, i) => (
                 <span key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-full
@@ -423,7 +428,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                       })
                     }}
                     className="hover:text-[#B42318] transition-colors"
-                    aria-label={`Remove certification ${cert}`}
+                    aria-label={t("Remove certification {cert}", { cert })}
                   >
                     <X className="w-2.5 h-2.5" />
                   </button>
@@ -455,7 +460,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
               >
                 <div className={SECTION_INNER}>
                   <div className="flex items-center justify-between mb-3">
-                    <p className={SECTION_TITLE}>Project {i + 1}</p>
+                    <p className={SECTION_TITLE}>{t("Project {v0}", { v0: i + 1 })}</p>
                     <button
                       onClick={() => {
                         pushToHistory(resumeData)
@@ -466,23 +471,23 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                       }}
                       className="text-xs text-[#B42318]/60 hover:text-[#B42318] transition-colors"
                     >
-                      Remove project
+                      {t("Remove project")}
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                     <div>
-                      <label className={LABEL_CLASS}>Project Name</label>
+                      <label className={LABEL_CLASS}>{t("Project Name")}</label>
                       <input type="text" className={INPUT_CLASS} value={proj.name}
                         onChange={(e) => updateProj(i, { name: e.target.value })} />
                     </div>
                     <div>
-                      <label className={LABEL_CLASS}>URL (optional)</label>
+                      <label className={LABEL_CLASS}>{t("URL (optional)")}</label>
                       <input type="url" className={INPUT_CLASS} value={proj.url ?? ''}
                         placeholder="https://..."
                         onChange={(e) => updateProj(i, { url: e.target.value })} />
                     </div>
                   </div>
-                  <label className={LABEL_CLASS}>Bullets</label>
+                  <label className={LABEL_CLASS}>{t("Bullets")}</label>
                   <div className="space-y-2">
                     {(proj.bullets ?? []).map((bullet, bi) => (
                       <BulletRow
@@ -500,7 +505,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                   </div>
                   <button className={ADD_BTN}
                     onClick={() => updateProj(i, { bullets: [...(proj.bullets ?? []), ''] })}>
-                    <Plus className="w-3 h-3" /> Add bullet
+                    <Plus className="w-3 h-3" />{' '}{t("Add bullet")}
                   </button>
                 </div>
               </motion.div>
@@ -519,7 +524,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
               })
             }}
           >
-            <Plus className="w-3.5 h-3.5" /> Add Project
+            <Plus className="w-3.5 h-3.5" />{' '}{t("Add Project")}
           </button>
         </>
       )}
@@ -539,7 +544,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
               >
                 <div className={SECTION_INNER}>
                   <div className="flex items-center justify-between mb-3">
-                    <p className={SECTION_TITLE}>Leadership {i + 1}</p>
+                    <p className={SECTION_TITLE}>{t("Leadership {v0}", { v0: i + 1 })}</p>
                     <button
                       onClick={() => {
                         pushToHistory(resumeData)
@@ -550,32 +555,32 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                       }}
                       className="text-xs text-[#B42318]/60 hover:text-[#B42318] transition-colors"
                     >
-                      Remove
+                      {t("Remove")}
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                     <div>
-                      <label className={LABEL_CLASS}>Role</label>
+                      <label className={LABEL_CLASS}>{t("Role")}</label>
                       <input type="text" className={INPUT_CLASS} value={lead.role}
                         onChange={(e) => updateLead(i, { role: e.target.value })} />
                     </div>
                     <div>
-                      <label className={LABEL_CLASS}>Organization</label>
+                      <label className={LABEL_CLASS}>{t("Organization")}</label>
                       <input type="text" className={INPUT_CLASS} value={lead.organization}
                         onChange={(e) => updateLead(i, { organization: e.target.value })} />
                     </div>
                     <div>
-                      <label className={LABEL_CLASS}>Start Date</label>
+                      <label className={LABEL_CLASS}>{t("Start Date")}</label>
                       <input type="text" className={INPUT_CLASS} value={lead.start}
                         onChange={(e) => updateLead(i, { start: e.target.value })} />
                     </div>
                     <div>
-                      <label className={LABEL_CLASS}>End Date</label>
+                      <label className={LABEL_CLASS}>{t("End Date")}</label>
                       <input type="text" className={INPUT_CLASS} value={lead.end}
                         onChange={(e) => updateLead(i, { end: e.target.value })} />
                     </div>
                   </div>
-                  <label className={LABEL_CLASS}>Bullets</label>
+                  <label className={LABEL_CLASS}>{t("Bullets")}</label>
                   <div className="space-y-2">
                     {(lead.bullets ?? []).map((bullet, bi) => (
                       <BulletRow
@@ -593,7 +598,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                   </div>
                   <button className={ADD_BTN}
                     onClick={() => updateLead(i, { bullets: [...(lead.bullets ?? []), ''] })}>
-                    <Plus className="w-3 h-3" /> Add bullet
+                    <Plus className="w-3 h-3" />{' '}{t("Add bullet")}
                   </button>
                 </div>
               </motion.div>
@@ -612,7 +617,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
               })
             }}
           >
-            <Plus className="w-3.5 h-3.5" /> Add Leadership
+            <Plus className="w-3.5 h-3.5" />{' '}{t("Add Leadership")}
           </button>
         </>
       )}
@@ -621,14 +626,14 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
       {(resumeData.languages ?? []).length > 0 && (
         <div className={SECTION_CARD}>
           <div className={SECTION_INNER}>
-            <p className={SECTION_TITLE}>Languages</p>
+            <p className={SECTION_TITLE}>{t("Languages")}</p>
             {(resumeData.languages ?? []).map((lang, i) => (
               <div key={lang.id} className="flex gap-2 items-center mb-2">
                 <input
                   type="text"
                   className={`${INPUT_CLASS} flex-1`}
                   value={lang.name}
-                  placeholder="Language name"
+                  placeholder={t("Language name")}
                   onChange={(e) => onDataChange({
                     ...resumeData,
                     languages: (resumeData.languages ?? []).map((l, idx) =>
@@ -650,10 +655,10 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                     text-sm text-lp-ink focus:outline-none focus:border-[#1F5C4A]/50
                     transition-colors flex-shrink-0"
                 >
-                  <option value="Native">Native</option>
-                  <option value="Fluent">Fluent</option>
-                  <option value="Intermediate">Intermediate</option>
-                  <option value="Basic">Basic</option>
+                  <option value="Native">{t("Native")}</option>
+                  <option value="Fluent">{t("Fluent")}</option>
+                  <option value="Intermediate">{t("Intermediate")}</option>
+                  <option value="Basic">{t("Basic")}</option>
                 </select>
                 <button
                   onClick={() => {
@@ -664,7 +669,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                     })
                   }}
                   className={DELETE_BTN}
-                  aria-label={`Remove language ${lang.name}`}
+                  aria-label={t("Remove language {v0}", { v0: lang.name })}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -680,7 +685,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
                 ],
               })}
             >
-              <Plus className="w-3 h-3" /> Add Language
+              <Plus className="w-3 h-3" />{' '}{t("Add Language")}
             </button>
           </div>
         </div>

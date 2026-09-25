@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -28,6 +30,7 @@ const PATH_LABELS: Record<string, string> = {
   '/dashboard/cover-letter': 'Cover Letter',
   '/dashboard/cover-letter/saved': 'My Cover Letters',
   '/dashboard/interview': 'Interview Prep',
+  '/dashboard/interview/saved': 'My Sessions',
   '/dashboard/settings': 'Settings',
 }
 
@@ -76,6 +79,7 @@ const MOBILE_MORE_ITEMS = [
 ]
 
 export default function DashboardClient({ children }: { children: React.ReactNode }) {
+  const t = useT()
   const pathname = usePathname()
   const router = useRouter()
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
@@ -164,18 +168,18 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                 transition={{ duration: 0.15 }}
                 className="font-heading font-bold text-lp-ink text-base whitespace-nowrap"
               >
-                AURI
+                {t("AURI")}
               </motion.span>
             )}
           </AnimatePresence>
         </div>
 
         {/* Nav items */}
-        <nav className="flex-1 py-4 flex flex-col gap-1 px-2" aria-label="Main navigation">
+        <nav className="flex-1 py-4 flex flex-col gap-1 px-2" aria-label={t("Main navigation")}>
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.href)
             return (
-              <Link key={item.id} href={item.href} aria-label={item.label}>
+              <Link key={item.id} href={item.href} aria-label={t(item.label)}>
                 <motion.div
                   whileHover={{ x: 2 }}
                   transition={SPRING}
@@ -196,7 +200,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                         transition={{ duration: 0.12 }}
                         className="text-sm font-medium whitespace-nowrap"
                       >
-                        {item.label}
+                        {t(item.label)}
                       </motion.span>
                     )}
                   </AnimatePresence>
@@ -225,13 +229,13 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                   ${syncError ? 'text-[#B42318]' : 'text-[#5A5F5C]'}`}
               >
                 {syncError ? <CloudOff className="w-3.5 h-3.5" /> : <Cloud className="w-3.5 h-3.5 animate-pulse" />}
-                {syncError ? 'Sync failed' : 'Syncing...'}
+                {syncError ? t("Sync failed") : 'Syncing...'}
               </motion.div>
             )}
           </AnimatePresence>
 
           {BOTTOM_ITEMS.map((item) => (
-            <Link key={item.id} href={item.href} aria-label={item.label}>
+            <Link key={item.id} href={item.href} aria-label={t(item.label)}>
               <div className={`flex items-center gap-3 px-3 py-2.5 rounded-[4px] cursor-pointer
                 transition-colors duration-200
                 ${isActive(item.href) ? 'bg-[#1F5C4A]/20 text-lp-ink' : 'text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/[0.04]'}`}
@@ -245,7 +249,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                       exit={{ opacity: 0 }}
                       className="text-sm font-medium whitespace-nowrap"
                     >
-                      {item.label}
+                      {t(item.label)}
                     </motion.span>
                   )}
                 </AnimatePresence>
@@ -256,7 +260,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
           {/* User */}
           <button
             onClick={() => setProfileDrawerOpen(true)}
-            aria-label="Open career profile"
+            aria-label={t("Open career profile")}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[4px]
               cursor-pointer transition-colors duration-200
               text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/[0.04]"
@@ -273,9 +277,9 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                   className="flex-1 text-left min-w-0"
                 >
                   <p className="text-xs font-medium text-[#3C403E] truncate">
-                    {user?.displayName ?? user?.email ?? 'Guest'}
+                    {user?.displayName ?? user?.email ?? t("Guest")}
                   </p>
-                  <p className="text-[10px] text-[#5A5F5C]">Pro</p>
+                  <p className="text-[10px] text-[#5A5F5C]">{t("Pro")}</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -293,7 +297,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
             <div className="hidden md:flex items-center gap-2 text-sm">
               <ChevronRight className="w-4 h-4 text-[#5A5F5C]" />
               <span className="text-[#3C403E] capitalize">
-                {getBreadcrumbLabel(pathname)}
+                {t(getBreadcrumbLabel(pathname))}
               </span>
             </div>
             {/* Mobile: show logo */}
@@ -301,7 +305,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
               <div className="w-7 h-7 rounded-[4px] bg-[#1F5C4A]/10 flex items-center justify-center">
                 <Sparkles className="w-3.5 h-3.5 text-lp-ink" />
               </div>
-              <span className="font-heading font-bold text-lp-ink">AURI</span>
+              <span className="font-heading font-bold text-lp-ink">{t("AURI")}</span>
             </div>
           </div>
 
@@ -309,12 +313,12 @@ export default function DashboardClient({ children }: { children: React.ReactNod
             {isSyncing && (
               <div className="hidden md:flex items-center gap-1.5 text-xs text-[#5A5F5C]">
                 <Cloud className="w-3.5 h-3.5 animate-pulse" />
-                Saving...
+                {t("Saving...")}
               </div>
             )}
             <button
               onClick={() => setProfileDrawerOpen(true)}
-              aria-label="Open career profile drawer"
+              aria-label={t("Open career profile drawer")}
               className="flex items-center gap-2 px-3 py-1.5 rounded-[4px] border border-lp-rule
                 hover:bg-lp-ink/5 transition-all duration-200"
             >
@@ -322,7 +326,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                 <User className="w-3 h-3 text-lp-ink" />
               </div>
               <span className="text-sm text-[#3C403E] hidden sm:block">
-                {user?.displayName ?? 'Profile'}
+                {user?.displayName ?? t("Profile")}
               </span>
             </button>
           </div>
@@ -339,29 +343,29 @@ export default function DashboardClient({ children }: { children: React.ReactNod
         border-t border-lp-hairline bg-[#FFFFFF]/95
         flex items-center justify-around px-2 pt-2"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}
-        aria-label="Mobile navigation"
+        aria-label={t("Mobile navigation")}
       >
         {MOBILE_PRIMARY_ITEMS.map((item) => {
           const active = isActive(item.href)
           return (
-            <Link key={item.id} href={item.href} aria-label={item.label}
+            <Link key={item.id} href={item.href} aria-label={t(item.label)}
               className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-[4px]
                 transition-colors duration-200 min-w-0 min-h-[44px] justify-center">
               <item.icon className={`w-5 h-5 ${active ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`} />
               <span className={`text-[9px] font-medium truncate ${active ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`}>
-                {item.label}
+                {t(item.label)}
               </span>
             </Link>
           )
         })}
         <button
           onClick={() => setMoreDrawerOpen(true)}
-          aria-label="More navigation options"
+          aria-label={t("More navigation options")}
           className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-[4px]
             transition-colors duration-200 min-w-0 min-h-[44px] justify-center"
         >
           <MoreHorizontal className={`w-5 h-5 ${moreDrawerOpen ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`} />
-          <span className={`text-[9px] font-medium ${moreDrawerOpen ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`}>More</span>
+          <span className={`text-[9px] font-medium ${moreDrawerOpen ? 'text-[#1F5C4A]' : 'text-[#5A5F5C]'}`}>{t("More")}</span>
         </button>
       </nav>
 
@@ -392,7 +396,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
               {/* Close button */}
               <button
                 onClick={() => setMoreDrawerOpen(false)}
-                aria-label="Close menu"
+                aria-label={t("Close menu")}
                 className="absolute top-3 right-4 p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-lp-ink transition-colors"
               >
                 <X className="w-4 h-4" />
@@ -402,7 +406,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                 {MOBILE_MORE_ITEMS.map((item) => {
                   const active = isActive(item.href)
                   return (
-                    <Link key={item.id} href={item.href} aria-label={item.label}
+                    <Link key={item.id} href={item.href} aria-label={t(item.label)}
                       className={`flex flex-col items-center gap-2 p-3 rounded-[10px]
                         transition-colors duration-200 text-center
                         ${active
@@ -414,7 +418,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                       {item.isPro && !userIsPro && (
                         <Crown className="w-3 h-3 text-[#8A5A00]" />
                       )}
-                      <span className="text-[10px] font-medium leading-tight">{item.label}</span>
+                      <span className="text-[10px] font-medium leading-tight">{t(item.label)}</span>
                     </Link>
                   )
                 })}
@@ -431,9 +435,9 @@ export default function DashboardClient({ children }: { children: React.ReactNod
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-medium text-[#3C403E]">
-                      {user?.displayName ?? user?.email ?? 'Guest'}
+                      {user?.displayName ?? user?.email ?? t("Guest")}
                     </p>
-                    <p className="text-xs text-[#5A5F5C]">View Profile</p>
+                    <p className="text-xs text-[#5A5F5C]">{t("View Profile")}</p>
                   </div>
                 </button>
               </div>
@@ -452,7 +456,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
       {user && (
         <button
           onClick={() => setFeedbackOpen(true)}
-          aria-label="Send feedback"
+          aria-label={t("Send feedback")}
           className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50
             flex items-center gap-2 px-3.5 py-2 rounded-full
             bg-[#FFFFFF] border border-lp-rule text-[#3C403E]
@@ -460,7 +464,7 @@ export default function DashboardClient({ children }: { children: React.ReactNod
               transition-all duration-200 text-sm font-medium"
         >
           <MessageSquare className="w-3.5 h-3.5 text-[#1F5C4A]" />
-          Feedback
+          {t("Feedback")}
         </button>
       )}
 

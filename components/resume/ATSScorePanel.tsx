@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Target, CheckCircle, XCircle, AlertTriangle, Lightbulb, Loader2, TrendingUp } from 'lucide-react'
@@ -104,6 +106,7 @@ interface DimensionBreakdownProps {
 }
 
 function DimensionBreakdown({ dims }: DimensionBreakdownProps) {
+  const t = useT()
   const bars: Array<{ label: string; key: keyof ATSDimensionScores; max: number; color: string }> = [
     { label: 'Keyword Match', key: 'keyword', max: 40, color: '#1F5C4A' },
     { label: 'Achievement Orientation', key: 'achievement', max: 25, color: '#1F5C4A' },
@@ -113,12 +116,12 @@ function DimensionBreakdown({ dims }: DimensionBreakdownProps) {
 
   return (
     <div>
-      <p className="text-[10px] font-semibold text-[#5A5F5C] uppercase tracking-wide mb-2.5">Score Breakdown</p>
+      <p className="text-[10px] font-semibold text-[#5A5F5C] uppercase tracking-wide mb-2.5">{t("Score Breakdown")}</p>
       <div className="space-y-2.5">
         {bars.map((bar, i) => (
           <DimensionBar
             key={bar.key}
-            label={bar.label}
+            label={t(bar.label)}
             value={dims[bar.key]}
             max={bar.max}
             color={bar.color}
@@ -131,6 +134,7 @@ function DimensionBreakdown({ dims }: DimensionBreakdownProps) {
 }
 
 export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScorePanelProps) {
+  const t = useT()
   const [prevScore, setPrevScore] = useState<number | undefined>()
 
   useEffect(() => {
@@ -143,7 +147,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
         <div className="rounded-[10px]  bg-[#FFFFFF] p-5">
           <div className="flex items-center gap-2 mb-4">
             <Target className="w-4 h-4 text-[#1F5C4A]" />
-            <span className="text-sm font-semibold text-lp-ink">Analyzing ATS compatibility...</span>
+            <span className="text-sm font-semibold text-lp-ink">{t("Analyzing ATS compatibility...")}</span>
             <Loader2 className="w-3.5 h-3.5 text-[#1F5C4A] animate-spin ml-auto" />
           </div>
           <div className="space-y-2">
@@ -175,11 +179,11 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <Target className="w-4 h-4 text-[#1F5C4A]" />
-              <span className="text-sm font-semibold text-lp-ink">ATS Score</span>
+              <span className="text-sm font-semibold text-lp-ink">{t("ATS Score")}</span>
             </div>
-            <p className={`text-2xl font-heading font-bold ${scoreColor}`}>{scoreLabel}</p>
+            <p className={`text-2xl font-heading font-bold ${scoreColor}`}>{t(scoreLabel)}</p>
             <p className="text-xs text-[#5A5F5C] mt-1">
-              {score.matched_keywords.length} keywords matched · {score.missing_keywords.length} missing
+              {t("{v0} keywords matched · {v1} missing", { v0: score.matched_keywords.length, v1: score.missing_keywords.length })}
             </p>
           </div>
         </div>
@@ -189,7 +193,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
           <div className="flex items-start gap-2 px-3 py-2 rounded-[4px] bg-[#8A5A00]/[0.08] border border-[#8A5A00]/20">
             <span className="text-[#8A5A00] text-xs flex-shrink-0 mt-px">⚠</span>
             <p className="text-xs text-[#8A5A00]">
-              Score based on extracted text — may be lower than your actual ATS performance
+              {t("Score based on extracted text — may be lower than your actual ATS performance")}
             </p>
           </div>
         )}
@@ -206,7 +210,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
           <div>
             <div className="flex items-center gap-1.5 mb-2">
               <TrendingUp className="w-3.5 h-3.5 text-[#1F7A4D]" />
-              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">Strengths</span>
+              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Strengths")}</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {score.strength_areas.map((s, i) => (
@@ -223,7 +227,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
           <div>
             <div className="flex items-center gap-1.5 mb-2">
               <CheckCircle className="w-3.5 h-3.5 text-[#1F7A4D]" />
-              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">Matched Keywords</span>
+              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Matched Keywords")}</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {score.matched_keywords.slice(0, 15).map((kw, i) => (
@@ -245,7 +249,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
           <div>
             <div className="flex items-center gap-1.5 mb-2">
               <XCircle className="w-3.5 h-3.5 text-[#B42318]" />
-              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">Missing Keywords</span>
+              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Missing Keywords")}</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {score.missing_keywords.map((kw, i) => (
@@ -262,7 +266,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
           <div>
             <div className="flex items-center gap-1.5 mb-2">
               <AlertTriangle className="w-3.5 h-3.5 text-[#8A5A00]" />
-              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">Formatting Issues</span>
+              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Formatting Issues")}</span>
             </div>
             <ul className="space-y-1">
               {score.formatting_issues.map((issue, i) => (
@@ -280,7 +284,7 @@ export default function ATSScorePanel({ score, isLoading, uploadMode }: ATSScore
           <div>
             <div className="flex items-center gap-1.5 mb-2">
               <Lightbulb className="w-3.5 h-3.5 text-[#1F5C4A]" />
-              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">Suggestions</span>
+              <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Suggestions")}</span>
             </div>
             <ul className="space-y-1.5">
               {score.suggestions.map((s, i) => (

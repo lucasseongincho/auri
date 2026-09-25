@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -15,6 +17,7 @@ const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
 // ── Upgrade success toast — shown after Stripe checkout redirect ──────────────
 function UpgradedToast({ onDismiss }: { onDismiss: () => void }) {
+  const t = useT()
   return (
     <motion.div
       initial={{ opacity: 0, y: -24, scale: 0.95 }}
@@ -29,10 +32,10 @@ function UpgradedToast({ onDismiss }: { onDismiss: () => void }) {
             <Sparkles className="w-4 h-4 text-lp-ink" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-heading font-bold text-lp-ink text-sm">Welcome to AURI Pro! 🎉</p>
-            <p className="text-xs text-[#3C403E] mt-0.5">Unlimited generations unlocked. You&apos;re ready to land the job.</p>
+            <p className="font-heading font-bold text-lp-ink text-sm">{t("Welcome to AURI Pro! 🎉")}</p>
+            <p className="text-xs text-[#3C403E] mt-0.5">{t("Unlimited generations unlocked. You're ready to land the job.")}</p>
           </div>
-          <button onClick={onDismiss} aria-label="Dismiss" className="text-[#5A5F5C] hover:text-lp-ink transition-colors flex-shrink-0">
+          <button onClick={onDismiss} aria-label={t("Dismiss")} className="text-[#5A5F5C] hover:text-lp-ink transition-colors flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -81,6 +84,7 @@ const QUICK_ACTIONS = [
 ]
 
 function UpgradeBanner() {
+  const t = useT()
   const [isPro, setIsPro] = useState<boolean | null>(null)
   const { user } = useAuth()
 
@@ -114,8 +118,8 @@ function UpgradeBanner() {
             <Zap className="w-4 h-4 text-lp-ink" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-lp-ink">3 free generations/month</p>
-            <p className="text-xs text-[#3C403E]">Upgrade to Pro for unlimited access to all AI tools.</p>
+            <p className="text-sm font-semibold text-lp-ink">{t("3 free generations/month")}</p>
+            <p className="text-xs text-[#3C403E]">{t("Upgrade to Pro for unlimited access to all AI tools.")}</p>
           </div>
         </div>
         <Link
@@ -124,7 +128,7 @@ function UpgradeBanner() {
             bg-[#1F5C4A]
              transition-all duration-200 whitespace-nowrap"
         >
-          Upgrade to Pro
+          {t("Upgrade to Pro")}
         </Link>
       </div>
     </motion.div>
@@ -132,6 +136,7 @@ function UpgradeBanner() {
 }
 
 export default function DashboardPage() {
+  const t = useT()
   const { profile, atsScore } = useCareerProfile()
   const { user } = useAuth()
 
@@ -150,9 +155,9 @@ export default function DashboardPage() {
 
   const greeting = () => {
     const hour = new Date().getHours()
-    if (hour < 12) return 'Good morning'
-    if (hour < 18) return 'Good afternoon'
-    return 'Good evening'
+    if (hour < 12) return t("Good morning")
+    if (hour < 18) return t("Good afternoon")
+    return t("Good evening")
   }
 
   return (
@@ -172,12 +177,14 @@ export default function DashboardPage() {
         transition={SPRING}
       >
         <h1 className="font-heading text-3xl font-bold text-lp-ink mb-1">
-          {greeting()}{user?.displayName ? `, ${user.displayName.split(' ')[0]}` : ''}
+          {user?.displayName
+            ? t('{greeting}, {name}', { greeting: greeting(), name: user.displayName.split(' ')[0] })
+            : greeting()}
         </h1>
         <p className="text-[#3C403E]">
           {completeness < 50
-            ? 'Complete your career profile to unlock full AI personalization.'
-            : 'Your career toolkit is ready. What would you like to work on?'}
+            ? t("Complete your career profile to unlock full AI personalization.")
+            : t("Your career toolkit is ready. What would you like to work on?")}
         </p>
       </motion.div>
 
@@ -192,7 +199,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-[#1F5C4A]" />
-              <span className="text-sm font-medium text-[#3C403E]">Profile Completeness</span>
+              <span className="text-sm font-medium text-[#3C403E]">{t("Profile Completeness")}</span>
             </div>
             <span className="font-heading font-bold text-lp-ink">{completeness}%</span>
           </div>
@@ -207,23 +214,23 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center gap-4 text-xs text-[#5A5F5C]">
               {profile?.personal.name ? (
-                <span className="flex items-center gap-1 text-[#1F7A4D]"><CheckCircle className="w-3 h-3" /> Personal info</span>
+                <span className="flex items-center gap-1 text-[#1F7A4D]"><CheckCircle className="w-3 h-3" />{' '}{t("Personal info")}</span>
               ) : (
-                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#8A5A00]" /> Personal info</span>
+                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#8A5A00]" />{' '}{t("Personal info")}</span>
               )}
               {profile?.experience && profile.experience.length > 0 ? (
-                <span className="flex items-center gap-1 text-[#1F7A4D]"><CheckCircle className="w-3 h-3" /> Experience</span>
+                <span className="flex items-center gap-1 text-[#1F7A4D]"><CheckCircle className="w-3 h-3" />{' '}{t("Experience")}</span>
               ) : (
-                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#8A5A00]" /> Experience</span>
+                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#8A5A00]" />{' '}{t("Experience")}</span>
               )}
               {profile?.target.position ? (
-                <span className="flex items-center gap-1 text-[#1F7A4D]"><CheckCircle className="w-3 h-3" /> Target role</span>
+                <span className="flex items-center gap-1 text-[#1F7A4D]"><CheckCircle className="w-3 h-3" />{' '}{t("Target role")}</span>
               ) : (
-                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#8A5A00]" /> Target role</span>
+                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3 text-[#8A5A00]" />{' '}{t("Target role")}</span>
               )}
             </div>
             <Link href="/dashboard/resume" className="text-xs text-[#1F5C4A] hover:text-[#1F5C4A] transition-colors flex items-center gap-1">
-              Complete profile <ChevronRight className="w-3 h-3" />
+              {t("Complete profile")}{' '}<ChevronRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
@@ -240,14 +247,14 @@ export default function DashboardPage() {
           <div className="rounded-[10px]  bg-[#FFFFFF] p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[#3C403E] mb-1">Last ATS Score</p>
+                <p className="text-sm text-[#3C403E] mb-1">{t("Last ATS Score")}</p>
                 <p className="font-heading text-4xl font-bold text-lp-ink">{atsScore.score}<span className="text-xl text-[#5A5F5C]">/100</span></p>
               </div>
               <div className="text-right">
                 <Link href="/dashboard/ats" className="text-sm text-[#1F5C4A] hover:text-[#1F5C4A] transition-colors flex items-center gap-1 justify-end">
-                  View report <ChevronRight className="w-3.5 h-3.5" />
+                  {t("View report")}{' '}<ChevronRight className="w-3.5 h-3.5" />
                 </Link>
-                <p className="text-xs text-[#5A5F5C] mt-1">{atsScore.missing_keywords.length} keywords missing</p>
+                <p className="text-xs text-[#5A5F5C] mt-1">{t("{v0} keywords missing", { v0: atsScore.missing_keywords.length })}</p>
               </div>
             </div>
           </div>
@@ -257,7 +264,7 @@ export default function DashboardPage() {
       {/* Quick actions grid */}
       <div>
         <h2 className="font-heading font-semibold text-[#3C403E] text-sm mb-4 uppercase tracking-widest">
-          Quick Actions
+          {t("Quick Actions")}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {QUICK_ACTIONS.map((action, i) => (
@@ -279,8 +286,8 @@ export default function DashboardPage() {
                         transition-shadow duration-300`}>
                       <action.icon className="w-5 h-5 text-lp-ink" />
                     </div>
-                    <p className="font-heading font-semibold text-lp-ink text-sm mb-1">{action.label}</p>
-                    <p className="text-xs text-[#5A5F5C]">{action.desc}</p>
+                    <p className="font-heading font-semibold text-lp-ink text-sm mb-1">{t(action.label)}</p>
+                    <p className="text-xs text-[#5A5F5C]">{t(action.desc)}</p>
                   </div>
                 </motion.div>
               </Link>

@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/i18n/client'
+
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -29,8 +31,8 @@ function toMs(val: unknown): number {
   return toDate(val)?.getTime() ?? 0
 }
 
-function formatDate(val: unknown) {
-  return formatResumeDate(val, '')
+function formatDate(locale: 'en' | 'ko', val: unknown) {
+  return formatResumeDate(val, '', locale)
 }
 
 function ATSBadge({ score }: { score?: number }) {
@@ -48,6 +50,7 @@ function ATSBadge({ score }: { score?: number }) {
 }
 
 export default function SavedResumesPage() {
+  const { t, locale } = useLocale()
   const { user, loading: authLoading } = useAuth()
 
   const [resumes, setResumes] = useState<SavedResume[]>([])
@@ -75,7 +78,7 @@ export default function SavedResumesPage() {
           setResumes([])
         }
       } catch {
-        setError('Failed to load saved resumes.')
+        setError(t("Failed to load saved resumes."))
       } finally {
         setLoading(false)
       }
@@ -110,7 +113,7 @@ export default function SavedResumesPage() {
       await deleteSavedResume(user.uid, id)
       setResumes((prev) => prev.filter((r) => r.id !== id))
     } catch {
-      setError('Failed to delete resume.')
+      setError(t("Failed to delete resume."))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -137,7 +140,7 @@ export default function SavedResumesPage() {
       setRenameSuccessId(id)
       setTimeout(() => setRenameSuccessId(null), 2000)
     } catch {
-      setError('Failed to rename resume.')
+      setError(t("Failed to rename resume."))
     } finally {
       setRenameSaving(false)
     }
@@ -159,9 +162,9 @@ export default function SavedResumesPage() {
             <FileText className="w-5 h-5 text-lp-ink" />
           </div>
           <div>
-            <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">My Resumes</h1>
+            <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight">{t("My Resumes")}</h1>
             <p className="text-xs text-[#5A5F5C]">
-              {loading ? 'Loading…' : `${resumes.length} saved resume${resumes.length !== 1 ? 's' : ''}`}
+              {loading ? t("Loading…") : t("{v0} saved resume{v1}", { v0: resumes.length, v1: resumes.length !== 1 ? 's' : '' })}
             </p>
           </div>
         </div>
@@ -172,7 +175,7 @@ export default function SavedResumesPage() {
              transition-all duration-200"
         >
           <Plus className="w-4 h-4" />
-          New Resume
+          {t("New Resume")}
         </Link>
       </motion.div>
 
@@ -203,7 +206,7 @@ export default function SavedResumesPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A5F5C]" />
             <input
               type="text"
-              placeholder="Search by position, company, or name…"
+              placeholder={t("Search by position, company, or name…")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2 rounded-[10px] text-sm
@@ -219,10 +222,10 @@ export default function SavedResumesPage() {
               className="px-3 py-2 rounded-[4px] text-sm bg-[#FFFFFF] border border-lp-rule
                 text-[#3C403E] focus:outline-none focus:border-[#1F5C4A]/50 transition-colors"
             >
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-              <option value="az">Position A–Z</option>
-              <option value="za">Position Z–A</option>
+              <option value="newest">{t("Newest first")}</option>
+              <option value="oldest">{t("Oldest first")}</option>
+              <option value="az">{t("Position A–Z")}</option>
+              <option value="za">{t("Position Z–A")}</option>
             </select>
           </div>
         </motion.div>
@@ -249,9 +252,9 @@ export default function SavedResumesPage() {
               flex items-center justify-center mb-4">
               <FileText className="w-8 h-8 text-[#1F5C4A]" />
             </div>
-            <h3 className="font-heading text-base font-semibold text-lp-ink mb-2">No saved resumes yet</h3>
+            <h3 className="font-heading text-base font-semibold text-lp-ink mb-2">{t("No saved resumes yet")}</h3>
             <p className="text-sm text-[#5A5F5C] mb-5 max-w-sm">
-              Build your first AI-powered resume and hit Save to see it here.
+              {t("Build your first AI-powered resume and hit Save to see it here.")}
             </p>
             <Link
               href="/dashboard/resume"
@@ -260,7 +263,7 @@ export default function SavedResumesPage() {
                     transition-all"
             >
               <Plus className="w-4 h-4" />
-              Build your first resume
+              {t("Build your first resume")}
             </Link>
           </motion.div>
         )}
@@ -273,9 +276,9 @@ export default function SavedResumesPage() {
             className="flex flex-col items-center justify-center py-16 text-center"
           >
             <Search className="w-8 h-8 text-[#5A5F5C] mb-3" />
-            <p className="text-sm text-[#3C403E]">No resumes match &ldquo;{search}&rdquo;</p>
+            <p className="text-sm text-[#3C403E]">{t("No resumes match “{v0}”", { v0: search })}</p>
             <button onClick={() => setSearch('')} className="mt-2 text-xs text-[#1F5C4A] hover:underline">
-              Clear search
+              {t("Clear search")}
             </button>
           </motion.div>
         )}
@@ -322,14 +325,14 @@ export default function SavedResumesPage() {
                           <button
                             onClick={() => handleSaveRename(resume.id)}
                             disabled={renameSaving}
-                            aria-label="Save rename"
+                            aria-label={t("Save rename")}
                             className="p-1 rounded-[4px] text-[#1F7A4D] hover:bg-[#1F7A4D]/10 transition-colors flex-shrink-0"
                           >
                             {renameSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                           </button>
                           <button
                             onClick={handleCancelRename}
-                            aria-label="Cancel rename"
+                            aria-label={t("Cancel rename")}
                             className="p-1 rounded-[4px] text-[#5A5F5C] hover:bg-lp-ink/5 transition-colors flex-shrink-0"
                           >
                             <X className="w-3.5 h-3.5" />
@@ -339,14 +342,14 @@ export default function SavedResumesPage() {
                         <div className="flex items-center gap-1 min-w-0">
                           <p className="text-sm font-semibold text-lp-ink truncate">
                             {renameSuccessId === resume.id ? (
-                              <span className="text-[#1F7A4D]">Renamed ✓</span>
+                              <span className="text-[#1F7A4D]">{t("Renamed ✓")}</span>
                             ) : (
-                              resume.name || resume.targetPosition || 'Untitled'
+                              resume.name || resume.targetPosition || t("Untitled")
                             )}
                           </p>
                           <button
                             onClick={() => handleStartRename(resume)}
-                            aria-label="Rename resume"
+                            aria-label={t("Rename resume")}
                             className="p-1 rounded-[4px] text-[#5A5F5C] hover:text-[#3C403E] hover:bg-lp-ink/5
                               transition-all duration-200 flex-shrink-0 opacity-0 group-hover:opacity-100"
                           >
@@ -378,7 +381,7 @@ export default function SavedResumesPage() {
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-[#5A5F5C]">
                       <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>Updated {formatDate(resume.updatedAt)}</span>
+                      <span>{t("Updated {v0}", { v0: formatDate(locale, resume.updatedAt) })}</span>
                     </div>
                   </div>
 
@@ -390,11 +393,11 @@ export default function SavedResumesPage() {
                         rounded-[4px] text-xs font-semibold bg-[#1F5C4A] text-white
                         hover:bg-[#15443A] transition-colors"
                     >
-                      Open
+                      {t("Open")}
                     </Link>
                     <button
                       onClick={() => setDeleteTarget(resume.id)}
-                      aria-label={`Delete resume ${resume.name}`}
+                      aria-label={t("Delete resume {v0}", { v0: resume.name })}
                       className="p-2 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318]
                         hover:bg-[#B42318]/10 transition-all duration-200"
                     >
@@ -438,9 +441,9 @@ export default function SavedResumesPage() {
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                <h3 className="font-heading text-base font-semibold text-lp-ink mb-1">Delete resume?</h3>
+                <h3 className="font-heading text-base font-semibold text-lp-ink mb-1">{t("Delete resume?")}</h3>
                 <p className="text-sm text-[#5A5F5C] mb-6">
-                  This resume will be permanently deleted. This action cannot be undone.
+                  {t("This resume will be permanently deleted. This action cannot be undone.")}
                 </p>
                 <div className="flex gap-3">
                   <button
@@ -449,7 +452,7 @@ export default function SavedResumesPage() {
                       border border-lp-rule text-[#3C403E]
                       hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                   <button
                     onClick={() => handleDelete(deleteTarget)}
@@ -458,7 +461,7 @@ export default function SavedResumesPage() {
                       bg-[#B42318] text-white hover:bg-[#912018] transition-colors
                       disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Delete'}
+                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t("Delete")}
                   </button>
                 </div>
               </div>

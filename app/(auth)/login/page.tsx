@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -9,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth'
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
 export default function LoginPage() {
+  const t = useT()
   const router = useRouter()
   const { signInWithGoogle, signInWithEmail } = useAuth()
   const [email, setEmail] = useState('')
@@ -33,7 +36,7 @@ export default function LoginPage() {
       await signInWithEmail(email, password)
       router.push(getPostAuthRedirect())
     } catch {
-      setError('Invalid email or password.')
+      setError(t("Invalid email or password."))
     } finally {
       setLoading(false)
     }
@@ -49,15 +52,15 @@ export default function LoginPage() {
       const code = (err as { code?: string })?.code ?? ''
       console.error('[Google Sign-In Error]', err)
       if (code === 'auth/popup-blocked') {
-        setError('Popup was blocked. Please allow popups and try again.')
+        setError(t("Popup was blocked. Please allow popups and try again."))
       } else if (code === 'auth/cancelled-popup-request' || code === 'auth/popup-closed-by-user') {
-        setError('Sign-in was cancelled. Please try again.')
+        setError(t("Sign-in was cancelled. Please try again."))
       } else if (code === 'auth/unauthorized-domain') {
-        setError('This domain is not authorized. Please contact support.')
+        setError(t("This domain is not authorized. Please contact support."))
       } else if (code) {
-        setError(`Sign-in failed: ${code}`)
+        setError(t("Sign-in failed: {code}", { code }))
       } else {
-        setError('Google sign-in failed. Please try again.')
+        setError(t("Google sign-in failed. Please try again."))
       }
     } finally {
       setLoading(false)
@@ -83,34 +86,34 @@ export default function LoginPage() {
               <div className="w-8 h-8 rounded-[4px] bg-[#1F5C4A]/10 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-lp-ink" />
               </div>
-              <span className="font-heading font-bold text-lp-ink text-lg">AURI</span>
+              <span className="font-heading font-bold text-lp-ink text-lg">{t("AURI")}</span>
             </div>
 
-            <h1 className="font-heading text-2xl font-bold text-lp-ink mb-2">Welcome back</h1>
-            <p className="text-[#3C403E] text-sm mb-8">Sign in to your career toolkit</p>
+            <h1 className="font-heading text-2xl font-bold text-lp-ink mb-2">{t("Welcome back")}</h1>
+            <p className="text-[#3C403E] text-sm mb-8">{t("Sign in to your career toolkit")}</p>
 
             <button
               onClick={handleGoogleLogin}
               disabled={loading}
-              aria-label="Sign in with Google"
+              aria-label={t("Sign in with Google")}
               className="w-full flex items-center justify-center gap-3 py-3 rounded-[10px]
                 border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
                 transition-all duration-200 font-medium mb-6 disabled:opacity-50"
             >
               <Chrome className="w-4 h-4" />
-              Continue with Google
+              {t("Continue with Google")}
             </button>
 
             <div className="flex items-center gap-4 mb-6">
               <div className="flex-1 h-px bg-lp-ink/8" />
-              <span className="text-xs text-[#5A5F5C]">or</span>
+              <span className="text-xs text-[#5A5F5C]">{t("or")}</span>
               <div className="flex-1 h-px bg-lp-ink/8" />
             </div>
 
             <form onSubmit={handleEmailLogin} className="space-y-4">
               <div>
                 <label className="text-xs font-medium text-[#3C403E] mb-1.5 block" htmlFor="email">
-                  Email
+                  {t("Email")}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A5F5C]" />
@@ -119,7 +122,7 @@ export default function LoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
+                    placeholder={t("you@example.com")}
                     className="w-full pl-10 pr-4 py-3 rounded-[10px] bg-lp-ink/5 border border-lp-rule
                       text-lp-ink placeholder-[#5A5F5C] focus:outline-none focus:border-[#1F5C4A]
                       transition-colors duration-200 text-sm"
@@ -130,7 +133,7 @@ export default function LoginPage() {
 
               <div>
                 <label className="text-xs font-medium text-[#3C403E] mb-1.5 block" htmlFor="password">
-                  Password
+                  {t("Password")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A5F5C]" />
@@ -157,15 +160,15 @@ export default function LoginPage() {
                   bg-[#1F5C4A]
                    transition-all duration-200 disabled:opacity-50"
               >
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? t("Signing in...") : t("Sign In")}
               </button>
             </form>
 
             <div className="mt-6 pt-6 border-t border-lp-hairline text-center">
               <p className="text-sm text-[#5A5F5C]">
-                Don&apos;t have an account?{' '}
+                {t("Don't have an account?")}{' '}
                 <Link href="/signup" className="text-[#1F5C4A] underline underline-offset-2 hover:text-[#15443A] transition-colors">
-                  Sign up
+                  {t("Sign up")}
                 </Link>
               </p>
             </div>

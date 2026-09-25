@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -34,6 +36,7 @@ const ANNUAL_FEATURES = [
 ]
 
 export default function PricingPage() {
+  const t = useT()
   const { user } = useAuth()
   const [billing, setBilling] = useState<'monthly' | 'annual'>('annual')
 
@@ -72,7 +75,7 @@ export default function PricingPage() {
           className="inline-flex items-center gap-1.5 text-sm text-[#5A5F5C] hover:text-lp-ink transition-colors mb-12"
         >
           <ArrowLeft className="w-4 h-4" />
-          {user ? 'Back to dashboard' : 'Back to home'}
+          {user ? t("Back to dashboard") : t("Back to home")}
         </Link>
 
         {/* Header */}
@@ -83,13 +86,13 @@ export default function PricingPage() {
           className="text-center mb-10"
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1F5C4A]/30 bg-[#1F5C4A]/10 text-[#1F5C4A] text-xs font-medium mb-6">
-            <Sparkles className="w-3 h-3" /> Simple, transparent pricing
+            <Sparkles className="w-3 h-3" />{' '}{t("Simple, transparent pricing")}
           </div>
           <h1 className="font-heading text-4xl lg:text-5xl font-bold text-lp-ink mb-4">
-            Start free. Upgrade when<br />you&apos;re ready.
+            {t("Start free. Upgrade when")}<br />{t("you're ready.")}
           </h1>
           <p className="text-[#3C403E] text-lg">
-            No credit card required to start. Cancel anytime.
+            {t("No credit card required to start. Cancel anytime.")}
           </p>
         </motion.div>
 
@@ -111,7 +114,7 @@ export default function PricingPage() {
                   : 'text-[#5A5F5C] hover:text-[#3C403E]'
               }`}
             >
-              Monthly
+              {t("Monthly")}
             </button>
             <button
               onClick={() => setBilling('annual')}
@@ -122,10 +125,10 @@ export default function PricingPage() {
                   : 'text-[#5A5F5C] hover:text-[#3C403E]'
               }`}
             >
-              Annual
+              {t("Annual")}
               <span className="text-[10px] font-semibold px-1.5 py-0.5
                 rounded-full bg-[#1F7A4D] text-white">
-                Save 17%
+                {t("Save 17%")}
               </span>
             </button>
           </div>
@@ -142,23 +145,23 @@ export default function PricingPage() {
             <div className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0 h-full">
               <div className="rounded-[10px]  bg-[#FFFFFF] p-8 h-full flex flex-col">
                 <div className="mb-6">
-                  <p className="font-heading font-semibold text-[#3C403E] mb-2">Free</p>
+                  <p className="font-heading font-semibold text-[#3C403E] mb-2">{t("Free")}</p>
                   <div className="flex items-end gap-1">
                     <span className="font-heading font-bold text-4xl text-lp-ink">$0</span>
-                    <span className="text-[#5A5F5C] mb-1">/month</span>
+                    <span className="text-[#5A5F5C] mb-1">{t("/month")}</span>
                   </div>
-                  <p className="text-xs text-[#5A5F5C] mt-2">No credit card required</p>
+                  <p className="text-xs text-[#5A5F5C] mt-2">{t("No credit card required")}</p>
                 </div>
 
                 <ul className="space-y-3 mb-2 flex-1">
                   {FREE_FEATURES.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-[#3C403E]">
-                      <CheckCircle className="w-4 h-4 text-[#1F7A4D] flex-shrink-0" /> {f}
+                      <CheckCircle className="w-4 h-4 text-[#1F7A4D] flex-shrink-0" /> {t(f)}
                     </li>
                   ))}
                 </ul>
                 <p className="text-xs text-[#5A5F5C] mt-2 mb-8">
-                  LinkedIn, Strategy, Interview &amp; Rewriter require Pro
+                  {t("LinkedIn, Strategy, Interview & Rewriter require Pro")}
                 </p>
 
                 <Link
@@ -167,7 +170,7 @@ export default function PricingPage() {
                     text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5
                     transition-all duration-200 font-medium"
                 >
-                  Get Started Free
+                  {t("Get Started Free")}
                 </Link>
               </div>
             </div>
@@ -182,11 +185,11 @@ export default function PricingPage() {
             <div className="rounded-[10px] border border-[#1F5C4A]/40 bg-[#FFFFFF] p-1 h-full relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full
                 bg-[#1F5C4A] text-white text-xs font-semibold">
-                Most Popular
+                {t("Most Popular")}
               </div>
               <div className="rounded-[10px] border border-[#1F5C4A]/20 bg-[#FFFFFF] p-8 h-full flex flex-col">
                 <div className="mb-6">
-                  <p className="font-heading font-semibold text-[#1F5C4A] mb-2">Pro</p>
+                  <p className="font-heading font-semibold text-[#1F5C4A] mb-2">{t("Pro")}</p>
                   <div className="flex items-end gap-1">
                     <AnimatePresence mode="wait">
                       <motion.span
@@ -200,7 +203,7 @@ export default function PricingPage() {
                         {billing === 'annual' ? '$15.83' : '$19'}
                       </motion.span>
                     </AnimatePresence>
-                    <span className="text-[#5A5F5C] mb-1">/month</span>
+                    <span className="text-[#5A5F5C] mb-1">{t("/month")}</span>
                   </div>
                   <AnimatePresence>
                     {billing === 'annual' && (
@@ -211,7 +214,7 @@ export default function PricingPage() {
                         transition={{ duration: 0.15 }}
                         className="text-xs text-[#1F7A4D] mt-1"
                       >
-                        $190 billed annually
+                        {t("$190 billed annually")}
                       </motion.p>
                     )}
                   </AnimatePresence>
@@ -220,7 +223,7 @@ export default function PricingPage() {
                 <ul className="space-y-3 mb-8 flex-1">
                   {PRO_FEATURES.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-[#3C403E]">
-                      <CheckCircle className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" /> {f}
+                      <CheckCircle className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" /> {t(f)}
                     </li>
                   ))}
                 </ul>
@@ -231,7 +234,7 @@ export default function PricingPage() {
                     bg-[#1F5C4A]
                      transition-all duration-200"
                 >
-                  {user ? 'Upgrade to Pro' : 'Sign in to Upgrade'}
+                  {user ? t("Upgrade to Pro") : t("Sign in to Upgrade")}
                 </button>
               </div>
             </div>
@@ -245,9 +248,9 @@ export default function PricingPage() {
           transition={{ delay: 0.3 }}
           className="text-center text-sm text-[#5A5F5C] mt-12"
         >
-          Questions? Email{' '}
+          {t("Questions? Email")}{' '}
           <a href="mailto:support@auri.app" className="text-[#1F5C4A] underline underline-offset-2 hover:text-[#15443A] transition-colors">
-            support@auri.app
+            {t("support@auri.app")}
           </a>
         </motion.p>
       </div>

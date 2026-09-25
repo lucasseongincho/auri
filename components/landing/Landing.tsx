@@ -273,7 +273,6 @@ export default function Landing({ c }: { c: LandingCopy }) {
         <div className={`${shell} flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-12`}>
           <div className="flex flex-col gap-1.5 lg:gap-2.5">
             <p className="font-lp-serif text-xl font-semibold tracking-[0.06em] lg:text-[22px]">AURI</p>
-            <p className="text-sm text-lp-muted">{c.footer.poweredBy}</p>
             <p className="text-sm text-lp-muted">{c.footer.copyright}</p>
           </div>
           <nav aria-label={c.footer.label} className="grid grid-cols-2 gap-x-4 text-[15px] lg:flex lg:gap-8">

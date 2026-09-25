@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { motion } from 'framer-motion'
 import { Wand2, Loader2 } from 'lucide-react'
 import type { StructuredSuggestion } from '@/types'
@@ -36,6 +38,7 @@ export default function SuggestionsPanel({
   isApplying,
   onDiscard,
 }: SuggestionsPanelProps) {
+  const t = useT()
   const allChecked =
     suggestions.length > 0 && suggestions.every((s) => checkedIds.has(s.id))
 
@@ -65,16 +68,16 @@ export default function SuggestionsPanel({
         {/* Header */}
         <div className="flex items-center gap-2">
           <Wand2 className="w-4 h-4 text-[#1F5C4A]" />
-          <span className="text-sm font-semibold text-lp-ink">Suggested Edits</span>
+          <span className="text-sm font-semibold text-lp-ink">{t("Suggested Edits")}</span>
           <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]">
             {suggestions.length}
           </span>
-          <span className="text-[10px] text-[#5A5F5C] ml-auto uppercase tracking-wide">pro</span>
+          <span className="text-[10px] text-[#5A5F5C] ml-auto uppercase tracking-wide">{t("pro")}</span>
           <button
             onClick={handleToggleAll}
             className="text-xs text-[#5A5F5C] hover:text-[#3C403E] transition-colors"
           >
-            {allChecked ? 'Deselect all' : 'Select all'}
+            {allChecked ? t("Deselect all") : t("Select all")}
           </button>
         </div>
 
@@ -165,15 +168,15 @@ export default function SuggestionsPanel({
               transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isApplying
-              ? <><Loader2 className="w-4 h-4 animate-spin" /> Applying…</>
-              : `Apply ${checkedIds.size} Selected`
+              ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Applying…")}</>
+              : t("Apply {v0} Selected", { v0: checkedIds.size })
             }
           </button>
           <button
             onClick={onDiscard}
             className="text-sm text-[#5A5F5C] hover:text-[#3C403E] transition-colors"
           >
-            Discard
+            {t("Discard")}
           </button>
         </div>
       </div>

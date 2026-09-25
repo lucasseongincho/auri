@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/i18n/client'
+
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -73,6 +75,7 @@ function DayCard({ day, dayIndex, completed, onToggle }: {
   completed: Record<string, boolean>
   onToggle: (key: string) => void
 }) {
+  const { t, locale } = useLocale()
   const [expanded, setExpanded] = useState(dayIndex === 0)
   const color = DAY_COLORS[dayIndex % DAY_COLORS.length]
   const completedCount = day.actions.filter((_, ai) => completed[`${day.day}-${ai}`]).length
@@ -91,7 +94,7 @@ function DayCard({ day, dayIndex, completed, onToggle }: {
             </div>
             <div>
               <p className="text-sm font-semibold text-lp-ink leading-tight">{day.theme}</p>
-              <p className="text-xs text-[#5A5F5C] mt-0.5">{completedCount}/{day.actions.length} actions complete</p>
+              <p className="text-xs text-[#5A5F5C] mt-0.5">{t("{v0}/{v1} actions complete", { v0: completedCount, v1: day.actions.length })}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -129,6 +132,7 @@ function DayCard({ day, dayIndex, completed, onToggle }: {
 }
 
 export default function SavedStrategyDetailPage() {
+  const { t, locale } = useLocale()
   const { user, loading: authLoading } = useAuth()
   const params = useParams()
   const router = useRouter()
@@ -198,9 +202,9 @@ export default function SavedStrategyDetailPage() {
     }
   }
 
-  function formatDate(iso: string) {
+  function formatDate(locale: 'en' | 'ko', iso: string) {
     try {
-      return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+      return new Date(iso).toLocaleDateString(locale === 'ko' ? 'ko-KR' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     } catch { return iso }
   }
 
@@ -209,7 +213,7 @@ export default function SavedStrategyDetailPage() {
       <div className="min-h-screen bg-[#F4F2EC] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-[#1F5C4A] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[#3C403E] text-sm">Loading strategy…</p>
+          <p className="text-[#3C403E] text-sm">{t("Loading strategy…")}</p>
         </div>
       </div>
     )
@@ -221,13 +225,13 @@ export default function SavedStrategyDetailPage() {
         <div className="w-14 h-14 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mb-2">
           <Map className="w-7 h-7 text-[#B42318]" />
         </div>
-        <h2 className="text-lg font-semibold text-[#1B1D1C]">Strategy not found</h2>
-        <p className="text-[#5A5F5C] text-sm">This strategy may have been deleted.</p>
+        <h2 className="text-lg font-semibold text-[#1B1D1C]">{t("Strategy not found")}</h2>
+        <p className="text-[#5A5F5C] text-sm">{t("This strategy may have been deleted.")}</p>
         <button
           onClick={() => router.push('/dashboard/strategy/saved')}
           className="mt-2 px-5 py-2.5 rounded-[4px] bg-[#1F5C4A] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
         >
-          Back to strategies
+          {t("Back to strategies")}
         </button>
       </div>
     )
@@ -250,7 +254,7 @@ export default function SavedStrategyDetailPage() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
-              Back
+              {t("Back")}
             </button>
             <div className="w-px h-5 bg-lp-ink/10" />
             <div>
@@ -259,14 +263,14 @@ export default function SavedStrategyDetailPage() {
                 {[saved.industry, saved.city].filter(Boolean).join(' · ')}
               </p>
               <p className="text-[#5A5F5C] text-xs mt-0.5">
-                {typeof saved.createdAt === 'string' ? formatDate(saved.createdAt) : ''}
+                {typeof saved.createdAt === 'string' ? formatDate(locale, saved.createdAt) : ''}
               </p>
             </div>
           </div>
           <button
             onClick={() => setShowDelete(true)}
             className="p-2 rounded-[4px] bg-lp-ink/5 hover:bg-[#B42318]/10 hover:text-[#B42318] text-[#5A5F5C] transition-colors flex-shrink-0"
-            aria-label="Delete strategy"
+            aria-label={t("Delete strategy")}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -279,8 +283,8 @@ export default function SavedStrategyDetailPage() {
           <div className="rounded-[10px]  bg-[#FFFFFF] p-4">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-sm font-semibold text-lp-ink">{completedCount} / {totalActions} actions completed</p>
-                <p className="text-xs text-[#5A5F5C] mt-0.5">7-day plan · saved snapshot</p>
+                <p className="text-sm font-semibold text-lp-ink">{t("{v0} / {v1} actions completed", { v0: completedCount, v1: totalActions })}</p>
+                <p className="text-xs text-[#5A5F5C] mt-0.5">{t("7-day plan · saved snapshot")}</p>
               </div>
               <span className="text-sm font-bold text-[#1F5C4A]">
                 {totalActions > 0 ? Math.round((completedCount / totalActions) * 100) : 0}%
@@ -336,9 +340,9 @@ export default function SavedStrategyDetailPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-[#1B1D1C] text-center mb-2">Delete Strategy?</h3>
+                <h3 className="text-lg font-semibold text-[#1B1D1C] text-center mb-2">{t("Delete Strategy?")}</h3>
                 <p className="text-[#3C403E] text-sm text-center mb-6">
-                  This strategy plan will be permanently deleted.
+                  {t("This strategy plan will be permanently deleted.")}
                 </p>
                 <div className="flex gap-3">
                   <button
@@ -346,7 +350,7 @@ export default function SavedStrategyDetailPage() {
                     disabled={deleting}
                     className="flex-1 px-4 py-2.5 rounded-[4px] bg-lp-ink/5 hover:bg-lp-ink/8 text-[#3C403E] text-sm font-medium transition-colors disabled:opacity-50"
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                   <button
                     onClick={handleDelete}
@@ -354,8 +358,8 @@ export default function SavedStrategyDetailPage() {
                     className="flex-1 px-4 py-2.5 rounded-[4px] bg-[#B42318] hover:bg-[#912018] text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {deleting ? (
-                      <><div className="w-4 h-4 border-2 border-lp-rule border-t-lp-rule rounded-full animate-spin" />Deleting…</>
-                    ) : 'Delete'}
+                      <><div className="w-4 h-4 border-2 border-lp-rule border-t-lp-rule rounded-full animate-spin" />{t("Deleting…")}</>
+                    ) : t("Delete")}
                   </button>
                 </div>
               </div>

@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/i18n/client'
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -38,7 +40,7 @@ const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function formatDate(iso: unknown): string {
+function formatDate(locale: 'en' | 'ko', iso: unknown): string {
   try {
     // Firestore serverTimestamp() returns a Timestamp object {seconds, nanoseconds}.
     // Convert it to a JS Date before formatting; fall back to ISO string parsing.
@@ -48,8 +50,8 @@ function formatDate(iso: unknown): string {
     } else {
       date = new Date(iso as string)
     }
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
+    return new Intl.DateTimeFormat(locale === 'ko' ? 'ko-KR' : 'en-US', {
+      month: locale === 'ko' ? 'long' : 'short',
       day: 'numeric',
       year: 'numeric',
     }).format(date)
@@ -135,6 +137,7 @@ function DeleteConfirmModal({
   onCancel: () => void
   isDeleting: boolean
 }) {
+  const { t, locale } = useLocale()
   return (
     <AnimatePresence>
       <motion.div
@@ -162,29 +165,28 @@ function DeleteConfirmModal({
             </div>
 
             <h2 id="delete-dialog-title" className="font-heading font-semibold text-lp-ink text-lg mb-2">
-              Delete resume?
+              {t("Delete resume?")}
             </h2>
             <p className="text-sm text-[#3C403E] mb-6 leading-relaxed">
-              <span className="text-lp-ink font-medium">&ldquo;{resumeName}&rdquo;</span> will be
-              permanently deleted. This action cannot be undone.
+              <span className="text-lp-ink font-medium">{t("“{v0}”", { v0: resumeName })}</span>{' '}{t("will be permanently deleted. This action cannot be undone.")}
             </p>
 
             <div className="flex gap-3">
               <button
                 onClick={onCancel}
                 disabled={isDeleting}
-                aria-label="Cancel delete"
+                aria-label={t("Cancel delete")}
                 className="flex-1 px-4 py-2.5 rounded-[4px] text-sm font-medium
                   border border-lp-rule text-[#3C403E]
                   hover:bg-lp-ink/5 hover:text-lp-ink
                   transition-all duration-200 disabled:opacity-50"
               >
-                Cancel
+                {t("Cancel")}
               </button>
               <button
                 onClick={onConfirm}
                 disabled={isDeleting}
-                aria-label="Confirm delete resume"
+                aria-label={t("Confirm delete resume")}
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-[4px]
                   text-sm font-semibold bg-[#B42318] text-white
                   hover:bg-[#912018] transition-all duration-200
@@ -195,7 +197,7 @@ function DeleteConfirmModal({
                 ) : (
                   <Trash2 className="w-4 h-4" />
                 )}
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                {isDeleting ? 'Deleting...' : t("Delete")}
               </button>
             </div>
           </div>
@@ -207,6 +209,7 @@ function DeleteConfirmModal({
 
 /** Sign-in prompt shown when user is not authenticated */
 function SignInPrompt() {
+  const { t, locale } = useLocale()
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -221,11 +224,10 @@ function SignInPrompt() {
             <LogIn className="w-6 h-6 text-[#1F5C4A]" />
           </div>
           <h2 className="font-heading font-semibold text-lp-ink text-xl mb-2">
-            Sign in to view saved resumes
+            {t("Sign in to view saved resumes")}
           </h2>
           <p className="text-sm text-[#3C403E] mb-6 leading-relaxed">
-            Your saved resumes are stored securely in the cloud. Sign in to access them from any
-            device.
+            {t("Your saved resumes are stored securely in the cloud. Sign in to access them from any device.")}
           </p>
           <div className="flex gap-3 justify-center">
             <Link
@@ -234,7 +236,7 @@ function SignInPrompt() {
                 bg-[#1F5C4A] text-white
                  transition-all duration-200"
             >
-              Sign in
+              {t("Sign in")}
             </Link>
             <Link
               href="/dashboard/resume"
@@ -243,7 +245,7 @@ function SignInPrompt() {
                 hover:bg-lp-ink/5 hover:text-lp-ink
                 transition-all duration-200"
             >
-              New resume
+              {t("New resume")}
             </Link>
           </div>
         </div>
@@ -254,6 +256,7 @@ function SignInPrompt() {
 
 /** Not-found state */
 function ResumeNotFound() {
+  const { t, locale } = useLocale()
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -268,10 +271,10 @@ function ResumeNotFound() {
             <FileText className="w-6 h-6 text-[#5A5F5C]" />
           </div>
           <h2 className="font-heading font-semibold text-lp-ink text-xl mb-2">
-            Resume not found
+            {t("Resume not found")}
           </h2>
           <p className="text-sm text-[#3C403E] mb-6 leading-relaxed">
-            This resume may have been deleted or you may not have permission to view it.
+            {t("This resume may have been deleted or you may not have permission to view it.")}
           </p>
           <Link
             href="/dashboard/resume"
@@ -280,7 +283,7 @@ function ResumeNotFound() {
                transition-all duration-200"
           >
             <Plus className="w-4 h-4" />
-            Create new resume
+            {t("Create new resume")}
           </Link>
         </div>
       </div>
@@ -291,6 +294,7 @@ function ResumeNotFound() {
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function SavedResumePage() {
+  const { t, locale } = useLocale()
   const params = useParams<{ id: string }>()
   const router = useRouter()
   const { user, loading: authLoading, isAuthenticated } = useAuth()
@@ -388,7 +392,7 @@ export default function SavedResumePage() {
           setResume(data.resumeData)
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load resume')
+        setError(err instanceof Error ? err.message : t("Failed to load resume"))
       } finally {
         setLoadingResume(false)
       }
@@ -431,7 +435,7 @@ export default function SavedResumePage() {
         setSaveSuccess(false)
       }, 1200)
     } catch {
-      setError('Failed to save changes.')
+      setError(t("Failed to save changes."))
     } finally {
       setSaving(false)
     }
@@ -477,21 +481,21 @@ export default function SavedResumePage() {
           self-start sticky top-6
           max-h-[calc(100vh-120px)]
         `}
-        aria-label="Saved resumes list"
+        aria-label={t("Saved resumes list")}
       >
         <div className="rounded-[10px]  bg-[#FFFFFF] flex flex-col overflow-hidden flex-1">
           {/* Sidebar header */}
           <div className="flex items-center justify-between px-4 py-3.5 border-b border-lp-hairline">
-            <span className="text-sm font-semibold text-lp-ink">Saved Resumes</span>
+            <span className="text-sm font-semibold text-lp-ink">{t("Saved Resumes")}</span>
             <Link
               href="/dashboard/resume"
-              aria-label="Create new resume"
+              aria-label={t("Create new resume")}
               className="flex items-center gap-1 px-2.5 py-1 rounded-[4px] text-xs font-medium
                 bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]
                 hover:bg-[#1F5C4A]/20 transition-all duration-200"
             >
               <Plus className="w-3 h-3" />
-              New
+              {t("New")}
             </Link>
           </div>
 
@@ -502,7 +506,7 @@ export default function SavedResumePage() {
             ) : allResumes.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <FileText className="w-6 h-6 text-[#5A5F5C] mx-auto mb-2" />
-                <p className="text-xs text-[#5A5F5C]">No saved resumes yet</p>
+                <p className="text-xs text-[#5A5F5C]">{t("No saved resumes yet")}</p>
               </div>
             ) : (
               <ul className="px-2 space-y-1">
@@ -544,7 +548,7 @@ export default function SavedResumePage() {
                           <div className="flex items-center justify-between mt-1.5 gap-2">
                             <span className="text-[10px] text-[#5A5F5C] flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              {formatDate(r.createdAt)}
+                              {formatDate(locale, r.createdAt)}
                             </span>
                             {r.atsScore !== undefined && (
                               <span className={`
@@ -569,7 +573,7 @@ export default function SavedResumePage() {
       <div className="lg:hidden fixed bottom-20 right-4 z-30">
         <button
           onClick={() => setSidebarOpen((v) => !v)}
-          aria-label="Toggle resumes list"
+          aria-label={t("Toggle resumes list")}
           className="w-10 h-10 rounded-[10px] bg-[#1F5C4A] text-white flex items-center justify-center
               hover:bg-[#15443A] transition-all"
         >
@@ -589,10 +593,10 @@ export default function SavedResumePage() {
               bg-[#FFFFFF] border-r border-lp-rule overflow-y-auto p-3 pt-16"
           >
             <div className="flex items-center justify-between mb-3 px-1">
-              <span className="text-sm font-semibold text-lp-ink">Saved Resumes</span>
+              <span className="text-sm font-semibold text-lp-ink">{t("Saved Resumes")}</span>
               <button
                 onClick={() => setSidebarOpen(false)}
-                aria-label="Close resumes list"
+                aria-label={t("Close resumes list")}
                 className="p-1 rounded-[4px] hover:bg-lp-ink/5 text-[#5A5F5C] hover:text-lp-ink"
               >
                 <X className="w-4 h-4" />
@@ -625,7 +629,7 @@ export default function SavedResumePage() {
                           </p>
                           <div className="flex items-center justify-between mt-1 gap-2">
                             <span className="text-[10px] text-[#5A5F5C]">
-                              {formatDate(r.createdAt)}
+                              {formatDate(locale, r.createdAt)}
                             </span>
                             {r.atsScore !== undefined && (
                               <span className={`text-[10px] font-semibold px-1.5 py-0.5
@@ -664,7 +668,7 @@ export default function SavedResumePage() {
               onClick={() => router.refresh()}
               className="mt-2 text-xs text-[#3C403E] hover:text-lp-ink underline"
             >
-              Try again
+              {t("Try again")}
             </button>
           </motion.div>
         )}
@@ -683,12 +687,12 @@ export default function SavedResumePage() {
             {/* Breadcrumb + action toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-3">
               {/* Breadcrumb */}
-              <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm">
+              <nav aria-label={t("Breadcrumb")} className="flex items-center gap-1.5 text-sm">
                 <Link
                   href="/dashboard/resume"
                   className="text-[#5A5F5C] hover:text-[#3C403E] transition-colors"
                 >
-                  Resumes
+                  {t("Resumes")}
                 </Link>
                 <ChevronRight className="w-3.5 h-3.5 text-[#5A5F5C]" />
                 <span className="text-[#3C403E] truncate max-w-[180px]">{resume.name}</span>
@@ -700,13 +704,13 @@ export default function SavedResumePage() {
                 {!isEditMode && (
                   <Link
                     href="/dashboard/resume/saved"
-                    aria-label="Back to saved resumes"
+                    aria-label={t("Back to saved resumes")}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium
                       border border-lp-rule text-[#3C403E]
                       hover:bg-lp-ink/5 hover:text-lp-ink transition-all duration-200"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
-                    Back
+                    {t("Back")}
                   </Link>
                 )}
 
@@ -714,12 +718,12 @@ export default function SavedResumePage() {
                 {!isEditMode ? (
                   <button
                     onClick={() => setIsEditMode(true)}
-                    aria-label="Edit this resume"
+                    aria-label={t("Edit this resume")}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
                       bg-[#1F5C4A] text-white hover:bg-[#15443A] transition-colors duration-200"
                   >
                     <Pencil className="w-3.5 h-3.5" />
-                    Edit
+                    {t("Edit")}
                   </button>
                 ) : (
                   <>
@@ -731,7 +735,7 @@ export default function SavedResumePage() {
                         disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                      {saving ? 'Saving…' : saveSuccess ? 'Saved!' : 'Save Changes'}
+                      {saving ? t("Saving…") : saveSuccess ? t("Saved!") : t("Save Changes")}
                     </button>
                     <button
                       onClick={() => {
@@ -744,7 +748,7 @@ export default function SavedResumePage() {
                         transition-all duration-200"
                     >
                       <X className="w-3.5 h-3.5" />
-                      Cancel
+                      {t("Cancel")}
                     </button>
                   </>
                 )}
@@ -753,14 +757,14 @@ export default function SavedResumePage() {
                 {!isEditMode && (
                   <button
                     onClick={() => setShowDeleteModal(true)}
-                    aria-label="Delete this resume"
+                    aria-label={t("Delete this resume")}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-medium
                       border border-[#B42318]/20 text-[#B42318]/70
                       hover:bg-[#B42318]/10 hover:text-[#B42318] hover:border-[#B42318]/40
                       transition-all duration-200"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                    Delete
+                    {t("Delete")}
                   </button>
                 )}
               </div>
@@ -779,7 +783,7 @@ export default function SavedResumePage() {
                       {isEditMode && (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold
                           bg-[#8A5A00]/10 border border-[#8A5A00]/20 text-[#8A5A00]">
-                          Editing
+                          {t("Editing")}
                         </span>
                       )}
                     </div>
@@ -795,11 +799,11 @@ export default function SavedResumePage() {
                       )}
                       <span className="flex items-center gap-1.5 text-sm text-[#5A5F5C]">
                         <Calendar className="w-3.5 h-3.5" />
-                        Created {formatDate(resume.createdAt)}
+                        {t("Created {v0}", { v0: formatDate(locale, resume.createdAt) })}
                       </span>
-                      {formatDate(resume.updatedAt) !== formatDate(resume.createdAt) && (
+                      {formatDate(locale, resume.updatedAt) !== formatDate(locale, resume.createdAt) && (
                         <span className="text-sm text-[#5A5F5C]">
-                          · Updated {formatDate(resume.updatedAt)}
+                          {t("· Updated {v0}", { v0: formatDate(locale, resume.updatedAt) })}
                         </span>
                       )}
                     </div>
@@ -817,7 +821,7 @@ export default function SavedResumePage() {
                     {resume.atsScore !== undefined && (
                       <span className={`px-2.5 py-1 rounded-[4px] text-xs font-semibold
                         border ${atsScoreBg(resume.atsScore)}`}>
-                        ATS {resume.atsScore}%
+                        {t("ATS {v0}%", { v0: resume.atsScore })}
                       </span>
                     )}
 

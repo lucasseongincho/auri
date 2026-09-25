@@ -1,4 +1,6 @@
 'use client'
+
+import { useT } from '@/lib/i18n/client'
 import { motion } from 'framer-motion'
 import { Crown, Lock } from 'lucide-react'
 import Link from 'next/link'
@@ -20,6 +22,7 @@ export default function ProGate({
   featureDescription,
   icon,
 }: ProGateProps) {
+  const t = useT()
   const { profile } = useCareerStore()
   const { user, loading } = useAuth()
 
@@ -48,7 +51,7 @@ export default function ProGate({
               <div className="flex items-center justify-center gap-1.5 mb-2">
                 <Crown className="w-3.5 h-3.5 text-[#8A5A00]" />
                 <span className="text-xs font-semibold text-[#8A5A00] uppercase tracking-wide">
-                  Pro Feature
+                  {t("Pro Feature")}
                 </span>
               </div>
               <h2 className="font-heading text-xl font-bold text-lp-ink mb-2">
@@ -66,7 +69,7 @@ export default function ProGate({
                   bg-[#1F5C4A]
                    transition-all duration-200 text-center"
               >
-                Upgrade to Pro — $19/month
+                {t("Upgrade to Pro — $19/month")}
               </Link>
               {!user && (
                 <Link
@@ -75,13 +78,13 @@ export default function ProGate({
                     border border-lp-rule text-[#3C403E] hover:text-lp-ink
                     hover:bg-lp-ink/5 transition-all duration-200"
                 >
-                  Sign in to existing account
+                  {t("Sign in to existing account")}
                 </Link>
               )}
             </div>
 
             <p className="text-xs text-[#5A5F5C]">
-              Free plan includes resume builder, ATS optimizer &amp; cover letter generator
+              {t("Free plan includes resume builder, ATS optimizer & cover letter generator")}
             </p>
           </div>
         </motion.div>

@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useState, useRef, useEffect } from 'react'
 
 interface AIEstimateHighlightProps {
@@ -19,6 +21,7 @@ export default function AIEstimateHighlight({
   estimateId,
   onVerify,
 }: AIEstimateHighlightProps) {
+  const t = useT()
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(value)
   const [isVerified, setIsVerified] = useState(false)
@@ -69,21 +72,21 @@ export default function AIEstimateHighlight({
             px-1 py-0 text-amber-700 text-[0.85em] font-medium
             focus:outline-none focus:ring-1 focus:ring-amber-400"
           style={{ width: `${Math.max(editValue.length + 1, 4)}ch`, minWidth: '3rem' }}
-          aria-label="Edit AI-estimated value"
+          aria-label={t("Edit AI-estimated value")}
         />
         <button
           onClick={handleConfirm}
           className="text-green-600 hover:text-green-700 text-xs font-bold leading-none"
-          title="Confirm value"
-          aria-label="Confirm edited value"
+          title={t("Confirm value")}
+          aria-label={t("Confirm edited value")}
         >
           ✓
         </button>
         <button
           onClick={() => { setEditValue(value); setIsEditing(false) }}
           className="text-gray-400 hover:text-gray-600 text-xs leading-none"
-          title="Cancel"
-          aria-label="Cancel editing"
+          title={t("Cancel")}
+          aria-label={t("Cancel editing")}
         >
           ✕
         </button>
@@ -99,8 +102,8 @@ export default function AIEstimateHighlight({
           border-b-2 border-amber-400 border-dashed font-medium px-0.5 rounded-sm
           hover:bg-amber-200 hover:border-amber-500
           transition-all duration-150 cursor-pointer text-[0.85em]"
-        title="AI estimated — click to verify and replace with your real number"
-        aria-label={`AI estimated value: ${value}. Click to edit.`}
+        title={t("AI estimated — click to verify and replace with your real number")}
+        aria-label={t("AI estimated value: {value}. Click to edit.", { value })}
       >
         {value}
       </button>
@@ -114,9 +117,9 @@ export default function AIEstimateHighlight({
           text-center whitespace-normal"
         role="tooltip"
       >
-        ⚠️ AI estimated
+        {t("⚠️ AI estimated")}
         <br />
-        <span className="text-amber-300">Click to replace with your real number</span>
+        <span className="text-amber-300">{t("Click to replace with your real number")}</span>
       </span>
     </span>
   )

@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -27,6 +29,7 @@ const LABEL_CLASS = 'block text-xs font-medium text-[#3C403E] mb-1.5'
 const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
 function CopyButton({ text, label }: { text: string; label: string }) {
+  const t = useT()
   const [copied, setCopied] = useState(false)
   return (
     <button
@@ -35,12 +38,13 @@ function CopyButton({ text, label }: { text: string; label: string }) {
       className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all flex-shrink-0"
     >
       {copied ? <CheckCircle className="w-3 h-3 text-[#1F7A4D]" /> : <Copy className="w-3 h-3" />}
-      {copied ? 'Copied!' : `Copy ${label}`}
+      {copied ? t("Copied!") : `Copy ${label}`}
     </button>
   )
 }
 
 function LinkedInCard({ data }: { data: LinkedInRewrite }) {
+  const t = useT()
   return (
     <div className="rounded-[10px] bg-white border border-gray-200 overflow-hidden ">
       <div className="h-16 bg-[#0077B5] " />
@@ -54,25 +58,25 @@ function LinkedInCard({ data }: { data: LinkedInRewrite }) {
         <div className="mb-3">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h3 className="font-bold text-gray-900 text-base leading-tight">Your Name</h3>
+              <h3 className="font-bold text-gray-900 text-base leading-tight">{t("Your Name")}</h3>
               <p className="text-sm text-gray-700 mt-0.5 leading-snug">{data.headline}</p>
             </div>
-            <CopyButton text={data.headline} label="Headline" />
+            <CopyButton text={data.headline} label={t("Headline")} />
           </div>
         </div>
 
         <div className="border-t border-gray-100 pt-3 mb-3">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">About</p>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t("About")}</p>
               <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{data.about}</p>
             </div>
-            <CopyButton text={data.about} label="About" />
+            <CopyButton text={data.about} label={t("About")} />
           </div>
         </div>
 
         <div className="border-t border-gray-100 pt-3 space-y-3">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Experience</p>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t("Experience")}</p>
           {data.experiences.map((exp, i) => (
             <div key={i} className="flex items-start gap-3">
               <div className="w-9 h-9 rounded bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -97,6 +101,7 @@ function LinkedInCard({ data }: { data: LinkedInRewrite }) {
 }
 
 export default function LinkedInPage() {
+  const t = useT()
   const { user } = useAuth()
   const { profile, updateProfile } = useCareerStore()
 
@@ -144,7 +149,7 @@ export default function LinkedInPage() {
           updateProfile({ generated: { ...profile.generated, linkedin_rewrite: parsed } })
         }
       } catch {
-        setGenerateError('Could not parse the LinkedIn rewrite. Please try again.')
+        setGenerateError(t("Could not parse the LinkedIn rewrite. Please try again."))
       }
     }
   }, [headline, aboutSection, experiences, targetPosition, sectorOrIndustry, user?.uid, stream, profile, updateProfile])
@@ -153,8 +158,8 @@ export default function LinkedInPage() {
 
   return (
     <ProGate
-      featureName="LinkedIn Profile Rewriter"
-      featureDescription="Rewrite your headline, About section, and top experiences to attract recruiters for your target role. Optimized for LinkedIn's search algorithm."
+      featureName={t("LinkedIn Profile Rewriter")}
+      featureDescription={t("Rewrite your headline, About section, and top experiences to attract recruiters for your target role. Optimized for LinkedIn's search algorithm.")}
       icon={<Linkedin className="w-6 h-6 text-[#1F5C4A]" />}
     >
     <div className="space-y-6 pb-20 md:pb-0">
@@ -163,10 +168,10 @@ export default function LinkedInPage() {
           <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center">
             <Linkedin className="w-5 h-5 text-lp-ink" />
           </div>
-          <h1 className="font-heading text-2xl font-bold text-lp-ink">LinkedIn Profile Rewriter</h1>
+          <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("LinkedIn Profile Rewriter")}</h1>
         </div>
         <p className="text-[#3C403E] text-sm ml-12">
-          Rewrite your headline, About, and top 3 experiences to attract recruiters for your target role.
+          {t("Rewrite your headline, About, and top 3 experiences to attract recruiters for your target role.")}
         </p>
       </motion.div>
 
@@ -181,28 +186,28 @@ export default function LinkedInPage() {
           <div className="rounded-[10px]  bg-[#FFFFFF] p-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className={LABEL_CLASS}>Target Position <span className="text-[#B42318]">*</span></label>
-                <input type="text" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} placeholder="Product Manager" className={INPUT_CLASS} aria-label="Target position" style={{ fontSize: '16px' }} />
+                <label className={LABEL_CLASS}>{t("Target Position")}{' '}<span className="text-[#B42318]">*</span></label>
+                <input type="text" value={targetPosition} onChange={(e) => setTargetPosition(e.target.value)} placeholder={t("Product Manager")} className={INPUT_CLASS} aria-label={t("Target position")} style={{ fontSize: '16px' }} />
               </div>
               <div>
-                <label className={LABEL_CLASS}>Sector / Industry</label>
-                <input type="text" className={INPUT_CLASS} placeholder="B2B SaaS, FinTech…" value={sectorOrIndustry} onChange={(e) => setSectorOrIndustry(e.target.value)} aria-label="Sector or industry" />
+                <label className={LABEL_CLASS}>{t("Sector / Industry")}</label>
+                <input type="text" className={INPUT_CLASS} placeholder={t("B2B SaaS, FinTech…")} value={sectorOrIndustry} onChange={(e) => setSectorOrIndustry(e.target.value)} aria-label={t("Sector or industry")} />
               </div>
             </div>
 
             <div className="border-t border-lp-hairline pt-4 space-y-4">
-              <p className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">Your Current LinkedIn Profile</p>
+              <p className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">{t("Your Current LinkedIn Profile")}</p>
               <div>
-                <label className={LABEL_CLASS}>Current Headline</label>
-                <input type="text" className={INPUT_CLASS} placeholder="Software Engineer at Acme Corp" value={headline} onChange={(e) => setHeadline(e.target.value)} aria-label="Current headline" />
+                <label className={LABEL_CLASS}>{t("Current Headline")}</label>
+                <input type="text" className={INPUT_CLASS} placeholder={t("Software Engineer at Acme Corp")} value={headline} onChange={(e) => setHeadline(e.target.value)} aria-label={t("Current headline")} />
               </div>
               <div>
-                <label className={LABEL_CLASS}>Current About Section</label>
-                <textarea className={TEXTAREA_CLASS} rows={4} placeholder="Paste your current About section here…" value={aboutSection} onChange={(e) => setAboutSection(e.target.value)} aria-label="Current About section" />
+                <label className={LABEL_CLASS}>{t("Current About Section")}</label>
+                <textarea className={TEXTAREA_CLASS} rows={4} placeholder={t("Paste your current About section here…")} value={aboutSection} onChange={(e) => setAboutSection(e.target.value)} aria-label={t("Current About section")} />
               </div>
               <div>
-                <label className={LABEL_CLASS}>Top 3 Experiences (paste all three)</label>
-                <textarea className={TEXTAREA_CLASS} rows={6} placeholder={`Title at Company\nKey responsibilities...\n\nTitle at Company\n...`} value={experiences} onChange={(e) => setExperiences(e.target.value)} aria-label="Top 3 experiences" />
+                <label className={LABEL_CLASS}>{t("Top 3 Experiences (paste all three)")}</label>
+                <textarea className={TEXTAREA_CLASS} rows={6} placeholder={t("Title at Company\nKey responsibilities...\n\nTitle at Company\n...")} value={experiences} onChange={(e) => setExperiences(e.target.value)} aria-label={t("Top 3 experiences")} />
               </div>
             </div>
 
@@ -211,11 +216,11 @@ export default function LinkedInPage() {
                 <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
                   <Zap className="w-4 h-4 text-[#1F5C4A] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
-                    <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
+                    <p className="text-xs font-medium text-lp-ink">{t("Monthly limit reached")}</p>
+                    <p className="text-xs text-[#3C403E]">{t("You've used all 3 free generations this month.")}</p>
                   </div>
                   <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
-                    Upgrade →
+                    {t("Upgrade →")}
                   </Link>
                 </div>
               ) : (
@@ -233,7 +238,7 @@ export default function LinkedInPage() {
                 bg-[#1F5C4A] text-white font-semibold text-sm
                 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {isStreaming ? <><Loader2 className="w-4 h-4 animate-spin" /> Rewriting…</> : <><Sparkles className="w-4 h-4" /> Rewrite LinkedIn Profile</>}
+              {isStreaming ? <><Loader2 className="w-4 h-4 animate-spin" />{' '}{t("Rewriting…")}</> : <><Sparkles className="w-4 h-4" />{' '}{t("Rewrite LinkedIn Profile")}</>}
             </button>
           </div>
         </motion.div>
@@ -252,7 +257,7 @@ export default function LinkedInPage() {
                 <div className="rounded-[10px]  bg-[#FFFFFF] p-6 space-y-3 min-h-[300px]">
                   <div className="flex items-center gap-2 p-3 rounded-[4px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
                     <Loader2 className="w-4 h-4 text-[#1F5C4A] animate-spin" />
-                    <span className="text-sm text-[#1F5C4A] font-medium">AURI is rewriting your LinkedIn profile…</span>
+                    <span className="text-sm text-[#1F5C4A] font-medium">{t("AURI is rewriting your LinkedIn profile…")}</span>
                   </div>
                   {[85, 70, 90, 75, 88, 60].map((w, i) => (
                     <div key={i} className="h-3 rounded-full bg-lp-ink/[0.04] animate-pulse" style={{ width: `${w}%` }} />
@@ -270,8 +275,8 @@ export default function LinkedInPage() {
                   <div className="w-14 h-14 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 flex items-center justify-center mb-4">
                     <Linkedin className="w-6 h-6 text-[#1F5C4A]" />
                   </div>
-                  <p className="text-sm font-medium text-[#3C403E]">Your rewritten LinkedIn profile will appear here</p>
-                  <p className="text-xs text-[#5A5F5C] mt-1">Fill in your current profile and click Rewrite</p>
+                  <p className="text-sm font-medium text-[#3C403E]">{t("Your rewritten LinkedIn profile will appear here")}</p>
+                  <p className="text-xs text-[#5A5F5C] mt-1">{t("Fill in your current profile and click Rewrite")}</p>
                 </div>
               </motion.div>
             )}

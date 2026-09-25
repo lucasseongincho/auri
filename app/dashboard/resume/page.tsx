@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useState, useCallback, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -157,6 +159,7 @@ function StepPersonal({
 }: {
   errors: Step1Errors
 }) {
+  const t = useT()
   const { profile, updateProfile } = useCareerStore()
   const personal = profile?.personal ?? {
     name: '',
@@ -176,80 +179,80 @@ function StepPersonal({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Full Name" required error={errors.name}>
+        <Field label={t("Full Name")} required error={errors.name}>
           <input
             type="text"
             className={INPUT_CLASS}
-            placeholder="Jane Smith"
+            placeholder={t("Jane Smith")}
             value={personal.name}
             onChange={(e) => update('name', e.target.value)}
-            aria-label="Full name"
+            aria-label={t("Full name")}
           />
         </Field>
-        <Field label="Email Address" required error={errors.email}>
+        <Field label={t("Email Address")} required error={errors.email}>
           <input
             type="email"
             className={INPUT_CLASS}
-            placeholder="jane@example.com"
+            placeholder={t("jane@example.com")}
             value={personal.email}
             onChange={(e) => update('email', e.target.value)}
-            aria-label="Email address"
+            aria-label={t("Email address")}
           />
         </Field>
-        <Field label="Phone Number">
+        <Field label={t("Phone Number")}>
           <input
             type="tel"
             className={INPUT_CLASS}
             placeholder="+1 (555) 000-0000"
             value={personal.phone}
             onChange={(e) => update('phone', e.target.value)}
-            aria-label="Phone number"
+            aria-label={t("Phone number")}
           />
         </Field>
-        <Field label="Location">
-          <LocationAutocomplete value={personal.location} onChange={(v) => update('location', v)} placeholder="New York, NY" className={INPUT_CLASS} aria-label="Location" />
+        <Field label={t("Location")}>
+          <LocationAutocomplete value={personal.location} onChange={(v) => update('location', v)} placeholder={t("New York, NY")} className={INPUT_CLASS} aria-label={t("Location")} />
         </Field>
-        <Field label="LinkedIn URL">
+        <Field label={t("LinkedIn URL")}>
           <input
             type="url"
             className={INPUT_CLASS}
             placeholder="https://linkedin.com/in/janesmith"
             value={personal.linkedin_url}
             onChange={(e) => update('linkedin_url', e.target.value)}
-            aria-label="LinkedIn URL"
+            aria-label={t("LinkedIn URL")}
           />
         </Field>
-        <Field label="GitHub URL">
+        <Field label={t("GitHub URL")}>
           <input
             type="url"
             className={INPUT_CLASS}
             placeholder="https://github.com/username"
             value={personal.github ?? ''}
             onChange={(e) => update('github', e.target.value)}
-            aria-label="GitHub URL"
+            aria-label={t("GitHub URL")}
           />
         </Field>
-        <Field label="Website / Portfolio URL">
+        <Field label={t("Website / Portfolio URL")}>
           <input
             type="url"
             className={INPUT_CLASS}
             placeholder="https://janesmith.dev"
             value={personal.website}
             onChange={(e) => update('website', e.target.value)}
-            aria-label="Website or portfolio URL"
+            aria-label={t("Website or portfolio URL")}
           />
         </Field>
-        <Field label="Portfolio Link Label">
+        <Field label={t("Portfolio Link Label")}>
           <input
             type="text"
             className={INPUT_CLASS}
-            placeholder="Portfolio"
+            placeholder={t("Portfolio")}
             value={personal.portfolioLabel ?? ''}
             onChange={(e) => update('portfolioLabel', e.target.value)}
-            aria-label="Portfolio link label"
+            aria-label={t("Portfolio link label")}
           />
           <p className="mt-1.5 text-[11px] text-[#5A5F5C]">
-            This is what people will see as the link text (default: &quot;Portfolio&quot;)
+            {t("This is what people will see as the link text (default: \"Portfolio\")")}
           </p>
         </Field>
       </div>
@@ -264,6 +267,7 @@ interface Step2Errors {
 }
 
 function StepExperience({ errors }: { errors: Step2Errors }) {
+  const t = useT()
   const { profile, updateProfile } = useCareerStore()
   const experiences: Experience[] = profile?.experience ?? []
 
@@ -318,11 +322,11 @@ function StepExperience({ errors }: { errors: Step2Errors }) {
             <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">
-                  Position {idx + 1}
+                  {t("Position {v0}", { v0: idx + 1 })}
                 </span>
                 <button
                   onClick={() => removeExperience(exp.id)}
-                  aria-label={`Remove experience ${idx + 1}`}
+                  aria-label={t("Remove experience {v0}", { v0: idx + 1 })}
                   className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -330,46 +334,46 @@ function StepExperience({ errors }: { errors: Step2Errors }) {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Field label="Job Title">
+                <Field label={t("Job Title")}>
                   <input
                     type="text"
                     className={INPUT_CLASS}
-                    placeholder="Software Engineer"
+                    placeholder={t("Software Engineer")}
                     value={exp.title}
                     onChange={(e) => updateExp(exp.id, 'title', e.target.value)}
-                    aria-label={`Job title for position ${idx + 1}`}
+                    aria-label={t("Job title for position {v0}", { v0: idx + 1 })}
                   />
                 </Field>
-                <Field label="Company">
+                <Field label={t("Company")}>
                   <input
                     type="text"
                     className={INPUT_CLASS}
-                    placeholder="Acme Corp"
+                    placeholder={t("Acme Corp")}
                     value={exp.company}
                     onChange={(e) => updateExp(exp.id, 'company', e.target.value)}
-                    aria-label={`Company name for position ${idx + 1}`}
+                    aria-label={t("Company name for position {v0}", { v0: idx + 1 })}
                   />
                 </Field>
-                <Field label="Start Date">
+                <Field label={t("Start Date")}>
                   <input
                     type="text"
                     className={INPUT_CLASS}
-                    placeholder="Jan 2022"
+                    placeholder={t("Jan 2022")}
                     value={exp.start}
                     onChange={(e) => updateExp(exp.id, 'start', e.target.value)}
-                    aria-label={`Start date for position ${idx + 1}`}
+                    aria-label={t("Start date for position {v0}", { v0: idx + 1 })}
                   />
                 </Field>
-                <Field label="End Date">
+                <Field label={t("End Date")}>
                   <div className="space-y-2">
                     <input
                       type="text"
                       className={INPUT_CLASS}
-                      placeholder="Dec 2023"
+                      placeholder={t("Dec 2023")}
                       value={exp.end === 'Present' ? '' : exp.end}
                       disabled={exp.end === 'Present'}
                       onChange={(e) => updateExp(exp.id, 'end', e.target.value)}
-                      aria-label={`End date for position ${idx + 1}`}
+                      aria-label={t("End date for position {v0}", { v0: idx + 1 })}
                     />
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -379,22 +383,22 @@ function StepExperience({ errors }: { errors: Step2Errors }) {
                           updateExp(exp.id, 'end', e.target.checked ? 'Present' : '')
                         }
                         className="w-3.5 h-3.5 rounded accent-[#1F5C4A]"
-                        aria-label={`Currently working here for position ${idx + 1}`}
+                        aria-label={t("Currently working here for position {v0}", { v0: idx + 1 })}
                       />
-                      <span className="text-xs text-[#3C403E]">Currently working here</span>
+                      <span className="text-xs text-[#3C403E]">{t("Currently working here")}</span>
                     </label>
                   </div>
                 </Field>
               </div>
 
-              <Field label="Achievements / Bullets (one per line — AI will rewrite these)">
+              <Field label={t("Achievements / Bullets (one per line — AI will rewrite these)")}>
                 <textarea
                   className={TEXTAREA_CLASS}
                   rows={4}
-                  placeholder={`Led a team of 5 engineers\nIncreased system performance by 40%\nBuilt payment integration`}
+                  placeholder={t("Led a team of 5 engineers\nIncreased system performance by 40%\nBuilt payment integration")}
                   value={exp.bullets.join('\n')}
                   onChange={(e) => updateBullets(exp.id, e.target.value)}
-                  aria-label={`Achievements for position ${idx + 1}`}
+                  aria-label={t("Achievements for position {v0}", { v0: idx + 1 })}
                 />
               </Field>
             </div>
@@ -404,14 +408,14 @@ function StepExperience({ errors }: { errors: Step2Errors }) {
 
       <button
         onClick={addExperience}
-        aria-label="Add another experience entry"
+        aria-label={t("Add another experience entry")}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
           border border-dashed border-lp-rule text-[#3C403E] text-sm
           hover:border-[#1F5C4A]/40 hover:text-[#1F5C4A] hover:bg-[#1F5C4A]/5
           transition-all duration-200"
       >
         <Plus className="w-4 h-4" />
-        Add Experience
+        {t("Add Experience")}
       </button>
     </div>
   )
@@ -430,6 +434,7 @@ function EducationCard({
   onUpdate: (patch: Partial<Education>) => void
   onRemove: () => void
 }) {
+  const t = useT()
   const [majorInput, setMajorInput] = useState('')
   const [minorInput, setMinorInput] = useState('')
 
@@ -472,75 +477,75 @@ function EducationCard({
       <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">
-            Education {idx + 1}
+            {t("Education {v0}", { v0: idx + 1 })}
           </span>
           <button
             onClick={onRemove}
-            aria-label={`Remove education ${idx + 1}`}
+            aria-label={t("Remove education {v0}", { v0: idx + 1 })}
             className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Field label="Institution">
+          <Field label={t("Institution")}>
             <input
               type="text"
               className={INPUT_CLASS}
-              placeholder="MIT"
+              placeholder={t("MIT")}
               value={edu.institution}
               onChange={(e) => onUpdate({ institution: e.target.value })}
-              aria-label={`Institution for education ${idx + 1}`}
+              aria-label={t("Institution for education {v0}", { v0: idx + 1 })}
             />
           </Field>
-          <Field label="Degree">
+          <Field label={t("Degree")}>
             <input
               type="text"
               className={INPUT_CLASS}
-              placeholder="Bachelor of Science"
+              placeholder={t("Bachelor of Science")}
               value={edu.degree}
               onChange={(e) => onUpdate({ degree: e.target.value })}
-              aria-label={`Degree for education ${idx + 1}`}
+              aria-label={t("Degree for education {v0}", { v0: idx + 1 })}
             />
           </Field>
-          <Field label="Primary Major / Field of Study">
+          <Field label={t("Primary Major / Field of Study")}>
             <input
               type="text"
               className={INPUT_CLASS}
-              placeholder="Computer Science"
+              placeholder={t("Computer Science")}
               value={edu.field}
               onChange={(e) => onUpdate({ field: e.target.value })}
-              aria-label={`Field of study for education ${idx + 1}`}
+              aria-label={t("Field of study for education {v0}", { v0: idx + 1 })}
             />
           </Field>
-          <Field label="Graduation Year">
+          <Field label={t("Graduation Year")}>
             <input
               type="text"
               className={INPUT_CLASS}
               placeholder="2021"
               value={edu.year}
               onChange={(e) => onUpdate({ year: e.target.value })}
-              aria-label={`Graduation year for education ${idx + 1}`}
+              aria-label={t("Graduation year for education {v0}", { v0: idx + 1 })}
             />
           </Field>
-          <Field label="GPA (optional — omit if below 3.5)">
+          <Field label={t("GPA (optional — omit if below 3.5)")}>
             <input
               type="text"
               className={INPUT_CLASS}
               placeholder="3.8/4.0"
               value={edu.gpa ?? ''}
               onChange={(e) => onUpdate({ gpa: e.target.value })}
-              aria-label={`GPA for education ${idx + 1}`}
+              aria-label={t("GPA for education {v0}", { v0: idx + 1 })}
             />
           </Field>
         </div>
 
-        <Field label="Additional Major(s) — press Enter or comma to add">
+        <Field label={t("Additional Major(s) — press Enter or comma to add")}>
           <div className="flex gap-2">
             <input
               type="text"
               className={INPUT_CLASS}
-              placeholder="e.g. Mathematics"
+              placeholder={t("e.g. Mathematics")}
               value={majorInput}
               onChange={(e) => setMajorInput(e.target.value)}
               onKeyDown={(e) => {
@@ -549,15 +554,15 @@ function EducationCard({
                   addMajor(majorInput)
                 }
               }}
-              aria-label={`Additional major for education ${idx + 1}`}
+              aria-label={t("Additional major for education {v0}", { v0: idx + 1 })}
             />
             <button
               onClick={() => addMajor(majorInput)}
-              aria-label="Add additional major"
+              aria-label={t("Add additional major")}
               className="px-4 py-3 rounded-[4px] bg-[#1F5C4A]/20 border border-[#1F5C4A]/30
                 text-[#1F5C4A] text-sm font-medium hover:bg-[#1F5C4A]/30 transition-all flex-shrink-0"
             >
-              Add
+              {t("Add")}
             </button>
           </div>
           {(edu.additionalMajors?.length ?? 0) > 0 && (
@@ -576,7 +581,7 @@ function EducationCard({
                     {major}
                     <button
                       onClick={() => removeMajor(major)}
-                      aria-label={`Remove major ${major}`}
+                      aria-label={t("Remove major {major}", { major })}
                       className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-[#1F5C4A]/30 transition-all"
                     >
                       <X className="w-2.5 h-2.5" />
@@ -588,12 +593,12 @@ function EducationCard({
           )}
         </Field>
 
-        <Field label="Minor(s) — press Enter or comma to add">
+        <Field label={t("Minor(s) — press Enter or comma to add")}>
           <div className="flex gap-2">
             <input
               type="text"
               className={INPUT_CLASS}
-              placeholder="e.g. Statistics"
+              placeholder={t("e.g. Statistics")}
               value={minorInput}
               onChange={(e) => setMinorInput(e.target.value)}
               onKeyDown={(e) => {
@@ -602,15 +607,15 @@ function EducationCard({
                   addMinor(minorInput)
                 }
               }}
-              aria-label={`Minor for education ${idx + 1}`}
+              aria-label={t("Minor for education {v0}", { v0: idx + 1 })}
             />
             <button
               onClick={() => addMinor(minorInput)}
-              aria-label="Add minor"
+              aria-label={t("Add minor")}
               className="px-4 py-3 rounded-[4px] bg-[#1F5C4A]/20 border border-[#1F5C4A]/30
                 text-[#1F5C4A] text-sm font-medium hover:bg-[#1F5C4A]/30 transition-all flex-shrink-0"
             >
-              Add
+              {t("Add")}
             </button>
           </div>
           {(edu.minors?.length ?? 0) > 0 && (
@@ -629,7 +634,7 @@ function EducationCard({
                     {minor}
                     <button
                       onClick={() => removeMinor(minor)}
-                      aria-label={`Remove minor ${minor}`}
+                      aria-label={t("Remove minor {minor}", { minor })}
                       className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-[#1F5C4A]/30 transition-all"
                     >
                       <X className="w-2.5 h-2.5" />
@@ -646,6 +651,7 @@ function EducationCard({
 }
 
 function StepEducation() {
+  const t = useT()
   const { profile, updateProfile } = useCareerStore()
   const educations: Education[] = profile?.education ?? []
 
@@ -688,14 +694,14 @@ function StepEducation() {
 
       <button
         onClick={addEducation}
-        aria-label="Add another education entry"
+        aria-label={t("Add another education entry")}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
           border border-dashed border-lp-rule text-[#3C403E] text-sm
           hover:border-[#1F5C4A]/40 hover:text-[#1F5C4A] hover:bg-[#1F5C4A]/5
           transition-all duration-200"
       >
         <Plus className="w-4 h-4" />
-        Add Education
+        {t("Add Education")}
       </button>
     </div>
   )
@@ -704,6 +710,7 @@ function StepEducation() {
 // ─── Step 4: Skills ───────────────────────────────────────────────────────────
 
 function StepSkills() {
+  const t = useT()
   const { profile, updateProfile } = useCareerStore()
   const skills: string[] = profile?.skills ?? []
   const [input, setInput] = useState('')
@@ -735,25 +742,25 @@ function StepSkills() {
 
   return (
     <div className="space-y-4">
-      <Field label="Add Skills (press Enter or comma to add)">
+      <Field label={t("Add Skills (press Enter or comma to add)")}>
         <div className="flex gap-2">
           <input
             type="text"
             className={INPUT_CLASS}
-            placeholder="e.g. React, TypeScript, Node.js"
+            placeholder={t("e.g. React, TypeScript, Node.js")}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            aria-label="Add a skill"
+            aria-label={t("Add a skill")}
           />
           <button
             onClick={() => addSkill(input)}
-            aria-label="Add skill"
+            aria-label={t("Add skill")}
             className="px-4 py-3 rounded-[4px] bg-[#1F5C4A]/20 border border-[#1F5C4A]/30
               text-[#1F5C4A] text-sm font-medium hover:bg-[#1F5C4A]/30 transition-all
               flex-shrink-0"
           >
-            Add
+            {t("Add")}
           </button>
         </div>
       </Field>
@@ -774,7 +781,7 @@ function StepSkills() {
                 {skill}
                 <button
                   onClick={() => removeSkill(skill)}
-                  aria-label={`Remove skill ${skill}`}
+                  aria-label={t("Remove skill {skill}", { skill })}
                   className="w-4 h-4 rounded-full flex items-center justify-center
                     hover:bg-[#1F5C4A]/30 transition-all"
                 >
@@ -786,7 +793,7 @@ function StepSkills() {
         </div>
       ) : (
         <p className="text-sm text-[#5A5F5C] text-center py-4">
-          No skills added yet. Type above and press Enter.
+          {t("No skills added yet. Type above and press Enter.")}
         </p>
       )}
     </div>
@@ -796,6 +803,7 @@ function StepSkills() {
 // ─── Step 5: Certifications ───────────────────────────────────────────────────
 
 function StepCertifications() {
+  const t = useT()
   const { profile, updateProfile } = useCareerStore()
   const certifications: string[] = profile?.certifications ?? []
   const [input, setInput] = useState('')
@@ -820,25 +828,25 @@ function StepCertifications() {
 
   return (
     <div className="space-y-4">
-      <Field label="Add Certification (press Enter to add)">
+      <Field label={t("Add Certification (press Enter to add)")}>
         <div className="flex gap-2">
           <input
             type="text"
             className={INPUT_CLASS}
-            placeholder="e.g. AWS Certified Developer"
+            placeholder={t("e.g. AWS Certified Developer")}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            aria-label="Add a certification"
+            aria-label={t("Add a certification")}
           />
           <button
             onClick={() => addCert(input)}
-            aria-label="Add certification"
+            aria-label={t("Add certification")}
             className="px-4 py-3 rounded-[4px] bg-[#1F5C4A]/20 border border-[#1F5C4A]/30
               text-[#1F5C4A] text-sm font-medium hover:bg-[#1F5C4A]/30 transition-all
               flex-shrink-0"
           >
-            Add
+            {t("Add")}
           </button>
         </div>
       </Field>
@@ -862,7 +870,7 @@ function StepCertifications() {
                 </div>
                 <button
                   onClick={() => removeCert(cert)}
-                  aria-label={`Remove certification ${cert}`}
+                  aria-label={t("Remove certification {cert}", { cert })}
                   className="p-1 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318]
                     hover:bg-[#B42318]/10 transition-all"
                 >
@@ -874,7 +882,7 @@ function StepCertifications() {
         </div>
       ) : (
         <p className="text-sm text-[#5A5F5C] text-center py-4">
-          No certifications added yet — this section is optional.
+          {t("No certifications added yet — this section is optional.")}
         </p>
       )}
     </div>
@@ -884,6 +892,7 @@ function StepCertifications() {
 // ─── Step 6: Projects ─────────────────────────────────────────────────────────
 
 function StepProjects() {
+  const t = useT()
   const { profile, updateProfile } = useCareerStore()
   const projects: Project[] = profile?.projects ?? []
 
@@ -946,46 +955,46 @@ function StepProjects() {
             <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">
-                  Project {idx + 1}
+                  {t("Project {v0}", { v0: idx + 1 })}
                 </span>
                 <button
                   onClick={() => removeProject(proj.id)}
-                  aria-label={`Remove project ${idx + 1}`}
+                  aria-label={t("Remove project {v0}", { v0: idx + 1 })}
                   className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Field label="Project Name">
+                <Field label={t("Project Name")}>
                   <input
                     type="text"
                     className={INPUT_CLASS}
-                    placeholder="My SaaS App"
+                    placeholder={t("My SaaS App")}
                     value={proj.name}
                     onChange={(e) => updateProj(proj.id, 'name', e.target.value)}
-                    aria-label={`Project name for project ${idx + 1}`}
+                    aria-label={t("Project name for project {v0}", { v0: idx + 1 })}
                   />
                 </Field>
-                <Field label="URL (optional)">
+                <Field label={t("URL (optional)")}>
                   <input
                     type="url"
                     className={INPUT_CLASS}
                     placeholder="https://myapp.com"
                     value={proj.url ?? ''}
                     onChange={(e) => updateProj(proj.id, 'url', e.target.value)}
-                    aria-label={`Project URL for project ${idx + 1}`}
+                    aria-label={t("Project URL for project {v0}", { v0: idx + 1 })}
                   />
                 </Field>
               </div>
-              <Field label="Key Points / Bullets (one per line)">
+              <Field label={t("Key Points / Bullets (one per line)")}>
                 <textarea
                   className={TEXTAREA_CLASS}
                   rows={3}
-                  placeholder={`Built with React and Node.js\nGrew to 1,000+ users in 3 months`}
+                  placeholder={t("Built with React and Node.js\nGrew to 1,000+ users in 3 months")}
                   value={proj.bullets.join('\n')}
                   onChange={(e) => updateBullets(proj.id, e.target.value)}
-                  aria-label={`Bullets for project ${idx + 1}`}
+                  aria-label={t("Bullets for project {v0}", { v0: idx + 1 })}
                 />
               </Field>
             </div>
@@ -995,14 +1004,14 @@ function StepProjects() {
 
       <button
         onClick={addProject}
-        aria-label="Add another project"
+        aria-label={t("Add another project")}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
           border border-dashed border-lp-rule text-[#3C403E] text-sm
           hover:border-[#1F5C4A]/40 hover:text-[#1F5C4A] hover:bg-[#1F5C4A]/5
           transition-all duration-200"
       >
         <Plus className="w-4 h-4" />
-        Add Project
+        {t("Add Project")}
       </button>
     </div>
   )
@@ -1013,6 +1022,7 @@ function StepProjects() {
 const PROFICIENCY_LEVELS: Language['proficiency'][] = ['Native', 'Fluent', 'Intermediate', 'Basic']
 
 function StepAdditional() {
+  const t = useT()
   const { profile, updateProfile } = useCareerStore()
   const leadershipList: Leadership[] = profile?.leadership ?? []
   const volunteerList: Volunteer[] = profile?.volunteer ?? []
@@ -1049,14 +1059,14 @@ function StepAdditional() {
   return (
     <div className="space-y-6">
       <p className="text-xs text-[#3C403E]">
-        All sections below are optional. They appear on the resume only if you add data.
+        {t("All sections below are optional. They appear on the resume only if you add data.")}
       </p>
 
       {/* Leadership */}
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Star className="w-4 h-4 text-[#1F5C4A]" />
-          <span className="text-sm font-semibold text-lp-ink">Leadership Experience</span>
+          <span className="text-sm font-semibold text-lp-ink">{t("Leadership Experience")}</span>
         </div>
         <div className="space-y-3">
           <AnimatePresence initial={false}>
@@ -1066,36 +1076,36 @@ function StepAdditional() {
                 className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
                 <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">Leadership {idx + 1}</span>
-                    <button onClick={() => removeLeadership(item.id)} aria-label={`Remove leadership ${idx + 1}`}
+                    <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">{t("Leadership {v0}", { v0: idx + 1 })}</span>
+                    <button onClick={() => removeLeadership(item.id)} aria-label={t("Remove leadership {v0}", { v0: idx + 1 })}
                       className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Field label="Role"><input type="text" className={INPUT_CLASS} placeholder="President" value={item.role}
-                      onChange={(e) => updateLeadership(item.id, 'role', e.target.value)} aria-label="Leadership role" /></Field>
-                    <Field label="Organization"><input type="text" className={INPUT_CLASS} placeholder="Student Government"
-                      value={item.organization} onChange={(e) => updateLeadership(item.id, 'organization', e.target.value)} aria-label="Organization" /></Field>
-                    <Field label="Start Date"><input type="text" className={INPUT_CLASS} placeholder="Sep 2022"
-                      value={item.start} onChange={(e) => updateLeadership(item.id, 'start', e.target.value)} aria-label="Start date" /></Field>
-                    <Field label="End Date"><input type="text" className={INPUT_CLASS} placeholder="May 2023 or Present"
-                      value={item.end} onChange={(e) => updateLeadership(item.id, 'end', e.target.value)} aria-label="End date" /></Field>
+                    <Field label={t("Role")}><input type="text" className={INPUT_CLASS} placeholder={t("President")} value={item.role}
+                      onChange={(e) => updateLeadership(item.id, 'role', e.target.value)} aria-label={t("Leadership role")} /></Field>
+                    <Field label={t("Organization")}><input type="text" className={INPUT_CLASS} placeholder={t("Student Government")}
+                      value={item.organization} onChange={(e) => updateLeadership(item.id, 'organization', e.target.value)} aria-label={t("Organization")} /></Field>
+                    <Field label={t("Start Date")}><input type="text" className={INPUT_CLASS} placeholder={t("Sep 2022")}
+                      value={item.start} onChange={(e) => updateLeadership(item.id, 'start', e.target.value)} aria-label={t("Start date")} /></Field>
+                    <Field label={t("End Date")}><input type="text" className={INPUT_CLASS} placeholder={t("May 2023 or Present")}
+                      value={item.end} onChange={(e) => updateLeadership(item.id, 'end', e.target.value)} aria-label={t("End date")} /></Field>
                   </div>
-                  <Field label="Key Achievements (one per line)">
+                  <Field label={t("Key Achievements (one per line)")}>
                     <textarea className={TEXTAREA_CLASS} rows={3}
-                      placeholder={`Led team of 12 to increase fundraising by 40%\nImplemented new onboarding reducing member drop-off by 25%`}
+                      placeholder={t("Led team of 12 to increase fundraising by 40%\nImplemented new onboarding reducing member drop-off by 25%")}
                       value={item.bullets.join('\n')}
-                      onChange={(e) => updateLeadershipBullets(item.id, e.target.value)} aria-label="Leadership achievements" />
+                      onChange={(e) => updateLeadershipBullets(item.id, e.target.value)} aria-label={t("Leadership achievements")} />
                   </Field>
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
-          <button onClick={addLeadership} aria-label="Add leadership experience"
+          <button onClick={addLeadership} aria-label={t("Add leadership experience")}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] border border-dashed border-lp-rule
               text-[#3C403E] text-sm hover:border-[#1F5C4A]/40 hover:text-[#1F5C4A] hover:bg-[#1F5C4A]/5 transition-all">
-            <Plus className="w-4 h-4" /> Add Leadership
+            <Plus className="w-4 h-4" />{' '}{t("Add Leadership")}
           </button>
         </div>
       </div>
@@ -1104,7 +1114,7 @@ function StepAdditional() {
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Heart className="w-4 h-4 text-[#1F5C4A]" />
-          <span className="text-sm font-semibold text-lp-ink">Volunteer Work</span>
+          <span className="text-sm font-semibold text-lp-ink">{t("Volunteer Work")}</span>
         </div>
         <div className="space-y-3">
           <AnimatePresence initial={false}>
@@ -1114,33 +1124,33 @@ function StepAdditional() {
                 className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
                 <div className="rounded-[10px]  bg-[#FFFFFF] p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">Volunteer {idx + 1}</span>
-                    <button onClick={() => removeVolunteer(item.id)} aria-label={`Remove volunteer ${idx + 1}`}
+                    <span className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">{t("Volunteer {v0}", { v0: idx + 1 })}</span>
+                    <button onClick={() => removeVolunteer(item.id)} aria-label={t("Remove volunteer {v0}", { v0: idx + 1 })}
                       className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Field label="Role"><input type="text" className={INPUT_CLASS} placeholder="Tutor" value={item.role}
-                      onChange={(e) => updateVolunteer(item.id, 'role', e.target.value)} aria-label="Volunteer role" /></Field>
-                    <Field label="Organization"><input type="text" className={INPUT_CLASS} placeholder="Local Food Bank"
-                      value={item.organization} onChange={(e) => updateVolunteer(item.id, 'organization', e.target.value)} aria-label="Organization" /></Field>
-                    <Field label="Date / Period"><input type="text" className={INPUT_CLASS} placeholder="2022–Present"
-                      value={item.date} onChange={(e) => updateVolunteer(item.id, 'date', e.target.value)} aria-label="Date" /></Field>
+                    <Field label={t("Role")}><input type="text" className={INPUT_CLASS} placeholder={t("Tutor")} value={item.role}
+                      onChange={(e) => updateVolunteer(item.id, 'role', e.target.value)} aria-label={t("Volunteer role")} /></Field>
+                    <Field label={t("Organization")}><input type="text" className={INPUT_CLASS} placeholder={t("Local Food Bank")}
+                      value={item.organization} onChange={(e) => updateVolunteer(item.id, 'organization', e.target.value)} aria-label={t("Organization")} /></Field>
+                    <Field label={t("Date / Period")}><input type="text" className={INPUT_CLASS} placeholder={t("2022–Present")}
+                      value={item.date} onChange={(e) => updateVolunteer(item.id, 'date', e.target.value)} aria-label={t("Date")} /></Field>
                   </div>
-                  <Field label="One-line Description">
+                  <Field label={t("One-line Description")}>
                     <input type="text" className={INPUT_CLASS}
-                      placeholder="Provided weekly math tutoring to 8 underprivileged students"
-                      value={item.description} onChange={(e) => updateVolunteer(item.id, 'description', e.target.value)} aria-label="Description" />
+                      placeholder={t("Provided weekly math tutoring to 8 underprivileged students")}
+                      value={item.description} onChange={(e) => updateVolunteer(item.id, 'description', e.target.value)} aria-label={t("Description")} />
                   </Field>
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
-          <button onClick={addVolunteer} aria-label="Add volunteer work"
+          <button onClick={addVolunteer} aria-label={t("Add volunteer work")}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] border border-dashed border-lp-rule
               text-[#3C403E] text-sm hover:border-[#1F5C4A]/40 hover:text-[#1F5C4A] hover:bg-[#1F5C4A]/5 transition-all">
-            <Plus className="w-4 h-4" /> Add Volunteer
+            <Plus className="w-4 h-4" />{' '}{t("Add Volunteer")}
           </button>
         </div>
       </div>
@@ -1149,7 +1159,7 @@ function StepAdditional() {
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Languages className="w-4 h-4 text-[#8A5A00]" />
-          <span className="text-sm font-semibold text-lp-ink">Languages</span>
+          <span className="text-sm font-semibold text-lp-ink">{t("Languages")}</span>
         </div>
         <div className="space-y-2">
           <AnimatePresence initial={false}>
@@ -1158,29 +1168,29 @@ function StepAdditional() {
                 exit={{ opacity: 0, x: -8 }} transition={SPRING}
                 className="flex items-center gap-3 px-4 py-2.5 rounded-[4px] bg-[#F4F2EC] border border-lp-rule">
                 <input type="text" className="flex-1 bg-transparent text-sm text-lp-ink placeholder-[#5A5F5C] outline-none"
-                  placeholder="Language (e.g. Spanish)" value={lang.name}
-                  onChange={(e) => updateLanguage(lang.id, 'name', e.target.value)} aria-label="Language name" />
+                  placeholder={t("Language (e.g. Spanish)")} value={lang.name}
+                  onChange={(e) => updateLanguage(lang.id, 'name', e.target.value)} aria-label={t("Language name")} />
                 <select
                   className="bg-[#FFFFFF] border border-lp-rule rounded-[4px] px-2 py-1 text-xs text-[#3C403E] outline-none"
                   value={lang.proficiency}
                   onChange={(e) => updateLanguage(lang.id, 'proficiency', e.target.value)}
-                  aria-label="Proficiency level"
+                  aria-label={t("Proficiency level")}
                 >
                   {PROFICIENCY_LEVELS.map((level) => (
                     <option key={level} value={level}>{level}</option>
                   ))}
                 </select>
-                <button onClick={() => removeLanguage(lang.id)} aria-label={`Remove language ${lang.name}`}
+                <button onClick={() => removeLanguage(lang.id)} aria-label={t("Remove language {v0}", { v0: lang.name })}
                   className="p-1 rounded-[4px] text-[#5A5F5C] hover:text-[#B42318] hover:bg-[#B42318]/10 transition-all">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </motion.div>
             ))}
           </AnimatePresence>
-          <button onClick={addLanguage} aria-label="Add language"
+          <button onClick={addLanguage} aria-label={t("Add language")}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] border border-dashed border-lp-rule
               text-[#3C403E] text-sm hover:border-[#8A5A00]/40 hover:text-[#8A5A00] hover:bg-[#8A5A00]/5 transition-all">
-            <Plus className="w-4 h-4" /> Add Language
+            <Plus className="w-4 h-4" />{' '}{t("Add Language")}
           </button>
         </div>
       </div>
@@ -1197,6 +1207,7 @@ interface Step8Errors {
 }
 
 function StepTargetJob({ errors }: { errors: Step8Errors }) {
+  const t = useT()
   const { profile, updateProfile } = useCareerStore()
   const target = profile?.target ?? {
     position: '',
@@ -1215,51 +1226,50 @@ function StepTargetJob({ errors }: { errors: Step8Errors }) {
     <div className="space-y-4">
       <div className="p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
         <p className="text-xs text-[#1F5C4A]">
-          AURI will tailor your entire resume to this specific role and job description.
-          The more detail you provide, the stronger the keyword match.
+          {t("AURI will tailor your entire resume to this specific role and job description. The more detail you provide, the stronger the keyword match.")}
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Target Position" required error={errors.position}>
-          <input type="text" value={target.position} onChange={(e) => update('position', e.target.value)} placeholder="Senior Software Engineer" className={INPUT_CLASS} aria-label="Target position" style={{ fontSize: '16px' }} />
+        <Field label={t("Target Position")} required error={errors.position}>
+          <input type="text" value={target.position} onChange={(e) => update('position', e.target.value)} placeholder={t("Senior Software Engineer")} className={INPUT_CLASS} aria-label={t("Target position")} style={{ fontSize: '16px' }} />
         </Field>
-        <Field label="Target Company" required error={errors.company}>
-          <CompanyAutocomplete value={target.company} onChange={(v) => update('company', v)} placeholder="Google" className={INPUT_CLASS} aria-label="Target company" />
+        <Field label={t("Target Company")} required error={errors.company}>
+          <CompanyAutocomplete value={target.company} onChange={(v) => update('company', v)} placeholder={t("Google")} className={INPUT_CLASS} aria-label={t("Target company")} />
         </Field>
-        <Field label="Company Type">
+        <Field label={t("Company Type")}>
           <input
             type="text"
             className={INPUT_CLASS}
-            placeholder="e.g. SaaS startup, Enterprise, Non-profit"
+            placeholder={t("e.g. SaaS startup, Enterprise, Non-profit")}
             value={target.company_type}
             onChange={(e) => update('company_type', e.target.value)}
-            aria-label="Company type"
+            aria-label={t("Company type")}
           />
         </Field>
-        <Field label="Industry">
+        <Field label={t("Industry")}>
           <input
             type="text"
             className={INPUT_CLASS}
-            placeholder="e.g. Fintech, Healthcare, EdTech"
+            placeholder={t("e.g. Fintech, Healthcare, EdTech")}
             value={target.industry}
             onChange={(e) => update('industry', e.target.value)}
-            aria-label="Industry"
+            aria-label={t("Industry")}
           />
         </Field>
-        <Field label="City / Remote">
-          <LocationAutocomplete value={target.city} onChange={(v) => update('city', v)} placeholder="San Francisco, CA or Remote" className={INPUT_CLASS} aria-label="City or remote" />
+        <Field label={t("City / Remote")}>
+          <LocationAutocomplete value={target.city} onChange={(v) => update('city', v)} placeholder={t("San Francisco, CA or Remote")} className={INPUT_CLASS} aria-label={t("City or remote")} />
         </Field>
       </div>
 
-      <Field label="Job Description" required error={errors.job_description}>
+      <Field label={t("Job Description")} required error={errors.job_description}>
         <textarea
           className={TEXTAREA_CLASS}
           rows={8}
-          placeholder="Paste the full job description here. Claude uses it to match keywords and rewrite your resume for maximum ATS compatibility..."
+          placeholder={t("Paste the full job description here. Claude uses it to match keywords and rewrite your resume for maximum ATS compatibility...")}
           value={target.job_description ?? ''}
           onChange={(e) => update('job_description', e.target.value)}
-          aria-label="Job description"
+          aria-label={t("Job description")}
         />
       </Field>
     </div>
@@ -1281,6 +1291,7 @@ interface SignUpModalProps {
 }
 
 function SignUpModal({ onClose }: SignUpModalProps) {
+  const t = useT()
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -1303,9 +1314,9 @@ function SignUpModal({ onClose }: SignUpModalProps) {
             flex items-center justify-center mx-auto mb-4">
             <Save className="w-6 h-6 text-lp-ink" />
           </div>
-          <h3 className="font-heading text-lg font-bold text-lp-ink mb-2">Save Your Resume</h3>
+          <h3 className="font-heading text-lg font-bold text-lp-ink mb-2">{t("Save Your Resume")}</h3>
           <p className="text-sm text-[#3C403E] mb-6">
-            Create a free account to save your resume, access it anywhere, and unlock all AI features.
+            {t("Create a free account to save your resume, access it anywhere, and unlock all AI features.")}
           </p>
           <div className="space-y-2">
             <a
@@ -1314,14 +1325,14 @@ function SignUpModal({ onClose }: SignUpModalProps) {
                 text-white font-semibold text-sm
                   transition-all text-center"
             >
-              Sign Up Free
+              {t("Sign Up Free")}
             </a>
             <button
               onClick={onClose}
               className="block w-full px-6 py-3 rounded-[4px] border border-lp-rule
                 text-[#3C403E] text-sm hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
             >
-              Continue as Guest
+              {t("Continue as Guest")}
             </button>
           </div>
         </div>
@@ -1339,6 +1350,7 @@ interface ToastProps {
 }
 
 function Toast({ message, type, onDismiss }: ToastProps) {
+  const t = useT()
   useEffect(() => {
     const timer = setTimeout(onDismiss, 4000)
     return () => clearTimeout(timer)
@@ -1364,7 +1376,7 @@ function Toast({ message, type, onDismiss }: ToastProps) {
       <span className="text-sm font-medium">{message}</span>
       <button
         onClick={onDismiss}
-        aria-label="Dismiss notification"
+        aria-label={t("Dismiss notification")}
         className="p-0.5 ml-1 rounded opacity-60 hover:opacity-100 transition-opacity"
       >
         <X className="w-3.5 h-3.5" />
@@ -1376,6 +1388,7 @@ function Toast({ message, type, onDismiss }: ToastProps) {
 // ─── Main Page Component ──────────────────────────────────────────────────────
 
 function ResumePageContent() {
+  const t = useT()
   const {
     profile,
     currentResume,
@@ -1445,25 +1458,25 @@ function ResumePageContent() {
     (step: number): boolean => {
       if (step === 1) {
         const errors: ValidationErrors['step1'] = {}
-        if (!profile?.personal.name?.trim()) errors.name = 'Full name is required'
-        if (!profile?.personal.email?.trim()) errors.email = 'Email address is required'
+        if (!profile?.personal.name?.trim()) errors.name = t("Full name is required")
+        if (!profile?.personal.email?.trim()) errors.email = t("Email address is required")
         setValidationErrors((prev) => ({ ...prev, step1: errors }))
         return Object.keys(errors).length === 0
       }
       if (step === 2) {
         const errors: ValidationErrors['step2'] = {}
         if (!profile?.experience?.length) {
-          errors.experience = 'Add at least one work experience entry'
+          errors.experience = t("Add at least one work experience entry")
         }
         setValidationErrors((prev) => ({ ...prev, step2: errors }))
         return Object.keys(errors).length === 0
       }
       if (step === 8) {
         const errors: ValidationErrors['step8'] = {}
-        if (!profile?.target.position?.trim()) errors.position = 'Target position is required'
-        if (!profile?.target.company?.trim()) errors.company = 'Target company is required'
+        if (!profile?.target.position?.trim()) errors.position = t("Target position is required")
+        if (!profile?.target.company?.trim()) errors.company = t("Target company is required")
         if (!profile?.target.job_description?.trim())
-          errors.job_description = 'Job description is required for ATS optimization'
+          errors.job_description = t("Job description is required for ATS optimization")
         setValidationErrors((prev) => ({ ...prev, step8: errors }))
         return Object.keys(errors).length === 0
       }
@@ -1646,7 +1659,7 @@ function ResumePageContent() {
         setIsEditing(false) // start in preview mode; user clicks Edit to enter inline editing
         setATSScore(null)
       } catch {
-        setGenerateError('Failed to parse AI response. Please try again.')
+        setGenerateError(t("Failed to parse AI response. Please try again."))
       }
     }
   }, [profile, validateStep, stream, resetStream, setResume, setATSScore])
@@ -1697,10 +1710,10 @@ function ResumePageContent() {
       await saveResume(user.uid, savePayload)
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
-      setToast({ message: 'Resume saved successfully!', type: 'success' })
+      setToast({ message: t("Resume saved successfully!"), type: 'success' })
     } catch (error) {
       console.error('Save resume error:', error)
-      setToast({ message: 'Failed to save resume. Please try again.', type: 'error' })
+      setToast({ message: t("Failed to save resume. Please try again."), type: 'error' })
     } finally {
       // Always reset — whether save succeeded, failed, or threw synchronously.
       setIsSaving(false)
@@ -1761,10 +1774,10 @@ function ResumePageContent() {
           </div>
           <div>
             <h1 className="font-heading text-xl font-bold text-lp-ink leading-tight truncate">
-              Resume Builder
+              {t("Resume Builder")}
             </h1>
             <p className="text-xs text-[#5A5F5C] hidden sm:block">
-              AI-powered · ATS-optimized · Tailored to your target role
+              {t("AI-powered · ATS-optimized · Tailored to your target role")}
             </p>
           </div>
         </div>
@@ -1775,7 +1788,7 @@ function ResumePageContent() {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              aria-label="Save resume"
+              aria-label={t("Save resume")}
               className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
                 bg-[#1F5C4A] text-white
                  transition-all duration-200
@@ -1787,7 +1800,7 @@ function ResumePageContent() {
                 ? <CheckCircle className="w-3.5 h-3.5" />
                 : <Save className="w-3.5 h-3.5" />
               }
-              {isSaving ? 'Saving…' : saveSuccess ? 'Saved!' : 'Save'}
+              {isSaving ? t("Saving…") : saveSuccess ? t("Saved!") : t("Save")}
             </button>
           )}
           <Link
@@ -1797,7 +1810,7 @@ function ResumePageContent() {
               transition-all duration-200"
           >
             <FolderOpen className="w-3.5 h-3.5" />
-            My Resumes
+            {t("My Resumes")}
           </Link>
         </div>
 
@@ -1806,7 +1819,7 @@ function ResumePageContent() {
           bg-[#FFFFFF] border border-lp-rule">
           <button
             onClick={() => setMobileView('form')}
-            aria-label="Show form"
+            aria-label={t("Show form")}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[4px] text-xs font-medium transition-all
               ${mobileView === 'form'
                 ? 'bg-[#1F5C4A] text-white'
@@ -1814,11 +1827,11 @@ function ResumePageContent() {
               }`}
           >
             <EyeOff className="w-3.5 h-3.5" />
-            Form
+            {t("Form")}
           </button>
           <button
             onClick={() => setMobileView('preview')}
-            aria-label="Show preview"
+            aria-label={t("Show preview")}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[4px] text-xs font-medium transition-all
               ${mobileView === 'preview'
                 ? 'bg-[#1F5C4A] text-white'
@@ -1826,7 +1839,7 @@ function ResumePageContent() {
               }`}
           >
             <Eye className="w-3.5 h-3.5" />
-            Preview
+            {t("Preview")}
           </button>
         </div>
       </motion.div>
@@ -1856,7 +1869,7 @@ function ResumePageContent() {
                   <button
                     key={step.id}
                     onClick={() => handleStepClick(step.id)}
-                    aria-label={`Go to step ${step.id}: ${step.label}`}
+                    aria-label={t('Go to step {v0}: {v1}', { v0: step.id, v1: t(step.label) })}
                     aria-current={isActive ? 'step' : undefined}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[4px] text-xs font-medium
                       flex-shrink-0 transition-all duration-200
@@ -1872,7 +1885,7 @@ function ResumePageContent() {
                     ) : (
                       <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                     )}
-                    <span className="hidden sm:inline">{step.label}</span>
+                    <span className="hidden sm:inline">{t(step.label)}</span>
                     <span className="sm:hidden">{step.id}</span>
                   </button>
                 )
@@ -1907,7 +1920,7 @@ function ResumePageContent() {
                     )
                   })()}
                   <h2 className="font-heading text-sm font-semibold text-lp-ink">
-                    Step {currentStep} of {STEPS.length} — {STEPS[currentStep - 1].label}
+                    {t("Step {v0} of {v1} — {v2}", { v0: currentStep, v1: STEPS.length, v2: t(STEPS[currentStep - 1].label) })}
                   </h2>
                 </div>
               </div>
@@ -1942,11 +1955,11 @@ function ResumePageContent() {
                         <div className="flex items-center gap-3 p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
                           <Zap className="w-3.5 h-3.5 text-[#1F5C4A] flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-lp-ink">Monthly limit reached</p>
-                            <p className="text-xs text-[#3C403E]">You&apos;ve used all 3 free generations this month.</p>
+                            <p className="text-xs font-medium text-lp-ink">{t("Monthly limit reached")}</p>
+                            <p className="text-xs text-[#3C403E]">{t("You've used all 3 free generations this month.")}</p>
                           </div>
                           <Link href="/pricing" className="flex-shrink-0 text-xs font-semibold text-[#1F5C4A] hover:text-lp-ink transition-colors">
-                            Upgrade →
+                            {t("Upgrade →")}
                           </Link>
                         </div>
                       ) : (
@@ -1963,14 +1976,14 @@ function ResumePageContent() {
                   <button
                     onClick={handleBack}
                     disabled={currentStep === 1}
-                    aria-label="Go to previous step"
+                    aria-label={t("Go to previous step")}
                     className="flex items-center gap-1.5 px-4 py-2.5 rounded-[4px] text-sm font-medium
                       border border-lp-rule text-[#3C403E]
                       hover:text-lp-ink hover:bg-lp-ink/5 hover:border-lp-rule
                       disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    Back
+                    {t("Back")}
                   </button>
 
                   <div className="flex items-center gap-2">
@@ -1978,7 +1991,7 @@ function ResumePageContent() {
                       <button
                         onClick={handleGenerate}
                         disabled={isStreaming}
-                        aria-label="Generate resume with AI"
+                        aria-label={t("Generate resume with AI")}
                         className="flex items-center gap-2 px-5 py-2.5 rounded-[4px] text-sm font-semibold
                           bg-[#1F5C4A] text-white
                            transition-all duration-200
@@ -1987,24 +2000,24 @@ function ResumePageContent() {
                         {isStreaming ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            Generating...
+                            {t("Generating...")}
                           </>
                         ) : (
                           <>
                             <Sparkles className="w-4 h-4" />
-                            Generate Resume
+                            {t("Generate Resume")}
                           </>
                         )}
                       </button>
                     ) : (
                       <button
                         onClick={handleNext}
-                        aria-label="Go to next step"
+                        aria-label={t("Go to next step")}
                         className="flex items-center gap-1.5 px-5 py-2.5 rounded-[4px] text-sm font-semibold
                           bg-[#1F5C4A] text-white
                            transition-all duration-200"
                       >
-                        Next
+                        {t("Next")}
                         <ChevronRight className="w-4 h-4" />
                       </button>
                     )}
@@ -2014,7 +2027,7 @@ function ResumePageContent() {
                 {/* Generate shortcut hint on last step */}
                 {isLastStep && displayResume && (
                   <p className="text-xs text-[#5A5F5C] text-center mt-2">
-                    Resume generated — edit inline in the preview or regenerate
+                    {t("Resume generated — edit inline in the preview or regenerate")}
                   </p>
                 )}
               </div>
@@ -2076,7 +2089,7 @@ function ResumePageContent() {
                       setIsEditing(true)
                     }
                   }}
-                  aria-label={isEditing ? 'Exit editing mode' : 'Enter Easy Tune editing mode'}
+                  aria-label={isEditing ? t("Exit editing mode") : t("Enter Easy Tune editing mode")}
                   className={`flex items-center gap-2 px-4 py-2 rounded-[4px] text-xs font-medium
                     border transition-all duration-200
                     ${isEditing
@@ -2087,12 +2100,12 @@ function ResumePageContent() {
                   {isEditing ? (
                     <>
                       <CheckCircle className="w-3.5 h-3.5" />
-                      Done Editing
+                      {t("Done Editing")}
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-3.5 h-3.5" />
-                      Easy Tune — Edit Inline
+                      {t("Easy Tune — Edit Inline")}
                     </>
                   )}
                 </button>
@@ -2118,8 +2131,8 @@ function ResumePageContent() {
                     runATSScore(plainText, jd, displayResume)
                   }}
                   disabled={!profile?.target.job_description}
-                  aria-label="Run ATS compatibility score"
-                  title={!profile?.target.job_description ? 'Add a job description in Step 8 to run ATS scoring' : undefined}
+                  aria-label={t("Run ATS compatibility score")}
+                  title={!profile?.target.job_description ? t("Add a job description in Step 8 to run ATS scoring") : undefined}
                   className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] text-sm font-medium
                     border border-[#1F5C4A]/30 text-[#1F5C4A] bg-[#1F5C4A]/5
                     hover:bg-[#1F5C4A]/10 hover:border-[#1F5C4A]/50
@@ -2127,7 +2140,7 @@ function ResumePageContent() {
                     transition-all duration-200"
                 >
                   <Target className="w-4 h-4" />
-                  {profile?.target.job_description ? 'Run ATS Score' : 'Add a job description to run ATS Score'}
+                  {profile?.target.job_description ? t("Run ATS Score") : t("Add a job description to run ATS Score")}
                 </button>
               </motion.div>
             )}
@@ -2181,11 +2194,10 @@ function ResumePageContent() {
                 <FileText className="w-7 h-7 text-[#1F5C4A]/60" />
               </div>
               <p className="text-sm font-medium text-[#3C403E] mb-1">
-                Your resume will appear here
+                {t("Your resume will appear here")}
               </p>
               <p className="text-xs text-[#5A5F5C] max-w-xs">
-                Complete the form steps and click <strong className="text-[#1F5C4A]">Generate Resume</strong> on
-                step 8 to create your AI-tailored resume.
+                {t("Complete the form steps and click")}{' '}<strong className="text-[#1F5C4A]">{t("Generate Resume")}</strong>{' '}{t("on step 8 to create your AI-tailored resume.")}
               </p>
             </motion.div>
           )}

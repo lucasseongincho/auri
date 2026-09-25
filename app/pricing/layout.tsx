@@ -1,3 +1,6 @@
+import '@/lib/i18n/fonts'
+import { LocaleProvider } from '@/lib/i18n/client'
+import { getRequestLocale } from '@/lib/i18n/server'
 import type { Metadata } from 'next'
 import { generatePageMetadata } from '@/lib/metadata'
 
@@ -8,6 +11,7 @@ export const metadata: Metadata = generatePageMetadata({
   path: '/pricing',
 })
 
-export default function PricingLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+export default async function PricingLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getRequestLocale()
+  return <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
 }

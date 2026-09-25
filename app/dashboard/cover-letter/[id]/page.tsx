@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/i18n/client'
+
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
@@ -116,6 +118,7 @@ interface LetterShellProps {
 }
 
 function LetterShell({ company, name, email, phone, location, children, signerName, onSignerNameChange }: LetterShellProps) {
+  const { t, locale } = useLocale()
   const today = new Date().toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
   })
@@ -133,7 +136,7 @@ function LetterShell({ company, name, email, phone, location, children, signerNa
     }}>
       <div style={{ marginBottom: '24px' }}>
         <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700, fontSize: '13pt', margin: '0 0 4px 0' }}>
-          {name || 'Your Name'}
+          {name || t("Your Name")}
         </p>
         <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '9.5pt', color: '#555', margin: 0 }}>
           {[location, email, phone].filter(Boolean).join('  ·  ')}
@@ -145,14 +148,14 @@ function LetterShell({ company, name, email, phone, location, children, signerNa
       <div style={{ marginBottom: '24px' }}>
         <p style={{ margin: 0 }}>{company}</p>
       </div>
-      <p style={{ marginBottom: '16px', fontWeight: 500 }}>Dear Hiring Manager,</p>
+      <p style={{ marginBottom: '16px', fontWeight: 500 }}>{t("Dear Hiring Manager,")}</p>
       {children}
-      <p style={{ marginBottom: '40px' }}>Sincerely,</p>
+      <p style={{ marginBottom: '40px' }}>{t("Sincerely,")}</p>
       {onSignerNameChange ? (
         <input
           value={signerName ?? name}
           onChange={(e) => onSignerNameChange(e.target.value)}
-          placeholder="Your Name"
+          placeholder={t("Your Name")}
           style={{
             fontFamily: 'Arial, sans-serif',
             fontWeight: 700,
@@ -169,7 +172,7 @@ function LetterShell({ company, name, email, phone, location, children, signerNa
         />
       ) : (
         <p style={{ fontFamily: 'Arial, sans-serif', fontWeight: 700 }}>
-          {(signerName ?? name) || 'Your Name'}
+          {(signerName ?? name) || t("Your Name")}
         </p>
       )}
     </div>
@@ -225,8 +228,8 @@ function LetterDocEditable({
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 30 }
 
-function formatDate(val: unknown) {
-  return formatResumeDate(val, 'Saved')
+function formatDate(locale: 'en' | 'ko', val: unknown) {
+  return formatResumeDate(val, 'Saved', locale)
 }
 
 function toMs(val: unknown): number {
@@ -248,6 +251,7 @@ function WordBadge({ count }: { count: number }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function CoverLetterDetailPage() {
+  const { t, locale } = useLocale()
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
@@ -329,7 +333,7 @@ export default function CoverLetterDetailPage() {
         }
         setAllLetters(all.sort((a, b) => toMs(b.updatedAt) - toMs(a.updatedAt)))
       } catch {
-        setError('Failed to load cover letter.')
+        setError(t("Failed to load cover letter."))
       } finally {
         setLoading(false)
       }
@@ -354,7 +358,7 @@ export default function CoverLetterDetailPage() {
       setIsEditMode(false)
       setActiveParagraphIdx(null)
     } catch {
-      setError('Failed to save changes.')
+      setError(t("Failed to save changes."))
     } finally {
       setSaving(false)
     }
@@ -375,7 +379,7 @@ export default function CoverLetterDetailPage() {
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(body.error ?? `Server responded ${res.status}`)
+        throw new Error(body.error ?? t("Server responded {v0}", { v0: res.status }))
       }
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
@@ -388,7 +392,7 @@ export default function CoverLetterDetailPage() {
       URL.revokeObjectURL(url)
     } catch (err) {
       console.error('[pdf] Saved cover letter download failed:', err instanceof Error ? err.message : err)
-      setError('PDF generation is temporarily unavailable — please try again in a moment.')
+      setError(t("PDF generation is temporarily unavailable — please try again in a moment."))
     } finally {
       setDownloading(false)
     }
@@ -401,7 +405,7 @@ export default function CoverLetterDetailPage() {
       await deleteCoverLetter(user.uid, id)
       router.push('/dashboard/cover-letter/saved')
     } catch {
-      setError('Failed to delete cover letter.')
+      setError(t("Failed to delete cover letter."))
       setDeleting(false)
       setDeleteTarget(false)
     }
@@ -422,12 +426,12 @@ export default function CoverLetterDetailPage() {
           flex items-center justify-center mb-4">
           <Mail className="w-8 h-8 text-[#1F5C4A]" />
         </div>
-        <h2 className="font-heading text-lg font-semibold text-lp-ink mb-2">Sign in to view your cover letters</h2>
-        <p className="text-sm text-[#5A5F5C] mb-5">Your saved cover letters are stored securely in your account.</p>
+        <h2 className="font-heading text-lg font-semibold text-lp-ink mb-2">{t("Sign in to view your cover letters")}</h2>
+        <p className="text-sm text-[#5A5F5C] mb-5">{t("Your saved cover letters are stored securely in your account.")}</p>
         <Link href="/login" className="px-5 py-2.5 rounded-[4px] text-sm font-semibold
           bg-[#1F5C4A] text-white
               transition-all">
-          Sign in
+          {t("Sign in")}
         </Link>
       </div>
     )
@@ -443,11 +447,11 @@ export default function CoverLetterDetailPage() {
 
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold text-[#3C403E] uppercase tracking-wide">
-                Saved Letters
+                {t("Saved Letters")}
               </span>
               <Link
                 href="/dashboard/cover-letter"
-                aria-label="New cover letter"
+                aria-label={t("New cover letter")}
                 className="w-6 h-6 rounded-[4px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20
                   flex items-center justify-center hover:bg-[#1F5C4A]/20 transition-colors"
               >
@@ -477,12 +481,12 @@ export default function CoverLetterDetailPage() {
                       {l.company}
                     </p>
                     <p className="text-[10px] text-[#5A5F5C] truncate mt-0.5">{l.position}</p>
-                    <p className="text-[10px] text-[#5A5F5C] mt-0.5">{formatDate(l.updatedAt)}</p>
+                    <p className="text-[10px] text-[#5A5F5C] mt-0.5">{formatDate(locale, l.updatedAt)}</p>
                   </button>
                 )
               })}
               {!loading && allLetters.length === 0 && (
-                <p className="text-xs text-[#5A5F5C] text-center py-6">No saved letters</p>
+                <p className="text-xs text-[#5A5F5C] text-center py-6">{t("No saved letters")}</p>
               )}
             </div>
           </div>
@@ -533,14 +537,14 @@ export default function CoverLetterDetailPage() {
               flex items-center justify-center mb-4">
               <Mail className="w-8 h-8 text-[#1F5C4A]" />
             </div>
-            <h2 className="font-heading text-lg font-semibold text-lp-ink mb-2">Cover letter not found</h2>
-            <p className="text-sm text-[#5A5F5C] mb-5">This letter may have been deleted.</p>
+            <h2 className="font-heading text-lg font-semibold text-lp-ink mb-2">{t("Cover letter not found")}</h2>
+            <p className="text-sm text-[#5A5F5C] mb-5">{t("This letter may have been deleted.")}</p>
             <Link href="/dashboard/cover-letter/saved"
               className="flex items-center gap-2 px-5 py-2.5 rounded-[4px] text-sm font-semibold
                 bg-[#1F5C4A] text-white
                     transition-all">
               <ArrowLeft className="w-4 h-4" />
-              Back to My Cover Letters
+              {t("Back to My Cover Letters")}
             </Link>
           </motion.div>
         )}
@@ -563,7 +567,7 @@ export default function CoverLetterDetailPage() {
                     href="/dashboard/cover-letter/saved"
                     className="p-1.5 rounded-[4px] text-[#5A5F5C] hover:text-lp-ink hover:bg-lp-ink/5
                       transition-all flex-shrink-0"
-                    aria-label="Back to My Cover Letters"
+                    aria-label={t("Back to My Cover Letters")}
                   >
                     <ArrowLeft className="w-4 h-4" />
                   </Link>
@@ -580,7 +584,7 @@ export default function CoverLetterDetailPage() {
                 </div>
                 <button
                   onClick={() => setDeleteTarget(true)}
-                  aria-label="Delete this cover letter"
+                  aria-label={t("Delete this cover letter")}
                   className="p-2 rounded-[10px] text-[#5A5F5C] hover:text-[#B42318]
                     hover:bg-[#B42318]/10 transition-all duration-200 flex-shrink-0"
                 >
@@ -599,13 +603,13 @@ export default function CoverLetterDetailPage() {
                   <button
                     onClick={handleDownloadPDF}
                     disabled={downloading}
-                    aria-label="Download cover letter as PDF"
+                    aria-label={t("Download cover letter as PDF")}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-[4px] text-xs font-semibold
                       bg-[#1F5C4A] text-white
                       transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     {downloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-                    {downloading ? 'Generating…' : 'Download PDF'}
+                    {downloading ? t("Generating…") : t("Download PDF")}
                   </button>
                 )}
 
@@ -620,7 +624,7 @@ export default function CoverLetterDetailPage() {
                       border border-[#1F5C4A]/40 text-[#1F5C4A] hover:bg-[#1F5C4A]/10 transition-colors"
                   >
                     <Pencil className="w-3 h-3" />
-                    Edit
+                    {t("Edit")}
                   </button>
                 ) : (
                   <>
@@ -632,7 +636,7 @@ export default function CoverLetterDetailPage() {
                         disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
-                      {saving ? 'Saving…' : saveSuccess ? 'Saved!' : 'Save Changes'}
+                      {saving ? t("Saving…") : saveSuccess ? t("Saved!") : t("Save Changes")}
                     </button>
                     <button
                       onClick={() => {
@@ -643,7 +647,7 @@ export default function CoverLetterDetailPage() {
                         border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
                     >
                       <X className="w-3 h-3" />
-                      Cancel
+                      {t("Cancel")}
                     </button>
                   </>
                 )}
@@ -659,12 +663,12 @@ export default function CoverLetterDetailPage() {
               </div>
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
-                {formatDate(letter.updatedAt)}
+                {formatDate(locale, letter.updatedAt)}
               </div>
               {isEditMode && (
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold
                   bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A]">
-                  Editing
+                  {t("Editing")}
                 </span>
               )}
             </div>
@@ -672,15 +676,15 @@ export default function CoverLetterDetailPage() {
             {/* Opening hook callout */}
             {letter.openingHook && (
               <div className="rounded-[4px] border border-[#1F5C4A]/20 bg-[#1F5C4A]/5 px-4 py-3">
-                <p className="text-xs font-semibold text-[#1F5C4A] mb-1">Opening hook</p>
-                <p className="text-sm text-[#3C403E] italic">&ldquo;{letter.openingHook}&rdquo;</p>
+                <p className="text-xs font-semibold text-[#1F5C4A] mb-1">{t("Opening hook")}</p>
+                <p className="text-sm text-[#3C403E] italic">{t("“{v0}”", { v0: letter.openingHook })}</p>
               </div>
             )}
 
             {/* Edit mode hint */}
             {isEditMode && activeParagraphIdx === null && (
               <p className="text-xs text-[#5A5F5C] text-center py-1">
-                Click any paragraph to edit inline
+                {t("Click any paragraph to edit inline")}
               </p>
             )}
 
@@ -740,7 +744,7 @@ export default function CoverLetterDetailPage() {
       <div className="lg:hidden fixed bottom-20 right-4 z-30">
         <button
           onClick={() => setSidebarOpen((v) => !v)}
-          aria-label="Toggle saved letters list"
+          aria-label={t("Toggle saved letters list")}
           className="w-10 h-10 rounded-[10px] bg-[#1F5C4A] text-white flex items-center justify-center
               hover:bg-[#15443A] transition-all"
         >
@@ -768,10 +772,10 @@ export default function CoverLetterDetailPage() {
                 bg-[#FFFFFF] border-r border-lp-rule overflow-y-auto p-3 pt-16"
             >
               <div className="flex items-center justify-between mb-3 px-1">
-                <span className="text-sm font-semibold text-lp-ink">Saved Letters</span>
+                <span className="text-sm font-semibold text-lp-ink">{t("Saved Letters")}</span>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  aria-label="Close letters list"
+                  aria-label={t("Close letters list")}
                   className="p-1 rounded-[4px] hover:bg-lp-ink/5 text-[#5A5F5C] hover:text-lp-ink"
                 >
                   <X className="w-4 h-4" />
@@ -783,7 +787,7 @@ export default function CoverLetterDetailPage() {
                   bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-[#1F5C4A] text-xs font-semibold"
                 onClick={() => setSidebarOpen(false)}
               >
-                <Plus className="w-3.5 h-3.5" /> New Cover Letter
+                <Plus className="w-3.5 h-3.5" />{' '}{t("New Cover Letter")}
               </Link>
               <ul className="space-y-1">
                 {allLetters.map((l) => {
@@ -805,7 +809,7 @@ export default function CoverLetterDetailPage() {
                           {l.company}
                         </p>
                         <p className="text-[10px] text-[#5A5F5C] truncate mt-0.5">{l.position}</p>
-                        <p className="text-[10px] text-[#5A5F5C] mt-0.5">{formatDate(l.updatedAt)}</p>
+                        <p className="text-[10px] text-[#5A5F5C] mt-0.5">{formatDate(locale, l.updatedAt)}</p>
                       </button>
                     </li>
                   )
@@ -846,9 +850,9 @@ export default function CoverLetterDetailPage() {
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                <h3 className="font-heading text-base font-semibold text-lp-ink mb-1">Delete cover letter?</h3>
+                <h3 className="font-heading text-base font-semibold text-lp-ink mb-1">{t("Delete cover letter?")}</h3>
                 <p className="text-sm text-[#5A5F5C] mb-6">
-                  This will be permanently deleted. This action cannot be undone.
+                  {t("This will be permanently deleted. This action cannot be undone.")}
                 </p>
                 <div className="flex gap-3">
                   <button
@@ -856,7 +860,7 @@ export default function CoverLetterDetailPage() {
                     className="flex-1 px-4 py-2.5 rounded-[4px] text-sm font-medium
                       border border-lp-rule text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                   <button
                     onClick={handleDelete}
@@ -865,7 +869,7 @@ export default function CoverLetterDetailPage() {
                       bg-[#B42318] text-white hover:bg-[#912018] transition-colors
                       disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Delete'}
+                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t("Delete")}
                   </button>
                 </div>
               </div>

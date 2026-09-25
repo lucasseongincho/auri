@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/client'
+
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
@@ -12,6 +14,7 @@ export default function DashboardError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const t = useT()
   useEffect(() => {
     console.error('[Dashboard Error]', error)
   }, [error])
@@ -31,15 +34,14 @@ export default function DashboardError({
           </div>
           <div>
             <h2 className="font-heading text-lg font-bold text-lp-ink mb-1">
-              Something went wrong
+              {t("Something went wrong")}
             </h2>
             <p className="text-sm text-[#5A5F5C]">
-              An unexpected error occurred. Your data is safe — try refreshing
-              or go back to the dashboard.
+              {t("An unexpected error occurred. Your data is safe — try refreshing or go back to the dashboard.")}
             </p>
             {error.digest && (
               <p className="text-[10px] text-[#5A5F5C]/60 mt-2 font-mono">
-                Error ID: {error.digest}
+                {t("Error ID: {v0}", { v0: error.digest })}
               </p>
             )}
           </div>
@@ -51,7 +53,7 @@ export default function DashboardError({
                 hover:bg-[#15443A] transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
-              Try again
+              {t("Try again")}
             </button>
             <Link
               href="/dashboard"
@@ -60,7 +62,7 @@ export default function DashboardError({
                 text-[#3C403E] hover:text-lp-ink hover:bg-lp-ink/5 transition-all"
             >
               <Home className="w-4 h-4" />
-              Dashboard
+              {t("Dashboard")}
             </Link>
           </div>
         </div>
