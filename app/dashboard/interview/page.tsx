@@ -54,7 +54,7 @@ function STARAnswer({ text }: { text: string }) {
 }
 const CARD_SPRING = { type: 'spring' as const, stiffness: 200, damping: 25 }
 const INPUT_CLASS =
-  'w-full bg-[#F4F2EC] border border-lp-rule rounded-[4px] px-4 py-3 text-lp-ink text-sm placeholder-[#5A5F5C] focus:outline-none focus:border-[#B42318]/50 focus:ring-1 focus:ring-[#B42318]/30 transition-all'
+  'w-full bg-[#F4F2EC] border border-lp-rule rounded-[4px] px-4 py-3 text-lp-ink text-sm placeholder-[#5A5F5C] focus:outline-none focus:border-[#1F5C4A]/50 focus:ring-1 focus:ring-[#1F5C4A]/30 transition-all'
 const LABEL_CLASS = 'block text-xs font-medium text-[#3C403E] mb-1.5'
 const TEXTAREA_CLASS = `${INPUT_CLASS} resize-none`
 
@@ -139,7 +139,7 @@ function FlipCard({
         >
           <div className="rounded-[10px]  bg-[#FFFFFF] p-6 flex flex-col gap-4">
             <div className="flex items-start justify-between">
-              <span className="px-2.5 py-1 rounded-[4px] bg-[#B42318]/10 border border-[#B42318]/20 text-xs font-semibold text-[#B42318] uppercase tracking-wide">
+              <span className="px-2.5 py-1 rounded-[4px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide">
                 Q{index + 1}
               </span>
               {!isPracticeMode && (
@@ -198,7 +198,7 @@ function FlipCard({
                   <button
                     onClick={handleScore}
                     disabled={!userAnswer.trim() || isScoring}
-                    className="flex items-center gap-2 px-4 py-2 rounded-[4px] text-sm font-semibold bg-[#B42318] text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2 rounded-[4px] text-sm font-semibold bg-[#1F5C4A] text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isScoring
                       ? <><IconLoading className="w-3.5 h-3.5 animate-spin" />{' '}{t("Scoring…")}</>
@@ -470,7 +470,7 @@ export default function InterviewPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}>
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-[10px] bg-[#B42318]/10 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-[10px] bg-[#1F5C4A]/10 flex items-center justify-center">
               <IconInterviewPrep className="w-5 h-5 text-lp-ink" />
             </div>
             <h1 className="font-heading text-2xl font-bold text-lp-ink">{t("Interview Prep")}</h1>
@@ -561,7 +561,7 @@ export default function InterviewPage() {
                 onClick={handleGenerate}
                 disabled={!position.trim() || !company.trim() || isStreaming}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-[10px]
-                  bg-[#B42318] text-white font-semibold text-sm
+                  bg-[#1F5C4A] text-white font-semibold text-sm
                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isStreaming
@@ -584,7 +584,7 @@ export default function InterviewPage() {
                     onClick={() => setIsPracticeMode(!isPracticeMode)}
                     className={`relative inline-flex items-center w-12 h-6 rounded-full
                       transition-colors duration-200 focus:outline-none
-                      ${isPracticeMode ? 'bg-[#B42318]' : 'bg-lp-ink/10'}`}
+                      ${isPracticeMode ? 'bg-[#1F5C4A]' : 'bg-lp-ink/10'}`}
                     role="switch"
                     aria-checked={isPracticeMode}
                     aria-label={t("Toggle practice mode")}
@@ -634,9 +634,9 @@ export default function InterviewPage() {
           <AnimatePresence mode="wait">
             {isStreaming ? (
               <motion.div key="streaming" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-                <div className="rounded-[10px] border border-[#B42318]/20 bg-[#B42318]/5 p-4 flex items-center gap-3">
-                  <IconLoading className="w-4 h-4 text-[#B42318] animate-spin" />
-                  <span className="text-sm text-[#B42318] font-medium">{t("AURI is preparing your interview questions…")}</span>
+                <div className="rounded-[10px] border border-[#1F5C4A]/20 bg-[#1F5C4A]/5 p-4 flex items-center gap-3">
+                  <IconLoading className="w-4 h-4 text-[#1F5C4A] animate-spin" />
+                  <span className="text-sm text-[#1F5C4A] font-medium">{t("AURI is preparing your interview questions…")}</span>
                 </div>
                 {Array.from({ length: 2 }).map((_, i) => (
                   <div key={i} className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
@@ -653,9 +653,9 @@ export default function InterviewPage() {
                 {/* Mode indicator */}
                 <div className="flex items-center gap-2">
                   {isPracticeMode ? (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#B42318]/10 border border-[#B42318]/20">
-                      <span className="w-2 h-2 rounded-full bg-[#B42318]" />
-                      <span className="text-xs font-medium text-[#B42318]">{t("Practice Mode Active — Type your answers below")}</span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
+                      <span className="w-2 h-2 rounded-full bg-[#1F5C4A]" />
+                      <span className="text-xs font-medium text-[#1F5C4A]">{t("Practice Mode Active — Type your answers below")}</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-lp-ink/5 border border-lp-rule">
@@ -692,7 +692,7 @@ export default function InterviewPage() {
                       onClick={() => setCurrentCard(i)}
                       aria-label={`Go to question ${i + 1}`}
                       className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                        i === currentCard ? 'bg-[#B42318]' : 'bg-lp-ink/20 hover:bg-lp-ink/40'
+                        i === currentCard ? 'bg-[#1F5C4A]' : 'bg-lp-ink/20 hover:bg-lp-ink/40'
                       }`}
                     />
                   ))}
@@ -709,8 +709,8 @@ export default function InterviewPage() {
               <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 className="rounded-[10px] border border-lp-rule bg-[#FFFFFF] p-0">
                 <div className="rounded-[10px]  bg-[#FFFFFF] p-16 flex flex-col items-center text-center">
-                  <div className="w-14 h-14 rounded-[10px] bg-[#B42318]/10 border border-[#B42318]/20 flex items-center justify-center mb-4">
-                    <IconInterviewPrep className="w-6 h-6 text-[#B42318]" />
+                  <div className="w-14 h-14 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20 flex items-center justify-center mb-4">
+                    <IconInterviewPrep className="w-6 h-6 text-[#1F5C4A]" />
                   </div>
                   <p className="text-sm font-medium text-[#3C403E]">{t("Your interview prep will appear here")}</p>
                   <p className="text-xs text-[#5A5F5C] mt-1">{t("Enter the position and company, then click Generate")}</p>

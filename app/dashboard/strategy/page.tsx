@@ -25,7 +25,7 @@ const DAY_COLORS = [
   { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
   { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
   { bg: 'bg-[#1F7A4D]/10', border: 'border-[#1F7A4D]/20', text: 'text-[#1F7A4D]' },
-  { bg: 'bg-[#8A5A00]/10', border: 'border-[#8A5A00]/20', text: 'text-[#F2D45C]' },
+  { bg: 'bg-[#8A5A00]/10', border: 'border-[#8A5A00]/20', text: 'text-[#8A5A00]' },
   { bg: 'bg-[#B42318]/10', border: 'border-[#B42318]/20', text: 'text-[#B42318]' },
   { bg: 'bg-[#1F5C4A]/10', border: 'border-[#1F5C4A]/20', text: 'text-[#1F5C4A]' },
 ]

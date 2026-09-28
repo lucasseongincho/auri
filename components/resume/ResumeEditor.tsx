@@ -417,7 +417,7 @@ export default function ResumeEditor({ resumeData, onDataChange, syncRef }: Resu
             <div className="flex flex-wrap gap-2 mb-3">
               {(resumeData.certifications ?? []).map((cert, i) => (
                 <span key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-full
-                  bg-[#8A5A00]/10 border border-[#8A5A00]/20 text-xs text-[#F2D45C]">
+                  bg-[#8A5A00]/10 border border-[#8A5A00]/20 text-xs text-[#8A5A00]">
                   {cert}
                   <button
                     onClick={() => {

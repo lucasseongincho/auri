@@ -933,7 +933,7 @@ function CoverLetterContent() {
                 {result.opening_hook && (
                   <div className="print:hidden p-3 rounded-[10px] bg-[#1F5C4A]/10 border border-[#1F5C4A]/20">
                     <p className="text-xs font-semibold text-[#1F5C4A] uppercase tracking-wide mb-1">{t("Opening Hook")}</p>
-                    <p className="text-sm text-[#F2D45C] italic">{result.opening_hook}</p>
+                    <p className="text-sm text-lp-ink italic">{result.opening_hook}</p>
                   </div>
                 )}
 

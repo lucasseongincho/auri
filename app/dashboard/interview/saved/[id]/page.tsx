@@ -646,7 +646,7 @@ export default function StudyViewPage() {
             onClick={() => setPracticeMode(true)}
             className={`px-4 py-2 rounded-[4px] text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
               practiceMode
-                ? 'bg-[#B42318] text-white '
+                ? 'bg-[#1F5C4A] text-white '
                 : 'text-[#5A5F5C] hover:text-[#3C403E]'
             }`}
           >
