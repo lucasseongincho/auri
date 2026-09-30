@@ -61,9 +61,8 @@ export const metadata: Metadata = {
   verification: {
     google: 'P2tadCAsvByF8yjAeb7ZVg2TH5OlXFajDfEAAoXjDlE',
   },
-  icons: {
-    icon: '/favicon.svg',
-  },
+  // Icons come from app/icon.svg, app/favicon.ico and app/apple-icon.png.
+  // Next.js adds a content hash to their URLs, so browsers pick up a new icon.
 }
 
 // JSON-LD structured data — WebApplication schema for rich search results
