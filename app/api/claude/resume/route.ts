@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { streamClaude, callClaudeJSON, buildErrorResponse, MAX_TOKENS_RESUME, MAX_TOKENS_ASSIST } from '@/lib/claude'
+import { streamClaude, toSanitizedTextStream, callClaudeJSON, buildErrorResponse, MAX_TOKENS_RESUME, MAX_TOKENS_ASSIST } from '@/lib/claude'
 import { buildResumePrompt, buildEasyTunePrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
@@ -27,23 +27,7 @@ async function attemptStream(prompt: string, retryCount = 0, temperature = 1.0):
   try {
     const claudeStream = await streamClaude(prompt, MAX_TOKENS_RESUME, temperature)
 
-    return new ReadableStream<Uint8Array>({
-      async start(controller) {
-        try {
-          for await (const event of claudeStream) {
-            if (
-              event.type === 'content_block_delta' &&
-              event.delta.type === 'text_delta'
-            ) {
-              controller.enqueue(new TextEncoder().encode(event.delta.text))
-            }
-          }
-          controller.close()
-        } catch (err) {
-          controller.error(err)
-        }
-      },
-    })
+    return toSanitizedTextStream(claudeStream)
   } catch (err) {
     // Retry once on 529 (Claude overloaded) per CLAUDE.md §7
     const status = (err as { status?: number }).status

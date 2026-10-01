@@ -10,6 +10,7 @@
 - [x] Claude API wrapper + streaming + JSON parsing with repair/retry
 - [x] Error boundaries on all dashboard routes (app/dashboard/error.tsx + per-feature)
 - [x] Rate limiting (Upstash Redis — 10/min free, 60/min Pro)
+- [x] Invisible-character sanitizer (lib/sanitize/invisibleChars.ts, ported from watermarks-remover, MIT) at ingest + Claude output, plus AURI PDF metadata (lib/pdfMetadata.ts) — tests: `node --test scripts/test-sanitize.ts scripts/test-pdf-metadata.ts`
 - [x] Atomic beta call counter replaced with free tier enforcement
 
 ### Landing & Marketing

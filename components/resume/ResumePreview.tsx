@@ -320,7 +320,12 @@ export default function ResumePreview({
       const res = await fetch('/api/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ html, filename }),
+        body: JSON.stringify({
+          html,
+          filename,
+          title: personal.name ? `Resume - ${personal.name}` : 'Resume',
+          author: personal.name || undefined,
+        }),
       })
 
       if (!res.ok) {

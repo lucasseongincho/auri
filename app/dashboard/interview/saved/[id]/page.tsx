@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { getSavedInterviewPrep, deleteInterviewPrep, getGuestInterviewPreps, deleteGuestInterviewPrep } from '@/lib/firestore'
 import type { SavedInterviewPrep, InterviewQuestion } from '@/types'
+import { cleanText } from '@/lib/sanitize/invisibleChars'
+import { rewritePdfInfo } from '@/lib/pdfMetadata'
 
 const CARD_SPRING = { type: 'spring', stiffness: 280, damping: 28 } as const
 
@@ -268,16 +270,39 @@ export default function StudyViewPage() {
     if (!printRef.current) return
     try {
       const html2pdf = (await import('html2pdf.js')).default
-      html2pdf()
+      const filename = `interview-prep-${prep?.company ?? 'session'}.pdf`
+
+      // Render from a sanitized clone so invisible characters never reach the PDF.
+      const source = printRef.current.cloneNode(true) as HTMLElement
+      const walker = document.createTreeWalker(source, NodeFilter.SHOW_TEXT)
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (node.nodeValue) node.nodeValue = cleanText(node.nodeValue)
+      }
+
+      const raw = await html2pdf()
         .set({
           margin: [10, 12],
-          filename: `interview-prep-${prep?.company ?? 'session'}.pdf`,
+          filename,
           image: { type: 'jpeg', quality: 0.97 },
           html2canvas: { scale: 2, useCORS: true },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         })
-        .from(printRef.current)
-        .save()
+        .from(source)
+        .outputPdf('arraybuffer')
+
+      // jsPDF hard-codes Producer "jsPDF x.y" — replace with AURI metadata.
+      const original = new Uint8Array(raw)
+      const bytes = rewritePdfInfo(original, {
+        title: cleanText(prep?.company ? `Interview Prep - ${prep.company}` : 'Interview Prep'),
+      }) ?? original
+      const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }))
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
     } catch {
       window.print()
     }

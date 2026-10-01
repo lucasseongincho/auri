@@ -19,6 +19,7 @@ import ATSScorePanel from '@/components/resume/ATSScorePanel'
 import RequirementCoveragePanel from '@/components/resume/RequirementCoveragePanel'
 import SectionAnalysisPanel from '@/components/resume/SectionAnalysisPanel'
 import SuggestionsPanel from '@/components/resume/SuggestionsPanel'
+import { cleanText } from '@/lib/sanitize/invisibleChars'
 import type {
   ATSScore, RequirementCoverage, ATSOutcome, StructuredSuggestion,
   ResumeData, SavedResume, ParsedResumeResult,
@@ -623,7 +624,7 @@ export default function ATSPage() {
                   rows={8}
                   placeholder={t("Paste the job description here…")}
                   value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
+                  onChange={(e) => setJobDescription(cleanText(e.target.value))}
                   aria-label={t("Job description")}
                 />
               </div>

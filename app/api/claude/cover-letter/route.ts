@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { streamClaude, buildErrorResponse } from '@/lib/claude'
+import { streamClaude, toSanitizedTextStream, buildErrorResponse } from '@/lib/claude'
 import { buildCoverLetterPrompt, buildCoverLetterAssistPrompt } from '@/lib/prompts'
 import { checkRateLimit, getIdentifier, rateLimitResponse } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
@@ -26,23 +26,7 @@ interface CoverLetterRequestBody {
 async function attemptStream(prompt: string, retryCount = 0): Promise<ReadableStream<Uint8Array>> {
   try {
     const claudeStream = await streamClaude(prompt, 2500)
-    return new ReadableStream<Uint8Array>({
-      async start(controller) {
-        try {
-          for await (const event of claudeStream) {
-            if (
-              event.type === 'content_block_delta' &&
-              event.delta.type === 'text_delta'
-            ) {
-              controller.enqueue(new TextEncoder().encode(event.delta.text))
-            }
-          }
-          controller.close()
-        } catch (err) {
-          controller.error(err)
-        }
-      },
-    })
+    return toSanitizedTextStream(claudeStream)
   } catch (err) {
     const status = (err as { status?: number }).status
     if (status === 529 && retryCount < 1) {

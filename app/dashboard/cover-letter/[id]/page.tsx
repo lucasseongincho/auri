@@ -360,10 +360,16 @@ export default function CoverLetterDetailPage() {
     try {
       const { getResumeHTML } = await import('@/lib/pdf')
       const html = getResumeHTML(letterDocRef.current)
+      const signer = letter.signerName || personal.name
       const res = await fetch('/api/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ html, filename }),
+        body: JSON.stringify({
+          html,
+          filename,
+          title: signer ? `Cover Letter - ${signer}` : 'Cover Letter',
+          author: signer || undefined,
+        }),
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({})) as { error?: string }

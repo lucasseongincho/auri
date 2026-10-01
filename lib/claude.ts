@@ -2,6 +2,7 @@
 // All Anthropic API calls are routed through /app/api/claude/* routes.
 
 import Anthropic from '@anthropic-ai/sdk'
+import { cleanText, sanitizeDeep, createStreamSanitizer } from '@/lib/sanitize/invisibleChars'
 
 // ANTHROPIC_API_KEY is server-side only per CLAUDE.md §11 security rule
 if (!process.env.ANTHROPIC_API_KEY) {
@@ -31,11 +32,14 @@ export async function callClaude(
   const response = await client.messages.create({
     model: CLAUDE_MODEL,
     max_tokens: maxTokens,
-    messages: [{ role: 'user', content: prompt }],
+    messages: [{ role: 'user', content: cleanText(prompt) }],
   })
 
-  const text =
+  // Output boundary: strip invisible/watermark characters before anything
+  // downstream parses or returns the text.
+  const text = cleanText(
     response.content[0].type === 'text' ? response.content[0].text : ''
+  )
 
   return {
     text,
@@ -56,7 +60,39 @@ export async function streamClaude(
     model: CLAUDE_MODEL,
     max_tokens: maxTokens,
     temperature,
-    messages: [{ role: 'user', content: prompt }],
+    messages: [{ role: 'user', content: cleanText(prompt) }],
+  })
+}
+
+// ── Stream → sanitized text ReadableStream ───────────────────────────────────
+// Single output choke point for every streaming route. The stream sanitizer
+// holds back joiners/invisibles at chunk edges so the client receives exactly
+// what sanitizeText() would produce on the full response.
+
+export function toSanitizedTextStream(
+  claudeStream: Awaited<ReturnType<typeof streamClaude>>
+): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder()
+  const sanitizer = createStreamSanitizer()
+  return new ReadableStream<Uint8Array>({
+    async start(controller) {
+      try {
+        for await (const event of claudeStream) {
+          if (
+            event.type === 'content_block_delta' &&
+            event.delta.type === 'text_delta'
+          ) {
+            const clean = sanitizer.push(event.delta.text)
+            if (clean) controller.enqueue(encoder.encode(clean))
+          }
+        }
+        const rest = sanitizer.flush()
+        if (rest) controller.enqueue(encoder.encode(rest))
+        controller.close()
+      } catch (err) {
+        controller.error(err)
+      }
+    },
   })
 }
 
@@ -170,7 +206,9 @@ export async function callClaudeJSON<T>(
   for (let attempt = 0; attempt <= retries; attempt++) {
     const { text, inputTokens, outputTokens } = await callClaude(prompt, maxTokens)
     try {
-      const data = parseClaudeJSON<T>(text)
+      // Deep pass catches ​-style JSON escapes that only become
+      // invisible characters after parsing.
+      const { value: data } = sanitizeDeep(parseClaudeJSON<T>(text))
       return { data, inputTokens, outputTokens }
     } catch (err) {
       lastError = err

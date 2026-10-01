@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { CareerProfile, ResumeData, ATSScore, FeatureId, EditHistoryEntry } from '@/types'
 import { saveCareerProfile, getCareerProfile } from '@/lib/firestore'
+import { sanitizeDeep } from '@/lib/sanitize/invisibleChars'
 
 const DEFAULT_PROFILE: CareerProfile = {
   personal: { name: '', email: '', phone: '', location: '', linkedin_url: '', website: '' },
@@ -74,7 +75,11 @@ export const useCareerStore = create<CareerStore>()(
       editHistory: [],
       historyIndex: -1,
 
-      updateProfile: (partial) => {
+      // Ingest boundary: everything typed, pasted or imported into the profile
+      // or resume passes through these setters, so invisible characters never
+      // reach the store, Firestore, or a Claude prompt.
+      updateProfile: (rawPartial) => {
+        const partial = sanitizeDeep(rawPartial).value
         set((state) => ({
           profile: state.profile
             ? { ...state.profile, ...partial }
@@ -82,10 +87,10 @@ export const useCareerStore = create<CareerStore>()(
         }))
       },
 
-      setProfile: (profile) => set({ profile }),
+      setProfile: (profile) => set({ profile: sanitizeDeep(profile).value }),
 
       setResume: (resume) => {
-        set({ currentResume: resume })
+        set({ currentResume: sanitizeDeep(resume).value })
       },
 
       setATSScore: (score) => {

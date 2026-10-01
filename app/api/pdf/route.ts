@@ -1,4 +1,6 @@
 import type { Browser } from 'puppeteer-core'
+import { cleanText } from '@/lib/sanitize/invisibleChars'
+import { rewritePdfInfo } from '@/lib/pdfMetadata'
 
 export const maxDuration = 30
 
@@ -35,14 +37,20 @@ async function launchBrowser(): Promise<Browser> {
 
 export async function POST(req: Request) {
   try {
-    const { html, filename = 'resume.pdf' } = await req.json() as {
+    const { html: rawHtml, filename = 'resume.pdf', title, author } = await req.json() as {
       html: string
       filename: string
+      title?: string
+      author?: string
     }
 
-    if (!html) {
+    if (!rawHtml) {
       return Response.json({ success: false, error: 'No HTML provided' }, { status: 400 })
     }
+
+    // Last line of defense: strip invisible/watermark characters from the
+    // document right before Chromium renders it into the PDF text layer.
+    const html = cleanText(rawHtml)
 
     const browser = await launchBrowser()
     const page = await browser.newPage()
@@ -66,7 +74,15 @@ export async function POST(req: Request) {
 
     await browser.close()
 
-    const pdfBuffer = Buffer.from(pdf)
+    // Chromium writes Title "about:blank", Creator = the HeadlessChrome
+    // user-agent and Producer "Skia/PDF". Replace with our own metadata; if the
+    // file layout is one we don't rewrite, ship the original rather than fail.
+    const rewritten = rewritePdfInfo(pdf, {
+      title: cleanText(title ?? '') || filename.replace(/\.pdf$/i, ''),
+      author: author ? cleanText(author) : undefined,
+    })
+    if (!rewritten) console.warn('[pdf] Metadata rewrite skipped: unsupported PDF structure')
+    const pdfBuffer = Buffer.from(rewritten ?? pdf)
 
     return new Response(pdfBuffer, {
       status: 200,

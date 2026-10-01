@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { getAuthenticatedUser } from '@/lib/verifyAuth'
 import { analyzeResumeText } from '@/lib/ats/parser'
+import { cleanText } from '@/lib/sanitize/invisibleChars'
 
 export const runtime = 'nodejs'
 
@@ -38,7 +39,8 @@ export async function POST(req: NextRequest) {
     // index.js that reads a test PDF file at runtime, causing ENOENT in Vercel deploys.
     const pdfParse = (await import('pdf-parse/lib/pdf-parse.js')).default
     const parsed = await pdfParse(buffer)
-    const extractedText: string = parsed.text
+    // Ingest boundary: uploaded PDFs often carry zero-width / NBSP debris.
+    const extractedText = cleanText(parsed.text)
 
     const result = analyzeResumeText(extractedText)
 

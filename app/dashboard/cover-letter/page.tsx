@@ -22,6 +22,7 @@ import { buildExperienceSummary } from '@/lib/prompts'
 import { saveCoverLetter, getSavedCoverLetter, saveGuestCoverLetter } from '@/lib/firestore'
 import LocationAutocomplete from '@/components/ui/LocationAutocomplete'
 import CompanyAutocomplete from '@/components/ui/CompanyAutocomplete'
+import { cleanText } from '@/lib/sanitize/invisibleChars'
 import type { CoverLetter } from '@/types'
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -588,7 +589,12 @@ function CoverLetterContent() {
       const res = await fetch('/api/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ html, filename }),
+        body: JSON.stringify({
+          html,
+          filename,
+          title: profile?.personal?.name ? `Cover Letter - ${profile.personal.name}` : 'Cover Letter',
+          author: profile?.personal?.name || undefined,
+        }),
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({})) as { error?: string }
@@ -609,7 +615,7 @@ function CoverLetterContent() {
     } finally {
       setDownloading(false)
     }
-  }, [company, position])
+  }, [company, position, profile?.personal?.name])
 
   // Save to Firestore
   const handleSave = useCallback(async () => {
@@ -790,7 +796,7 @@ function CoverLetterContent() {
                 <div>
                   <label className={LABEL_CLASS}>{t("Job Description")}{' '}<span className="text-[#5A5F5C] font-normal">{t("(paste for keyword match)")}</span></label>
                   <textarea className={TEXTAREA_CLASS} rows={4} placeholder={t("Paste the job description here…")}
-                    value={jobDescription} onChange={(e) => setJobDescription(e.target.value)}
+                    value={jobDescription} onChange={(e) => setJobDescription(cleanText(e.target.value))}
                     aria-label={t("Job description")} />
                 </div>
 
