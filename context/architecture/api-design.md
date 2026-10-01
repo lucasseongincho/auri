@@ -2,7 +2,7 @@
 
 ## Route Pattern
 All Claude API calls: /app/api/claude/[feature]/route.ts
-PDF export: /app/api/pdf/route.ts (Puppeteer + html2pdf.js fallback)
+PDF export: /app/api/pdf/route.ts (Puppeteer; auth + "pdf:" rate limit; no network — see lib/pdfNetworkPolicy.ts)
 
 ## Auth on Every Route
 1. getAuthenticatedUser(req) — Firebase Admin token verification

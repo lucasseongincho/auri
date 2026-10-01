@@ -314,18 +314,13 @@ export default function ResumePreview({
     try {
       el.classList.add('printing')
 
-      const { getResumeHTML } = await import('@/lib/pdf')
-      const html = getResumeHTML(el)
+      const { getResumeHTML, requestPdf } = await import('@/lib/pdf')
+      const html = await getResumeHTML(el)
 
-      const res = await fetch('/api/pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          html,
-          filename,
-          title: personal.name ? `Resume - ${personal.name}` : 'Resume',
-          author: personal.name || undefined,
-        }),
+      const res = await requestPdf(html, {
+        filename,
+        title: personal.name ? `Resume - ${personal.name}` : 'Resume',
+        author: personal.name || undefined,
       })
 
       if (!res.ok) {

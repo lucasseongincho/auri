@@ -584,17 +584,12 @@ function CoverLetterContent() {
     const slug = `${company.replace(/\s+/g, '-').toLowerCase()}-${position.replace(/\s+/g, '-').toLowerCase()}`
     const filename = `cover-letter-${slug || 'download'}.pdf`
     try {
-      const { getResumeHTML } = await import('@/lib/pdf')
-      const html = getResumeHTML(letterPrintRef.current)
-      const res = await fetch('/api/pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          html,
-          filename,
-          title: profile?.personal?.name ? `Cover Letter - ${profile.personal.name}` : 'Cover Letter',
-          author: profile?.personal?.name || undefined,
-        }),
+      const { getResumeHTML, requestPdf } = await import('@/lib/pdf')
+      const html = await getResumeHTML(letterPrintRef.current)
+      const res = await requestPdf(html, {
+        filename,
+        title: profile?.personal?.name ? `Cover Letter - ${profile.personal.name}` : 'Cover Letter',
+        author: profile?.personal?.name || undefined,
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({})) as { error?: string }

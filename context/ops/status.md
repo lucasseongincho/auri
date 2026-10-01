@@ -29,7 +29,8 @@
 ### Resume Features
 - [x] Resume Builder — structured form editor (NOT contentEditable)
 - [x] ClassicPro template only (other templates removed)
-- [x] Puppeteer PDF export (html2pdf.js fallback)
+- [x] Puppeteer PDF export for resumes + cover letters (no html2pdf.js fallback; html2pdf.js is only used for interview-prep export)
+- [x] /api/pdf hardened: Firebase auth required, 10/min "pdf:" rate limit, 1 MB body cap, JS off, all outbound requests blocked (fonts inlined as data: URIs) — lib/pdfNetworkPolicy.ts, tests in scripts/test-pdf-network.ts
 - [x] ATS Score panel
 - [x] Resume Rewriter (saved resume list capped, scrollable)
 - [x] My Resumes — saved list + detail page with inline editing

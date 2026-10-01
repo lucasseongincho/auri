@@ -6,7 +6,7 @@
 - AI generates ATS-optimized resume tailored to a specific job posting
 - Live ClassicPro template preview on the right panel
 - Structured form editor (NOT contentEditable) — see components/resume/ResumeEditor.tsx
-- PDF export via Puppeteer API route (/api/pdf) with html2pdf.js fallback
+- PDF export via Puppeteer API route (/api/pdf), signed-in users only
 - Prompts: see lib/prompts.ts → buildResumePrompt()
 
 ## Feature 2 — ATS Score & Optimizer
