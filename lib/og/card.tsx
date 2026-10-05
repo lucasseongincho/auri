@@ -1,27 +1,24 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { ImageResponse } from 'next/og'
-import { en, ko, DEMO_KEYWORDS, type Lang } from '@/components/landing/copy'
+import type { Lang } from '@/components/landing/copy'
 
 // Shared Open Graph / Twitter card for / and /ko.
-// Same system as the landing page: paper, ink, pine, highlight only on
-// matched keywords, single-border panel, Pretendard.
+// Brand mark, wordmark and slogan, centered so platforms that crop the
+// image (square or 2:1 thumbnails) still show all of it.
 // Rendered at build time (no request data), so reading fonts from disk is fine.
 
 export const OG_SIZE = { width: 1200, height: 630 }
 
+export type OgVariant = 'minimal' | 'descriptor' | 'highlight'
+
 const C = {
   paper: '#F4F2EC',
-  sheet: '#FAF9F5',
-  white: '#FFFFFF',
-  rule: '#D9D5CC',
-  hairline: '#E6E2D9',
   ink: '#1B1D1C',
   body: '#3C403E',
   muted: '#5A5F5C',
   pine: '#1F5C4A',
   mark: '#F2D45C',
-  miss: '#9A3B12',
 }
 
 const FONT_DIR = path.join(process.cwd(), 'node_modules/pretendard/dist/public/static/alternative')
@@ -37,17 +34,11 @@ async function loadFonts() {
   ]
 }
 
-const TEXT: Record<Lang, { headline: string[]; sub: string; url: string }> = {
-  en: {
-    headline: ['Paste the job post.', 'Get a resume', 'written for it.'],
-    sub: 'Resume, cover letter and interview prep, tailored to one job post.',
-    url: 'auri-resume.com',
-  },
-  ko: {
-    headline: ['공고를 붙여넣으면', '맞춤 영문 이력서가', '나옵니다.'],
-    sub: '해외 취업 · 영문 이력서 · 커버레터 · 영어 면접 준비',
-    url: 'auri-resume.com/ko',
-  },
+const SLOGAN = ['Not a score.', 'A system.'] as const
+
+const DESCRIPTOR: Record<Lang, { line: string; url: string }> = {
+  en: { line: 'Resume, cover letter and interview prep, tailored to each job post.', url: 'auri-resume.com' },
+  ko: { line: '해외 취업, 공고 하나로 이력서부터 면접까지.', url: 'auri-resume.com/ko' },
 }
 
 function LogoMark({ size }: { size: number }) {
@@ -62,11 +53,9 @@ function LogoMark({ size }: { size: number }) {
   )
 }
 
-export async function renderOgCard(lang: Lang) {
-  const copy = lang === 'ko' ? ko : en
-  const t = TEXT[lang]
-  const d = copy.demo
-  const missing = DEMO_KEYWORDS[DEMO_KEYWORDS.length - 1]
+export async function renderOgCard(lang: Lang, variant: OgVariant = 'descriptor') {
+  const d = DESCRIPTOR[lang]
+  const withDetails = variant !== 'minimal'
 
   return new ImageResponse(
     (
@@ -75,117 +64,80 @@ export async function renderOgCard(lang: Lang) {
           width: '100%',
           height: '100%',
           display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
           background: C.paper,
           fontFamily: 'Pretendard',
           color: C.ink,
-          padding: '64px 64px 56px 72px',
+          position: 'relative',
         }}
       >
-        {/* Left: brand + promise */}
-        <div style={{ display: 'flex', flexDirection: 'column', width: 560, height: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <LogoMark size={44} />
-            <span style={{ fontSize: 34, fontWeight: 600, letterSpacing: '0.06em' }}>AURI</span>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', marginTop: 56 }}>
-            {t.headline.map((line) => (
-              <span
-                key={line}
-                style={{ fontSize: lang === 'ko' ? 58 : 62, fontWeight: 600, letterSpacing: '-0.025em', lineHeight: 1.14 }}
-              >
-                {line}
-              </span>
-            ))}
-          </div>
-
-          <span style={{ marginTop: 28, fontSize: 24, color: C.body, lineHeight: 1.45, maxWidth: 520 }}>{t.sub}</span>
-
-          <div style={{ display: 'flex', marginTop: 'auto', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 28, height: 3, background: C.pine }} />
-            <span style={{ fontSize: 22, fontWeight: 500, color: C.pine }}>{t.url}</span>
-          </div>
-        </div>
-
-        {/* Right: the product, as on the landing page */}
-        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 'auto', width: 500, justifyContent: 'center' }}>
-          <div
+        {/* Mark + wordmark */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+          <LogoMark size={withDetails ? 104 : 120} />
+          <span
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              background: C.white,
-              border: `1px solid ${C.rule}`,
-              borderRadius: 10,
+              fontSize: withDetails ? 128 : 148,
+              fontWeight: 600,
+              letterSpacing: '0.04em',
+              lineHeight: 1,
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '18px 24px',
-                borderBottom: `1px solid ${C.hairline}`,
-                fontSize: 17,
-              }}
-            >
-              <span style={{ fontWeight: 500 }}>{`${d.tailoringFor}${d.role}`}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: C.muted }}>
-                <span>{d.atsShort}</span>
-                <span style={{ textDecoration: 'line-through' }}>61</span>
-                <span style={{ color: C.ink, fontWeight: 600 }}>87</span>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', padding: '20px 24px 24px', gap: 10 }}>
-              <span style={{ fontSize: 14, color: C.muted }}>{d.before}</span>
-              <span style={{ fontSize: 18, color: C.muted, textDecoration: 'line-through', lineHeight: 1.45 }}>
-                {d.beforeText}
-              </span>
-
-              <span style={{ fontSize: 14, color: C.muted, marginTop: 8 }}>{d.after}</span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', fontSize: 19, lineHeight: 1.6, color: C.ink }}>
-                {d.afterHtml.flatMap((part, i) =>
-                  part.mark
-                    ? [
-                        <span key={i} style={{ background: C.mark, padding: '0 4px', borderRadius: 3, marginRight: 5 }}>
-                          {part.text}
-                        </span>,
-                      ]
-                    : part.text
-                        .trim()
-                        .split(' ')
-                        .filter(Boolean)
-                        .map((w, j) => (
-                          <span key={`${i}-${j}`} style={{ marginRight: 5 }}>
-                            {w}
-                          </span>
-                        )),
-                )}
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', marginTop: 12, borderTop: `1px solid ${C.hairline}` }}>
-                {DEMO_KEYWORDS.map((k) => (
-                  <div
-                    key={k}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      fontSize: 16,
-                      padding: '8px 0',
-                      borderBottom: `1px solid ${C.hairline}`,
-                    }}
-                  >
-                    <span>{k}</span>
-                    <span style={{ color: k === missing ? C.miss : C.pine, fontWeight: 500 }}>
-                      {k === missing ? d.missing : d.found}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <span style={{ marginTop: 12, fontSize: 15, color: C.muted }}>{d.caption}</span>
+            AURI
+          </span>
         </div>
+
+        {/* Slogan */}
+        <div
+          style={{
+            display: 'flex',
+            gap: 14,
+            marginTop: withDetails ? 40 : 48,
+            fontSize: withDetails ? 46 : 52,
+            fontWeight: 500,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          <span style={{ color: C.muted }}>{SLOGAN[0]}</span>
+          <span
+            style={{
+              color: C.ink,
+              fontWeight: 600,
+              ...(variant === 'highlight'
+                ? { background: C.mark, padding: '0 10px', borderRadius: 6 }
+                : {}),
+            }}
+          >
+            {SLOGAN[1]}
+          </span>
+        </div>
+
+        {withDetails && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 40 }}>
+            <div style={{ width: 56, height: 3, background: C.pine }} />
+            <span style={{ marginTop: 28, fontSize: 28, color: C.body }}>{d.line}</span>
+          </div>
+        )}
+
+        {withDetails && (
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 44,
+              display: 'flex',
+              justifyContent: 'center',
+              fontSize: 22,
+              fontWeight: 500,
+              color: C.pine,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {d.url}
+          </div>
+        )}
       </div>
     ),
     { ...OG_SIZE, fonts: await loadFonts() },
