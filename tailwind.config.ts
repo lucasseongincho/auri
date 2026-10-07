@@ -45,11 +45,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        heading: ['"Newsreader Variable"', '"Noto Serif KR"', 'Georgia', 'serif'],
-        body: ['"IBM Plex Sans"', '"IBM Plex Sans KR"', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
-        'lp-serif': ['"Newsreader Variable"', '"Noto Serif KR"', 'Georgia', 'serif'],
-        'lp-sans': ['"IBM Plex Sans"', '"IBM Plex Sans KR"', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
-        'lp-mono': ['"IBM Plex Mono"', '"IBM Plex Sans KR"', 'ui-monospace', 'monospace'],
+        heading: ['"Pretendard Variable"', 'Pretendard', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
+        body: ['"Pretendard Variable"', 'Pretendard', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
+        'lp-serif': ['"Pretendard Variable"', 'Pretendard', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
+        'lp-sans': ['"Pretendard Variable"', 'Pretendard', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
+        'lp-mono': ['"Pretendard Variable"', 'Pretendard', '"Apple SD Gothic Neo"', '"Malgun Gothic"', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         'lp-control': '4px',

@@ -1,5 +1,5 @@
-/* UI fonts (Newsreader, IBM Plex Sans/Mono) are self-hosted via @fontsource
-   and imported in app/layout.tsx. */
+/* UI font: Pretendard Variable (Latin + Hangul), self-hosted from the
+   pretendard package and imported in app/layout.tsx. */
 
 /* Resume template fonts — Tinos (≡ Times New Roman) and Arimo (≡ Arial),
    both SIL OFL licensed and metrically compatible with their system-font
@@ -66,12 +66,18 @@
     overflow-x: hidden;
     background-color: var(--background);
     color: var(--text-primary);
-    font-family: 'IBM Plex Sans', 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+    font-family: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Newsreader Variable', 'Noto Serif KR', Georgia, serif;
-    font-weight: 500;
+    font-family: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* Former mono labels and numbers keep aligned digits. */
+  .font-lp-mono {
+    font-variant-numeric: tabular-nums;
   }
 
   ::-webkit-scrollbar {

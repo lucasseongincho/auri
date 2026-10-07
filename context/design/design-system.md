@@ -22,10 +22,12 @@ All features use pine. No per-feature colors, no gradients, no glass,
 no glow shadows.
 
 ## Typography
-- Headings: Newsreader (font-heading / font-lp-serif), weight 500–600
-- Body: IBM Plex Sans (font-body / font-lp-sans)
-- Numbers, labels: IBM Plex Mono (font-lp-mono)
-- Self-hosted via @fontsource, imported in app/layout.tsx
+- One family for everything: Pretendard Variable (Latin + Hangul, SIL OFL)
+- Headings: weight 600, letter-spacing -0.02em (font-heading / font-lp-serif)
+- Body: weight 400–500 (font-body / font-lp-sans)
+- Numbers, labels: font-lp-mono = Pretendard with tabular figures
+- Self-hosted from the `pretendard` npm package (dynamic subset), imported in app/layout.tsx
+- Class names lp-serif / lp-mono are kept for history; they all map to Pretendard
 
 ## Radius, depth
 - Controls (buttons, inputs, chips): 4px  rounded-[4px] / rounded-lp-control

@@ -1,4 +1,3 @@
-import '@/lib/i18n/fonts'
 import { LocaleProvider } from '@/lib/i18n/client'
 import { getRequestLocale } from '@/lib/i18n/server'
 import type { Metadata } from 'next'

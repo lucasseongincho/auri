@@ -1,4 +1,3 @@
-import '@/lib/i18n/fonts'
 import type { Metadata } from 'next'
 import Landing from '@/components/landing/Landing'
 import { RememberLocale } from '@/lib/i18n/client'

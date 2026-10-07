@@ -1,10 +1,7 @@
 import type { Metadata } from 'next'
-import '@fontsource-variable/newsreader/wght.css'
-import '@fontsource/ibm-plex-sans/400.css'
-import '@fontsource/ibm-plex-sans/500.css'
-import '@fontsource/ibm-plex-sans/600.css'
-import '@fontsource/ibm-plex-mono/400.css'
-import '@fontsource/ibm-plex-mono/500.css'
+// Pretendard covers Latin and Hangul in one variable font. The dynamic-subset
+// build splits it by unicode-range, so pages only download the glyphs they use.
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css'
 import './globals.css'
 import { Providers } from './providers'
 import SentryErrorBoundary from '@/components/SentryErrorBoundary'

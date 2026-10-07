@@ -151,7 +151,7 @@ export const en: LandingCopy = {
     start: 'Start free',
     menuOpen: 'Open menu',
     menuClose: 'Close menu',
-    switchTo: { label: '한국어', href: '/ko', hrefLang: 'ko', ariaLabel: '한국어 페이지로 이동' },
+    switchTo: { label: 'KR', href: '/ko', hrefLang: 'ko', ariaLabel: 'KR, 한국어 페이지로 이동' },
   },
   hero: {
     eyebrow: 'Resume, cover letter, interview prep',
@@ -319,7 +319,7 @@ export const ko: LandingCopy = {
     start: '무료로 시작하기',
     menuOpen: '메뉴 열기',
     menuClose: '메뉴 닫기',
-    switchTo: { label: 'English', href: '/', hrefLang: 'en', ariaLabel: 'Switch to English' },
+    switchTo: { label: 'EN', href: '/', hrefLang: 'en', ariaLabel: 'EN, switch to English' },
   },
   hero: {
     eyebrow: '해외 취업 · 영문 이력서 · 영어 면접',
